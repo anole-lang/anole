@@ -1,5 +1,4 @@
 # Pion
-`learn from Modern_Compiler_Implementation_in_C and ParsingTechs_A_Practical_Guide`<br>
 A programming language that names Pion.
 ### Features
 * Cross-platform
