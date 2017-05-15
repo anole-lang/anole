@@ -1,5 +1,5 @@
-# Pion
-A programming language that names Pion.
+# Amoeba
+A programming language that names Amoeba.
 ### Features
 * Cross-platform
 * Object-oriented
