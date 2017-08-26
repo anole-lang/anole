@@ -1,5 +1,5 @@
 # Amoeba
-A programming language that names Amoeba.
+A programming language names Amoeba.
 ### Features
 * Cross-platform
 * Object-oriented
