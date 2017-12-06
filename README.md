@@ -1,5 +1,5 @@
-# Amoeba
-A programming language names Amoeba.
+# Ice
+A programming language names Ice.
 ### Features
 * Cross-platform
 * Object-oriented
