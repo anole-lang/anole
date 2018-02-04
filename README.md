@@ -22,5 +22,5 @@ print 'Hello world'
     res = a * 5 + 3
 ..res
 
-.sum(10)
+print .do_math(10)
 ```
