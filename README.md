@@ -18,9 +18,9 @@ print 'Hello world'
 ```ice
 # CommonFunction.ice
 
-.sum(a, b)
-    return a + b
-..
+.do_math(a)
+    res = a * 5 + 3
+..res
 
 .sum(10)
 ```
