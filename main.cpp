@@ -2,25 +2,17 @@
 #include "codegen.h"
 #include "node.h"
 
-using namespace std;
-
-extern int yyparse();
 extern NBlock* programBlock;
-
-void createCoreFunctions(CodeGenContext& context);
+extern int yyparse();
 
 int main(int argc, char **argv)
 {
-	yyparse();
-	cout << programBlock << endl;
-	InitializeNativeTarget();
-	InitializeNativeTargetAsmPrinter();
-	InitializeNativeTargetAsmParser();
-	CodeGenContext context;
-	createCoreFunctions(context);
-	context.generateCode(*programBlock);
-	context.runCode();
-	
-	return 0;
-}
+    yyparse();
+    std::cout << programBlock << std::endl;
+    std::cout << "=====" << std::endl;
 
+    CodeGenContext context;
+    context.generateCode(*programBlock);
+    context.runCode();
+    return 0;
+}
