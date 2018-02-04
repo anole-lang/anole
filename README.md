@@ -11,16 +11,20 @@ A programming language named Ice.
 ```ice
 # HelloWorld.ice
 
-print 'Hello world'
+print('Hello world')
 ```
 
-### Common Function
+### Common method
 ```ice
-# CommonFunction.ice
+# CommonMethod.ice
 
-.do_math(a)
-    res = a * 5 + 3
-..res
+=== Comments
+type method_name(arg, args)
+    stmts
+end
+===
 
-print .do_math(10)
+int sum(int a, int b)
+    return a + b
+end
 ```
