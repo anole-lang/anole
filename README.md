@@ -18,7 +18,7 @@ int b : a
 ###### Arithmetic operator
 ```ice
 # support + - * / %
-int a : 1
-int b : 1
+int a : 1 + 1
+int b : 2 - 1
 (a + b) - a * b / a # also support ()
 ```
