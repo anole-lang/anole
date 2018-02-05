@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void CodeGenContext::generateCode(NBlock& root)
+void CodeGenContext::generateCode(BlockExprAST& root)
 {
     vector<Type*> argTypes;
     FunctionType *ftype = FunctionType::get(Type::getVoidTy(TheContext), makeArrayRef(argTypes), false);
@@ -30,7 +30,7 @@ GenericValue CodeGenContext::runCode()
 	return v;
 }
 
-static Type *typeOf(const NIdentifier& type)
+static Type *typeOf(const IdentifierExprAST& type)
 {
     if(type.name.compare("int") == 0)
     {
@@ -43,17 +43,17 @@ static Type *typeOf(const NIdentifier& type)
     return Type::getVoidTy(TheContext);
 }
 
-Value* NInteger::codeGen(CodeGenContext& context)
+Value* IntegerExprAST::codeGen(CodeGenContext& context)
 {
     return ConstantInt::get(Type::getInt64Ty(TheContext), value, true);
 }
 
-Value* NDouble::codeGen(CodeGenContext& context)
+Value* DoubleExprAST::codeGen(CodeGenContext& context)
 {
     return ConstantFP::get(TheContext, APFloat(value));
 }
 
-Value* NIdentifier::codeGen(CodeGenContext& context)
+Value* IdentifierExprAST::codeGen(CodeGenContext& context)
 {
     if (context.locals().find(name) == context.locals().end())
     {
@@ -63,7 +63,7 @@ Value* NIdentifier::codeGen(CodeGenContext& context)
     return new LoadInst(context.locals()[name], "", false, context.currentBlock());
 }
 
-Value* NAssignment::codeGen(CodeGenContext& context)
+Value* AssignmentExprAST::codeGen(CodeGenContext& context)
 {
     if(context.locals().find(lhs.name) == context.locals().end())
     {
@@ -73,7 +73,7 @@ Value* NAssignment::codeGen(CodeGenContext& context)
     return new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
 }
 
-Value* NBinaryOperator::codeGen(CodeGenContext& context)
+Value* BinaryOperatorExprAST::codeGen(CodeGenContext& context)
 {
     Value *L = lhs.codeGen(context);
     Value *R = rhs.codeGen(context);
@@ -96,7 +96,7 @@ Value* NBinaryOperator::codeGen(CodeGenContext& context)
     }
 }
 
-Value* NBlock::codeGen(CodeGenContext& context)
+Value* BlockExprAST::codeGen(CodeGenContext& context)
 {
     StatementList::const_iterator it;
     Value *last = nullptr;
@@ -107,19 +107,29 @@ Value* NBlock::codeGen(CodeGenContext& context)
     return last;
 }
 
-Value* NExpressionStatement::codeGen(CodeGenContext& context)
+Value* ExprStmtAST::codeGen(CodeGenContext& context)
 {
     return expression.codeGen(context);
 }
 
-Value* NVariableDeclaration::codeGen(CodeGenContext& context)
+Value* VariableDeclarationStmtAST::codeGen(CodeGenContext& context)
 {
     AllocaInst *alloc = new AllocaInst(typeOf(type), id.name.c_str(), context.currentBlock());
     context.locals()[id.name] = alloc;
     if (assignmentExpr != nullptr)
     {
-        NAssignment assn(id, *assignmentExpr);
+        AssignmentExprAST assn(id, *assignmentExpr);
         assn.codeGen(context);
     }
     return alloc;
+}
+
+Value* PrintStmtAST::codeGen(CodeGenContext& context)
+{
+    Value *CalleeF = context.module->getOrInsertFunction("print",
+                                                        FunctionType::get(Type::getInt32Ty(TheContext), PointerType::get(Type::getInt8Ty(TheContext), 0), true)
+                                                        );
+    std::vector<Value*> args;
+    args.push_back(arg.codeGen(context));
+    return Builder.CreateCall(CalleeF, makeArrayRef(args), "printCall");
 }

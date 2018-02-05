@@ -8,17 +8,19 @@ A funny language named Ice.
 # this is a comment
 ```
 
-###### Variable declaration 
+###### Variable Declaration 
 ```ice
 int a
 a : 1
 int b : a
 ```
 
-###### Arithmetic operator
+###### Arithmetic Operator
 ```ice
 # support + - * / %
 int a : 1 + 1
 int b : 2 - 1
 (a + b) - a * b / a # also support ()
 ```
+
+###### 

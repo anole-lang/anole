@@ -20,6 +20,9 @@ double                  {int}\.[0-9]*
 
 {ws}                    ;
 {comment}               ;
+
+print                   return TOKEN(TPRINT);
+
 {id}                    SAVE_TOKEN; return TIDENTIFIER;
 {int}                   SAVE_TOKEN; return TINTEGER;
 {double}                SAVE_TOKEN; return TDOUBLE;

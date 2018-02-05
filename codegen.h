@@ -20,7 +20,7 @@
 
 using namespace llvm;
 
-class NBlock;
+class BlockExprAST;
 
 static LLVMContext TheContext;
 static IRBuilder<> Builder(TheContext);
@@ -39,7 +39,7 @@ public:
     Module *module;
     CodeGenContext() { module = new Module("main", TheContext); }
     
-    void generateCode(NBlock& root);
+    void generateCode(BlockExprAST& root);
     GenericValue runCode();
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }

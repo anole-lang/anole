@@ -3,13 +3,13 @@
 #include <llvm/IR/Value.h>
 
 class CodeGenContext;
-class NStatement;
-class NExpression;
-class NVariableDeclaration;
+class StmtAST;
+class ExprAST;
+class VariableDeclarationStmtAST;
 
-typedef std::vector<NStatement*> StatementList;
-typedef std::vector<NExpression*> ExpressionList;
-typedef std::vector<NVariableDeclaration*> VariableList;
+typedef std::vector<StmtAST*> StatementList;
+typedef std::vector<ExprAST*> ExpressionList;
+typedef std::vector<VariableDeclarationStmtAST*> VariableList;
 
 class Node{
 public:
@@ -17,73 +17,80 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context) { }
 };
 
-class NStatement: public Node{};
+class StmtAST: public Node{};
 
-class NExpression: public Node{};
+class ExprAST: public Node{};
 
-class NInteger: public NExpression{
+class IntegerExprAST: public ExprAST{
 public:
 	long long value;
-	NInteger(long long value):value(value){}
+	IntegerExprAST(long long value):value(value){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NDouble: public NExpression{
+class DoubleExprAST: public ExprAST{
 public:
 	double value;
-	NDouble(double value):value(value){}
+	DoubleExprAST(double value):value(value){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NIdentifier: public NExpression{
+class IdentifierExprAST: public ExprAST{
 public:
 	std::string name;
-	NIdentifier(std::string& name):name(name){}
+	IdentifierExprAST(std::string& name):name(name){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NAssignment: public NExpression{
+class AssignmentExprAST: public ExprAST{
 public:
-	NIdentifier& lhs;
-	NExpression& rhs;
-	NAssignment(NIdentifier& lhs, NExpression& rhs):
+	IdentifierExprAST& lhs;
+	ExprAST& rhs;
+	AssignmentExprAST(IdentifierExprAST& lhs, ExprAST& rhs):
 		lhs(lhs), rhs(rhs){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NBinaryOperator: public NExpression{
+class BinaryOperatorExprAST: public ExprAST{
 public:
 	int op;
-	NExpression& lhs;
-	NExpression& rhs;
-	NBinaryOperator(NExpression& lhs, int op, NExpression& rhs):
+	ExprAST& lhs;
+	ExprAST& rhs;
+	BinaryOperatorExprAST(ExprAST& lhs, int op, ExprAST& rhs):
 		lhs(lhs), op(op), rhs(rhs){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NBlock: public NExpression{
+class BlockExprAST: public ExprAST{
 public:
 	StatementList statements;
-	NBlock(){}
+	BlockExprAST(){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NExpressionStatement : public NStatement {
+class ExprStmtAST: public StmtAST {
 public:
-    NExpression& expression;
-    NExpressionStatement(NExpression& expression) : 
+    ExprAST& expression;
+    ExprStmtAST(ExprAST& expression) : 
         expression(expression) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NVariableDeclaration: public NStatement{
+class VariableDeclarationStmtAST: public StmtAST {
 public:
-	const NIdentifier& type;
-	NIdentifier& id;
-	NExpression *assignmentExpr;
-	NVariableDeclaration(const NIdentifier& type, NIdentifier& id):
+	const IdentifierExprAST& type;
+	IdentifierExprAST& id;
+	ExprAST *assignmentExpr;
+	VariableDeclarationStmtAST(const IdentifierExprAST& type, IdentifierExprAST& id):
 		type(type), id(id){}
-	NVariableDeclaration(const NIdentifier& type, NIdentifier& id, NExpression *assignmentExpr):
+	VariableDeclarationStmtAST(const IdentifierExprAST& type, IdentifierExprAST& id, ExprAST *assignmentExpr):
 		type(type), id(id), assignmentExpr(assignmentExpr){}
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+class PrintStmtAST: public StmtAST{
+public:
+	ExprAST& arg;
+	PrintStmtAST(ExprAST& arg): arg(arg){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
