@@ -22,7 +22,8 @@ using namespace llvm;
 
 class NBlock;
 
-static LLVMContext MyContext;
+static LLVMContext TheContext;
+static IRBuilder<> Builder(TheContext);
 
 class CodeGenBlock {
 public:
@@ -36,7 +37,7 @@ class CodeGenContext {
 
 public:
     Module *module;
-    CodeGenContext() { module = new Module("main", MyContext); }
+    CodeGenContext() { module = new Module("main", TheContext); }
     
     void generateCode(NBlock& root);
     GenericValue runCode();

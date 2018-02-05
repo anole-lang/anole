@@ -51,6 +51,16 @@ public:
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class NBinaryOperator: public NExpression{
+public:
+	int op;
+	NExpression& lhs;
+	NExpression& rhs;
+	NBinaryOperator(NExpression& lhs, int op, NExpression& rhs):
+		lhs(lhs), op(op), rhs(rhs){}
+	virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class NBlock: public NExpression{
 public:
 	StatementList statements;

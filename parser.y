@@ -21,11 +21,16 @@
 
 %token <string> TIDENTIFIER TINTEGER TDOUBLE
 %token <token> TASSIGN
+%token <token> TLPAREN TRPAREN
+%token <token> TADD TSUB TMUL TDIV TMOD
 
 %type <ident> ident
 %type <expr> numeric expr
 %type <block> program stmts
 %type <stmt> stmt var_decl
+
+%left TPLUS TMINUS
+%left TMUL TDIV TMOD
 
 %start program
 
@@ -50,6 +55,12 @@ numeric	: TINTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }
 expr	: ident TASSIGN expr { $$ = new NAssignment(*$1, *$3); }
 		| ident { $$ = $1; }
 		| numeric
+		| expr TADD expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+		| expr TSUB expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+		| expr TMUL expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+		| expr TDIV expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+		| expr TMOD expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+		| TLPAREN expr TRPAREN { $$ = $2; }
 		;
 
 %%
