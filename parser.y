@@ -31,7 +31,6 @@
 %type <expr> numeric expr
 %type <block> program stmts
 %type <stmt> stmt var_decl
-%type <token> b_op
 %type <stmt> print
 
 %left TADD TSUB
@@ -63,10 +62,12 @@ numeric	: TINTEGER { $$ = new IntegerExprAST(atol($1->c_str())); delete $1; }
 expr	: ident TASSIGN expr { $$ = new AssignmentExprAST(*$1, *$3); }
 		| ident { $$ = $1; }
 		| numeric
-		| expr b_op expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+		| expr TADD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+		| expr TSUB expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+		| expr TMUL expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+		| expr TDIV expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+		| expr TMOD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
 		| TLPAREN expr TRPAREN { $$ = $2; }
-		;
-b_op	: TADD | TSUB | TMUL | TDIV | TMOD
 		;
 
 %%

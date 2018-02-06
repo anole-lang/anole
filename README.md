@@ -23,4 +23,8 @@ int b : 2 - 1
 (a + b) - a * b / a # also support ()
 ```
 
-###### 
+###### print
+```ice
+int a : 1
+print a # output: 1
+```
