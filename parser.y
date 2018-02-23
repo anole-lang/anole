@@ -40,34 +40,49 @@
 
 %%
 
-program	: stmts { programBlock = $1; }
-		;
-stmts	: stmt { $$ = new BlockExprAST(); $$->statements.push_back($1); }
-		| stmts stmt { $1->statements.push_back($2); }
-		;
-stmt	: var_decl
-		| print
-		| expr { $$ = new ExprStmtAST(*$1); }
-		;
-print	: TPRINT expr { $$ = new PrintStmtAST(*$2); }
-		;
-var_decl: ident ident { $$ = new VariableDeclarationStmtAST(*$1, *$2); }
-		| ident ident TASSIGN expr { $$ = new VariableDeclarationStmtAST(*$1, *$2, $4); }
-		;
-ident	: TIDENTIFIER { $$ = new IdentifierExprAST(*$1); delete $1; }
-		;
-numeric	: TINTEGER { $$ = new IntegerExprAST(atol($1->c_str())); delete $1; }
-		| TDOUBLE { $$ = new DoubleExprAST(atof($1->c_str())); delete $1; }
-		;
-expr	: ident TASSIGN expr { $$ = new AssignmentExprAST(*$1, *$3); }
-		| ident { $$ = $1; }
-		| numeric
-		| expr TADD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
-		| expr TSUB expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
-		| expr TMUL expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
-		| expr TDIV expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
-		| expr TMOD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
-		| TLPAREN expr TRPAREN { $$ = $2; }
-		;
+program	
+	: stmts { programBlock = $1; }
+	;
+
+stmts	
+	: stmt { $$ = new BlockExprAST(); $$->statements.push_back($1); }
+	| stmts stmt { $1->statements.push_back($2); }
+	;
+
+stmt
+	: var_decl
+	| print
+	| expr { $$ = new ExprStmtAST(*$1); }
+	;
+
+print	
+	: TPRINT expr { $$ = new PrintStmtAST(*$2); }
+	;
+
+var_decl
+	: ident ident { $$ = new VariableDeclarationStmtAST(*$1, *$2); }
+	| ident ident TASSIGN expr { $$ = new VariableDeclarationStmtAST(*$1, *$2, $4); }
+	;
+
+ident
+	: TIDENTIFIER { $$ = new IdentifierExprAST(*$1); delete $1; }
+	;
+
+numeric	
+	: TINTEGER { $$ = new IntegerExprAST(atol($1->c_str())); delete $1; }
+	| TDOUBLE { $$ = new DoubleExprAST(atof($1->c_str())); delete $1; }
+	;
+
+expr	
+	: ident TASSIGN expr { $$ = new AssignmentExprAST(*$1, *$3); }
+	| ident { $$ = $1; }
+	| numeric
+	| expr TADD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+	| expr TSUB expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+	| expr TMUL expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+	| expr TDIV expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+	| expr TMOD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+	| TLPAREN expr TRPAREN { $$ = $2; }
+	;
 
 %%
