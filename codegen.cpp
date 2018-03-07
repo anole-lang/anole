@@ -30,13 +30,13 @@ GenericValue CodeGenContext::runCode()
     return v;
 }
 
-static Type *typeOf(const IdentifierExprAST &type)
+static Type *typeOf(const std::string& type)
 {
-    if (type.name.compare("int") == 0)
+    if (type == "int")
     {
         return Type::getInt64Ty(TheContext);
     }
-    else if (type.name.compare("double") == 0)
+    else if (type == "double")
     {
         return Type::getDoubleTy(TheContext);
     }
@@ -60,17 +60,8 @@ Value *IdentifierExprAST::codeGen(CodeGenContext &context)
         std::cerr << "undeclared variable " << name << std::endl;
         return nullptr;
     }
+    _type = context.types()[name];
     return new LoadInst(context.locals()[name], "", false, context.currentBlock());
-}
-
-Value *AssignmentExprAST::codeGen(CodeGenContext &context)
-{
-    if (context.locals().find(lhs.name) == context.locals().end())
-    {
-        std::cerr << "undeclared variable " << lhs.name << std::endl;
-        return nullptr;
-    }
-    return new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
 }
 
 Value *BinaryOperatorExprAST::codeGen(CodeGenContext &context)
@@ -83,9 +74,11 @@ Value *BinaryOperatorExprAST::codeGen(CodeGenContext &context)
         case TDIV: 		instr = Instruction::SDiv; break;
         case TMOD:      instr = Instruction::URem; break;
         default:        return nullptr;
-	}
-	return BinaryOperator::Create(instr, lhs.codeGen(context), 
-        rhs.codeGen(context), "", context.currentBlock());
+    }
+    Value *_lhs = lhs.codeGen(context);
+    Value *_rhs = rhs.codeGen(context);
+    this->_type = lhs._type;
+	return BinaryOperator::Create(instr, _lhs, _rhs, "", context.currentBlock());
 }
 
 Value *BlockExprAST::codeGen(CodeGenContext &context)
@@ -106,14 +99,13 @@ Value *ExprStmtAST::codeGen(CodeGenContext &context)
 
 Value *VariableDeclarationStmtAST::codeGen(CodeGenContext &context)
 {
-    AllocaInst *alloc = new AllocaInst(typeOf(type), id.name.c_str(), context.currentBlock());
+    if (assignmentExpr == nullptr) return nullptr;
+    Value *_rhs = assignmentExpr->codeGen(context);
+    id._type = assignmentExpr->_type;
+    context.types()[id.name] = id._type;
+    AllocaInst *alloc = new AllocaInst(typeOf(id._type), id.name.c_str(), context.currentBlock());
     context.locals()[id.name] = alloc;
-    if (assignmentExpr != nullptr)
-    {
-        AssignmentExprAST assn(id, *assignmentExpr);
-        assn.codeGen(context);
-    }
-    return alloc;
+    return new StoreInst(_rhs, alloc, false, context.currentBlock());
 }
 
 Value *PrintStmtAST::codeGen(CodeGenContext &context)

@@ -29,6 +29,7 @@ class CodeGenBlock {
 public:
     BasicBlock *block;
     std::map<std::string, Value*> locals;
+    std::map<std::string, std::string> types;
 };
 
 class CodeGenContext {
@@ -41,6 +42,7 @@ public:
     
     void generateCode(BlockExprAST& root);
     GenericValue runCode();
+    std::map<std::string, std::string>& types() {return blocks.top()->types;}
     std::map<std::string, Value*>& locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }
     void pushBlock(BasicBlock *block) { blocks.push(new CodeGenBlock()); blocks.top()->block = block; }

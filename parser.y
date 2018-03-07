@@ -44,7 +44,7 @@ program
 	: stmts { programBlock = $1; }
 	;
 
-stmts	
+stmts
 	: stmt { $$ = new BlockExprAST(); $$->statements.push_back($1); }
 	| stmts stmt { $1->statements.push_back($2); }
 	;
@@ -60,12 +60,11 @@ print
 	;
 
 var_decl
-	: ident ident { $$ = new VariableDeclarationStmtAST(*$1, *$2); }
-	| ident ident TASSIGN expr { $$ = new VariableDeclarationStmtAST(*$1, *$2, $4); }
+	: ident TASSIGN expr { $$ = new VariableDeclarationStmtAST(*$1, $3); }
 	;
 
 ident
-	: TIDENTIFIER { $$ = new IdentifierExprAST(*$1); delete $1; }
+	: TIDENTIFIER { $$ = new IdentifierExprAST(*$1); delete $1;}
 	;
 
 numeric	
@@ -74,8 +73,7 @@ numeric
 	;
 
 expr	
-	: ident TASSIGN expr { $$ = new AssignmentExprAST(*$1, *$3); }
-	| ident { $$ = $1; }
+	: ident { $$ = $1; }
 	| numeric
 	| expr TADD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
 	| expr TSUB expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }

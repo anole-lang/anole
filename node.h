@@ -19,35 +19,30 @@ public:
 
 class StmtAST: public Node{};
 
-class ExprAST: public Node{};
+class ExprAST: public Node
+{
+public:
+	std::string _type;
+	std::string name;
+};
 
 class IntegerExprAST: public ExprAST{
 public:
 	long long value;
-	IntegerExprAST(long long value):value(value){}
+	IntegerExprAST(long long value):value(value){ _type = "int"; }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
 class DoubleExprAST: public ExprAST{
 public:
 	double value;
-	DoubleExprAST(double value):value(value){}
+	DoubleExprAST(double value):value(value){ _type = "double"; }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
 class IdentifierExprAST: public ExprAST{
 public:
-	std::string name;
-	IdentifierExprAST(std::string& name):name(name){}
-	virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class AssignmentExprAST: public ExprAST{
-public:
-	IdentifierExprAST& lhs;
-	ExprAST& rhs;
-	AssignmentExprAST(IdentifierExprAST& lhs, ExprAST& rhs):
-		lhs(lhs), rhs(rhs){}
+	IdentifierExprAST(std::string& name){ this->name = name; }
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
@@ -78,13 +73,10 @@ public:
 
 class VariableDeclarationStmtAST: public StmtAST {
 public:
-	const IdentifierExprAST& type;
 	IdentifierExprAST& id;
 	ExprAST *assignmentExpr;
-	VariableDeclarationStmtAST(const IdentifierExprAST& type, IdentifierExprAST& id):
-		type(type), id(id){}
-	VariableDeclarationStmtAST(const IdentifierExprAST& type, IdentifierExprAST& id, ExprAST *assignmentExpr):
-		type(type), id(id), assignmentExpr(assignmentExpr){}
+	VariableDeclarationStmtAST(IdentifierExprAST& id, ExprAST *assignmentExpr):
+		id(id), assignmentExpr(assignmentExpr){}
 	virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
