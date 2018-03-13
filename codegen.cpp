@@ -108,6 +108,11 @@ Value *VariableDeclarationStmtAST::codeGen(CodeGenContext &context)
     return new StoreInst(_rhs, alloc, false, context.currentBlock());
 }
 
+Value *FunctionDeclarationStmtAST::codeGen(CodeGenContext &context)
+{
+    
+}
+
 Value *PrintStmtAST::codeGen(CodeGenContext &context)
 {
     Function *func = context.module->getFunction("print");

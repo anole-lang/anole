@@ -28,9 +28,12 @@ print                   return TOKEN(TPRINT);
 {double}                SAVE_TOKEN; return TDOUBLE;
 
 ":"                     return TOKEN(TASSIGN);
+","                     return TOKEN(TCOMMA);
 
 "("                     return TOKEN(TLPAREN);
 ")"                     return TOKEN(TRPAREN);
+"{"                     return TOKEN(TLBRACE);
+"}"                     return TOKEN(TRBRACE);
 
 "+"                     return TOKEN(TADD);
 "-"                     return TOKEN(TSUB);

@@ -25,26 +25,40 @@ class BlockExprAST;
 static LLVMContext TheContext;
 static IRBuilder<> Builder(TheContext);
 
-class CodeGenBlock {
-public:
+class CodeGenBlock
+{
+  public:
     BasicBlock *block;
-    std::map<std::string, Value*> locals;
+    Value *returnValue;
+    std::map<std::string, Value *> locals;
     std::map<std::string, std::string> types;
 };
 
-class CodeGenContext {
+class CodeGenContext
+{
     std::stack<CodeGenBlock *> blocks;
     Function *mainFunction;
 
-public:
+  public:
     Module *module;
     CodeGenContext() { module = new Module("main", TheContext); }
-    
-    void generateCode(BlockExprAST& root);
+
+    void generateCode(BlockExprAST &root);
     GenericValue runCode();
-    std::map<std::string, std::string>& types() {return blocks.top()->types;}
-    std::map<std::string, Value*>& locals() { return blocks.top()->locals; }
+    std::map<std::string, std::string> &types() { return blocks.top()->types; }
+    std::map<std::string, Value *> &locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }
-    void pushBlock(BasicBlock *block) { blocks.push(new CodeGenBlock()); blocks.top()->block = block; }
-    void popBlock() { CodeGenBlock *top = blocks.top(); blocks.pop(); delete top; }
+    void pushBlock(BasicBlock *block)
+    {
+        blocks.push(new CodeGenBlock());
+        blocks.top()->block = block;
+    }
+    void popBlock()
+    {
+        CodeGenBlock *top = blocks.top();
+        blocks.pop();
+        delete top;
+    }
+    void setCurrentReturnValue(Value *value) { blocks.top()->returnValue = value; }
+    Value *getCurrentReturnValue() { return blocks.top()->returnValue; }
 };

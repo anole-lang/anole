@@ -22,12 +22,26 @@ b : 2 - 1
 c : (a + b) - a * b / a # also support ()
 ```
 
-###### print
+###### Print
 ```ice
 a : 1
 b : a + 3 * 4 - 2 / 2 + 2 % 4
 print b / 2 # output: 7
 ```
+
+###### Function Declaration
+```ice
+# decl_1
+func(arg, arg, ...) : return_value
+
+# decl_2
+func(arg, arg, ...) : return_value
+{
+    stmt
+    ...
+}
+```
+
 
 ### TODO
 * Function Declaration

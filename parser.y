@@ -13,7 +13,7 @@
 	StmtAST *stmt;
 	IdentifierExprAST *ident;
 	VariableDeclarationStmtAST *var_decl;
-	std::vector<VariableDeclarationStmtAST*> *varvec;
+	std::vector<IdentifierExprAST*> *varvec;
     std::vector<ExprAST*> *exprvec;
     std::string *string;
     int token;
@@ -22,15 +22,16 @@
 }
 
 %token <string> TIDENTIFIER TINTEGER TDOUBLE
-%token <token> TASSIGN
-%token <token> TLPAREN TRPAREN
+%token <token> TASSIGN TCOMMA
+%token <token> TLPAREN TRPAREN TLBRACE TRBRACE
 %token <token> TADD TSUB TMUL TDIV TMOD
 %token <token> TPRINT
 
 %type <ident> ident
 %type <expr> numeric expr
-%type <block> program stmts
-%type <stmt> stmt var_decl
+%type <varvec> func_decl_args
+%type <block> program stmts block
+%type <stmt> stmt var_decl func_decl
 %type <stmt> print
 
 %left TADD TSUB
@@ -50,9 +51,14 @@ stmts
 	;
 
 stmt
-	: var_decl
+	: var_decl | func_decl
 	| print
 	| expr { $$ = new ExprStmtAST(*$1); }
+	;
+
+block
+	: TLBRACE stmts TRBRACE { $$ = $2; }
+	| TLBRACE TRBRACE { $$ = new BlockExprAST(); }
 	;
 
 print	
@@ -61,6 +67,17 @@ print
 
 var_decl
 	: ident TASSIGN expr { $$ = new VariableDeclarationStmtAST(*$1, $3); }
+	;
+
+func_decl
+	: ident TLPAREN func_decl_args TRPAREN TASSIGN expr { BlockExprAST *b = new BlockExprAST(); b->statements.push_back(new ReturnStmtAST(*$6)); $$ = new FunctionDeclarationStmtAST(*$1, *$3, *b); }
+	| ident TLPAREN func_decl_args TRPAREN TASSIGN expr block { $7->statements.push_back(new ReturnStmtAST(*$6)) ; $$ = new FunctionDeclarationStmtAST(*$1, *$3, *$7); }
+	;
+
+func_decl_args
+	: /*blank*/ { && = new VariableList(); }
+	| ident { $$ = new VariableList(); $$->push_back($1); }
+	| func_decl_args TCOMMA ident { $1->push_back($3); }
 	;
 
 ident
