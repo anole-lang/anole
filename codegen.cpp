@@ -17,7 +17,7 @@ void CodeGenContext::generateCode(BlockExprAST &root)
     popBlock();
 
     legacy::PassManager pm;
-    pm.add(createPrintModulePass(outs()));
+    //pm.add(createPrintModulePass(outs()));
     pm.run(*module);
 }
 

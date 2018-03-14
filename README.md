@@ -26,7 +26,7 @@ c : (a + b) - a * b / a # also support ()
 ```ice
 a : 1
 b : a + 3 * 4 - 2 / 2 + 2 % 4
-print b / 2 # output: 7
+print(b) / 2 # output: 7
 ```
 
 ###### Function Declaration & MethodCall
@@ -43,8 +43,12 @@ func(arg1, arg2, ...) : return_value
 
 # call
 func(expr1, expr2, ...)
+
+# example
+add(a, b) : a + b
+print(add(1, 2))
 ```
 
 
 ### TODO
-* Function Declaration
+* Fix the Bug in Function Declaration
