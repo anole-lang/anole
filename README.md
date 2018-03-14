@@ -29,17 +29,20 @@ b : a + 3 * 4 - 2 / 2 + 2 % 4
 print b / 2 # output: 7
 ```
 
-###### Function Declaration
+###### Function Declaration & MethodCall
 ```ice
 # decl_1
-func(arg, arg, ...) : return_value
+func(arg1, arg2, ...) : return_value
 
 # decl_2
-func(arg, arg, ...) : return_value
+func(arg1, arg2, ...) : return_value
 {
     stmt
     ...
 }
+
+# call
+func(expr1, expr2, ...)
 ```
 
 

@@ -5,7 +5,7 @@
 class CodeGenContext;
 class StmtAST;
 class ExprAST;
-class VariableDeclarationStmtAST;
+class IdentifierExprAST;
 
 typedef std::vector<StmtAST *> StatementList;
 typedef std::vector<ExprAST *> ExpressionList;
@@ -47,6 +47,14 @@ class IdentifierExprAST : public ExprAST
 {
 public:
 	IdentifierExprAST(std::string &name) { this->name = name; }
+	virtual llvm::Value *codeGen(CodeGenContext &context);
+};
+
+class MethodCallExprAST : public ExprAST
+{
+public:
+	ExpressionList arguments;
+	MethodCallExprAST(std::string &name, ExpressionList &arguments) : arguments(arguments) { this->name = name; }
 	virtual llvm::Value *codeGen(CodeGenContext &context);
 };
 
@@ -93,20 +101,12 @@ public:
 	BlockExprAST &block;
 	FunctionDeclarationStmtAST(const IdentifierExprAST &id, const VariableList &arguments, BlockExprAST &block) : id(id), arguments(arguments), block(block){};
 	virtual llvm::Value *codeGen(CodeGenContext &context);
-}
+};
 
 class ReturnStmtAST : public StmtAST
 {
 public:
-	ExprStmtAST &expression;
-	ReturnStmtAST(const ExprStmtAST &expression) : expression(expression){};
-	virtual llvm::value *codeGen(CodeGenContext &contest);
-}
-
-class PrintStmtAST : public StmtAST
-{
-public:
-	ExprAST &arg;
-	PrintStmtAST(ExprAST &arg) : arg(arg) {}
-	virtual llvm::Value *codeGen(CodeGenContext &context);
+	ExprAST &expression;
+	ReturnStmtAST(ExprAST &expression) : expression(expression){};
+	virtual llvm::Value *codeGen(CodeGenContext &contest);
 };

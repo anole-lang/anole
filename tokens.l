@@ -18,10 +18,10 @@ double                  {int}\.[0-9]*
 
 %%
 
+";"                     return ';';
+
 {ws}                    ;
 {comment}               ;
-
-print                   return TOKEN(TPRINT);
 
 {id}                    SAVE_TOKEN; return TIDENTIFIER;
 {int}                   SAVE_TOKEN; return TINTEGER;

@@ -17,7 +17,7 @@ void CodeGenContext::generateCode(BlockExprAST &root)
     popBlock();
 
     legacy::PassManager pm;
-    //pm.add(createPrintModulePass(outs()));
+    pm.add(createPrintModulePass(outs()));
     pm.run(*module);
 }
 
@@ -62,6 +62,22 @@ Value *IdentifierExprAST::codeGen(CodeGenContext &context)
     }
     _type = context.types()[name];
     return new LoadInst(context.locals()[name], "", false, context.currentBlock());
+}
+
+Value *MethodCallExprAST::codeGen(CodeGenContext &context)
+{
+    Function *func = context.module->getFunction(name.c_str());
+    _type = "int";
+    if (func == NULL) {
+		std::cerr << "no such function " << name << endl;
+    }
+    std::vector<Value*> args;
+    for(auto &arg : arguments)
+    {
+        args.push_back(arg->codeGen(context));
+    }
+    CallInst *call = CallInst::Create(func, makeArrayRef(args), "", context.currentBlock());
+    return call;
 }
 
 Value *BinaryOperatorExprAST::codeGen(CodeGenContext &context)
@@ -110,14 +126,39 @@ Value *VariableDeclarationStmtAST::codeGen(CodeGenContext &context)
 
 Value *FunctionDeclarationStmtAST::codeGen(CodeGenContext &context)
 {
-    
+    vector<Type*> argTypes;
+    for(auto &var : arguments)
+    {
+        argTypes.push_back(Type::getInt64Ty(TheContext));
+    }
+    FunctionType *ftype = FunctionType::get(Type::getInt64Ty(TheContext), makeArrayRef(argTypes), false);
+    Function *func = Function::Create(ftype, GlobalValue::InternalLinkage, id.name.c_str(), context.module);
+    BasicBlock *bblock = BasicBlock::Create(TheContext, "entry", func, 0);
+
+    context.pushBlock(bblock);
+
+    Function::arg_iterator argsValues = func->arg_begin();
+    Value *argumentValue;
+    for(auto &var : arguments)
+    {
+        AllocaInst *alloc = new AllocaInst(Type::getInt64Ty(TheContext), var->name.c_str(), context.currentBlock());
+        context.locals()[var->name] = alloc;
+
+        argumentValue = &*argsValues++;
+        argumentValue->setName(var->name.c_str());
+        StoreInst *inst = new StoreInst(argumentValue, context.locals()[var->name], false, bblock);
+    }
+
+    block.codeGen(context);
+    ReturnInst::Create(TheContext, context.getCurrentReturnValue(), bblock);
+
+    context.popBlock();
+    return func;
 }
 
-Value *PrintStmtAST::codeGen(CodeGenContext &context)
+Value *ReturnStmtAST::codeGen(CodeGenContext &context)
 {
-    Function *func = context.module->getFunction("print");
-    std::vector<Value*> args;
-    args.push_back(arg.codeGen(context));
-    CallInst *call = CallInst::Create(func, makeArrayRef(args), "printCall", context.currentBlock());
-    return call;
+    Value *returnValue = expression.codeGen(context);
+    context.setCurrentReturnValue(returnValue);
+    return returnValue;
 }
