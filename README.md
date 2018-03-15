@@ -14,9 +14,9 @@ a: 1
 b: a
 ```
 
-###### Arithmetic Operator
+###### Binary Operator
 ```ice
-# support + - * / %
+# support + - * / % = != < <= > >=
 a: 1 + 1
 b: 2 - 1
 c: (a + b) - a * b / a # also support ()
