@@ -23,6 +23,7 @@
 %token <token> TASSIGN TCOMMA
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE
 %token <token> TADD TSUB TMUL TDIV TMOD
+%token <token> TCEQ TCNE TCLT TCLE TCGT TCGE
 %token <token> TFUCK
 
 %type <ident> ident
@@ -31,6 +32,7 @@
 %type <exprvec> call_args
 %type <block> program stmts block
 %type <stmt> stmt var_decl func_decl
+%type <token> comparison
 
 %left TADD TSUB
 %left TMUL TDIV TMOD
@@ -91,6 +93,7 @@ expr
 	| expr TMUL expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
 	| expr TDIV expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
 	| expr TMOD expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
+	| expr comparison expr { $$ = new BinaryOperatorExprAST(*$1, $2, *$3); }
 	| TLPAREN expr TRPAREN { $$ = $2; }
 	;
 
@@ -98,6 +101,10 @@ call_args
 	: /*blank*/ { $$ = new ExpressionList(); }
 	| expr { $$ = new ExpressionList(); $$->push_back($1); }
 	| call_args TCOMMA expr  { $1->push_back($3); }
+	;
+
+comparison
+	: TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
 	;
 
 %%

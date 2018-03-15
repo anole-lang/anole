@@ -41,6 +41,13 @@ fuck                    return TOKEN(TFUCK);
 "/"                     return TOKEN(TDIV);
 "%"                     return TOKEN(TMOD);
 
+"="                     return TOKEN(TCEQ);
+"!="                    return TOKEN(TCNE);
+"<"                     return TOKEN(TCLT);
+"<="                    return TOKEN(TCLE);
+">"                     return TOKEN(TCGT);
+">="                    return TOKEN(TCGE);
+
 .                       printf("Unknown token!\n"); yyterminate();
 
 %%

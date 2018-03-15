@@ -17,7 +17,7 @@ void CodeGenContext::generateCode(BlockExprAST &root)
     popBlock();
 
     legacy::PassManager pm;
-    //pm.add(createPrintModulePass(outs()));
+    pm.add(createPrintModulePass(outs()));
     pm.run(*module);
 }
 
@@ -30,7 +30,7 @@ GenericValue CodeGenContext::runCode()
     return v;
 }
 
-static Type *typeOf(const std::string& type)
+static Type *typeOf(const std::string &type)
 {
     if (type == "int")
     {
@@ -68,11 +68,12 @@ Value *MethodCallExprAST::codeGen(CodeGenContext &context)
 {
     Function *func = context.module->getFunction(name.c_str());
     _type = "int";
-    if (func == NULL) {
-		std::cerr << "no such function " << name << endl;
+    if (func == NULL)
+    {
+        std::cerr << "no such function " << name << endl;
     }
-    std::vector<Value*> args;
-    for(auto &arg : arguments)
+    std::vector<Value *> args;
+    for (auto &arg : arguments)
     {
         args.push_back(arg->codeGen(context));
     }
@@ -82,19 +83,37 @@ Value *MethodCallExprAST::codeGen(CodeGenContext &context)
 
 Value *BinaryOperatorExprAST::codeGen(CodeGenContext &context)
 {
-	Instruction::BinaryOps instr;
-	switch (op) {
-		case TADD: 	    instr = Instruction::Add; break;
-		case TSUB: 	    instr = Instruction::Sub; break;
-		case TMUL: 		instr = Instruction::Mul; break;
-        case TDIV: 		instr = Instruction::SDiv; break;
-        case TMOD:      instr = Instruction::URem; break;
-        default:        return nullptr;
-    }
     Value *_lhs = lhs.codeGen(context);
     Value *_rhs = rhs.codeGen(context);
     this->_type = lhs._type;
-	return BinaryOperator::Create(instr, _lhs, _rhs, "", context.currentBlock());
+    switch (op)
+    {
+    case TADD:
+        return BinaryOperator::Create(Instruction::Add, _lhs, _rhs, "", context.currentBlock());
+    case TSUB:
+        return BinaryOperator::Create(Instruction::Sub, _lhs, _rhs, "", context.currentBlock());
+    case TMUL:
+        return BinaryOperator::Create(Instruction::Mul, _lhs, _rhs, "", context.currentBlock());
+    case TDIV:
+        return BinaryOperator::Create(Instruction::SDiv, _lhs, _rhs, "", context.currentBlock());
+    case TMOD:
+        return BinaryOperator::Create(Instruction::SRem, _lhs, _rhs, "", context.currentBlock());
+
+    case TCEQ:
+        return CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, _lhs, _rhs, "", context.currentBlock());
+    case TCNE:
+        return CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_NE, _lhs, _rhs, "", context.currentBlock());
+    case TCLT:
+        return CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_SLT, _lhs, _rhs, "", context.currentBlock());
+    case TCLE:
+        return CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_SLE, _lhs, _rhs, "", context.currentBlock());
+    case TCGT:
+        return CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_SGT, _lhs, _rhs, "", context.currentBlock());
+    case TCGE:
+        return CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_SGE, _lhs, _rhs, "", context.currentBlock());
+    default:
+        return nullptr;
+    }
 }
 
 Value *BlockExprAST::codeGen(CodeGenContext &context)
@@ -115,7 +134,8 @@ Value *ExprStmtAST::codeGen(CodeGenContext &context)
 
 Value *VariableDeclarationStmtAST::codeGen(CodeGenContext &context)
 {
-    if (assignmentExpr == nullptr) return nullptr;
+    if (assignmentExpr == nullptr)
+        return nullptr;
     Value *_rhs = assignmentExpr->codeGen(context);
     id._type = assignmentExpr->_type;
     context.types()[id.name] = id._type;
@@ -126,8 +146,8 @@ Value *VariableDeclarationStmtAST::codeGen(CodeGenContext &context)
 
 Value *FunctionDeclarationStmtAST::codeGen(CodeGenContext &context)
 {
-    vector<Type*> argTypes;
-    for(auto &var : arguments)
+    vector<Type *> argTypes;
+    for (auto &var : arguments)
     {
         argTypes.push_back(Type::getInt64Ty(TheContext));
     }
@@ -139,7 +159,7 @@ Value *FunctionDeclarationStmtAST::codeGen(CodeGenContext &context)
 
     Function::arg_iterator argsValues = func->arg_begin();
     Value *argumentValue;
-    for(auto &var : arguments)
+    for (auto &var : arguments)
     {
         AllocaInst *alloc = new AllocaInst(Type::getInt64Ty(TheContext), var->name.c_str(), context.currentBlock());
         context.locals()[var->name] = alloc;
