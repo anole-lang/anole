@@ -10,32 +10,32 @@ A funny language named Ice.
 
 ###### Variable Declaration
 ```ice
-a : 1
-b : a
+a: 1
+b: a
 ```
 
 ###### Arithmetic Operator
 ```ice
 # support + - * / %
-a : 1 + 1
-b : 2 - 1
-c : (a + b) - a * b / a # also support ()
+a: 1 + 1
+b: 2 - 1
+c: (a + b) - a * b / a # also support ()
 ```
 
 ###### Print
 ```ice
-a : 1
-b : a + 3 * 4 - 2 / 2 + 2 % 4
+a: 1
+b: a + 3 * 4 - 2 / 2 + 2 % 4
 print(b) / 2 # output: 7
 ```
 
 ###### Function Declaration & MethodCall
 ```ice
 # decl_1
-func(arg1, arg2, ...) : return_value
+fuck func(arg1, arg2, ...): return_value
 
 # decl_2
-func(arg1, arg2, ...) : return_value
+fuck func(arg1, arg2, ...): return_value
 {
     stmt
     ...
@@ -45,10 +45,17 @@ func(arg1, arg2, ...) : return_value
 func(expr1, expr2, ...)
 
 # example
-add(a, b) : a + b
+fuck add(a, b): a + b
+
+fuck sum(a, b, c): _sum
+{
+    _sum: a + b + c
+}
+
 print(add(1, 2))
+print(sum(1, 2, 3))
 ```
 
 
 ### TODO
-* Fix the Bug in Function Declaration
+* Control Flow

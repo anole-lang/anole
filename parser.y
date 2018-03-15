@@ -23,7 +23,7 @@
 %token <token> TASSIGN TCOMMA
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE
 %token <token> TADD TSUB TMUL TDIV TMOD
-%token <token> TPRINT
+%token <token> TFUCK
 
 %type <ident> ident
 %type <expr> numeric expr
@@ -49,8 +49,8 @@ stmts
 	;
 
 stmt
-	: var_decl ';' | func_decl ';'
-	| expr ';' { $$ = new ExprStmtAST(*$1); }
+	: var_decl | func_decl
+	| expr { $$ = new ExprStmtAST(*$1); }
 	;
 
 block
@@ -63,8 +63,8 @@ var_decl
 	;
 
 func_decl
-	: ident TLPAREN func_decl_args TRPAREN TASSIGN expr { BlockExprAST *b = new BlockExprAST(); b->statements.push_back(new ReturnStmtAST(*$6)); $$ = new FunctionDeclarationStmtAST(*$1, *$3, *b); }
-	| ident TLPAREN func_decl_args TRPAREN TASSIGN expr block { $7->statements.push_back(new ReturnStmtAST(*$6)) ; $$ = new FunctionDeclarationStmtAST(*$1, *$3, *$7); }
+	: TFUCK ident TLPAREN func_decl_args TRPAREN TASSIGN expr { BlockExprAST *b = new BlockExprAST(); b->statements.push_back(new ReturnStmtAST(*$7)); $$ = new FunctionDeclarationStmtAST(*$2, *$4, *b); }
+	| TFUCK ident TLPAREN func_decl_args TRPAREN TASSIGN expr block { $8->statements.push_back(new ReturnStmtAST(*$7)) ; $$ = new FunctionDeclarationStmtAST(*$2, *$4, *$8); }
 	;
 
 func_decl_args

@@ -18,7 +18,7 @@ double                  {int}\.[0-9]*
 
 %%
 
-";"                     return ';';
+fuck                    return TOKEN(TFUCK);
 
 {ws}                    ;
 {comment}               ;

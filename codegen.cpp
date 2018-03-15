@@ -143,6 +143,7 @@ Value *FunctionDeclarationStmtAST::codeGen(CodeGenContext &context)
     {
         AllocaInst *alloc = new AllocaInst(Type::getInt64Ty(TheContext), var->name.c_str(), context.currentBlock());
         context.locals()[var->name] = alloc;
+        context.types()[var->name] = "int";
 
         argumentValue = &*argsValues++;
         argumentValue->setName(var->name.c_str());
