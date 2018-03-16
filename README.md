@@ -45,9 +45,9 @@ print(b) / 2 # output: 7
 func(expr1, expr2, ...)
 
 # example
-@fuck add(a, b): a + b
+@add(a, b): a + b
 
-@fuck sum(a, b, c): _sum
+@sum(a, b, c): _sum
 {
     _sum: a + b + c
 }
