@@ -32,10 +32,10 @@ print(b) / 2 # output: 7
 ###### Function Declaration & MethodCall
 ```ice
 # decl_1
-fuck func(arg1, arg2, ...): return_value
+@func(arg1, arg2, ...): return_value
 
 # decl_2
-fuck func(arg1, arg2, ...): return_value
+@func(arg1, arg2, ...): return_value
 {
     stmt
     ...
@@ -45,15 +45,33 @@ fuck func(arg1, arg2, ...): return_value
 func(expr1, expr2, ...)
 
 # example
-fuck add(a, b): a + b
+@fuck add(a, b): a + b
 
-fuck sum(a, b, c): _sum
+@fuck sum(a, b, c): _sum
 {
     _sum: a + b + c
 }
 
 print(add(1, 2))
 print(sum(1, 2, 3))
+```
+
+###### Control Flow
+```ice
+# if & or & ok
+x: 3
+if x < 10
+{
+    ...
+}
+or x > 20
+{
+    ...
+}
+ok
+{
+    ...
+}
 ```
 
 ### TODO

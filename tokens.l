@@ -18,7 +18,11 @@ double                  {int}\.[0-9]*
 
 %%
 
-fuck                    return TOKEN(TFUCK);
+@                       return TOKEN(TAT);
+
+if                      return TOKEN(TIF);
+or                      return TOKEN(TOR);
+ok                      return TOKEN(TOK);
 
 {ws}                    ;
 {comment}               ;
@@ -28,12 +32,13 @@ fuck                    return TOKEN(TFUCK);
 {double}                SAVE_TOKEN; return TDOUBLE;
 
 ":"                     return TOKEN(TASSIGN);
+";"                     return ';';
 ","                     return TOKEN(TCOMMA);
 
 "("                     return TOKEN(TLPAREN);
 ")"                     return TOKEN(TRPAREN);
-"{"                     return TOKEN(TLBRACE);
-"}"                     return TOKEN(TRBRACE);
+"{"                    return TOKEN(TLBRACE);
+"}"                    return TOKEN(TRBRACE);
 
 "+"                     return TOKEN(TADD);
 "-"                     return TOKEN(TSUB);

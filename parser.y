@@ -24,7 +24,7 @@
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE
 %token <token> TADD TSUB TMUL TDIV TMOD
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE
-%token <token> TFUCK
+%token <token> TAT TIF TOR TOK
 
 %type <ident> ident
 %type <expr> numeric expr
@@ -34,6 +34,8 @@
 %type <stmt> stmt var_decl func_decl
 %type <token> comparison
 
+%left TCEQ TCNE
+%left TCLT TCLE TCGT TCGE
 %left TADD TSUB
 %left TMUL TDIV TMOD
 
@@ -65,8 +67,8 @@ var_decl
 	;
 
 func_decl
-	: TFUCK ident TLPAREN func_decl_args TRPAREN TASSIGN expr { BlockExprAST *b = new BlockExprAST(); b->statements.push_back(new ReturnStmtAST(*$7)); $$ = new FunctionDeclarationStmtAST(*$2, *$4, *b); }
-	| TFUCK ident TLPAREN func_decl_args TRPAREN TASSIGN expr block { $8->statements.push_back(new ReturnStmtAST(*$7)) ; $$ = new FunctionDeclarationStmtAST(*$2, *$4, *$8); }
+	: TAT ident TLPAREN func_decl_args TRPAREN TASSIGN expr { BlockExprAST *b = new BlockExprAST(); b->statements.push_back(new ReturnStmtAST(*$7)); $$ = new FunctionDeclarationStmtAST(*$2, *$4, *b); }
+	| TAT ident TLPAREN func_decl_args TRPAREN TASSIGN expr block { $8->statements.push_back(new ReturnStmtAST(*$7)) ; $$ = new FunctionDeclarationStmtAST(*$2, *$4, *$8); }
 	;
 
 func_decl_args
