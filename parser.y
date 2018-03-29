@@ -13,6 +13,7 @@
 	StmtAST *stmt;
 	IdentifierExprAST *ident;
 	VariableDeclarationStmtAST *var_decl;
+	IfElseStmtAST *if_else;
 	std::vector<IdentifierExprAST*> *varvec;
     std::vector<ExprAST*> *exprvec;
     std::string *string;
@@ -24,7 +25,7 @@
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE
 %token <token> TADD TSUB TMUL TDIV TMOD
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE
-%token <token> TAT TIF TOR TOK
+%token <token> TAT TIF TELSE TWHILE
 
 %type <ident> ident
 %type <expr> numeric expr
@@ -33,6 +34,7 @@
 %type <block> program stmts block
 %type <stmt> stmt var_decl func_decl
 %type <token> comparison
+%type <stmt> if_else
 
 %left TCEQ TCNE
 %left TCLT TCLE TCGT TCGE
@@ -53,7 +55,7 @@ stmts
 	;
 
 stmt
-	: var_decl | func_decl
+	: var_decl | func_decl | if_else
 	| expr { $$ = new ExprStmtAST(*$1); }
 	;
 
@@ -107,6 +109,11 @@ call_args
 
 comparison
 	: TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
+	;
+
+if_else
+	: TIF expr block { BlockExprAST *_b = new BlockExprAST(); ; $$ = new IfElseStmtAST(*$2, *$3, *_b); }
+	| TIF expr block TELSE block { $$ = new IfElseStmtAST(*$2, *$3, *$5); }
 	;
 
 %%

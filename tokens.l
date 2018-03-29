@@ -21,8 +21,8 @@ double                  {int}\.[0-9]*
 @                       return TOKEN(TAT);
 
 if                      return TOKEN(TIF);
-or                      return TOKEN(TOR);
-ok                      return TOKEN(TOK);
+else                    return TOKEN(TELSE);
+while                   return TOKEN(TWHILE);
 
 {ws}                    ;
 {comment}               ;

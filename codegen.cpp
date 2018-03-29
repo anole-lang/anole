@@ -183,3 +183,28 @@ Value *ReturnStmtAST::codeGen(CodeGenContext &context)
     context.setCurrentReturnValue(returnValue);
     return returnValue;
 }
+
+Value *IfElseStmtAST::codeGen(CodeGenContext &context)
+{
+    Value *CondV = cond.codeGen(context);
+    if(!CondV) return nullptr;
+
+    Value *_zero = CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, ConstantInt::get(Type::getInt64Ty(TheContext), 1, true), ConstantInt::get(Type::getInt64Ty(TheContext), 0, true), "", context.currentBlock());
+    CondV = CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, CondV, _zero, "ifcond", context.currentBlock());
+
+    BasicBlock *thenBB = BasicBlock::Create(TheContext, "then");
+    BasicBlock *elseBB = BasicBlock::Create(TheContext, "else");
+    BasicBlock *MergeBB = BasicBlock::Create(TheContext, "ifcont");
+
+    BranchInst::Create(thenBB, elseBB, CondV, context.currentBlock());
+
+    context.pushBlock(thenBB);
+    Value *thenV = blockTrue.codeGen(context);
+    context.popBlock();
+    context.pushBlock(elseBB);
+    Value *elseV = blockFalse.codeGen(context);
+    context.popBlock();
+
+    Builder.CreateBr(MergeBB);
+    return nullptr;
+}

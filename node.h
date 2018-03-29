@@ -110,3 +110,23 @@ public:
 	ReturnStmtAST(ExprAST &expression) : expression(expression){};
 	virtual llvm::Value *codeGen(CodeGenContext &contest);
 };
+
+
+class IfElseStmtAST : public StmtAST
+{
+public:
+	ExprAST &cond;
+	BlockExprAST &blockTrue;
+	BlockExprAST &blockFalse;
+	IfElseStmtAST(ExprAST &cond, BlockExprAST &blockTrue, BlockExprAST &blockFalse) : cond(cond), blockTrue(blockTrue), blockFalse(blockFalse){};
+	virtual llvm::Value *codeGen(CodeGenContext &context);
+};
+
+class WhileStmtAST : public StmtAST
+{
+public:
+	ExprAST &expression;
+	BlockExprAST &block;
+	WhileStmtAST(ExprAST &expression, BlockExprAST &block) : expression(expression), block(block){};
+	virtual llvm::Value *codeGen(CodeGenContext &context);
+};

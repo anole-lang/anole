@@ -58,21 +58,20 @@ print(sum(1, 2, 3))
 
 ###### Control Flow
 ```ice
-# if & or & ok
-x: 3
-if x < 10
+a: 1
+if a = 1
 {
-    ...
+    print(a)
 }
-or x > 20
+else
 {
-    ...
+    print(-1)
 }
-ok
+
+while a = 1
 {
-    ...
+    print(a)
 }
 ```
-
 ### TODO
 * Control Flow
