@@ -118,13 +118,12 @@ Value *BinaryOperatorExprAST::codeGen(CodeGenContext &context)
 
 Value *BlockExprAST::codeGen(CodeGenContext &context)
 {
-    StatementList::const_iterator it;
     Value *last = nullptr;
-    for (it = statements.begin(); it != statements.end(); it++)
+    for (auto &it: statements)
     {
-        last = (**it).codeGen(context);
+        last = (*it).codeGen(context);
     }
-    return last;
+    return last;   
 }
 
 Value *ExprStmtAST::codeGen(CodeGenContext &context)
@@ -192,19 +191,34 @@ Value *IfElseStmtAST::codeGen(CodeGenContext &context)
     Value *_zero = CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, ConstantInt::get(Type::getInt64Ty(TheContext), 1, true), ConstantInt::get(Type::getInt64Ty(TheContext), 0, true), "", context.currentBlock());
     CondV = CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, CondV, _zero, "ifcond", context.currentBlock());
 
-    BasicBlock *thenBB = BasicBlock::Create(TheContext, "then");
-    BasicBlock *elseBB = BasicBlock::Create(TheContext, "else");
-    BasicBlock *MergeBB = BasicBlock::Create(TheContext, "ifcont");
+    IRBuilder<> Builder = IRBuilder<>(context.currentBlock());
+    Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
-    BranchInst::Create(thenBB, elseBB, CondV, context.currentBlock());
+    BasicBlock *thenBB = BasicBlock::Create(TheContext, "then", TheFunction);
+    BasicBlock *elseBB = BasicBlock::Create(TheContext, "else", TheFunction);
+    BasicBlock *mergeBB = BasicBlock::Create(TheContext, "ifcont", TheFunction);
 
+    Builder.CreateCondBr(CondV, thenBB, elseBB);
+    //BranchInst::Create(thenBB, elseBB, CondV, context.currentBlock());
+
+    Builder.SetInsertPoint(thenBB);
     context.pushBlock(thenBB);
     Value *thenV = blockTrue.codeGen(context);
-    context.popBlock();
-    context.pushBlock(elseBB);
-    Value *elseV = blockFalse.codeGen(context);
+    Builder.CreateBr(mergeBB);
     context.popBlock();
 
-    Builder.CreateBr(MergeBB);
+    Builder.SetInsertPoint(elseBB);
+    context.pushBlock(elseBB);
+    Value *elseV = blockFalse.codeGen(context);
+    Builder.CreateBr(mergeBB);
+    context.popBlock();
+
+    Builder.SetInsertPoint(mergeBB);
+    context.pushBlock(mergeBB);
+    //PHINode *PN = Builder.CreatePHI(Type::getVoidTy(TheContext), 2, "iftmp");
+    //PN->addIncoming(thenV, thenBB);
+    //PN->addIncoming(elseV, elseBB);
+    //return PN;
+    
     return nullptr;
 }

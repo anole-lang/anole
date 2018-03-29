@@ -23,7 +23,6 @@ using namespace llvm;
 class BlockExprAST;
 
 static LLVMContext TheContext;
-static IRBuilder<> Builder(TheContext);
 
 class CodeGenBlock
 {
