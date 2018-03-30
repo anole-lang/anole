@@ -48,7 +48,7 @@ func(expr1, expr2, ...)
 # example
 @add(a, b): a + b
 
-@sum(a, b, c):
+@sum(a, b, c)
 {
     return a + b + c
 }
