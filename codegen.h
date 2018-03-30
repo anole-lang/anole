@@ -23,12 +23,12 @@ using namespace llvm;
 class BlockExprAST;
 
 static LLVMContext TheContext;
+static int popNum = 0;
 
 class CodeGenBlock
 {
   public:
     BasicBlock *block;
-    Value *returnValue;
     std::map<std::string, Value *> locals;
     std::map<std::string, std::string> types;
 };
@@ -58,6 +58,4 @@ class CodeGenContext
         blocks.pop();
         delete top;
     }
-    void setCurrentReturnValue(Value *value) { blocks.top()->returnValue = value; }
-    Value *getCurrentReturnValue() { return blocks.top()->returnValue; }
 };

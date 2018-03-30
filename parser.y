@@ -25,7 +25,7 @@
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE
 %token <token> TADD TSUB TMUL TDIV TMOD
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE
-%token <token> TAT TIF TELSE TWHILE
+%token <token> TAT TIF TELSE TWHILE TRETURN
 
 %type <ident> ident
 %type <expr> numeric expr
@@ -34,7 +34,7 @@
 %type <block> program stmts block
 %type <stmt> stmt var_decl func_decl
 %type <token> comparison
-%type <stmt> if_else
+%type <stmt> if_else return_stmt
 
 %left TCEQ TCNE
 %left TCLT TCLE TCGT TCGE
@@ -57,6 +57,11 @@ stmts
 stmt
 	: var_decl | func_decl | if_else
 	| expr { $$ = new ExprStmtAST(*$1); }
+	| return_stmt
+	;
+
+return_stmt
+	: TRETURN expr { $$ = new ReturnStmtAST(*$2); }
 	;
 
 block
@@ -70,7 +75,7 @@ var_decl
 
 func_decl
 	: TAT ident TLPAREN func_decl_args TRPAREN TASSIGN expr { BlockExprAST *b = new BlockExprAST(); b->statements.push_back(new ReturnStmtAST(*$7)); $$ = new FunctionDeclarationStmtAST(*$2, *$4, *b); }
-	| TAT ident TLPAREN func_decl_args TRPAREN TASSIGN expr block { $8->statements.push_back(new ReturnStmtAST(*$7)) ; $$ = new FunctionDeclarationStmtAST(*$2, *$4, *$8); }
+	| TAT ident TLPAREN func_decl_args TRPAREN block { $$ = new FunctionDeclarationStmtAST(*$2, *$4, *$6); }
 	;
 
 func_decl_args

@@ -35,10 +35,11 @@ print(b) / 2 # output: 7
 @func(arg1, arg2, ...): return_value
 
 # decl_2
-@func(arg1, arg2, ...): return_value
+@func(arg1, arg2, ...)
 {
     stmt
     ...
+    return return_value
 }
 
 # call
@@ -47,9 +48,9 @@ func(expr1, expr2, ...)
 # example
 @add(a, b): a + b
 
-@sum(a, b, c): _sum
+@sum(a, b, c):
 {
-    _sum: a + b + c
+    return a + b + c
 }
 
 print(add(1, 2))
@@ -58,20 +59,19 @@ print(sum(1, 2, 3))
 
 ###### Control Flow
 ```ice
-a: 1
-if a = 1
+@max(a, b)
 {
-    print(a)
+    if a < b
+    {
+        res: b
+    }
+    else
+    {
+        res: a
+    }
+    return res
 }
-else
-{
-    print(-1)
-}
-
-while a = 1
-{
-    print(a)
-}
+print(max(1, 2))
 ```
 ### TODO
-* Control Flow
+* Complete Control Flow & Fix Bugs

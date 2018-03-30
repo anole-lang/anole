@@ -24,6 +24,8 @@ if                      return TOKEN(TIF);
 else                    return TOKEN(TELSE);
 while                   return TOKEN(TWHILE);
 
+return                  return TOKEN(TRETURN);
+
 {ws}                    ;
 {comment}               ;
 

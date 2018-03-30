@@ -17,7 +17,7 @@ void CodeGenContext::generateCode(BlockExprAST &root)
     popBlock();
 
     legacy::PassManager pm;
-    pm.add(createPrintModulePass(outs()));
+    //pm.add(createPrintModulePass(outs()));
     pm.run(*module);
 }
 
@@ -140,7 +140,8 @@ Value *VariableDeclarationStmtAST::codeGen(CodeGenContext &context)
     context.types()[id.name] = id._type;
     AllocaInst *alloc = new AllocaInst(typeOf(id._type), id.name.c_str(), context.currentBlock());
     context.locals()[id.name] = alloc;
-    return new StoreInst(_rhs, alloc, false, context.currentBlock());
+    StoreInst *store = new StoreInst(_rhs, alloc, false, context.currentBlock());
+    return new LoadInst(context.locals()[id.name], "", false, context.currentBlock());
 }
 
 Value *FunctionDeclarationStmtAST::codeGen(CodeGenContext &context)
@@ -170,16 +171,16 @@ Value *FunctionDeclarationStmtAST::codeGen(CodeGenContext &context)
     }
 
     block.codeGen(context);
-    ReturnInst::Create(TheContext, context.getCurrentReturnValue(), bblock);
-
     context.popBlock();
+    while(popNum--)
+        context.popBlock();
     return func;
 }
 
 Value *ReturnStmtAST::codeGen(CodeGenContext &context)
 {
     Value *returnValue = expression.codeGen(context);
-    context.setCurrentReturnValue(returnValue);
+    ReturnInst::Create(TheContext, returnValue, context.currentBlock());
     return returnValue;
 }
 
@@ -188,7 +189,7 @@ Value *IfElseStmtAST::codeGen(CodeGenContext &context)
     Value *CondV = cond.codeGen(context);
     if(!CondV) return nullptr;
 
-    Value *_zero = CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, ConstantInt::get(Type::getInt64Ty(TheContext), 1, true), ConstantInt::get(Type::getInt64Ty(TheContext), 0, true), "", context.currentBlock());
+    Value *_zero = CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, ConstantInt::get(Type::getInt64Ty(TheContext), 0, true), ConstantInt::get(Type::getInt64Ty(TheContext), 0, true), "", context.currentBlock());
     CondV = CmpInst::Create(Instruction::ICmp, CmpInst::ICMP_EQ, CondV, _zero, "ifcond", context.currentBlock());
 
     IRBuilder<> Builder = IRBuilder<>(context.currentBlock());
@@ -201,24 +202,30 @@ Value *IfElseStmtAST::codeGen(CodeGenContext &context)
     Builder.CreateCondBr(CondV, thenBB, elseBB);
     //BranchInst::Create(thenBB, elseBB, CondV, context.currentBlock());
 
+    std::map<std::string, Value *> &locals = context.locals();
+    std::map<std::string, std::string> &types = context.types();
+
     Builder.SetInsertPoint(thenBB);
     context.pushBlock(thenBB);
+    context.locals() = locals;
+    context.types() = types;
     Value *thenV = blockTrue.codeGen(context);
     Builder.CreateBr(mergeBB);
     context.popBlock();
 
     Builder.SetInsertPoint(elseBB);
     context.pushBlock(elseBB);
+    context.locals() = locals;
+    context.types() = types;
     Value *elseV = blockFalse.codeGen(context);
     Builder.CreateBr(mergeBB);
     context.popBlock();
 
     Builder.SetInsertPoint(mergeBB);
     context.pushBlock(mergeBB);
-    //PHINode *PN = Builder.CreatePHI(Type::getVoidTy(TheContext), 2, "iftmp");
-    //PN->addIncoming(thenV, thenBB);
-    //PN->addIncoming(elseV, elseBB);
-    //return PN;
-    
-    return nullptr;
+    popNum++;
+    PHINode *PN = Builder.CreatePHI(Type::getInt64Ty(TheContext), 2, "iftmp");
+    PN->addIncoming(thenV, thenBB);
+    PN->addIncoming(elseV, elseBB);
+    return PN;
 }
