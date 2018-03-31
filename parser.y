@@ -20,7 +20,7 @@
     int token;
 }
 
-%token <string> TIDENTIFIER TINTEGER TDOUBLE
+%token <string> TIDENTIFIER TINTEGER
 %token <token> TASSIGN TCOMMA
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE
 %token <token> TADD TSUB TMUL TDIV TMOD
@@ -90,7 +90,6 @@ ident
 
 numeric	
 	: TINTEGER { $$ = new IntegerExprAST(atol($1->c_str())); delete $1; }
-	| TDOUBLE { $$ = new DoubleExprAST(atof($1->c_str())); delete $1; }
 	;
 
 expr

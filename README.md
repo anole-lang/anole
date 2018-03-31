@@ -1,5 +1,5 @@
 # Ice
-A funny language named Ice.
+A funny language named Ice ( and only supports integer operations now ).
 
 ### Progress
 

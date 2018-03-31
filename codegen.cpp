@@ -17,7 +17,7 @@ void CodeGenContext::generateCode(BlockExprAST &root)
     popBlock();
 
     legacy::PassManager pm;
-    //pm.add(createPrintModulePass(outs()));
+    pm.add(createPrintModulePass(outs()));
     pm.run(*module);
 }
 
@@ -36,21 +36,12 @@ static Type *typeOf(const std::string &type)
     {
         return Type::getInt64Ty(TheContext);
     }
-    else if (type == "double")
-    {
-        return Type::getDoubleTy(TheContext);
-    }
     return Type::getVoidTy(TheContext);
 }
 
 Value *IntegerExprAST::codeGen(CodeGenContext &context)
 {
     return ConstantInt::get(Type::getInt64Ty(TheContext), value, true);
-}
-
-Value *DoubleExprAST::codeGen(CodeGenContext &context)
-{
-    return ConstantFP::get(TheContext, APFloat(value));
 }
 
 Value *IdentifierExprAST::codeGen(CodeGenContext &context)

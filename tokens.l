@@ -12,7 +12,6 @@ ws                      {delim}+
 comment                 #[^\n]*
 id                      [a-zA-Z_][a-zA-Z0-9_]*
 int                     [0-9]+
-double                  {int}\.[0-9]*
 
 %option noyywrap
 
@@ -31,7 +30,6 @@ return                  return TOKEN(TRETURN);
 
 {id}                    SAVE_TOKEN; return TIDENTIFIER;
 {int}                   SAVE_TOKEN; return TINTEGER;
-{double}                SAVE_TOKEN; return TDOUBLE;
 
 ":"                     return TOKEN(TASSIGN);
 ";"                     return ';';

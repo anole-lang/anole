@@ -35,14 +35,6 @@ public:
 	virtual llvm::Value *codeGen(CodeGenContext &context);
 };
 
-class DoubleExprAST : public ExprAST
-{
-public:
-	double value;
-	DoubleExprAST(double value) : value(value) { _type = "double"; }
-	virtual llvm::Value *codeGen(CodeGenContext &context);
-};
-
 class IdentifierExprAST : public ExprAST
 {
 public:
