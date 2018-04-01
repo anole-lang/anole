@@ -1,4 +1,6 @@
 # Ice
+> this is a implementation that almost by myself in this branch.
+
 A funny language named Ice ( and only supports integer operations now ).
 
 ### Progress
@@ -74,4 +76,4 @@ print(sum(1, 2, 3))
 print(max(1, 2))
 ```
 ### TODO
-* Complete Control Flow & Fix Bugs
+* Lexical analyzer
