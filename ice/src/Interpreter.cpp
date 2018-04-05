@@ -12,11 +12,12 @@ void Interpreter::run()
         std::string line;
         std::cout << ">> ";
         getline(std::cin, line);
+        line += '\n';
         Parser parser(line);
         auto tokens = parser.getTokens();
         for (auto &token: tokens)
         {
-            std::cout << '<' << token.token_id << ', ' << token.value << '>' << std::endl; 
+            std::cout << "<" << (int)token.token_id << ", " << token.value << ">" << std::endl; 
         }
     }
 }

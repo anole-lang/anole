@@ -3,7 +3,6 @@
 #include <cstring>
 #include <cstdio>
 #include "interpreter.h"
-#include "parser.h"
 
 int main()
 {
