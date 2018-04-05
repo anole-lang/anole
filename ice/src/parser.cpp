@@ -1,5 +1,6 @@
 #include "parser.h"
 
-Parser::Parser(){}
-
-Parser::~Parser(){}
+std::vector<Token> &getTokens()
+{
+    
+}

@@ -2,11 +2,12 @@
 #include <string>
 #include <cstring>
 #include <cstdio>
+#include "parser.h"
+#include "tokens.h"
 
 class Interpreter
 {
 public:
     Interpreter();
-    ~Interpreter();
     void run();
 };
