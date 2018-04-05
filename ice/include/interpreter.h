@@ -3,9 +3,10 @@
 #include <cstring>
 #include <cstdio>
 
-class Parser
+class Interpreter
 {
 public:
-    Parser();
-    ~Parser();
+    Interpreter();
+    ~Interpreter();
+    void run();
 };
