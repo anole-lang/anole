@@ -2,7 +2,12 @@
 
 Interpreter::Interpreter()
 {
-    std::cout << "Ice 0.0.1" << std::endl;
+    std::cout << "      /////////\n"
+                 "        ///    ///////// /////////\n"
+                 "       ///    ///       ///   ///    Version 0.0.1 \n"
+                 "      ///    ///       /////////     http://www.jusot.com/ice\n"
+                 "     ///    ///       ///\n"
+                 " ///////// ///////// /////////\n" << std::endl;
 }
 
 void Interpreter::run()
