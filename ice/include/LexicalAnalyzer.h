@@ -3,9 +3,9 @@
 #include <cstring>
 #include <cstdio>
 #include <vector>
-#include "tokens.h"
+#include "Token.h"
 
-class Parser
+class LexicalAnalyzer
 {
 private:
     std::string &text;
@@ -19,6 +19,6 @@ private:
     };
 
 public:
-    Parser(std::string &text): text(text) {};
+    LexicalAnalyzer(std::string &text): text(text) {}
     std::vector<Token> &getTokens();
 };

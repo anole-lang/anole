@@ -1,4 +1,4 @@
-#include "interpreter.h"
+#include "Interpreter.h"
 
 Interpreter::Interpreter()
 {
@@ -8,6 +8,7 @@ Interpreter::Interpreter()
                  "      ///    ///       /////////     http://www.jusot.com/ice\n"
                  "     ///    ///       ///\n"
                  " ///////// ///////// /////////\n" << std::endl;
+    program = new Program();
 }
 
 void Interpreter::run()
@@ -16,13 +17,14 @@ void Interpreter::run()
     {
         std::string line;
         std::cout << ">> ";
+
         getline(std::cin, line);
         line += '\n';
-        Parser parser(line);
-        auto tokens = parser.getTokens();
-        for (auto &token: tokens)
-        {
-            std::cout << "<" << (int)token.token_id << ", " << token.value << ">" << std::endl; 
-        }
+
+        LexicalAnalyzer lexAnalyzer(line);
+        auto tokens = lexAnalyzer.getTokens();
+
+        SyntaxAnalyzer syntaxAnalyzer(tokens);
+        auto node = syntaxAnalyzer.getNode();
     }
 }

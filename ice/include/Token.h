@@ -38,7 +38,7 @@ public:
         TCGT, // >
     } token_id;
     std::string value;
-    Token(TOKEN token_id, std::string value): token_id(token_id), value(value) {};
-    Token(TOKEN token_id): token_id(token_id) {};
+    Token(TOKEN token_id, std::string value): token_id(token_id), value(value) {}
+    Token(TOKEN token_id): token_id(token_id) {}
     Token(std::string value);
 };

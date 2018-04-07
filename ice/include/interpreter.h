@@ -2,10 +2,14 @@
 #include <string>
 #include <cstring>
 #include <cstdio>
-#include "parser.h"
+#include "LexicalAnalyzer.h"
+#include "SyntaxAnalyzer.h"
+#include "Coderun.h"
 
 class Interpreter
 {
+private:
+    Program *program;
 public:
     Interpreter();
     void run();

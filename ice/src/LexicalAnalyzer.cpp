@@ -1,6 +1,6 @@
-#include "parser.h"
+#include "LexicalAnalyzer.h"
 
-std::vector<Token> &Parser::getTokens()
+std::vector<Token> &LexicalAnalyzer::getTokens()
 {
     tokens.clear();
     State state = State::Begin;
@@ -103,6 +103,11 @@ std::vector<Token> &Parser::getTokens()
                 value += *reading;
                 break;
             default:
+                if (('a' <= *reading && *reading <= 'z') || ('A' <= *reading && *reading <= 'Z') || *reading == '_')
+                {
+                    std::cout << "syntax error!" << std::endl;
+                    exit(0);
+                }
                 tokens.push_back(Token(Token::TOKEN::TINTEGER, value));
                 state = State::Begin;
                 value = "";

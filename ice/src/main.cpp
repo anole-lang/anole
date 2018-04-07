@@ -2,7 +2,7 @@
 #include <string>
 #include <cstring>
 #include <cstdio>
-#include "interpreter.h"
+#include "Interpreter.h"
 
 int main()
 {
