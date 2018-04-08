@@ -8,7 +8,8 @@ Interpreter::Interpreter()
                  "      ///    ///       /////////     http://www.jusot.com/ice\n"
                  "     ///    ///       ///\n"
                  " ///////// ///////// /////////\n" << std::endl;
-    program = new Program();
+    top = new Env(nullptr);
+    block = new BlockExpr();
 }
 
 void Interpreter::run()
@@ -26,5 +27,8 @@ void Interpreter::run()
 
         SyntaxAnalyzer syntaxAnalyzer(tokens);
         auto node = syntaxAnalyzer.getNode();
+
+        node->runCode(top);
+        block->statements.push_back(node);
     }
 }

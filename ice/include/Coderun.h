@@ -1,9 +1,10 @@
+#ifndef __CODERUN_H__
+#define __CODERUN_H__
+
 #include <iostream>
 #include <map>
 #include <string>
 #include <cstring>
-
-class BlockExprAST;
 
 class Env
 {
@@ -21,10 +22,4 @@ public:
     std::string getType(std::string&);
 };
 
-class Program
-{
-private:
-    Env *top;
-public:
-    Program();
-};
+#endif // __CODERUN_H__

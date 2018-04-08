@@ -1,3 +1,6 @@
+#ifndef __TOKEN_H__
+#define __TOKEN_H__
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -42,3 +45,5 @@ public:
     Token(TOKEN token_id): token_id(token_id) {}
     Token(std::string value);
 };
+
+#endif //__TOKEN_H__

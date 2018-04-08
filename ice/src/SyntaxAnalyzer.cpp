@@ -1,8 +1,7 @@
 #include "SyntaxAnalyzer.h"
 
-Node *SyntaxAnalyzer::getNode()
+Stmt *SyntaxAnalyzer::getNode()
 {
-    Node *node;
-    node = new Stmt();
+    Stmt *node = nullptr;
     return node;
 }

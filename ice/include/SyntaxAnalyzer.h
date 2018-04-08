@@ -1,8 +1,10 @@
+#ifndef __SYNTAX_ANALYZER_H__
+#define __SYNTAX_ANALYZER_H__
+
 #include <iostream>
 #include <vector>
-#include "Node.h"
 #include "Token.h"
-#include "LexicalAnalyzer.h"
+#include "Node.h"
 
 /* Grammer
 program	
@@ -87,6 +89,8 @@ class SyntaxAnalyzer
 private:
     std::vector<Token> &tokens;
 public:
-    SyntaxAnalyzer(std::vector<Token>&):tokens(tokens) {}
-    Node *getNode();
+    SyntaxAnalyzer(std::vector<Token> &tokens):tokens(tokens) {}
+    Stmt *getNode();
 };
+
+#endif //__SYNTAX_ANALYZER_H__

@@ -1,3 +1,6 @@
+#ifndef __LEXICAL_ANALYZER_H__
+#define __LEXICAL_ANALYZER_H__
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -22,3 +25,6 @@ public:
     LexicalAnalyzer(std::string &text): text(text) {}
     std::vector<Token> &getTokens();
 };
+
+#endif //__LEXICAL_ANALYZER_H__
+
