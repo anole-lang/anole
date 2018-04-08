@@ -15,8 +15,8 @@ protected:
     Env *prev;
 
 public:
-    Env(Env*);
-    void put(std::string &name, void* value);
+    Env(Env *prev): prev(prev) {}
+    void put(std::string&, void*);
     void *getValue(std::string&);
     std::string getType(std::string&);
 };
@@ -24,7 +24,7 @@ public:
 class Program
 {
 private:
-    Env *top;    
+    Env *top;
 public:
     Program();
 };
