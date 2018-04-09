@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include "Object.h"
 
 class Env;
 
@@ -29,7 +30,7 @@ class BlockExpr : public Expr
 public:
     StatementList statements;
     BlockExpr() {}
-    virtual void* runCode(Env *);
+    virtual Object *runCode(Env *);
 };
 
 class IntegerExpr : public Expr
@@ -37,7 +38,7 @@ class IntegerExpr : public Expr
 public:
     long long value;
     IntegerExpr(long long value): value(value) {}
-    virtual void* runCode(Env *);
+    virtual Object *runCode(Env *);
 };
 
 class IdentifierExpr : public Expr
@@ -45,16 +46,24 @@ class IdentifierExpr : public Expr
 public:
     std::string name;
     IdentifierExpr(std::string &name): name(name) {}
-    virtual void* runCode(Env *);
+    virtual Object *runCode(Env *);
 };
 
-class VariableDeclarationStmt : Stmt
+class ExprStmt : public Stmt
+{
+public:
+    Expr *assignment;
+    ExprStmt(Expr *assignment): assignment(assignment) {}
+    virtual Object *runCode(Env *);
+};
+
+class VariableDeclarationStmt : public Stmt
 {
 public:
     IdentifierExpr &id;
     Expr *assignment;
     VariableDeclarationStmt(IdentifierExpr &id, Expr *assignment): id(id), assignment(assignment) {}
-    virtual void* runCode(Env *);
+    virtual Object *runCode(Env *);
 };
 
 #endif //__NODE_H__

@@ -5,21 +5,20 @@
 #include <map>
 #include <string>
 #include <cstring>
+#include "Object.h"
 
 class Env
 {
 private:
-    std::map<std::string, void*> values;
-    std::map<std::string, std::string> types;
+    std::map<std::string, Object*> objects;
 
 protected:
     Env *prev;
 
 public:
     Env(Env *prev): prev(prev) {}
-    void put(std::string&, void*);
-    void *getValue(std::string&);
-    std::string getType(std::string&);
+    void put(std::string&, Object*);
+    Object *getObject(std::string&);
 };
 
 #endif // __CODERUN_H__

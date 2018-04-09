@@ -1,19 +1,19 @@
 #include "Coderun.h"
 #include "Node.h"
 
-void Env::put(std::string &name, void *value)
+void Env::put(std::string &name, Object *obj)
 {
-    values[name] = value;
+    objects[name] = obj;
 }
 
-void *Env::getValue(std::string &name)
+Object *Env::getObject(std::string &name)
 {
     Env *tmp = this;
     while (tmp != nullptr)
     {
-        if(tmp->values.find(name) != tmp->values.end())
+        if(tmp->objects.find(name) != tmp->objects.end())
         {
-            return tmp->values[name];
+            return tmp->objects[name];
         }
         else
         {
@@ -25,39 +25,29 @@ void *Env::getValue(std::string &name)
     return nullptr;
 }
 
-std::string Env::getType(std::string &name)
-{
-    Env *tmp = this;
-    while (tmp != nullptr)
-    {
-        if(tmp->types.find(name) != tmp->types.end())
-        {
-            return tmp->types[name];
-        }
-        else
-        {
-            tmp = tmp->prev;
-        }
-    }
-    return NULL;
-}
-
-void *BlockExpr::runCode(Env *top)
+Object *BlockExpr::runCode(Env *top)
 {
     return nullptr;
 }
 
-void *IntegerExpr::runCode(Env *top)
+Object *IntegerExpr::runCode(Env *top)
+{
+    static const int i = value;
+    void *val = (void *)&i;
+    return new Object(val, "int");
+}
+
+Object *IdentifierExpr::runCode(Env *top)
 {
     return nullptr;
 }
 
-void *IdentifierExpr::runCode(Env *top)
+Object *ExprStmt::runCode(Env *top)
 {
     return nullptr;
 }
 
-void *VariableDeclarationStmt::runCode(Env *top)
+Object *VariableDeclarationStmt::runCode(Env *top)
 {
     return nullptr;
 }
