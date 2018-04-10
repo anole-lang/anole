@@ -28,7 +28,9 @@ void Interpreter::run()
         SyntaxAnalyzer syntaxAnalyzer(tokens);
         auto node = syntaxAnalyzer.getNode();
 
-        node->runCode(top);
+        auto obj = node->runCode(top);
+        if ( obj != nullptr) obj->show();
+
         block->statements.push_back(node);
     }
 }

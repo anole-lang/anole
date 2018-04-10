@@ -19,7 +19,7 @@ class Node
 {
 public:
     virtual ~Node(){}
-    virtual void* runCode(Env *) = 0;
+    virtual Object* runCode(Env *) = 0;
 };
 
 class Stmt : public Node {};

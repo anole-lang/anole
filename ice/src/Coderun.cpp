@@ -32,7 +32,7 @@ Object *BlockExpr::runCode(Env *top)
 
 Object *IntegerExpr::runCode(Env *top)
 {
-    static const int i = value;
+    static const long long i = value;
     void *val = (void *)&i;
     return new Object(val, "int");
 }
@@ -44,7 +44,8 @@ Object *IdentifierExpr::runCode(Env *top)
 
 Object *ExprStmt::runCode(Env *top)
 {
-    return nullptr;
+    Object* obj = assignment->runCode(top);
+    return obj;
 }
 
 Object *VariableDeclarationStmt::runCode(Env *top)

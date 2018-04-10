@@ -13,6 +13,7 @@ protected:
 
 public:
     Object(void *value, std::string type): value(value), type(type) {}
-}
+    void show();
+};
 
 #endif // __OBJECT_H__
