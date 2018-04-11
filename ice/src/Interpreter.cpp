@@ -23,7 +23,7 @@ void Interpreter::run()
         line += '\n';
 
         LexicalAnalyzer lexAnalyzer(line);
-        auto tokens = lexAnalyzer.getTokens();
+        auto &tokens = lexAnalyzer.getTokens();
 
         SyntaxAnalyzer syntaxAnalyzer(tokens);
         auto node = syntaxAnalyzer.getNode();

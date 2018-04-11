@@ -1,12 +1,12 @@
 #include "Coderun.h"
 #include "Node.h"
 
-void Env::put(std::string &name, Object *obj)
+void Env::put(std::string &name, IceObject *obj)
 {
     objects[name] = obj;
 }
 
-Object *Env::getObject(std::string &name)
+IceObject *Env::getObject(std::string &name)
 {
     Env *tmp = this;
     while (tmp != nullptr)
@@ -25,30 +25,28 @@ Object *Env::getObject(std::string &name)
     return nullptr;
 }
 
-Object *BlockExpr::runCode(Env *top)
+IceObject *BlockExpr::runCode(Env *top)
 {
     return nullptr;
 }
 
-Object *IntegerExpr::runCode(Env *top)
+IceObject *IntegerExpr::runCode(Env *top)
 {
-    static const long long i = value;
-    void *val = (void *)&i;
-    return new Object(val, "int");
+    return new IceIntegerObject(value);
 }
 
-Object *IdentifierExpr::runCode(Env *top)
+IceObject *IdentifierExpr::runCode(Env *top)
 {
     return nullptr;
 }
 
-Object *ExprStmt::runCode(Env *top)
+IceObject *ExprStmt::runCode(Env *top)
 {
-    Object* obj = assignment->runCode(top);
+    IceObject* obj = assignment->runCode(top);
     return obj;
 }
 
-Object *VariableDeclarationStmt::runCode(Env *top)
+IceObject *VariableDeclarationStmt::runCode(Env *top)
 {
     return nullptr;
 }

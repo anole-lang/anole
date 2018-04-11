@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
-#include "Object.h"
+#include "IceObject.h"
 
 class Env;
 
@@ -19,7 +19,7 @@ class Node
 {
 public:
     virtual ~Node(){}
-    virtual Object* runCode(Env *) = 0;
+    virtual IceObject* runCode(Env *) = 0;
 };
 
 class Stmt : public Node {};
@@ -30,15 +30,15 @@ class BlockExpr : public Expr
 public:
     StatementList statements;
     BlockExpr() {}
-    virtual Object *runCode(Env *);
+    virtual IceObject *runCode(Env *);
 };
 
 class IntegerExpr : public Expr
 {
 public:
-    long long value;
+    long value;
     IntegerExpr(long long value): value(value) {}
-    virtual Object *runCode(Env *);
+    virtual IceObject *runCode(Env *);
 };
 
 class IdentifierExpr : public Expr
@@ -46,7 +46,7 @@ class IdentifierExpr : public Expr
 public:
     std::string name;
     IdentifierExpr(std::string &name): name(name) {}
-    virtual Object *runCode(Env *);
+    virtual IceObject *runCode(Env *);
 };
 
 class ExprStmt : public Stmt
@@ -54,7 +54,7 @@ class ExprStmt : public Stmt
 public:
     Expr *assignment;
     ExprStmt(Expr *assignment): assignment(assignment) {}
-    virtual Object *runCode(Env *);
+    virtual IceObject *runCode(Env *);
 };
 
 class VariableDeclarationStmt : public Stmt
@@ -63,7 +63,7 @@ public:
     IdentifierExpr &id;
     Expr *assignment;
     VariableDeclarationStmt(IdentifierExpr &id, Expr *assignment): id(id), assignment(assignment) {}
-    virtual Object *runCode(Env *);
+    virtual IceObject *runCode(Env *);
 };
 
 #endif //__NODE_H__
