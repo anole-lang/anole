@@ -37,7 +37,7 @@ class IntegerExpr : public Expr
 {
 public:
     long value;
-    IntegerExpr(long long value): value(value) {}
+    IntegerExpr(long value): value(value) {}
     virtual IceObject *runCode(Env *);
 };
 
@@ -60,9 +60,9 @@ public:
 class VariableDeclarationStmt : public Stmt
 {
 public:
-    IdentifierExpr &id;
+    IdentifierExpr *id;
     Expr *assignment;
-    VariableDeclarationStmt(IdentifierExpr &id, Expr *assignment): id(id), assignment(assignment) {}
+    VariableDeclarationStmt(IdentifierExpr *id, Expr *assignment): id(id), assignment(assignment) {}
     virtual IceObject *runCode(Env *);
 };
 

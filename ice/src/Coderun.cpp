@@ -27,6 +27,8 @@ IceObject *Env::getObject(std::string &name)
 
 IceObject *BlockExpr::runCode(Env *top)
 {
+    for (auto stmt: statements)
+        stmt->runCode(top);
     return nullptr;
 }
 
@@ -37,16 +39,18 @@ IceObject *IntegerExpr::runCode(Env *top)
 
 IceObject *IdentifierExpr::runCode(Env *top)
 {
-    return nullptr;
+    return top->getObject(name);
 }
 
 IceObject *ExprStmt::runCode(Env *top)
 {
-    IceObject* obj = assignment->runCode(top);
+    IceObject *obj = assignment->runCode(top);
     return obj;
 }
 
 IceObject *VariableDeclarationStmt::runCode(Env *top)
 {
+    IceObject *obj = assignment->runCode(top);
+    top->put(id->name, obj);
     return nullptr;
 }
