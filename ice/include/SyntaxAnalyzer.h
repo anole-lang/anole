@@ -120,6 +120,13 @@ if_else_tail
 	;
 */
 
+/* Predictive Parser
+
+| Non-terminal symbols | Input symbols
+|					   | TAT 	| TIF 				| TELSE | TWHILE | TRETURN | TIDENTIFIER | TINTEGER | TASSIGN | TCOMMA | TLPAREN | TRPAREN | TLBRACE | TRBRACE | TADD | TSUB | TMUL | TDIV | TMOD | TCEQ | TEXC | TCLT | TCGT
+| stmt				   |		| stmt -> if_else 	|		|
+*/
+
 class SyntaxAnalyzer
 {
 private:
