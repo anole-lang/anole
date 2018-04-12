@@ -6,14 +6,14 @@
 #include "Token.h"
 #include "Node.h"
 
-/* Grammer
+/* LL(1) Grammer
 program	
 	: stmts
 	;
 
 stmts
-	: stmt
-	| stmts stmt
+	:
+	| stmt stmts
 	;
 
 stmt
@@ -37,15 +37,22 @@ var_decl
 	;
 
 func_decl
-	: TAT ident TLPAREN func_decl_args TRPAREN TASSIGN expr
-	| TAT ident TLPAREN func_decl_args TRPAREN block
+	: TAT ident TLPAREN func_decl_args TRPAREN func_decl_tail
+	;
+
+func_decl_tail
+	: TASSIGN expr
+	| block
 	;
 
 func_decl_args
 	: 
-	| ident 
-	| func_decl_args TCOMMA ident 
+	| ident func_decl_args_tail
 	;
+
+func_decl_args_tail
+	:
+	| TCOMMA ident func_decl_args_tail
 
 ident
 	: TIDENTIFIER
@@ -56,22 +63,47 @@ numeric
 	;
 
 expr
-	: ident TLPAREN call_args TRPAREN
-	| ident
-	| numeric
-	| expr TADD expr
-	| expr TSUB expr
-	| expr TMUL expr
-	| expr TDIV expr
-	| expr TMOD expr
-	| expr comparison expr
+	: factor factor_rest
 	| TLPAREN expr TRPAREN
+	;
+
+factor_rest
+	:
+	| TADD factor factor_rest
+	| TSUB factor factor_rest
+	| comparison factor
+	;
+
+factor
+	: term term_rest
+	;
+
+term
+	: ident method_call_tail
+	| numeric
+	| TLPAREN expr TRPAREN
+	;
+
+term_rest
+	:
+	| TMUL term term_rest
+	| TDIV term term_rest
+	| TMOD term term_rest
+	;
+
+method_call_tail
+	:
+	| TLPAREN call_args TRPAREN
 	;
 
 call_args
 	:
-	| expr
-	| call_args TCOMMA expr
+	| expr call_args_tail
+	;
+
+call_args_tail
+	:
+	| TCOMMA expr call_args_tail
 	;
 
 comparison
@@ -79,15 +111,20 @@ comparison
 	;
 
 if_else
-	: TIF expr block
-	| TIF expr block TELSE block
-    ;
+	: TIF expr block if_else_tail
+	;
+	
+if_else_tail
+	: 
+	| TELSE block
+	;
 */
 
 class SyntaxAnalyzer
 {
 private:
-    std::vector<Token> &tokens;
+	std::vector<Token> &tokens;
+	
 public:
     SyntaxAnalyzer(std::vector<Token> &tokens):tokens(tokens) {}
     Stmt *getNode();

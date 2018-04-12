@@ -32,6 +32,7 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
                 tokens.push_back(Token(Token::TOKEN::TMOD));
                 break;
             case '=':
+            state = State::InIdentifier;
                 tokens.push_back(Token(Token::TOKEN::TCEQ));
                 break;
             case '!':
@@ -99,7 +100,6 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
             case '7':
             case '8':
             case '9':
-                state = State::InInteger;
                 value += *reading;
                 break;
             default:
@@ -117,7 +117,6 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
         case State::InIdentifier:
             if (('a' <= *reading && *reading <= 'z') || ('A' <= *reading && *reading <= 'Z') || *reading == '_')
             {
-                state = State::InIdentifier;
                 value += *reading;
             }
             else
@@ -125,7 +124,7 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
                 tokens.push_back(Token(value));
                 state = State::Begin;
                 value = "";
-                break;
+                continue;
             }
             break;
         case State::InComment:

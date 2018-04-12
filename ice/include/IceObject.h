@@ -8,7 +8,6 @@
 class IceObject
 {
 protected:
-    void *value;
     std::string type;
 
 public:
@@ -18,6 +17,9 @@ public:
 
 class IceIntegerObject : public IceObject
 {
+private:
+    long value;
+
 public:
     IceIntegerObject(long value);
     virtual ~IceIntegerObject() {}

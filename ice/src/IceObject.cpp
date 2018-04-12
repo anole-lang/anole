@@ -1,12 +1,11 @@
 #include "IceObject.h"
 
-IceIntegerObject::IceIntegerObject(long value)
+IceIntegerObject::IceIntegerObject(long value): value(value)
 {
     type = "int";
-    this->value = new long(value);
 }
 
 void IceIntegerObject::show()
 {
-    std::cout << *(long *)value << std::endl;
+    std::cout << value << std::endl;
 }
