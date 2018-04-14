@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <stack>
+#include <iterator>
 #include "Token.h"
 #include "Node.h"
 
@@ -168,9 +170,40 @@ class SyntaxAnalyzer
 {
 private:
 	std::vector<Token> &tokens;
+	std::vector<Token>::iterator iToken;
+	enum class Symbol
+	{
+		stmts,
+		stmt,
+		var_decl_or_func_decl,
+		if_else,
+		expr,
+		return_stmt,
+		var_decl_or_func_decl_tail,
+		block,
+		block_tail,
+		var_decl_tail,
+		func_decl_tail,
+		func_decl_rest,
+		func_decl_args,
+		func_decl_args_tail,
+		ident,
+		numeric,
+		factor_rest,
+		factor,
+		term,
+		term_rest,
+		method_call_tail,
+		call_args,
+		call_args_tail,
+		comparison,
+		if_else_tail
+	};
+
+	auto cont(Symbol) -> Node *(*);
 	
 public:
-    SyntaxAnalyzer(std::vector<Token> &tokens):tokens(tokens) {}
+    SyntaxAnalyzer(std::vector<Token> &tokens):tokens(tokens) { iToken = tokens.begin(); }
     Stmt *getNode();
 };
 
