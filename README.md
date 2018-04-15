@@ -22,7 +22,7 @@ make
 cd bin
 ./ice
 ```
-Also you can use Visual Studio, just open ice/ice/ice.sln by Visual Studio.
+Also you can use Visual Studio, just open ice/ice/ice.sln by Visual Studio 2017 or above.
 
 ### Document
 * [Progress](./PROGRESS.md)
