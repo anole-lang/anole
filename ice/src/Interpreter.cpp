@@ -31,6 +31,6 @@ void Interpreter::run()
         auto obj = node->runCode(top);
         if ( obj != nullptr) obj->show();
 
-        block->statements.push_back(node);
+        block->statements.push_back(dynamic_cast<Stmt *>(node));
     }
 }

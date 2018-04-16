@@ -5,6 +5,8 @@
 #include <vector>
 #include <stack>
 #include <iterator>
+#include <functional>
+#include <map>
 #include "Token.h"
 #include "Node.h"
 
@@ -199,12 +201,11 @@ private:
 		comparison,
 		if_else_tail
 	};
-
-	auto cont(Symbol) -> Node *(*);
+	static std::map<Symbol, std::function<Node *()>> genNode;
 	
 public:
-    SyntaxAnalyzer(std::vector<Token> &tokens):tokens(tokens) { iToken = tokens.begin(); }
-    Stmt *getNode();
+    SyntaxAnalyzer(std::vector<Token> &tokens);
+    Node *getNode();
 };
 
 #endif //__SYNTAX_ANALYZER_H__
