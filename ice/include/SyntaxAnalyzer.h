@@ -201,7 +201,7 @@ private:
 		comparison,
 		if_else_tail
 	};
-	static std::map<Symbol, std::function<Node *()>> genNode;
+	std::map<Symbol, std::function<Node *()>> genNode;
 	
 public:
     SyntaxAnalyzer(std::vector<Token> &tokens);

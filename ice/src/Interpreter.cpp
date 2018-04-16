@@ -29,7 +29,7 @@ void Interpreter::run()
         auto node = syntaxAnalyzer.getNode();
 
         auto obj = node->runCode(top);
-        if ( obj != nullptr) obj->show();
+        if (obj != nullptr) obj->show();
 
         block->statements.push_back(dynamic_cast<Stmt *>(node));
     }

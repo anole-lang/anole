@@ -3,77 +3,176 @@
 SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
 {
     iToken = tokens.begin();
+
     genNode[Symbol::stmt] = [&](){
-        return nullptr;
+        Node *node = nullptr;
+        switch (iToken->token_id)
+        {
+            case Token::TOKEN::TAT:
+                node = genNode[Symbol::var_decl_or_func_decl]();
+                break;
+            case Token::TOKEN::TIDENTIFIER:
+                node = new ExprStmt(dynamic_cast<Expr *>(genNode[Symbol::expr]()));
+                break;
+            default:
+                break;
+        }
+        return node;
     };
+
     genNode[Symbol::var_decl_or_func_decl] = [&](){
-        return nullptr;
+        switch (iToken->token_id)
+        {
+            case Token::TOKEN::TAT:
+                goto varDecl;
+            default:
+                break;
+        }
+        varDecl:
+        iToken++;
+        IdentifierExpr *id = dynamic_cast<IdentifierExpr *>(genNode[Symbol::ident]());
+        Expr *assignment = dynamic_cast<Expr *>(genNode[Symbol::var_decl_or_func_decl_tail]());
+        return new VariableDeclarationStmt(id, assignment);
     };
+
     genNode[Symbol::if_else] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::expr] = [&](){
-        return nullptr;
+        Expr *node = nullptr;
+        switch (iToken->token_id)
+        {
+            case Token::TOKEN::TINTEGER:
+                node = new IntegerExpr(std::stoi(iToken->value));
+                iToken++;
+                break;
+            case Token::TOKEN::TIDENTIFIER:
+                node = new IdentifierExpr(iToken->value);
+                iToken++;
+                break;
+            default:
+                break;
+        };
+        return node;
     };
+
     genNode[Symbol::return_stmt] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::var_decl_or_func_decl_tail] = [&](){
-        return nullptr;
+        switch (iToken->token_id)
+        {
+            case Token::TOKEN::TASSIGN:
+                iToken++;
+                return genNode[Symbol::expr]();
+            default:
+                break;
+        }
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::block] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::block_tail] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+    
     genNode[Symbol::var_decl_tail] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::func_decl_tail] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::func_decl_rest] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::func_decl_args] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::func_decl_args_tail] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::ident] = [&](){
-        return nullptr;
+        Node *node = nullptr;
+        switch (iToken->token_id)
+        {
+            case Token::TOKEN::TIDENTIFIER:
+                node = new IdentifierExpr(iToken->value);
+                iToken++;
+                break;
+            default:
+                break;
+        }
+        return node;
     };
+
     genNode[Symbol::numeric] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::factor_rest] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::factor] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::term] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::term_rest] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::method_call_tail] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::call_args] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::call_args_tail] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::comparison] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
+
     genNode[Symbol::if_else_tail] = [&](){
-        return nullptr;
+        Node *_ = nullptr;
+        return _;
     };
 }
 
