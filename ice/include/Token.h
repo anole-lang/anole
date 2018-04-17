@@ -26,7 +26,7 @@ public:
         TASSIGN, // :
         TCOMMA, // ,
 
-        TESCAPE, // \
+        TESCAPE, // "\"
 
         TLPAREN, // (
         TRPAREN, // )
