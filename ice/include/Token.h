@@ -20,9 +20,13 @@ public:
 
         TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
         TINTEGER, // [0-9]+
+        TDOUBLE, // [0-9]+\.[0-9]*
+        TSTRING, // "[^"\n]"
 
         TASSIGN, // :
         TCOMMA, // ,
+
+        TESCAPE, // \
 
         TLPAREN, // (
         TRPAREN, // )
@@ -35,10 +39,23 @@ public:
         TDIV, // /
         TMOD, // %
 
+        TBAND, // &
+        TBOR, // |
+        TBXOR, // ^
+        TBNEG, // ~
+        TBLS, // <<
+        TBRS, // >>
+
+        TAND, // and
+        TOR, // or
+        TNOT, // not
+
         TCEQ, // =
-        TEXC, // !
-        TCLT, // <
+        TCNE, // !=
+        TCLT, // < 
+        TCLE, // <=
         TCGT, // >
+        TCGE // >=
     } token_id;
     std::string value;
     Token(TOKEN token_id, std::string value): token_id(token_id), value(value) {}

@@ -16,9 +16,17 @@ private:
     enum class State 
     {
         Begin,
+        
+        InNot,
+        InCLT,
+        InCGT,
+
         InComment,
         InInteger,
-        InIdentifier
+        InDouble,
+        InIdentifier,
+        InString,
+        InStringEscaping
     };
 
 public:
