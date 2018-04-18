@@ -1,10 +1,24 @@
 # Ice
 > this is a implementation that almost by myself in this branch.
 
-A funny language named Ice ( and only supports integer operations now ).
+A funny language named Ice (an exercise for Compilers).
 
 ### Progress
-* Basic Lexical Analyzer
+
+###### Comments
+```ice
+>> # this is a comment
+```
+
+###### Variable Declaration
+```ice
+# var_decl
+@var_name: expr
+
+# example
+@a: 1
+@b: a
+```
 
 ### TODO
-* Complete Lexical Analyzer
+* Complete Binary Operator

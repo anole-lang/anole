@@ -12,6 +12,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
                 node = genNode[Symbol::var_decl_or_func_decl]();
                 break;
             case Token::TOKEN::TIDENTIFIER:
+            case Token::TOKEN::TINTEGER:
                 node = new ExprStmt(dynamic_cast<Expr *>(genNode[Symbol::expr]()));
                 break;
             default:
@@ -178,6 +179,6 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
 
 Node *SyntaxAnalyzer::getNode()
 {
-    Node *node = genNode[Symbol::stmt]();
+    Node *node = iToken == tokens.end() ? nullptr : genNode[Symbol::stmt]();
     return node;
 }

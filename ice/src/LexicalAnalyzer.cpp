@@ -4,8 +4,8 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
 {
     tokens.clear();
     State state = State::Begin;
-    const char *reading = text.c_str();
     std::string value = "";
+    const char *reading = text.c_str();
     while (*reading)
     {
         switch (state)

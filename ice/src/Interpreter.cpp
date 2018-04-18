@@ -20,7 +20,7 @@ void Interpreter::run()
         std::cout << ">> ";
 
         getline(std::cin, line);
-        line += '\n';
+        line += '$';
 
         LexicalAnalyzer lexAnalyzer(line);
         auto &tokens = lexAnalyzer.getTokens();
@@ -28,7 +28,7 @@ void Interpreter::run()
         SyntaxAnalyzer syntaxAnalyzer(tokens);
         auto node = syntaxAnalyzer.getNode();
 
-        auto obj = node->runCode(top);
+        auto obj = node == nullptr ? nullptr : node->runCode(top);
         if (obj != nullptr) obj->show();
 
         block->statements.push_back(dynamic_cast<Stmt *>(node));
