@@ -7,7 +7,7 @@ A funny language named Ice (an exercise for Compilers).
 
 ###### Comments
 ```ice
->> # this is a comment
+# this is a comment
 ```
 
 ###### Variable Declaration

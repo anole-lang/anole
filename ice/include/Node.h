@@ -41,11 +41,38 @@ public:
     virtual IceObject *runCode(Env *);
 };
 
+class DoubleExpr : public Expr
+{
+public:
+    double value;
+    DoubleExpr(double value): value(value) {}
+    virtual IceObject *runCode(Env *);
+};
+
 class IdentifierExpr : public Expr
 {
 public:
     std::string name;
     IdentifierExpr(std::string &name): name(name) {}
+    virtual IceObject *runCode(Env *);
+};
+
+class BinaryOperatorRestExpr : public Expr
+{
+public:
+    Token::TOKEN op;
+    Expr *rhs;
+    BinaryOperatorRestExpr(Token::TOKEN op, Expr *rhs): op(op), rhs(rhs) {}
+};
+
+class BinaryOperatorExpr : public Expr
+{
+public:
+    Token::TOKEN op;
+    Expr *lhs;
+    Expr *rhs;
+    BinaryOperatorExpr(Expr *lhs, Token::TOKEN op, Expr *rhs): lhs(lhs), op(op), rhs(rhs) {}
+    BinaryOperatorExpr(Expr *lhs, BinaryOperatorRestExpr *fact_rest): lhs(lhs), op(fact_rest->op), rhs(fact_rest->rhs) {}
     virtual IceObject *runCode(Env *);
 };
 

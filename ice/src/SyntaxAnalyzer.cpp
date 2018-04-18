@@ -22,18 +22,23 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
     };
 
     genNode[Symbol::var_decl_or_func_decl] = [&](){
+        VariableDeclarationStmt *node = nullptr;
         switch (iToken->token_id)
         {
             case Token::TOKEN::TAT:
                 goto varDecl;
             default:
-                break;
+                goto ret;
         }
         varDecl:
         iToken++;
         IdentifierExpr *id = dynamic_cast<IdentifierExpr *>(genNode[Symbol::ident]());
         Expr *assignment = dynamic_cast<Expr *>(genNode[Symbol::var_decl_or_func_decl_tail]());
-        return new VariableDeclarationStmt(id, assignment);
+        node = new VariableDeclarationStmt(id, assignment);
+        goto ret;
+
+        ret:
+        return node;
     };
 
     genNode[Symbol::if_else] = [&](){
@@ -45,17 +50,19 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         Expr *node = nullptr;
         switch (iToken->token_id)
         {
-            case Token::TOKEN::TINTEGER:
-                node = new IntegerExpr(std::stoi(iToken->value));
-                iToken++;
-                break;
             case Token::TOKEN::TIDENTIFIER:
-                node = new IdentifierExpr(iToken->value);
-                iToken++;
-                break;
+            case Token::TOKEN::TINTEGER:
+                goto factor;
             default:
-                break;
+                goto ret;
         };
+        factor:
+        Expr *fact = dynamic_cast<Expr *>(genNode[Symbol::factor]());
+        BinaryOperatorRestExpr *fact_rest = dynamic_cast<BinaryOperatorRestExpr *>(genNode[Symbol::factor_rest]());
+        node = fact_rest == nullptr ? fact : new BinaryOperatorExpr(fact, fact_rest);
+        goto ret;
+
+        ret:
         return node;
     };
 
@@ -137,8 +144,23 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
     };
 
     genNode[Symbol::factor] = [&](){
-        Node *_ = nullptr;
-        return _;
+        Node *node = nullptr;
+        switch (iToken->token_id)
+        {
+            case Token::TOKEN::TIDENTIFIER:
+            case Token::TOKEN::TINTEGER:
+                goto item;
+            default:
+                goto ret;
+        }
+        item:
+        Expr *term = dynamic_cast<Expr *>(genNode[Symbol::term]());
+        BinaryOperatorRestExpr *term_rest = dynamic_cast<BinaryOperatorRestExpr *>(genNode[Symbol::term_rest]());
+        node = term_rest == nullptr ? term : new BinaryOperatorExpr(term, term_rest);
+        goto ret;
+
+        ret:
+        return node;
     };
 
     genNode[Symbol::term] = [&](){
