@@ -12,28 +12,55 @@ void IceIntegerObject::show()
 
 IceObject *IceIntegerObject::add(IceObject *obj)
 {
-    IceObject *res_obj = nullptr;
     switch(obj->type)
     {
         case TYPE::INT:
-            res_obj = new IceIntegerObject(value + dynamic_cast<IceIntegerObject *>(obj)->value);
-            break;
+            return new IceIntegerObject(value + dynamic_cast<IceIntegerObject *>(obj)->value);
         default:
-            break;
+            return nullptr;
     }
-    return res_obj;
+}
+
+IceObject *IceIntegerObject::sub(IceObject *obj)
+{
+    switch(obj->type)
+    {
+        case TYPE::INT:
+            return new IceIntegerObject(value - dynamic_cast<IceIntegerObject *>(obj)->value);
+        default:
+            return nullptr;
+    }
 }
 
 IceObject *IceIntegerObject::mul(IceObject *obj)
 {
-    IceObject *res_obj = nullptr;
     switch(obj->type)
     {
         case TYPE::INT:
-            res_obj = new IceIntegerObject(value * dynamic_cast<IceIntegerObject *>(obj)->value);
-            break;
+            return new IceIntegerObject(value * dynamic_cast<IceIntegerObject *>(obj)->value);
         default:
-            break;
+            return nullptr;
     }
-    return res_obj;
+}
+
+IceObject *IceIntegerObject::div(IceObject *obj)
+{
+    switch(obj->type)
+    {
+        case TYPE::INT:
+            return new IceIntegerObject(value / dynamic_cast<IceIntegerObject *>(obj)->value);
+        default:
+            return nullptr;
+    }
+}
+
+IceObject *IceIntegerObject::mod(IceObject *obj)
+{
+    switch(obj->type)
+    {
+        case TYPE::INT:
+            return new IceIntegerObject(value % dynamic_cast<IceIntegerObject *>(obj)->value);
+        default:
+            return nullptr;
+    }
 }

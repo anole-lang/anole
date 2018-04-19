@@ -44,21 +44,23 @@ IceObject *IdentifierExpr::runCode(Env *top)
 
 IceObject *BinaryOperatorExpr::runCode(Env *top)
 {
-    IceObject *res = nullptr;
     IceObject *lobj = lhs->runCode(top);
     IceObject *robj = rhs->runCode(top);
     switch (op)
     {
         case Token::TOKEN::TADD:
-            res = lobj->add(robj);
-            break;
+            return lobj->add(robj);
+        case Token::TOKEN::TSUB:
+            return lobj->sub(robj);
         case Token::TOKEN::TMUL:
-            res = lobj->mul(robj);
-            break;
+            return lobj->mul(robj);
+        case Token::TOKEN::TDIV:
+            return lobj->div(robj);
+        case Token::TOKEN::TMOD:
+            return lobj->mod(robj);
         default:
-            break;
+            return nullptr;
     }
-    return res;
 }
 
 IceObject *ExprStmt::runCode(Env *top)

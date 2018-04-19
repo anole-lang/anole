@@ -12,12 +12,16 @@ A funny language named Ice (an exercise for Compilers).
 
 ###### Variable Declaration
 ```ice
-# var_decl
-@var_name: expr
-
-# example
 @a: 1
 @b: a
+```
+
+###### Binary Operator
+```ice
+# support + - * / % now
+@a: 1 + 1
+@b: 4 - 1
+@c: (a + b) - a * b / a % b # support ()
 ```
 
 ### TODO

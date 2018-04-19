@@ -77,11 +77,11 @@ ident
 
 numeric	
 	: TINTEGER
+	| TDOUBLE
 	;
 
 expr
 	: factor factor_rest
-	| TLPAREN expr TRPAREN
 	;
 
 factor_rest

@@ -58,15 +58,6 @@ public:
     virtual IceObject *runCode(Env *);
 };
 
-class BinaryOperatorRestExpr : public Expr
-{
-public:
-    Token::TOKEN op;
-    Expr *rhs;
-    BinaryOperatorRestExpr(Token::TOKEN op, Expr *rhs): op(op), rhs(rhs) {}
-    virtual IceObject *runCode(Env *) { return nullptr; }
-};
-
 class BinaryOperatorExpr : public Expr
 {
 public:
@@ -74,7 +65,6 @@ public:
     Token::TOKEN op;
     Expr *rhs;
     BinaryOperatorExpr(Expr *lhs, Token::TOKEN op, Expr *rhs): lhs(lhs), op(op), rhs(rhs) {}
-    BinaryOperatorExpr(Expr *lhs, BinaryOperatorRestExpr *fact_rest): lhs(lhs), op(fact_rest->op), rhs(fact_rest->rhs) {}
     virtual IceObject *runCode(Env *);
 };
 
