@@ -51,8 +51,10 @@ IceObject *BinaryOperatorExpr::runCode(Env *top)
     {
         case Token::TOKEN::TADD:
             res = lobj->add(robj);
+            break;
         case Token::TOKEN::TMUL:
             res = lobj->mul(robj);
+            break;
         default:
             break;
     }
