@@ -9,16 +9,16 @@
 
 class Env
 {
-private:
-    std::map<std::string, IceObject*> objects;
+  private:
+    std::map<std::string, IceObject *> objects;
 
-protected:
+  protected:
     Env *prev;
 
-public:
-    Env(Env *prev): prev(prev) {}
-    void put(std::string&, IceObject*);
-    IceObject *getObject(std::string&);
+  public:
+    Env(Env *prev) : prev(prev) {}
+    void put(std::string &, IceObject *);
+    IceObject *getObject(std::string &);
 };
 
 #endif // __CODERUN_H__

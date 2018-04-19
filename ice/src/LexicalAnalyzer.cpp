@@ -101,7 +101,7 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
                     state = State::InIdentifier;
                     value += *reading;
                 }
-                else if ( *reading == '\"')
+                else if (*reading == '\"')
                 {
                     state = State::InString;
                 }
@@ -191,7 +191,7 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
                 break;
             }
             break;
-        
+
         case State::InDouble:
             switch (*reading)
             {
@@ -253,7 +253,7 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
                 break;
             }
             break;
-        
+
         case State::InStringEscaping:
             switch (*reading)
             {

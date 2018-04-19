@@ -7,7 +7,8 @@ Interpreter::Interpreter()
                  "       ///    ///       ///   ///    Version 0.0.1 \n"
                  "      ///    ///       /////////     http://www.jusot.com/ice\n"
                  "     ///    ///       ///\n"
-                 " ///////// ///////// /////////\n" << std::endl;
+                 " ///////// ///////// /////////\n"
+              << std::endl;
     top = new Env(nullptr);
     block = new BlockExpr();
 }
@@ -29,7 +30,8 @@ void Interpreter::run()
         auto node = syntaxAnalyzer.getNode();
 
         auto obj = node == nullptr ? nullptr : node->runCode(top);
-        if (obj != nullptr) obj->show();
+        if (obj != nullptr)
+            obj->show();
 
         block->statements.push_back(dynamic_cast<Stmt *>(node));
     }

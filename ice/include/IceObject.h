@@ -7,7 +7,7 @@
 
 class IceObject
 {
-public:
+  public:
     enum class TYPE
     {
         INT,
@@ -25,10 +25,10 @@ public:
 
 class IceIntegerObject : public IceObject
 {
-private:
+  private:
     long value;
 
-public:
+  public:
     IceIntegerObject(long value);
     virtual ~IceIntegerObject() {}
     virtual void show();

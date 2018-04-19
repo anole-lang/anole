@@ -10,13 +10,13 @@
 
 class LexicalAnalyzer
 {
-private:
+  private:
     std::string &text;
     std::vector<Token> tokens;
-    enum class State 
+    enum class State
     {
         Begin,
-        
+
         InNot,
         InCLT,
         InCGT,
@@ -29,10 +29,9 @@ private:
         InStringEscaping
     };
 
-public:
-    LexicalAnalyzer(std::string &text): text(text) {}
+  public:
+    LexicalAnalyzer(std::string &text) : text(text) {}
     std::vector<Token> &getTokens();
 };
 
 #endif //__LEXICAL_ANALYZER_H__
-

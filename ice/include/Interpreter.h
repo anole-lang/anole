@@ -15,14 +15,13 @@ class BlockExpr;
 
 class Interpreter
 {
-private:
+  private:
     Env *top;
     BlockExpr *block;
 
-public:
+  public:
     Interpreter();
     void run();
 };
 
 #endif //__INTERPRETER_H__
-

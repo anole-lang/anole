@@ -11,7 +11,7 @@ IceObject *Env::getObject(std::string &name)
     Env *tmp = this;
     while (tmp != nullptr)
     {
-        if(tmp->objects.find(name) != tmp->objects.end())
+        if (tmp->objects.find(name) != tmp->objects.end())
         {
             return tmp->objects[name];
         }
@@ -27,7 +27,7 @@ IceObject *Env::getObject(std::string &name)
 
 IceObject *BlockExpr::runCode(Env *top)
 {
-    for (auto stmt: statements)
+    for (auto stmt : statements)
         stmt->runCode(top);
     return nullptr;
 }
@@ -48,18 +48,18 @@ IceObject *BinaryOperatorExpr::runCode(Env *top)
     IceObject *robj = rhs->runCode(top);
     switch (op)
     {
-        case Token::TOKEN::TADD:
-            return lobj->add(robj);
-        case Token::TOKEN::TSUB:
-            return lobj->sub(robj);
-        case Token::TOKEN::TMUL:
-            return lobj->mul(robj);
-        case Token::TOKEN::TDIV:
-            return lobj->div(robj);
-        case Token::TOKEN::TMOD:
-            return lobj->mod(robj);
-        default:
-            return nullptr;
+    case Token::TOKEN::TADD:
+        return lobj->add(robj);
+    case Token::TOKEN::TSUB:
+        return lobj->sub(robj);
+    case Token::TOKEN::TMUL:
+        return lobj->mul(robj);
+    case Token::TOKEN::TDIV:
+        return lobj->div(robj);
+    case Token::TOKEN::TMOD:
+        return lobj->mod(robj);
+    default:
+        return nullptr;
     }
 }
 

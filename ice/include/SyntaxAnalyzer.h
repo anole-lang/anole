@@ -170,7 +170,7 @@ if_else_tail
 
 class SyntaxAnalyzer
 {
-private:
+  private:
 	std::vector<Token> &tokens;
 	std::vector<Token>::iterator iToken;
 	enum class Symbol
@@ -202,10 +202,10 @@ private:
 		if_else_tail
 	};
 	std::map<Symbol, std::function<Node *()>> genNode;
-	
-public:
-    SyntaxAnalyzer(std::vector<Token> &tokens);
-    Node *getNode();
+
+  public:
+	SyntaxAnalyzer(std::vector<Token> &tokens);
+	Node *getNode();
 };
 
 #endif //__SYNTAX_ANALYZER_H__

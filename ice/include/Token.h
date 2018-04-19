@@ -8,23 +8,23 @@
 
 class Token
 {
-public:
+  public:
     enum class TOKEN
     {
         TAT, // @
 
-        TIF, // if
-        TELSE, // else
-        TWHILE, // while
+        TIF,     // if
+        TELSE,   // else
+        TWHILE,  // while
         TRETURN, // return
 
         TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
-        TINTEGER, // [0-9]+
-        TDOUBLE, // [0-9]+\.[0-9]*
-        TSTRING, // "[^"\n]"
+        TINTEGER,    // [0-9]+
+        TDOUBLE,     // [0-9]+\.[0-9]*
+        TSTRING,     // "[^"\n]"
 
         TASSIGN, // :
-        TCOMMA, // ,
+        TCOMMA,  // ,
 
         TESCAPE, // "\"
 
@@ -40,26 +40,26 @@ public:
         TMOD, // %
 
         TBAND, // &
-        TBOR, // |
+        TBOR,  // |
         TBXOR, // ^
         TBNEG, // ~
-        TBLS, // <<
-        TBRS, // >>
+        TBLS,  // <<
+        TBRS,  // >>
 
         TAND, // and
-        TOR, // or
+        TOR,  // or
         TNOT, // not
 
         TCEQ, // =
         TCNE, // !=
-        TCLT, // < 
+        TCLT, // <
         TCLE, // <=
         TCGT, // >
-        TCGE // >=
+        TCGE  // >=
     } token_id;
     std::string value;
-    Token(TOKEN token_id, std::string value): token_id(token_id), value(value) {}
-    Token(TOKEN token_id): token_id(token_id) {}
+    Token(TOKEN token_id, std::string value) : token_id(token_id), value(value) {}
+    Token(TOKEN token_id) : token_id(token_id) {}
     Token(std::string value);
 };
 

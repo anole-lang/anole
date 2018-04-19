@@ -1,6 +1,6 @@
 #include "Token.h"
 
-Token::Token(std::string value): value(value)
+Token::Token(std::string value) : value(value)
 {
     if (value == "if")
         token_id = TOKEN::TIF;
