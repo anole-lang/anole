@@ -1,5 +1,7 @@
 #include "Token.h"
 
+namespace Ice
+{
 Token::Token(std::string value) : value(value)
 {
     if (value == "if")
@@ -16,4 +18,5 @@ Token::Token(std::string value) : value(value)
         token_id = TOKEN::TNOT;
     else
         token_id = TOKEN::TIDENTIFIER;
+}
 }

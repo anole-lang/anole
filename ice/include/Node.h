@@ -8,6 +8,8 @@
 #include "IceObject.h"
 #include "Token.h"
 
+namespace Ice
+{
 class Env;
 
 class Stmt;
@@ -88,5 +90,6 @@ class VariableDeclarationStmt : public Stmt
     VariableDeclarationStmt(IdentifierExpr *id, Expr *assignment) : id(id), assignment(assignment) {}
     virtual IceObject *runCode(Env *);
 };
+}
 
 #endif //__NODE_H__

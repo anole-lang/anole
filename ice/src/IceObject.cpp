@@ -1,5 +1,7 @@
 #include "IceObject.h"
 
+namespace Ice
+{
 IceIntegerObject::IceIntegerObject(long value) : value(value)
 {
     type = TYPE::INT;
@@ -48,3 +50,5 @@ IceObject *IceIntegerObject::binaryOperate(IceObject *obj, Token::TOKEN op)
     }
     return nullptr;
 }
+}
+

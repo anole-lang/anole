@@ -151,43 +151,46 @@ if_else_tail
 	;
 */
 
+namespace Ice
+{
 class SyntaxAnalyzer
 {
   private:
-	std::vector<Token> &tokens;
-	std::vector<Token>::iterator iToken;
-	enum class Symbol
-	{
-		stmts,
-		stmt,
-		var_decl_or_func_decl,
-		if_else,
-		expr,
-		return_stmt,
-		var_decl_or_func_decl_tail,
-		block,
-		block_tail,
-		var_decl_tail,
-		func_decl_tail,
-		func_decl_rest,
-		func_decl_args,
-		func_decl_args_tail,
-		ident,
-		numeric,
-		cmp,
-		factor,
-		term,
-		method_call_tail,
-		call_args,
-		call_args_tail,
-		comparison,
-		if_else_tail
-	};
-	std::map<Symbol, std::function<Node *()>> genNode;
+    std::vector<Token> &tokens;
+    std::vector<Token>::iterator iToken;
+    enum class Symbol
+    {
+        stmts,
+        stmt,
+        var_decl_or_func_decl,
+        if_else,
+        expr,
+        return_stmt,
+        var_decl_or_func_decl_tail,
+        block,
+        block_tail,
+        var_decl_tail,
+        func_decl_tail,
+        func_decl_rest,
+        func_decl_args,
+        func_decl_args_tail,
+        ident,
+        numeric,
+        cmp,
+        factor,
+        term,
+        method_call_tail,
+        call_args,
+        call_args_tail,
+        comparison,
+        if_else_tail
+    };
+    std::map<Symbol, std::function<Node *()>> genNode;
 
   public:
-	SyntaxAnalyzer(std::vector<Token> &tokens);
-	Node *getNode();
+    SyntaxAnalyzer(std::vector<Token> &tokens);
+    Node *getNode();
 };
+}
 
 #endif //__SYNTAX_ANALYZER_H__

@@ -7,6 +7,9 @@
 #include <cstring>
 #include "IceObject.h"
 
+namespace Ice
+{
+
 class Env
 {
   private:
@@ -20,5 +23,6 @@ class Env
     void put(std::string &, IceObject *);
     IceObject *getObject(std::string &);
 };
+}
 
 #endif // __CODERUN_H__

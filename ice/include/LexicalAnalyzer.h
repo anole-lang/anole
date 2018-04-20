@@ -8,6 +8,8 @@
 #include <vector>
 #include "Token.h"
 
+namespace Ice
+{
 class LexicalAnalyzer
 {
   private:
@@ -33,5 +35,6 @@ class LexicalAnalyzer
     LexicalAnalyzer(std::string &text) : text(text) {}
     std::vector<Token> &getTokens();
 };
+}
 
 #endif //__LEXICAL_ANALYZER_H__

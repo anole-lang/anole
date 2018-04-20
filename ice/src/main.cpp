@@ -4,6 +4,8 @@
 #include <cstdio>
 #include "Interpreter.h"
 
+using namespace Ice;
+
 int main()
 {
     Interpreter interpreter;

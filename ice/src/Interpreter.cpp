@@ -1,5 +1,7 @@
 #include "Interpreter.h"
 
+namespace Ice
+{
 Interpreter::Interpreter()
 {
     std::cout << "      /////////\n"
@@ -35,4 +37,5 @@ void Interpreter::run()
 
         block->statements.push_back(dynamic_cast<Stmt *>(node));
     }
+}
 }

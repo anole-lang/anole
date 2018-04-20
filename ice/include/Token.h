@@ -6,6 +6,8 @@
 #include <cstring>
 #include <cstdio>
 
+namespace Ice
+{
 class Token
 {
   public:
@@ -62,5 +64,6 @@ class Token
     Token(TOKEN token_id) : token_id(token_id) {}
     Token(std::string value);
 };
+}
 
 #endif //__TOKEN_H__

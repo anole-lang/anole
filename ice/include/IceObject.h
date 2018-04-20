@@ -6,6 +6,8 @@
 #include <cstring>
 #include "Token.h"
 
+namespace Ice
+{
 class IceObject
 {
   public:
@@ -31,5 +33,6 @@ class IceIntegerObject : public IceObject
     virtual void show();
     virtual IceObject *binaryOperate(IceObject *, Token::TOKEN op);
 };
+}
 
 #endif // __ICE_OBJECT_H__

@@ -12,6 +12,8 @@
 #include "SyntaxAnalyzer.h"
 #include "Coderun.h"
 
+namespace Ice
+{
 class BlockExpr;
 
 class Interpreter
@@ -24,5 +26,6 @@ class Interpreter
     Interpreter();
     void run();
 };
+}
 
 #endif //__INTERPRETER_H__

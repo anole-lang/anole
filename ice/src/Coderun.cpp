@@ -1,6 +1,8 @@
 #include "Coderun.h"
 #include "Node.h"
 
+namespace Ice
+{
 void Env::put(std::string &name, IceObject *obj)
 {
     objects[name] = obj;
@@ -61,3 +63,5 @@ IceObject *VariableDeclarationStmt::runCode(Env *top)
     top->put(id->name, obj);
     return nullptr;
 }
+}
+

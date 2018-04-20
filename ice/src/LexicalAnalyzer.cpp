@@ -1,5 +1,7 @@
 #include "LexicalAnalyzer.h"
 
+namespace Ice
+{
 std::vector<Token> &LexicalAnalyzer::getTokens()
 {
     tokens.clear();
@@ -282,4 +284,5 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
         reading++;
     }
     return tokens;
+}    
 }

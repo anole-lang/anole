@@ -1,5 +1,7 @@
 #include "SyntaxAnalyzer.h"
 
+namespace Ice
+{
 SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
 {
     iToken = tokens.begin();
@@ -295,4 +297,6 @@ Node *SyntaxAnalyzer::getNode()
 {
     Node *node = iToken == tokens.end() ? nullptr : genNode[Symbol::stmt]();
     return node;
+}    
 }
+
