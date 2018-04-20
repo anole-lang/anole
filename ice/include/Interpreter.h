@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 #include <cstring>
 #include <cstdio>
 #include "Token.h"

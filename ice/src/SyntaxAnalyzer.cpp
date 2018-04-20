@@ -44,42 +44,6 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         return _;
     };
 
-    genNode[Symbol::expr] = [&]() {
-        std::function<Node *(Expr *)> genFactorRest;
-        genFactorRest = [&](Expr *lhs) {
-            Node *node = lhs;
-            Token::TOKEN op;
-            switch (iToken->token_id)
-            {
-            case Token::TOKEN::TADD:
-            case Token::TOKEN::TSUB:
-                op = iToken->token_id;
-                iToken++;
-                break;
-            default:
-                return node;
-            }
-            Expr *rhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
-            Expr *_lhs = new BinaryOperatorExpr(lhs, op, rhs);
-            node = genFactorRest(_lhs);
-            return node;
-        };
-        Node *node = nullptr;
-        switch (iToken->token_id)
-        {
-        case Token::TOKEN::TIDENTIFIER:
-        case Token::TOKEN::TLPAREN:
-        case Token::TOKEN::TINTEGER:
-            goto factor;
-        default:
-            return node;
-        };
-    factor:
-        Expr *lhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
-        node = genFactorRest(lhs);
-        return node;
-    };
-
     genNode[Symbol::return_stmt] = [&]() {
         Node *_ = nullptr;
         return _;
@@ -161,6 +125,82 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         return node;
     };
 
+    genNode[Symbol::expr] = [&]() {
+        std::function<Node *(Expr *)> genCmpRest;
+        genCmpRest = [&](Expr *lhs) {
+            Node *node = lhs;
+            Token::TOKEN op;
+            switch (iToken->token_id)
+            {
+            case Token::TOKEN::TCEQ:
+            case Token::TOKEN::TCNE:
+            case Token::TOKEN::TCLT:
+            case Token::TOKEN::TCLE:
+            case Token::TOKEN::TCGT:
+            case Token::TOKEN::TCGE:
+                op = iToken->token_id;
+                iToken++;
+                break;
+            default:
+                return node;
+            }
+            Expr *rhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
+            Expr *_lhs = new BinaryOperatorExpr(lhs, op, rhs);
+            node = genCmpRest(_lhs);
+            return node;
+        };
+        Node *node = nullptr;
+        switch (iToken->token_id)
+        {
+        case Token::TOKEN::TIDENTIFIER:
+        case Token::TOKEN::TLPAREN:
+        case Token::TOKEN::TINTEGER:
+            goto factor;
+        default:
+            return node;
+        };
+    factor:
+        Expr *lhs = dynamic_cast<Expr *>(genNode[Symbol::cmp]());
+        node = genCmpRest(lhs);
+        return node;
+    };
+
+    genNode[Symbol::cmp] = [&]() {
+        std::function<Node *(Expr *)> genFactorRest;
+        genFactorRest = [&](Expr *lhs) {
+            Node *node = lhs;
+            Token::TOKEN op;
+            switch (iToken->token_id)
+            {
+            case Token::TOKEN::TADD:
+            case Token::TOKEN::TSUB:
+                op = iToken->token_id;
+                iToken++;
+                break;
+            default:
+                return node;
+            }
+            Expr *rhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
+            Expr *_lhs = new BinaryOperatorExpr(lhs, op, rhs);
+            node = genFactorRest(_lhs);
+            return node;
+        };
+        Node *node = nullptr;
+        switch (iToken->token_id)
+        {
+        case Token::TOKEN::TIDENTIFIER:
+        case Token::TOKEN::TLPAREN:
+        case Token::TOKEN::TINTEGER:
+            goto factor;
+        default:
+            return node;
+        };
+    factor:
+        Expr *lhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
+        node = genFactorRest(lhs);
+        return node;
+    };
+
     genNode[Symbol::factor] = [&]() {
         std::function<Node *(Expr *)> genTermRest;
         genTermRest = [&](Expr *lhs) {
@@ -194,7 +234,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         }
     item:
         Expr *lhs = dynamic_cast<Expr *>(genNode[Symbol::term]());
-        node = dynamic_cast<Expr *>(genTermRest(lhs));
+        node = genTermRest(lhs);
         return node;
     };
 
@@ -203,13 +243,14 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         switch (iToken->token_id)
         {
         case Token::TOKEN::TIDENTIFIER:
+            node = genNode[Symbol::ident]();
             break;
         case Token::TOKEN::TINTEGER:
-            node = dynamic_cast<Expr *>(genNode[Symbol::numeric]());
+            node = genNode[Symbol::numeric]();
             break;
         case Token::TOKEN::TLPAREN:
             iToken++;
-            node = dynamic_cast<Expr *>(genNode[Symbol::expr]());
+            node = genNode[Symbol::expr]();
             if (iToken->token_id == Token::TOKEN::TRPAREN)
                 iToken++;
             else

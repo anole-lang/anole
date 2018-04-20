@@ -140,6 +140,7 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
                 reading--;
                 break;
             }
+            break;
 
         case State::InCGT:
             switch (*reading)
@@ -158,6 +159,7 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
                 reading--;
                 break;
             }
+            break;
 
         case State::InInteger:
             switch (*reading)

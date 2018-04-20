@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include "Token.h"
 
 class IceObject
 {
@@ -16,11 +17,7 @@ class IceObject
     } type;
     virtual ~IceObject() {}
     virtual void show() = 0;
-    virtual IceObject *add(IceObject *) = 0;
-    virtual IceObject *sub(IceObject *) = 0;
-    virtual IceObject *mul(IceObject *) = 0;
-    virtual IceObject *div(IceObject *) = 0;
-    virtual IceObject *mod(IceObject *) = 0;
+    virtual IceObject *binaryOperate(IceObject *, Token::TOKEN op) = 0;
 };
 
 class IceIntegerObject : public IceObject
@@ -32,11 +29,7 @@ class IceIntegerObject : public IceObject
     IceIntegerObject(long value);
     virtual ~IceIntegerObject() {}
     virtual void show();
-    virtual IceObject *add(IceObject *);
-    virtual IceObject *sub(IceObject *);
-    virtual IceObject *mul(IceObject *);
-    virtual IceObject *div(IceObject *);
-    virtual IceObject *mod(IceObject *);
+    virtual IceObject *binaryOperate(IceObject *, Token::TOKEN op);
 };
 
 #endif // __ICE_OBJECT_H__

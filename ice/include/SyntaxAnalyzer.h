@@ -81,7 +81,25 @@ numeric
 	;
 
 expr
-	: factor factor_rest
+	: cmp cmp_rest
+	;
+
+cmp
+	: factor fatcor_rest
+	;
+
+cmp_rest
+	: 
+	| TCEQ cmp cmp_rest
+	| TCNE cmp cmp_rest
+	| TCLT cmp cmp_rest
+	| TCLE cmp cmp_rest
+	| TCGT cmp cmp_rest
+	| TCGE cmp cmp_rest
+	;
+
+factor
+	: term term_rest
 	;
 
 factor_rest
@@ -89,10 +107,6 @@ factor_rest
 	| TADD factor factor_rest
 	| TSUB factor factor_rest
 	| comparison factor
-	;
-
-factor
-	: term term_rest
 	;
 
 term
@@ -124,7 +138,7 @@ call_args_tail
 	;
 
 comparison
-	: TCEQ | TEXC | TCLT | TCGT
+	: TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
 	;
 
 if_else
@@ -135,37 +149,6 @@ if_else_tail
 	: 
 	| TELSE block
 	;
-*/
-
-/* Predictive Parser
-
-| Non-terminal symbols  	 | Input symbols
-|					    	 | TAT 										| TIF 							| TELSE 		| TWHILE	| TRETURN 			| TIDENTIFIER 					| TINTEGER				| TASSIGN			| TCOMMA 							 | TLPAREN 											| TRPAREN	| TLBRACE 				| TRBRACE	| TADD 						| TSUB 						| TMUL 					| TDIV 					| TMOD 					| TCEQ		| TEXC		| TCLT		| TCGT
-| stmts						 | ->stmt stmts								| ->stmt stmts					|				| TODO		| ->stmt stmts		| ->stmt stmts					| ->stmt stmts			|					|									 | ->stmt stmts 									|			|						| ->ε		|							|							|						|						|						|			|			|			|
-| stmt				    	 | ->var_decl_or_func_decl					| ->if_else 					|				| TODO		| ->return_stmt		| ->expr						| ->expr				| 					| 									 | ->expr											|			|						|			|							|							|						|						|						|			|			|			|
-| var_decl_or_func_decl 	 | ->TAT ident var_decl_or_func_decl_tail	|								|				|			|					|								|						|					|									 |													|			|						|			|							|							|						|						|						|			|			|			|
-| if_else					 |											| ->TIF expr block if_else_tail |				|			|					|								|						|					|									 |													|			|						|			|							|							|						|						|						|			|			|			|
-| expr						 |											|								|				|			|					| ->factor factor_rest			| ->factor factor_rest  |					|									 | ->TLPAREN expr TRPAREN							|			|						|			|							|							|						|						|						|			|			|			|
-| return_stmt				 |											|								|				|			| ->TRETURN expr	|								|						|					|									 |													|			|						|			|							|							|						|						|						|			|			|			|
-| var_decl_or_func_decl_tail |											|								|				|			|					|								|						| ->var_decl_tail	|									 | ->func_decl_tail									|			|						|			|							|							|						|						|						|			|			|			|			
-| block						 |											|								|				|			|					|								|						|					|									 |													|			| ->TLBRACE block_tail	|			|							|							|						|						|						|			|			|			|
-| block_tail				 | ->stmts TRBRACE							| ->stmts TRBRACE				|				| TODO		| ->stmts TRBRACE	| ->stmts TRBRACE				| ->stmts TRBRACE		|					|									 | ->stmts TRBRACE									|			|						| ->TRBRACE	|							|							|						|						|						|			|			|			|
-| var_decl_tail				 |											|								|				|			|					|								|						| ->TASSIGN expr	|									 |													|			|						|			|							|							|						|						|						|			|			|			|
-| func_decl_tail			 |											|								|				|			|					|								|						|					|									 | ->TLPAREN func_decl_args TRPAREN func_decl_rest	|			|						|			|							|							|						|						|						|			|			|			|
-| func_decl_rest			 |											|								|				|			|					|								|						| ->TASSIGN expr	|									 |													|			| ->block				|			|							|							|						|						|						|			|			|			|
-| func_decl_args			 |											|								|				|			|					| ->ident func_decl_args_tail	|						|					|									 |													| ->ε		|						|			|							|							|						|						|						|			|			|			|
-| func_decl_args_tail		 |											|								|				|			|					|								|						|					| ->TCOMMA ident func_decl_args_tail |													| ->ε		|						|			|							|							|						|						|						|			|			|			|
-| ident						 |											|								|				|			|					| ->TIDENTIFIER					| 						|					|									 |													|			|						|			|							|							|						|						|						|			|			|			|
-| numeric					 |											|								|				|			|					|								| ->TINTEGER 			|					|									 |													|			|						|			|							|							|						|						|						|			|			|			|
-| factor_rest				 |											|								|				|			|					|								|						|					| ->ε								 |													| ->ε		|						| ->ε		| ->TADD factor factor_rest	| ->TSUB factor factor_rest	|						|						|						|			|			|			|
-| factor					 |											|								|				|			|					| ->term term_test				| ->term term_rest 		|					|									 | ->term term_rest									|			|						|			|							|							|						|						|						|			|			|			|
-| term						 |											|								|				|			|					| ->ident method_call_tail 		| ->numeric				|					|									 | ->TLPAREN expr TRPAREN							|			|						|			|							|							|						|						|						|			|			|			|
-| term_rest					 |											|								|				|			|					|								|						|					| ->ε								 |													| ->ε		|						| ->ε		|							|							| ->TMUL term term_rest	| ->TDIV term term_rest	| ->TMOD term term_rest	|			|			|			|
-| method_call_tail			 |											|								|				|			|					|								|						|					| ->ε								 | ->TLPAREN call_args TRPAREN						| ->ε		|						| ->ε		|							|							|						|						|						|			|			|			|
-| call_args					 |											|								|				|			|					| ->expr call_args_tail			| ->expr call_args_tail	|					|									 | ->expr call_args_tail							| ->ε		|						|			|							|							|						|						|						|			|			|			|
-| call_args_tail			 |											|								|				|			|					|								|						|					| TCOMMA expr call_args_tail		 |													| ->ε		|						|			|							|							|						|						|						|			|			|			|
-| comparison				 |											|								|				|			|					|								|						|					|									 |													|			|						|			|							|							|						|						|						| ->TCEQ	| ->TEXC	| ->TCLT	| ->TCGT
-| if_else_tail				 | ->ε										| ->ε							| ->TELSE block |			| ->ε				| ->ε							| ->ε					|					|									 |													|			|						| ->ε		|							|							|						|						|						|			|			|			|
 */
 
 class SyntaxAnalyzer
@@ -191,10 +174,9 @@ class SyntaxAnalyzer
 		func_decl_args_tail,
 		ident,
 		numeric,
-		factor_rest,
+		cmp,
 		factor,
 		term,
-		term_rest,
 		method_call_tail,
 		call_args,
 		call_args_tail,

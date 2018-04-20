@@ -18,11 +18,14 @@ A funny language named Ice (an exercise for Compilers).
 
 ###### Binary Operator
 ```ice
-# support + - * / % now
+# support + - * / % = != <= > >=
 @a: 1 + 1
 @b: 4 - 1
 @c: (a + b) - a * b / a % b # support ()
+1 = 1 # 1
+1 != 1 # 0
+a <= 3 # 1
 ```
 
 ### TODO
-* Complete Binary Operator
+* Complete Function Declaration & MethodCall

@@ -46,21 +46,7 @@ IceObject *BinaryOperatorExpr::runCode(Env *top)
 {
     IceObject *lobj = lhs->runCode(top);
     IceObject *robj = rhs->runCode(top);
-    switch (op)
-    {
-    case Token::TOKEN::TADD:
-        return lobj->add(robj);
-    case Token::TOKEN::TSUB:
-        return lobj->sub(robj);
-    case Token::TOKEN::TMUL:
-        return lobj->mul(robj);
-    case Token::TOKEN::TDIV:
-        return lobj->div(robj);
-    case Token::TOKEN::TMOD:
-        return lobj->mod(robj);
-    default:
-        return nullptr;
-    }
+    return lobj->binaryOperate(robj, op);
 }
 
 IceObject *ExprStmt::runCode(Env *top)
