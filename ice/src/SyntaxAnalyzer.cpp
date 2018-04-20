@@ -7,7 +7,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
     iToken = tokens.begin();
 
     genNode[Symbol::stmt] = [&]() {
-        Node *node = nullptr;
+        std::shared_ptr<Node> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TAT:
@@ -16,7 +16,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         case Token::TOKEN::TIDENTIFIER:
         case Token::TOKEN::TINTEGER:
         case Token::TOKEN::TLPAREN:
-            node = new ExprStmt(dynamic_cast<Expr *>(genNode[Symbol::expr]()));
+            node = std::make_shared<ExprStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
             break;
         default:
             break;
@@ -25,7 +25,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
     };
 
     genNode[Symbol::var_decl_or_func_decl] = [&]() {
-        VariableDeclarationStmt *node = nullptr;
+        std::shared_ptr<VariableDeclarationStmt> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TAT:
@@ -35,20 +35,20 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         }
     varDecl:
         iToken++;
-        IdentifierExpr *id = dynamic_cast<IdentifierExpr *>(genNode[Symbol::ident]());
-        Expr *assignment = dynamic_cast<Expr *>(genNode[Symbol::var_decl_or_func_decl_tail]());
-        node = new VariableDeclarationStmt(id, assignment);
+        std::shared_ptr<IdentifierExpr> id = std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]());
+        std::shared_ptr<Expr> assignment = std::dynamic_pointer_cast<Expr>(genNode[Symbol::var_decl_or_func_decl_tail]());
+        node = std::make_shared<VariableDeclarationStmt>(id, assignment);
         return node;
     };
 
     genNode[Symbol::if_else] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::return_stmt] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::var_decl_or_func_decl_tail] = [&]() {
@@ -60,51 +60,51 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
         default:
             break;
         }
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::block] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::block_tail] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::var_decl_tail] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::func_decl_tail] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::func_decl_rest] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::func_decl_args] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::func_decl_args_tail] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::ident] = [&]() {
-        Node *node = nullptr;
+        std::shared_ptr<Node> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TIDENTIFIER:
-            node = new IdentifierExpr(iToken->value);
+            node = std::make_shared<IdentifierExpr>(iToken->value);
             iToken++;
             break;
         default:
@@ -114,11 +114,11 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
     };
 
     genNode[Symbol::numeric] = [&]() {
-        Node *node = nullptr;
+        std::shared_ptr<Node> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TINTEGER:
-            node = new IntegerExpr(std::stoi(iToken->value));
+            node = std::make_shared<IntegerExpr>(std::stoi(iToken->value));
             iToken++;
             break;
         default:
@@ -128,9 +128,9 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
     };
 
     genNode[Symbol::expr] = [&]() {
-        std::function<Node *(Expr *)> genCmpRest;
-        genCmpRest = [&](Expr *lhs) {
-            Node *node = lhs;
+        std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genCmpRest;
+        genCmpRest = [&](std::shared_ptr<Expr> lhs) {
+            std::shared_ptr<Node> node = lhs;
             Token::TOKEN op;
             switch (iToken->token_id)
             {
@@ -146,12 +146,12 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
             default:
                 return node;
             }
-            Expr *rhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
-            Expr *_lhs = new BinaryOperatorExpr(lhs, op, rhs);
+            std::shared_ptr<Expr> rhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::cmp]());
+            std::shared_ptr<Expr> _lhs = std::make_shared<BinaryOperatorExpr>(lhs, op, rhs);
             node = genCmpRest(_lhs);
             return node;
         };
-        Node *node = nullptr;
+        std::shared_ptr<Node> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TIDENTIFIER:
@@ -162,15 +162,15 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
             return node;
         };
     factor:
-        Expr *lhs = dynamic_cast<Expr *>(genNode[Symbol::cmp]());
+        std::shared_ptr<Expr> lhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::cmp]());
         node = genCmpRest(lhs);
         return node;
     };
 
     genNode[Symbol::cmp] = [&]() {
-        std::function<Node *(Expr *)> genFactorRest;
-        genFactorRest = [&](Expr *lhs) {
-            Node *node = lhs;
+        std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genFactorRest;
+        genFactorRest = [&](std::shared_ptr<Expr> lhs) {
+            std::shared_ptr<Node> node = lhs;
             Token::TOKEN op;
             switch (iToken->token_id)
             {
@@ -182,12 +182,12 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
             default:
                 return node;
             }
-            Expr *rhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
-            Expr *_lhs = new BinaryOperatorExpr(lhs, op, rhs);
+            std::shared_ptr<Expr> rhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::factor]());
+            std::shared_ptr<Expr> _lhs = std::make_shared<BinaryOperatorExpr>(lhs, op, rhs);
             node = genFactorRest(_lhs);
             return node;
         };
-        Node *node = nullptr;
+        std::shared_ptr<Node> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TIDENTIFIER:
@@ -198,15 +198,15 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
             return node;
         };
     factor:
-        Expr *lhs = dynamic_cast<Expr *>(genNode[Symbol::factor]());
+        std::shared_ptr<Expr> lhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::factor]());
         node = genFactorRest(lhs);
         return node;
     };
 
     genNode[Symbol::factor] = [&]() {
-        std::function<Node *(Expr *)> genTermRest;
-        genTermRest = [&](Expr *lhs) {
-            Node *node = lhs;
+        std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genTermRest;
+        genTermRest = [&](std::shared_ptr<Expr> lhs) {
+            std::shared_ptr<Node> node = lhs;
             Token::TOKEN op;
             switch (iToken->token_id)
             {
@@ -219,12 +219,12 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
             default:
                 return node;
             }
-            Expr *rhs = dynamic_cast<Expr *>(genNode[Symbol::term]());
-            Expr *_lhs = new BinaryOperatorExpr(lhs, op, rhs);
+            std::shared_ptr<Expr> rhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::term]());
+            std::shared_ptr<Expr> _lhs = std::make_shared<BinaryOperatorExpr>(lhs, op, rhs);
             node = genTermRest(_lhs);
             return node;
         };
-        Node *node = nullptr;
+        std::shared_ptr<Node> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TIDENTIFIER:
@@ -235,13 +235,13 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
             return node;
         }
     item:
-        Expr *lhs = dynamic_cast<Expr *>(genNode[Symbol::term]());
+        std::shared_ptr<Expr> lhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::term]());
         node = genTermRest(lhs);
         return node;
     };
 
     genNode[Symbol::term] = [&]() {
-        Node *node = nullptr;
+        std::shared_ptr<Node> node = nullptr;
         switch (iToken->token_id)
         {
         case Token::TOKEN::TIDENTIFIER:
@@ -268,35 +268,34 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::vector<Token> &tokens) : tokens(tokens)
     };
 
     genNode[Symbol::method_call_tail] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::call_args] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::call_args_tail] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::comparison] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 
     genNode[Symbol::if_else_tail] = [&]() {
-        Node *_ = nullptr;
-        return _;
+        std::shared_ptr<Node> node = nullptr;
+        return node;
     };
 }
 
-Node *SyntaxAnalyzer::getNode()
+std::shared_ptr<Node> SyntaxAnalyzer::getNode()
 {
-    Node *node = iToken == tokens.end() ? nullptr : genNode[Symbol::stmt]();
+    std::shared_ptr<Node> node = (iToken == tokens.end()) ? nullptr : genNode[Symbol::stmt]();
     return node;
-}    
 }
-
+}

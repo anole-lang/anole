@@ -4,24 +4,25 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <memory>
 #include <cstring>
 #include "IceObject.h"
 
 namespace Ice
 {
 
-class Env
+class Env : public std::enable_shared_from_this<Env>
 {
   private:
-    std::map<std::string, IceObject *> objects;
+    std::map<std::string, std::shared_ptr<IceObject>> objects;
 
   protected:
-    Env *prev;
+    std::shared_ptr<Env> prev;
 
   public:
-    Env(Env *prev) : prev(prev) {}
-    void put(std::string &, IceObject *);
-    IceObject *getObject(std::string &);
+    Env(std::shared_ptr<Env> prev) : prev(prev) {}
+    void put(std::string &, std::shared_ptr<IceObject>);
+    std::shared_ptr<IceObject> getObject(std::string &);
 };
 }
 

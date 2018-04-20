@@ -3,14 +3,14 @@
 
 namespace Ice
 {
-void Env::put(std::string &name, IceObject *obj)
+void Env::put(std::string &name, std::shared_ptr<IceObject> obj)
 {
     objects[name] = obj;
 }
 
-IceObject *Env::getObject(std::string &name)
+std::shared_ptr<IceObject> Env::getObject(std::string &name)
 {
-    Env *tmp = this;
+    std::shared_ptr<Env> tmp = shared_from_this();
     while (tmp != nullptr)
     {
         if (tmp->objects.find(name) != tmp->objects.end())
@@ -27,39 +27,39 @@ IceObject *Env::getObject(std::string &name)
     return nullptr;
 }
 
-IceObject *BlockExpr::runCode(Env *top)
+std::shared_ptr<IceObject> BlockExpr::runCode(std::shared_ptr<Env> top)
 {
     for (auto stmt : statements)
         stmt->runCode(top);
     return nullptr;
 }
 
-IceObject *IntegerExpr::runCode(Env *top)
+std::shared_ptr<IceObject> IntegerExpr::runCode(std::shared_ptr<Env> top)
 {
-    return new IceIntegerObject(value);
+    return std::make_shared<IceIntegerObject>(value);
 }
 
-IceObject *IdentifierExpr::runCode(Env *top)
+std::shared_ptr<IceObject> IdentifierExpr::runCode(std::shared_ptr<Env> top)
 {
     return top->getObject(name);
 }
 
-IceObject *BinaryOperatorExpr::runCode(Env *top)
+std::shared_ptr<IceObject> BinaryOperatorExpr::runCode(std::shared_ptr<Env> top)
 {
-    IceObject *lobj = lhs->runCode(top);
-    IceObject *robj = rhs->runCode(top);
+    std::shared_ptr<IceObject> lobj = lhs->runCode(top);
+    std::shared_ptr<IceObject> robj = rhs->runCode(top);
     return lobj->binaryOperate(robj, op);
 }
 
-IceObject *ExprStmt::runCode(Env *top)
+std::shared_ptr<IceObject> ExprStmt::runCode(std::shared_ptr<Env> top)
 {
-    IceObject *obj = assignment->runCode(top);
+    std::shared_ptr<IceObject> obj = assignment->runCode(top);
     return obj;
 }
 
-IceObject *VariableDeclarationStmt::runCode(Env *top)
+std::shared_ptr<IceObject> VariableDeclarationStmt::runCode(std::shared_ptr<Env> top)
 {
-    IceObject *obj = assignment->runCode(top);
+    std::shared_ptr<IceObject> obj = assignment->runCode(top);
     top->put(id->name, obj);
     return nullptr;
 }

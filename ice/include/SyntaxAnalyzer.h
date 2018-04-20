@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 #include <stack>
 #include <iterator>
 #include <functional>
@@ -185,11 +186,11 @@ class SyntaxAnalyzer
         comparison,
         if_else_tail
     };
-    std::map<Symbol, std::function<Node *()>> genNode;
+    std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 
   public:
     SyntaxAnalyzer(std::vector<Token> &tokens);
-    Node *getNode();
+    std::shared_ptr<Node> getNode();
 };
 }
 

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 #include <cstring>
 #include "Token.h"
 
@@ -19,7 +20,7 @@ class IceObject
     } type;
     virtual ~IceObject() {}
     virtual void show() = 0;
-    virtual IceObject *binaryOperate(IceObject *, Token::TOKEN op) = 0;
+    virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op) = 0;
 };
 
 class IceIntegerObject : public IceObject
@@ -31,7 +32,7 @@ class IceIntegerObject : public IceObject
     IceIntegerObject(long value);
     virtual ~IceIntegerObject() {}
     virtual void show();
-    virtual IceObject *binaryOperate(IceObject *, Token::TOKEN op);
+    virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
 };
 }
 

@@ -19,8 +19,8 @@ class BlockExpr;
 class Interpreter
 {
   private:
-    Env *top;
-    BlockExpr *block;
+    std::shared_ptr<Env> top;
+    std::shared_ptr<BlockExpr> block;
 
   public:
     Interpreter();

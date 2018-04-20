@@ -11,8 +11,8 @@ Interpreter::Interpreter()
                  "     ///    ///       ///\n"
                  " ///////// ///////// /////////\n"
               << std::endl;
-    top = new Env(nullptr);
-    block = new BlockExpr();
+    top = std::make_shared<Env>(nullptr);
+    block = std::make_shared<BlockExpr>();
 }
 
 void Interpreter::run()
@@ -31,11 +31,10 @@ void Interpreter::run()
         SyntaxAnalyzer syntaxAnalyzer(tokens);
         auto node = syntaxAnalyzer.getNode();
 
-        auto obj = node == nullptr ? nullptr : node->runCode(top);
-        if (obj != nullptr)
-            obj->show();
+        auto obj = (node == nullptr) ? nullptr : node->runCode(top);
+        if (obj != nullptr) obj->show();
 
-        block->statements.push_back(dynamic_cast<Stmt *>(node));
+        block->statements.push_back(std::dynamic_pointer_cast<Stmt>(node));
     }
 }
 }
