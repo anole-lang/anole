@@ -10,32 +10,32 @@
 
 namespace Ice
 {
-class LexicalAnalyzer
-{
-  private:
-    std::vector<Token> tokens;
-    enum class State
-    {
-        Begin,
+	class LexicalAnalyzer
+	{
+	private:
+		std::vector<Token> tokens;
+		enum class State
+		{
+			Begin,
 
-        InNot,
-        InCLT,
-        InCGT,
+			InNot,
+			InCLT,
+			InCGT,
 
-        InComment,
-        InInteger,
-        InDouble,
-        InIdentifier,
-        InString,
-        InStringEscaping
-    };
-	void analy();
+			InComment,
+			InInteger,
+			InDouble,
+			InIdentifier,
+			InString,
+			InStringEscaping
+		};
+		void analy();
 
-  public:
-    LexicalAnalyzer() {}
-    std::vector<Token> &getTokens();
-	std::vector<Token>::iterator cont();
-};
+	public:
+		LexicalAnalyzer() {}
+		std::vector<Token> &getTokens();
+		std::vector<Token>::iterator cont();
+	};
 }
 
 #endif //__LEXICAL_ANALYZER_H__

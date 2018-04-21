@@ -168,7 +168,6 @@ namespace Ice
 			if_else,
 			expr,
 			return_stmt,
-			var_decl_or_func_decl_tail,
 			block,
 			block_tail,
 			var_decl_tail,

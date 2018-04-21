@@ -23,19 +23,38 @@ namespace Ice
 		};
 
 		genNode[Symbol::var_decl_or_func_decl] = [&]() {
-			std::shared_ptr<VariableDeclarationStmt> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TAT:
-				goto varDecl;
-			default:
-				return node;
-			}
-		varDecl:
+			std::shared_ptr<Node> node = nullptr;
 			iToken++;
 			std::shared_ptr<IdentifierExpr> id = std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]());
-			std::shared_ptr<Expr> assignment = std::dynamic_pointer_cast<Expr>(genNode[Symbol::var_decl_or_func_decl_tail]());
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TASSIGN:
+				iToken++;
+				goto varDecl;
+			case Token::TOKEN::TLPAREN:
+				iToken++;
+				goto funcDecl;
+			default:
+				std::cout << "missing ':' or '('" << std::endl;
+				exit(0);
+			}
+		varDecl:
+			std::shared_ptr<Expr> assignment = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
 			node = std::make_shared<VariableDeclarationStmt>(id, assignment);
+			return node;
+		funcDecl:
+			VariableList arguments; // TODO: genArguments;
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TRPAREN:
+				iToken++;
+				break;
+			default:
+				std::cout << "missing ')'" << std::endl;
+				exit(0);
+			}
+			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::func_decl_rest]());
+			node = std::make_shared<FunctionDeclarationStmt>(id, arguments, block);
 			return node;
 		};
 
@@ -45,20 +64,6 @@ namespace Ice
 		};
 
 		genNode[Symbol::return_stmt] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
-		genNode[Symbol::var_decl_or_func_decl_tail] = [&]() {
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TASSIGN:
-				iToken++;
-				if (iToken->token_id == Token::TOKEN::TEND) iToken = lexicalAnalyzer.cont();
-				return genNode[Symbol::expr]();
-			default:
-				break;
-			}
 			std::shared_ptr<Node> node = nullptr;
 			return node;
 		};

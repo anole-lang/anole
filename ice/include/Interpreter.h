@@ -13,20 +13,20 @@
 
 namespace Ice
 {
-class BlockExpr;
+	class BlockExpr;
 
-class Interpreter
-{
-  private:
-    std::shared_ptr<Env> top;
-    std::shared_ptr<BlockExpr> block;
+	class Interpreter
+	{
+	private:
+		std::shared_ptr<Env> top;
+		std::shared_ptr<BlockExpr> block;
 
-    SyntaxAnalyzer syntaxAnalyzer;
+		SyntaxAnalyzer syntaxAnalyzer;
 
-  public:
-    Interpreter();
-    void run();
-};
+	public:
+		Interpreter();
+		void run();
+	};
 }
 
 #endif //__INTERPRETER_H__

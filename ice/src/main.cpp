@@ -8,7 +8,7 @@ using namespace Ice;
 
 int main()
 {
-    Interpreter interpreter;
-    interpreter.run();
-    return 0;
+	Interpreter interpreter;
+	interpreter.run();
+	return 0;
 }

@@ -8,64 +8,64 @@
 
 namespace Ice
 {
-class Token
-{
-  public:
-    enum class TOKEN
-    {
-		TEND, // #
+	class Token
+	{
+	public:
+		enum class TOKEN
+		{
+			TEND, // #
 
-        TAT, // @
+			TAT, // @
 
-        TIF,     // if
-        TELSE,   // else
-        TWHILE,  // while
-        TRETURN, // return
+			TIF,     // if
+			TELSE,   // else
+			TWHILE,  // while
+			TRETURN, // return
 
-        TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
-        TINTEGER,    // [0-9]+
-        TDOUBLE,     // [0-9]+\.[0-9]*
-        TSTRING,     // "[^"\n]"
+			TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
+			TINTEGER,    // [0-9]+
+			TDOUBLE,     // [0-9]+\.[0-9]*
+			TSTRING,     // "[^"\n]"
 
-        TASSIGN, // :
-        TCOMMA,  // ,
+			TASSIGN, // :
+			TCOMMA,  // ,
 
-        TESCAPE, // "\"
+			TESCAPE, // "\"
 
-        TLPAREN, // (
-        TRPAREN, // )
-        TLBRACE, // {
-        TRBRACE, // }
+			TLPAREN, // (
+			TRPAREN, // )
+			TLBRACE, // {
+			TRBRACE, // }
 
-        TADD, // +
-        TSUB, // -
-        TMUL, // *
-        TDIV, // /
-        TMOD, // %
+			TADD, // +
+			TSUB, // -
+			TMUL, // *
+			TDIV, // /
+			TMOD, // %
 
-        TBAND, // &
-        TBOR,  // |
-        TBXOR, // ^
-        TBNEG, // ~
-        TBLS,  // <<
-        TBRS,  // >>
+			TBAND, // &
+			TBOR,  // |
+			TBXOR, // ^
+			TBNEG, // ~
+			TBLS,  // <<
+			TBRS,  // >>
 
-        TAND, // and
-        TOR,  // or
-        TNOT, // not
+			TAND, // and
+			TOR,  // or
+			TNOT, // not
 
-        TCEQ, // =
-        TCNE, // !=
-        TCLT, // <
-        TCLE, // <=
-        TCGT, // >
-        TCGE  // >=
-    } token_id;
-    std::string value;
-    Token(TOKEN token_id, std::string value) : token_id(token_id), value(value) {}
-    Token(TOKEN token_id) : token_id(token_id) {}
-    Token(std::string value);
-};
+			TCEQ, // =
+			TCNE, // !=
+			TCLT, // <
+			TCLE, // <=
+			TCGT, // >
+			TCGE  // >=
+		} token_id;
+		std::string value;
+		Token(TOKEN token_id, std::string value) : token_id(token_id), value(value) {}
+		Token(TOKEN token_id) : token_id(token_id) {}
+		Token(std::string value);
+	};
 }
 
 #endif //__TOKEN_H__
