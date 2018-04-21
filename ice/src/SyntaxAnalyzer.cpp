@@ -54,6 +54,7 @@ namespace Ice
 			{
 			case Token::TOKEN::TASSIGN:
 				iToken++;
+				if (iToken->token_id == Token::TOKEN::TEND) iToken = lexicalAnalyzer.cont();
 				return genNode[Symbol::expr]();
 			default:
 				break;
@@ -291,8 +292,9 @@ namespace Ice
 		};
 	}
 
-	std::shared_ptr<Node> SyntaxAnalyzer::getNode(std::vector<Token> &tokens)
+	std::shared_ptr<Node> SyntaxAnalyzer::getNode()
 	{
+		auto &tokens = lexicalAnalyzer.getTokens();
 		iToken = tokens.begin();
 		return (iToken == tokens.end()) ? nullptr : genNode[Symbol::stmt]();
 	}

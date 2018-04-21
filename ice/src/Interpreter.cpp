@@ -17,17 +17,13 @@ Interpreter::Interpreter()
 
 void Interpreter::run()
 {
-    while (true)
-    {
-        std::cout << ">> ";
-        
-        auto &tokens = lexicalAnalyzer.getTokens();
-        auto node = syntaxAnalyzer.getNode(tokens);
-
-        auto obj = (node == nullptr) ? nullptr : node->runCode(top);
-        if (obj != nullptr) obj->show();
-
-        block->statements.push_back(std::dynamic_pointer_cast<Stmt>(node));
-    }
+	while (true)
+	{
+		std::cout << ">> ";
+		auto node = syntaxAnalyzer.getNode();
+		auto obj = (node == nullptr) ? nullptr : node->runCode(top);
+		if (obj != nullptr) obj->show();
+		block->statements.push_back(std::dynamic_pointer_cast<Stmt>(node));
+	}
 }
 }

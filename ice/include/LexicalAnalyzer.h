@@ -29,10 +29,12 @@ class LexicalAnalyzer
         InString,
         InStringEscaping
     };
+	void analy();
 
   public:
     LexicalAnalyzer() {}
     std::vector<Token> &getTokens();
+	std::vector<Token>::iterator cont();
 };
 }
 

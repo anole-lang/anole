@@ -10,9 +10,10 @@
 #include <map>
 #include "Token.h"
 #include "Node.h"
+#include "LexicalAnalyzer.h"
 
 /* LL(1) Grammer
-program	
+program
 	: stmts
 	;
 
@@ -22,8 +23,8 @@ stmts
 	;
 
 stmt
-	: var_decl_or_func_decl 
-    | if_else
+	: var_decl_or_func_decl
+	| if_else
 	| expr
 	| return_stmt
 	;
@@ -64,7 +65,7 @@ func_decl_rest
 	;
 
 func_decl_args
-	: 
+	:
 	| ident func_decl_args_tail
 	;
 
@@ -76,7 +77,7 @@ ident
 	: TIDENTIFIER
 	;
 
-numeric	
+numeric
 	: TINTEGER
 	| TDOUBLE
 	;
@@ -90,7 +91,7 @@ cmp
 	;
 
 cmp_rest
-	: 
+	:
 	| TCEQ cmp cmp_rest
 	| TCNE cmp cmp_rest
 	| TCLT cmp cmp_rest
@@ -145,52 +146,53 @@ comparison
 if_else
 	: TIF expr block if_else_tail
 	;
-	
+
 if_else_tail
-	: 
+	:
 	| TELSE block
 	;
 */
 
 namespace Ice
 {
-class SyntaxAnalyzer
-{
-  private:
-    std::vector<Token>::iterator iToken;
-    enum class Symbol
-    {
-        stmts,
-        stmt,
-        var_decl_or_func_decl,
-        if_else,
-        expr,
-        return_stmt,
-        var_decl_or_func_decl_tail,
-        block,
-        block_tail,
-        var_decl_tail,
-        func_decl_tail,
-        func_decl_rest,
-        func_decl_args,
-        func_decl_args_tail,
-        ident,
-        numeric,
-        cmp,
-        factor,
-        term,
-        method_call_tail,
-        call_args,
-        call_args_tail,
-        comparison,
-        if_else_tail
-    };
-    std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
+	class SyntaxAnalyzer
+	{
+	private:
+		LexicalAnalyzer lexicalAnalyzer;
+		std::vector<Token>::iterator iToken;
+		enum class Symbol
+		{
+			stmts,
+			stmt,
+			var_decl_or_func_decl,
+			if_else,
+			expr,
+			return_stmt,
+			var_decl_or_func_decl_tail,
+			block,
+			block_tail,
+			var_decl_tail,
+			func_decl_tail,
+			func_decl_rest,
+			func_decl_args,
+			func_decl_args_tail,
+			ident,
+			numeric,
+			cmp,
+			factor,
+			term,
+			method_call_tail,
+			call_args,
+			call_args_tail,
+			comparison,
+			if_else_tail
+		};
+		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 
-  public:
-	SyntaxAnalyzer();
-    std::shared_ptr<Node> getNode(std::vector<Token> &tokens);
-};
+	public:
+		SyntaxAnalyzer();
+		std::shared_ptr<Node> getNode();
+	};
 }
 
 #endif //__SYNTAX_ANALYZER_H__

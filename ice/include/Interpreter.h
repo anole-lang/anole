@@ -7,7 +7,6 @@
 #include <cstring>
 #include <cstdio>
 #include "Token.h"
-#include "LexicalAnalyzer.h"
 #include "Node.h"
 #include "SyntaxAnalyzer.h"
 #include "Coderun.h"
@@ -21,8 +20,7 @@ class Interpreter
   private:
     std::shared_ptr<Env> top;
     std::shared_ptr<BlockExpr> block;
-    
-    LexicalAnalyzer lexicalAnalyzer;
+
     SyntaxAnalyzer syntaxAnalyzer;
 
   public:
