@@ -40,7 +40,7 @@ namespace Ice
 	public:
 		StatementList statements;
 		BlockExpr() {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class IntegerExpr : public Expr
@@ -48,7 +48,7 @@ namespace Ice
 	public:
 		long value;
 		IntegerExpr(long value) : value(value) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class DoubleExpr : public Expr
@@ -56,7 +56,7 @@ namespace Ice
 	public:
 		double value;
 		DoubleExpr(double value) : value(value) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class IdentifierExpr : public Expr
@@ -64,7 +64,7 @@ namespace Ice
 	public:
 		std::string name;
 		IdentifierExpr(std::string &name) : name(name) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class MethodCallExpr : public Expr
@@ -73,7 +73,7 @@ namespace Ice
 		std::shared_ptr<IdentifierExpr> id;
 		ExpressionList arguments;
 		MethodCallExpr(std::shared_ptr<IdentifierExpr> id, ExpressionList &arguments) :id(id), arguments(arguments) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class BinaryOperatorExpr : public Expr
@@ -83,7 +83,7 @@ namespace Ice
 		Token::TOKEN op;
 		std::shared_ptr<Expr> rhs;
 		BinaryOperatorExpr(std::shared_ptr<Expr> lhs, Token::TOKEN op, std::shared_ptr<Expr> rhs) : lhs(lhs), op(op), rhs(rhs) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class ExprStmt : public Stmt
@@ -91,7 +91,7 @@ namespace Ice
 	public:
 		std::shared_ptr<Expr> assignment;
 		ExprStmt(std::shared_ptr<Expr> assignment) : assignment(assignment) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class VariableDeclarationStmt : public Stmt
@@ -100,7 +100,7 @@ namespace Ice
 		std::shared_ptr<IdentifierExpr> id;
 		std::shared_ptr<Expr> assignment;
 		VariableDeclarationStmt(std::shared_ptr<IdentifierExpr> id, std::shared_ptr<Expr>assignment) : id(id), assignment(assignment) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class FunctionDeclarationStmt : public Stmt, public std::enable_shared_from_this<FunctionDeclarationStmt>
@@ -110,7 +110,7 @@ namespace Ice
 		VariableList arguments;
 		std::shared_ptr<BlockExpr> block;
 		FunctionDeclarationStmt(std::shared_ptr<IdentifierExpr> id, const VariableList &arguments, std::shared_ptr<BlockExpr> block) : id(id), arguments(arguments), block(block) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class ReturnStmt : public Stmt
@@ -118,7 +118,7 @@ namespace Ice
 	public:
 		std::shared_ptr<Expr> assignment;
 		ReturnStmt(std::shared_ptr<Expr> assignment) :assignment(assignment) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 }
 

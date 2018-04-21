@@ -18,10 +18,8 @@ namespace Ice
 		std::map<std::string, std::shared_ptr<FunctionDeclarationStmt>> functions;
 		std::shared_ptr<IceObject> returnValue;
 
-	protected:
-		std::shared_ptr<Env> prev;
-
 	public:
+		std::shared_ptr<Env> prev;
 		Env(std::shared_ptr<Env> prev) : prev(prev) {}
 
 		void put(std::string &, std::shared_ptr<IceObject>);

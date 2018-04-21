@@ -43,7 +43,7 @@ namespace Ice
 		return nullptr;
 	}
 
-	std::shared_ptr<IceObject> BlockExpr::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> BlockExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> returnValue = top->getReturnValue();
 		for (auto stmt : statements)
@@ -59,22 +59,22 @@ namespace Ice
 		return nullptr;
 	}
 
-	std::shared_ptr<IceObject> IntegerExpr::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> IntegerExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		return std::make_shared<IceIntegerObject>(value);
 	}
 
-	std::shared_ptr<IceObject> DoubleExpr::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> DoubleExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		return std::make_shared<IceDoubleObject>(value);
 	}
 
-	std::shared_ptr<IceObject> IdentifierExpr::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> IdentifierExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		return top->getObject(name);
 	}
 
-	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		top = std::make_shared<Env>(top);
 		std::shared_ptr<FunctionDeclarationStmt> func = top->getFunction(id->name);
@@ -92,35 +92,37 @@ namespace Ice
 		{
 			top->put(func->arguments[i]->name, argValues[i]);
 		}
-		return func->block->runCode(top);
+		std::shared_ptr<IceObject> returnValue = func->block->runCode(top);
+		top = top->prev;
+		return returnValue;
 	}
 
-	std::shared_ptr<IceObject> BinaryOperatorExpr::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> BinaryOperatorExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> lobj = lhs->runCode(top);
 		std::shared_ptr<IceObject> robj = rhs->runCode(top);
 		return lobj->binaryOperate(robj, op);
 	}
 
-	std::shared_ptr<IceObject> ExprStmt::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> ExprStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		return assignment->runCode(top);
 	}
 
-	std::shared_ptr<IceObject> VariableDeclarationStmt::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> VariableDeclarationStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> obj = assignment->runCode(top);
 		top->put(id->name, obj);
 		return nullptr;
 	}
 
-	std::shared_ptr<IceObject> FunctionDeclarationStmt::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> FunctionDeclarationStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		top->put(id->name, shared_from_this());
 		return nullptr;
 	}
 
-	std::shared_ptr<IceObject> ReturnStmt::runCode(std::shared_ptr<Env> top)
+	std::shared_ptr<IceObject> ReturnStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> returnValue = assignment->runCode(top);
 		top->setReturnValue(returnValue);
