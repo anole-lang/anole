@@ -4,9 +4,12 @@ namespace Ice
 {
 std::vector<Token> &LexicalAnalyzer::getTokens()
 {
+    std::string text;
+    std::getline(std::cin, text);
+    text += "$";
     tokens.clear();
     State state = State::Begin;
-    std::string value = "";
+    std::string value;
     const char *reading = text.c_str();
     while (*reading)
     {
@@ -15,6 +18,8 @@ std::vector<Token> &LexicalAnalyzer::getTokens()
         case State::Begin:
             switch (*reading)
             {
+			case '$':
+				tokens.push_back(Token(Token::TOKEN::TEND));
             case '#':
                 state = State::InComment;
                 break;

@@ -21,6 +21,9 @@ class Interpreter
   private:
     std::shared_ptr<Env> top;
     std::shared_ptr<BlockExpr> block;
+    
+    LexicalAnalyzer lexicalAnalyzer;
+    SyntaxAnalyzer syntaxAnalyzer;
 
   public:
     Interpreter();

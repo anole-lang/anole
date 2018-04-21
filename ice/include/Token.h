@@ -13,6 +13,8 @@ class Token
   public:
     enum class TOKEN
     {
+		TEND, // #
+
         TAT, // @
 
         TIF,     // if

@@ -1,7 +1,18 @@
-# Ice
+<div align=center>
+<img width="300" height="300" src="https://images-1252918210.cos.ap-beijing.myqcloud.com/ICE_LOGO_1.png"/>
+</div>
+<hr>
+
+## Just an exercise for *Compilers*.
 > this is a implementation that almost by myself in this branch.
 
-A funny language named Ice (an exercise for Compilers).
+### Quick start
+```shell
+git clone https://github.com/MU001999/ice.git
+cd ice/ice
+make
+```
+Also you can use Visual Studio, just open ice/ice.sln by Visual Studio.
 
 ### Progress
 

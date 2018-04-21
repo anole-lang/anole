@@ -19,17 +19,10 @@ void Interpreter::run()
 {
     while (true)
     {
-        std::string line;
         std::cout << ">> ";
-
-        getline(std::cin, line);
-        line += '$';
-
-        LexicalAnalyzer lexAnalyzer(line);
-        auto &tokens = lexAnalyzer.getTokens();
-
-        SyntaxAnalyzer syntaxAnalyzer(tokens);
-        auto node = syntaxAnalyzer.getNode();
+        
+        auto &tokens = lexicalAnalyzer.getTokens();
+        auto node = syntaxAnalyzer.getNode(tokens);
 
         auto obj = (node == nullptr) ? nullptr : node->runCode(top);
         if (obj != nullptr) obj->show();

@@ -13,7 +13,6 @@ namespace Ice
 class LexicalAnalyzer
 {
   private:
-    std::string &text;
     std::vector<Token> tokens;
     enum class State
     {
@@ -32,7 +31,7 @@ class LexicalAnalyzer
     };
 
   public:
-    LexicalAnalyzer(std::string &text) : text(text) {}
+    LexicalAnalyzer() {}
     std::vector<Token> &getTokens();
 };
 }

@@ -157,7 +157,6 @@ namespace Ice
 class SyntaxAnalyzer
 {
   private:
-    std::vector<Token> &tokens;
     std::vector<Token>::iterator iToken;
     enum class Symbol
     {
@@ -189,8 +188,8 @@ class SyntaxAnalyzer
     std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 
   public:
-    SyntaxAnalyzer(std::vector<Token> &tokens);
-    std::shared_ptr<Node> getNode();
+	SyntaxAnalyzer();
+    std::shared_ptr<Node> getNode(std::vector<Token> &tokens);
 };
 }
 

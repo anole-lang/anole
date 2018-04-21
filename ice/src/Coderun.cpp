@@ -14,13 +14,9 @@ std::shared_ptr<IceObject> Env::getObject(std::string &name)
     while (tmp != nullptr)
     {
         if (tmp->objects.find(name) != tmp->objects.end())
-        {
             return tmp->objects[name];
-        }
         else
-        {
             tmp = tmp->prev;
-        }
     }
     std::cout << "cannot find " << name << std::endl;
     exit(0);
@@ -53,8 +49,7 @@ std::shared_ptr<IceObject> BinaryOperatorExpr::runCode(std::shared_ptr<Env> top)
 
 std::shared_ptr<IceObject> ExprStmt::runCode(std::shared_ptr<Env> top)
 {
-    std::shared_ptr<IceObject> obj = assignment->runCode(top);
-    return obj;
+    return assignment->runCode(top);
 }
 
 std::shared_ptr<IceObject> VariableDeclarationStmt::runCode(std::shared_ptr<Env> top)
