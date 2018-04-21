@@ -15,6 +15,7 @@ namespace Ice
 
 	class Stmt;
 	class Expr;
+	class IdentifierExpr;
 
 	typedef std::vector<std::shared_ptr<Stmt>> StatementList;
 	typedef std::vector<std::shared_ptr<Expr>> ExpressionList;
@@ -102,7 +103,7 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>);
 	};
 
-	class FunctionDeclarationStmt : public Stmt
+	class FunctionDeclarationStmt : public Stmt, public std::enable_shared_from_this<FunctionDeclarationStmt>
 	{
 	public:
 		std::shared_ptr<IdentifierExpr> id;

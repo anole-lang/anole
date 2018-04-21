@@ -7,6 +7,7 @@
 #include <memory>
 #include <cstring>
 #include "IceObject.h"
+#include "Node.h"
 
 namespace Ice
 {
@@ -14,6 +15,7 @@ namespace Ice
 	{
 	private:
 		std::map<std::string, std::shared_ptr<IceObject>> objects;
+		std::map<std::string, std::shared_ptr<FunctionDeclarationStmt>> functions;
 		std::shared_ptr<IceObject> returnValue;
 
 	protected:
@@ -24,6 +26,9 @@ namespace Ice
 
 		void put(std::string &, std::shared_ptr<IceObject>);
 		std::shared_ptr<IceObject> getObject(std::string &);
+
+		void put(std::string &, std::shared_ptr<FunctionDeclarationStmt>);
+		std::shared_ptr<FunctionDeclarationStmt> getFunction(std::string &);
 		
 		void setReturnValue(std::shared_ptr<IceObject> returnValue) { this->returnValue = returnValue; }
 		std::shared_ptr<IceObject> getReturnValue() { return returnValue; }

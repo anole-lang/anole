@@ -43,7 +43,7 @@ namespace Ice
 			node = std::make_shared<VariableDeclarationStmt>(id, assignment);
 			return node;
 		funcDecl:
-			VariableList arguments; // TODO: genArguments;
+			VariableList arguments; // TODO: complete lambda genArguments;
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TRPAREN:
@@ -68,7 +68,7 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::block] = [&]() {
+		genNode[Symbol::block] = [&]() { // TODO: complete
 			std::shared_ptr<Node> node = nullptr;
 			return node;
 		};
@@ -88,7 +88,7 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::func_decl_rest] = [&]() {
+		genNode[Symbol::func_decl_rest] = [&]() { // TODO: complete
 			std::shared_ptr<Node> node = nullptr;
 			return node;
 		};
@@ -244,7 +244,7 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::term] = [&]() {
+		genNode[Symbol::term] = [&]() { // TODO: add method_call_tail
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
@@ -261,7 +261,7 @@ namespace Ice
 					iToken++;
 				else
 				{
-					std::cout << "missing '(' ." << std::endl;
+					std::cout << "missing symbol '(' ." << std::endl;
 					exit(0);
 				}
 				return node;
@@ -271,17 +271,17 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::method_call_tail] = [&]() {
+		genNode[Symbol::method_call_tail] = [&]() { // TODO: complete
 			std::shared_ptr<Node> node = nullptr;
 			return node;
 		};
 
-		genNode[Symbol::call_args] = [&]() {
+		genNode[Symbol::call_args] = [&]() { // TODO: complete
 			std::shared_ptr<Node> node = nullptr;
 			return node;
 		};
 
-		genNode[Symbol::call_args_tail] = [&]() {
+		genNode[Symbol::call_args_tail] = [&]() { // TODO: complete
 			std::shared_ptr<Node> node = nullptr;
 			return node;
 		};

@@ -8,6 +8,11 @@ namespace Ice
 		objects[name] = obj;
 	}
 
+	void Env::put(std::string &name, std::shared_ptr<FunctionDeclarationStmt> func)
+	{
+		functions[name] = func;
+	}
+
 	std::shared_ptr<IceObject> Env::getObject(std::string &name)
 	{
 		std::shared_ptr<Env> tmp = shared_from_this();
@@ -18,7 +23,22 @@ namespace Ice
 			else
 				tmp = tmp->prev;
 		}
-		std::cout << "cannot find " << name << std::endl;
+		std::cout << "cannot find var " << name << std::endl;
+		exit(0);
+		return nullptr;
+	}
+
+	std::shared_ptr<FunctionDeclarationStmt> Env::getFunction(std::string &name)
+	{
+		std::shared_ptr<Env> tmp = shared_from_this();
+		while (tmp != nullptr)
+		{
+			if (tmp->functions.find(name) != tmp->functions.end())
+				return tmp->functions[name];
+			else
+				tmp = tmp->prev;
+		}
+		std::cout << "cannot find function " << name << std::endl;
 		exit(0);
 		return nullptr;
 	}
@@ -57,7 +77,22 @@ namespace Ice
 	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> top)
 	{
 		top = std::make_shared<Env>(top);
-		return nullptr;
+		std::shared_ptr<FunctionDeclarationStmt> func = top->getFunction(id->name);
+		if (arguments.size() != func->arguments.size())
+		{
+			std::cout << "The number of arguments does not match" << std::endl;
+			exit(0);
+		}
+		std::vector<std::shared_ptr<IceObject>> argValues;
+		for (auto argument : arguments)
+		{
+			argValues.push_back(argument->runCode(top));
+		}
+		for (int i = 0; i < arguments.size(); i++)
+		{
+			top->put(func->arguments[i]->name, argValues[i]);
+		}
+		return func->block->runCode(top);
 	}
 
 	std::shared_ptr<IceObject> BinaryOperatorExpr::runCode(std::shared_ptr<Env> top)
@@ -81,6 +116,7 @@ namespace Ice
 
 	std::shared_ptr<IceObject> FunctionDeclarationStmt::runCode(std::shared_ptr<Env> top)
 	{
+		top->put(id->name, shared_from_this());
 		return nullptr;
 	}
 
