@@ -25,7 +25,7 @@ namespace Ice
 	{
 	public:
 		virtual ~Node() {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>) = 0;
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env>&) = 0;
 	};
 
 	class Stmt : public Node

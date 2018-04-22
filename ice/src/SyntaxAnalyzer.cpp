@@ -11,6 +11,9 @@ namespace Ice
 			case Token::TOKEN::TAT:
 				node = genNode[Symbol::var_decl_or_func_decl]();
 				break;
+			case Token::TOKEN::TRETURN:
+				node = genNode[Symbol::return_stmt]();
+				break;
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TLPAREN:
@@ -39,11 +42,22 @@ namespace Ice
 				exit(0);
 			}
 		varDecl:
-			std::shared_ptr<Expr> assignment = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
-			node = std::make_shared<VariableDeclarationStmt>(id, assignment);
+			node = std::make_shared<VariableDeclarationStmt>(id, std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 			return node;
 		funcDecl:
-			VariableList arguments; // TODO: complete lambda genArguments;
+			std::function<VariableList()> genArguments;
+			genArguments = [&]() {
+				VariableList args;
+				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
+				{
+					args.push_back(std::make_shared<IdentifierExpr>(iToken->value));
+					iToken++;
+					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+					else break;
+				}
+				return args;
+			};
+			VariableList arguments = genArguments();
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TRPAREN:
@@ -65,41 +79,65 @@ namespace Ice
 
 		genNode[Symbol::return_stmt] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
+			iToken++;
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TIDENTIFIER:
+			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TLPAREN:
+				node = std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+				break;
+			default:
+				break;
+			}
 			return node;
 		};
 
-		genNode[Symbol::block] = [&]() { // TODO: complete
+		genNode[Symbol::block] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
+			if (iToken->token_id != Token::TOKEN::TLBRACE) iToken = lexicalAnalyzer.cont();
+			iToken++;
+			node = genNode[Symbol::block_tail]();
 			return node;
 		};
 
 		genNode[Symbol::block_tail] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
+			std::shared_ptr<BlockExpr> node = std::make_shared<BlockExpr>();
+			while (iToken->token_id != Token::TOKEN::TRBRACE)
+			{
+				switch (iToken->token_id)
+				{
+				case Token::TOKEN::TAT:
+				case Token::TOKEN::TIDENTIFIER:
+				case Token::TOKEN::TINTEGER:
+				case Token::TOKEN::TLPAREN:
+				case Token::TOKEN::TRETURN:
+					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
+					break;
+				case Token::TOKEN::TEND:
+					iToken = lexicalAnalyzer.cont();
+					break;
+				default:
+					std::cout << "missing '{'" << std::endl;
+					exit(0);
+				}
+			}
 			return node;
 		};
 
-		genNode[Symbol::var_decl_tail] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
-		genNode[Symbol::func_decl_tail] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
-		genNode[Symbol::func_decl_rest] = [&]() { // TODO: complete
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
-		genNode[Symbol::func_decl_args] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
-		genNode[Symbol::func_decl_args_tail] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
+		genNode[Symbol::func_decl_rest] = [&]() {
+			std::shared_ptr<BlockExpr> node = nullptr;
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TASSIGN:
+				iToken++;
+				node = std::make_shared<BlockExpr>();
+				node->statements.push_back(std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]())));
+				break;
+			default:
+				node = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+				break;
+			}
 			return node;
 		};
 
@@ -244,12 +282,25 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::term] = [&]() { // TODO: add method_call_tail
+		genNode[Symbol::term] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TIDENTIFIER:
 				node = genNode[Symbol::ident]();
+				if (iToken->token_id == Token::TOKEN::TLPAREN)
+				{
+					ExpressionList args;
+					iToken++;
+					while (iToken->token_id != Token::TOKEN::TRPAREN)
+					{
+						args.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+						if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+						else break;
+					}
+					iToken++;
+					node = std::make_shared<MethodCallExpr>(std::dynamic_pointer_cast<IdentifierExpr>(node), args);
+				}
 				break;
 			case Token::TOKEN::TINTEGER:
 				node = genNode[Symbol::numeric]();
@@ -268,21 +319,6 @@ namespace Ice
 			default:
 				break;
 			}
-			return node;
-		};
-
-		genNode[Symbol::method_call_tail] = [&]() { // TODO: complete
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
-		genNode[Symbol::call_args] = [&]() { // TODO: complete
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
-		genNode[Symbol::call_args_tail] = [&]() { // TODO: complete
-			std::shared_ptr<Node> node = nullptr;
 			return node;
 		};
 

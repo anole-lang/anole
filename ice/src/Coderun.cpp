@@ -88,7 +88,7 @@ namespace Ice
 		{
 			argValues.push_back(argument->runCode(top));
 		}
-		for (int i = 0; i < arguments.size(); i++)
+		for (size_t i = 0; i < this->arguments.size(); i++)
 		{
 			top->put(func->arguments[i]->name, argValues[i]);
 		}
