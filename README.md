@@ -38,5 +38,17 @@ Also you can use Visual Studio, just open ice/ice.sln by Visual Studio.
 a <= 3 # 1
 ```
 
+###### Function Declaration & Call
+```ice
+@add(a, b): a + b
+
+@mul(a, b)
+{
+    return a * b
+}
+
+mul(mul(2, 3), add(2, 3)) # 30
+```
+
 ### TODO
-* Complete Function Declaration & MethodCall
+* Complete Control Flow & Fix Bugs
