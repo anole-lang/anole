@@ -128,4 +128,14 @@ namespace Ice
 		top->setReturnValue(returnValue);
 		return nullptr;
 	}
+
+	std::shared_ptr<IceObject> IfElseStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> cond = this->cond->runCode(top);
+		std::shared_ptr<IceObject> returnValue = nullptr;
+		if (cond->isTrue()) returnValue = blockTrue->runCode(top);
+		else returnValue = blockFalse->runCode(top);
+		if (returnValue != nullptr) top->setReturnValue(returnValue);
+		return returnValue;
+	}
 }

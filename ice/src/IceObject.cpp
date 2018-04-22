@@ -51,6 +51,11 @@ namespace Ice
 		return nullptr;
 	}
 
+	bool IceIntegerObject::isTrue()
+	{
+		return value != 0;
+	}
+
 	IceDoubleObject::IceDoubleObject(double value)
 	{
 		type = TYPE::DOUBLE;
@@ -64,6 +69,11 @@ namespace Ice
 	std::shared_ptr<IceObject> IceDoubleObject::binaryOperate(std::shared_ptr<IceObject> obj, Token::TOKEN op)
 	{
 		return nullptr;
+	}
+
+	bool IceDoubleObject::isTrue()
+	{
+		return value != 0.0;
 	}
 }
 

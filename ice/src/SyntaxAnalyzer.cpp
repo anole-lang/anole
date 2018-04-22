@@ -11,6 +11,9 @@ namespace Ice
 			case Token::TOKEN::TAT:
 				node = genNode[Symbol::var_decl_or_func_decl]();
 				break;
+			case Token::TOKEN::TIF:
+				node = genNode[Symbol::if_else]();
+				break;
 			case Token::TOKEN::TRETURN:
 				node = genNode[Symbol::return_stmt]();
 				break;
@@ -74,6 +77,11 @@ namespace Ice
 
 		genNode[Symbol::if_else] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
+			iToken++;
+			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			std::shared_ptr<BlockExpr> blockTrue = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+			std::shared_ptr<BlockExpr> blockFalse = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::if_else_tail]());
+			node = std::make_shared<IfElseStmt>(cond, blockTrue, blockFalse);
 			return node;
 		};
 
@@ -95,7 +103,17 @@ namespace Ice
 
 		genNode[Symbol::block] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
-			if (iToken->token_id != Token::TOKEN::TLBRACE) iToken = lexicalAnalyzer.cont();
+			if (iToken->token_id == Token::TOKEN::TEND) iToken = lexicalAnalyzer.cont();
+			else if (iToken->token_id != Token::TOKEN::TLBRACE)
+			{
+				std::cout << "missing symbol '{'" << std::endl;
+				exit(0);
+			}
+			if (iToken->token_id != Token::TOKEN::TLBRACE)
+			{
+				std::cout << "missing symbol '{'" << std::endl;
+				exit(0);
+			}
 			iToken++;
 			node = genNode[Symbol::block_tail]();
 			return node;
@@ -111,6 +129,7 @@ namespace Ice
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TLPAREN:
+				case Token::TOKEN::TIF:
 				case Token::TOKEN::TRETURN:
 					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 					break;
@@ -322,13 +341,17 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::comparison] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			return node;
-		};
-
 		genNode[Symbol::if_else_tail] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
+			std::shared_ptr<BlockExpr> node = std::make_shared<BlockExpr>();
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TELSE:
+				iToken++;
+				node = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+				break;
+			default:
+				break;
+			}
 			return node;
 		};
 	}

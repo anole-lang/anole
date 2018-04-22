@@ -21,6 +21,7 @@ namespace Ice
 		virtual ~IceObject() {}
 		virtual void show() = 0;
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op) = 0;
+		virtual bool isTrue() = 0;
 	};
 
 	class IceIntegerObject : public IceObject
@@ -33,6 +34,7 @@ namespace Ice
 		virtual ~IceIntegerObject() {}
 		virtual void show();
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
+		virtual bool isTrue();
 	};
 
 	class IceDoubleObject : public IceObject
@@ -45,6 +47,7 @@ namespace Ice
 		virtual ~IceDoubleObject() {}
 		virtual void show();
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
+		virtual bool isTrue();
 	};
 }
 

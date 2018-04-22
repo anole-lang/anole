@@ -120,6 +120,16 @@ namespace Ice
 		ReturnStmt(std::shared_ptr<Expr> assignment) :assignment(assignment) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
+
+	class IfElseStmt : public Stmt
+	{
+	public:
+		std::shared_ptr<Expr> cond;
+		std::shared_ptr<BlockExpr> blockTrue;
+		std::shared_ptr<BlockExpr> blockFalse;
+		IfElseStmt(std::shared_ptr<Expr> cond, std::shared_ptr<BlockExpr> blockTrue, std::shared_ptr<BlockExpr> blockFalse) : cond(cond), blockTrue(blockTrue), blockFalse(blockFalse) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
 }
 
 #endif //__NODE_H__
