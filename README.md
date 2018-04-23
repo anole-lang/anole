@@ -21,6 +21,11 @@ Also you can use Visual Studio, just open ice/ice.sln by Visual Studio.
 # this is a comment
 ```
 
+###### Built-Functions
+```ice
+print(1)
+```
+
 ###### Variable Declaration
 ```ice
 @a: 1
@@ -65,6 +70,13 @@ mul(mul(2, 3), add(2, 3)) # 30
 }
 
 fib(10) # 89
+
+@a: 3
+while a
+{
+    print(a)
+    @a: a - 1
+}
 ```
 
 ### TODO
