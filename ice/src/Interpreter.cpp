@@ -12,6 +12,7 @@ namespace Ice
 					 " ///////// ///////// /////////\n"
 					<< std::endl;
 		top = std::make_shared<Env>(nullptr);
+		top->genBuildInFunction();
 		block = std::make_shared<BlockExpr>();
 	}
 

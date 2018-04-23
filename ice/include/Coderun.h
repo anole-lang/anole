@@ -18,9 +18,13 @@ namespace Ice
 		std::map<std::string, std::shared_ptr<FunctionDeclarationStmt>> functions;
 		std::shared_ptr<IceObject> returnValue;
 
+		void genPrintFunction();
+
 	public:
 		std::shared_ptr<Env> prev;
 		Env(std::shared_ptr<Env> prev) : prev(prev) {}
+
+		void genBuildInFunction();
 
 		void put(std::string &, std::shared_ptr<IceObject>);
 		std::shared_ptr<IceObject> getObject(std::string &);

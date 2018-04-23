@@ -155,4 +155,29 @@ namespace Ice
 		}
 		return returnValue;
 	}
+
+	// build_in_function_implement
+
+	std::shared_ptr<IceObject> PrintStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		top->getObject(id)->show();
+		return nullptr;
+	}
+
+	void Env::genBuildInFunction()
+	{
+		genPrintFunction();
+	}
+
+	void Env::genPrintFunction()
+	{
+		std::string func_name = "print";
+		std::string obj_name = "to_print";
+
+		VariableList args;
+		std::shared_ptr<BlockExpr> block;
+		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
+		block->statements.push_back(std::make_shared<PrintStmt>());
+		put(func_name, std::make_shared<FunctionDeclarationStmt>(std::make_shared<IdentifierExpr>(func_name), args, block));
+	}
 }

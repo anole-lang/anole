@@ -139,6 +139,16 @@ namespace Ice
 		WhileStmt(std::shared_ptr<Expr> cond, std::shared_ptr<BlockExpr> block) : cond(cond), block(block) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
+
+	// build_in_function
+
+	class PrintStmt : public Stmt
+	{
+	public:
+		std::string id;
+		PrintStmt() : id("to_print") {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
 }
 
 #endif //__NODE_H__
