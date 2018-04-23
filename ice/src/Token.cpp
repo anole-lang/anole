@@ -8,6 +8,8 @@ namespace Ice
 			token_id = TOKEN::TIF;
 		else if (value == "else")
 			token_id = TOKEN::TELSE;
+		else if (value == "while")
+			token_id = TOKEN::TWHILE;
 		else if (value == "return")
 			token_id = TOKEN::TRETURN;
 		else if (value == "and")

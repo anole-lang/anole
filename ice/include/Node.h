@@ -130,6 +130,15 @@ namespace Ice
 		IfElseStmt(std::shared_ptr<Expr> cond, std::shared_ptr<BlockExpr> blockTrue, std::shared_ptr<BlockExpr> blockFalse) : cond(cond), blockTrue(blockTrue), blockFalse(blockFalse) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
+
+	class WhileStmt : public Stmt 
+	{
+	public:
+		std::shared_ptr<Expr> cond;
+		std::shared_ptr<BlockExpr> block;
+		WhileStmt(std::shared_ptr<Expr> cond, std::shared_ptr<BlockExpr> block) : cond(cond), block(block) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
 }
 
 #endif //__NODE_H__

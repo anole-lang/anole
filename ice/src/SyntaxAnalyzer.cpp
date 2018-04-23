@@ -14,6 +14,9 @@ namespace Ice
 			case Token::TOKEN::TIF:
 				node = genNode[Symbol::if_else]();
 				break;
+			case Token::TOKEN::TWHILE:
+				node = genNode[Symbol::while_stmt]();
+				break;
 			case Token::TOKEN::TRETURN:
 				node = genNode[Symbol::return_stmt]();
 				break;
@@ -76,29 +79,23 @@ namespace Ice
 		};
 
 		genNode[Symbol::if_else] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
 			iToken++;
 			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
 			std::shared_ptr<BlockExpr> blockTrue = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
 			std::shared_ptr<BlockExpr> blockFalse = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::if_else_tail]());
-			node = std::make_shared<IfElseStmt>(cond, blockTrue, blockFalse);
-			return node;
+			return std::dynamic_pointer_cast<Node>(std::make_shared<IfElseStmt>(cond, blockTrue, blockFalse));
 		};
 
-		genNode[Symbol::return_stmt] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
+		genNode[Symbol::while_stmt] = [&]() {
 			iToken++;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TIDENTIFIER:
-			case Token::TOKEN::TINTEGER:
-			case Token::TOKEN::TLPAREN:
-				node = std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
-				break;
-			default:
-				break;
-			}
-			return node;
+			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+			return std::dynamic_pointer_cast<Node>(std::make_shared<WhileStmt>(cond, block));
+		};
+		
+		genNode[Symbol::return_stmt] = [&]() {
+			iToken++;
+			return std::dynamic_pointer_cast<Node>(std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]())));
 		};
 
 		genNode[Symbol::block] = [&]() {
@@ -219,11 +216,11 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
-				goto factor;
+				goto cmp;
 			default:
 				return node;
 			};
-		factor:
+		cmp:
 			std::shared_ptr<Expr> lhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::cmp]());
 			node = genCmpRest(lhs);
 			return node;

@@ -25,6 +25,7 @@ stmts
 stmt
 	: var_decl_or_func_decl
 	| if_else
+	| while_stmt
 	| expr
 	| return_stmt
 	;
@@ -151,6 +152,10 @@ if_else_tail
 	:
 	| TELSE block
 	;
+
+while_stmt
+	: TWHILE expr block
+	;
 */
 
 namespace Ice
@@ -166,6 +171,7 @@ namespace Ice
 			stmt,
 			var_decl_or_func_decl,
 			if_else,
+			while_stmt,
 			expr,
 			return_stmt,
 			block,
