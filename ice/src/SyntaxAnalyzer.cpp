@@ -137,10 +137,11 @@ namespace Ice
 					iToken = lexicalAnalyzer.cont();
 					break;
 				default:
-					std::cout << "missing '{'" << std::endl;
+					std::cout << "missing '}'" << std::endl;
 					exit(0);
 				}
 			}
+			iToken++;
 			return node;
 		};
 
@@ -342,13 +343,12 @@ namespace Ice
 		};
 
 		genNode[Symbol::if_else_tail] = [&]() {
-			std::shared_ptr<BlockExpr> node = std::make_shared<BlockExpr>();
+			auto node = std::make_shared<BlockExpr>();
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TELSE:
 				iToken++;
-				node = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
-				break;
+				return std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
 			default:
 				break;
 			}
