@@ -175,7 +175,7 @@ namespace Ice
 		std::string obj_name = "to_print";
 
 		VariableList args;
-		std::shared_ptr<BlockExpr> block;
+		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
 		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
 		block->statements.push_back(std::make_shared<PrintStmt>());
 		put(func_name, std::make_shared<FunctionDeclarationStmt>(std::make_shared<IdentifierExpr>(func_name), args, block));
