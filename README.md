@@ -50,5 +50,22 @@ a <= 3 # 1
 mul(mul(2, 3), add(2, 3)) # 30
 ```
 
+###### Control Flow
+```ice
+@fib(n)
+{
+    if (n = 0) + (n = 1)
+    {
+        return 1
+    }
+    else
+    {
+        return
+    }
+}
+
+fib(10) # 89
+```
+
 ### TODO
 * Complete Control Flow & Fix Bugs
