@@ -49,6 +49,10 @@ namespace Ice
 		for (auto stmt : statements)
 		{
 			stmt->runCode(top);
+			if (top->getBreakStatus() || top->getContinueStatus())
+			{
+				return returnValue;
+			}
 			if (returnValue != top->getReturnValue())
 			{
 				returnValue = top->getReturnValue();
@@ -122,6 +126,18 @@ namespace Ice
 		return nullptr;
 	}
 
+	std::shared_ptr<IceObject> BreakStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		top->setBreakStatus(true);
+		return nullptr;
+	}
+
+	std::shared_ptr<IceObject> ContinueStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		top->setContinueStatus(true);
+		return nullptr;
+	}
+
 	std::shared_ptr<IceObject> ReturnStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> returnValue = assignment->runCode(top);
@@ -146,6 +162,17 @@ namespace Ice
 		while (cond->isTrue())
 		{
 			returnValue = block->runCode(top);
+			if (top->getBreakStatus())
+			{
+				top->setBreakStatus(false);
+				return returnValue;
+			}
+			if (top->getContinueStatus())
+			{
+				top->setContinueStatus(false);
+				cond = this->cond->runCode(top);
+				continue;
+			}
 			if (returnValue != nullptr)
 			{
 				top->setReturnValue(returnValue);
@@ -162,6 +189,12 @@ namespace Ice
 		std::shared_ptr<IceObject> returnValue = nullptr;
 
 		returnValue = block->runCode(top);
+		if (top->getBreakStatus())
+		{
+			top->setBreakStatus(false);
+			return returnValue;
+		}
+		if (top->getContinueStatus()) top->setContinueStatus(false);
 		if (returnValue != nullptr)
 		{
 			top->setReturnValue(returnValue);
@@ -171,6 +204,17 @@ namespace Ice
 		while (cond->isTrue())
 		{
 			returnValue = block->runCode(top);
+			if (top->getBreakStatus())
+			{
+				top->setBreakStatus(false);
+				return returnValue;
+			}
+			if (top->getContinueStatus())
+			{
+				top->setContinueStatus(false);
+				cond = this->cond->runCode(top);
+				continue;
+			}
 			if (returnValue != nullptr)
 			{
 				top->setReturnValue(returnValue);
@@ -189,6 +233,17 @@ namespace Ice
 		while (begin->binaryOperate(end, Token::TOKEN::TCLT)->isTrue())
 		{
 			returnValue = block->runCode(top);
+			if (top->getBreakStatus())
+			{
+				top->setBreakStatus(false);
+				return returnValue;
+			}
+			if (top->getContinueStatus())
+			{
+				top->setContinueStatus(false);
+				begin = begin->binaryOperate(std::make_shared<IceIntegerObject>(1), Token::TOKEN::TADD);
+				continue;
+			}
 			if (returnValue != nullptr)
 			{
 				top->setReturnValue(returnValue);

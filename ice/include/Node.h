@@ -113,6 +113,20 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class BreakStmt : public Stmt
+	{
+	public:
+		BreakStmt() {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class ContinueStmt : public Stmt
+	{
+	public:
+		ContinueStmt() {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class ReturnStmt : public Stmt
 	{
 	public:

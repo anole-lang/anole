@@ -23,6 +23,8 @@ namespace Ice
 			TDO,	// do
 			TFOR,	// for
 			TTO,	// to
+			TBREAK,	// break
+			TCONTINUE,	// continue
 			TRETURN, // return
 
 			TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*

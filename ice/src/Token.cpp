@@ -16,6 +16,10 @@ namespace Ice
 			token_id = TOKEN::TFOR;
 		else if (value == "to")
 			token_id = TOKEN::TTO;
+		else if (value == "break")
+			token_id = TOKEN::TBREAK;
+		else if (value == "continue")
+			token_id = TOKEN::TCONTINUE;
 		else if (value == "return")
 			token_id = TOKEN::TRETURN;
 		else if (value == "and")

@@ -23,6 +23,14 @@ namespace Ice
 			case Token::TOKEN::TFOR:
 				node = genNode[Symbol::for_stmt]();
 				break;
+			case Token::TOKEN::TBREAK:
+				iToken++;
+				node = std::make_shared<BreakStmt>();
+				break;
+			case Token::TOKEN::TCONTINUE:
+				iToken++;
+				node = std::make_shared<ContinueStmt>();
+				break;
 			case Token::TOKEN::TRETURN:
 				node = genNode[Symbol::return_stmt]();
 				break;
@@ -116,6 +124,8 @@ namespace Ice
 				case Token::TOKEN::TWHILE:
 				case Token::TOKEN::TDO:
 				case Token::TOKEN::TFOR:
+				case Token::TOKEN::TBREAK:
+				case Token::TOKEN::TCONTINUE:
 				case Token::TOKEN::TRETURN:
 					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 					break;

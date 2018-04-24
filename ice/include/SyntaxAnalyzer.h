@@ -29,6 +29,7 @@ stmt
 	| do_while_stmt
 	| for_stmt
 	| expr
+	| break_stmt
 	| return_stmt
 	;
 

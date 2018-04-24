@@ -57,6 +57,8 @@ mul(mul(2, 3), add(2, 3)) # 30
 
 ###### Control Flow
 ```ice
+# support if_else while do_while for break continue
+
 @fib(n)
 {
     if (n = 0) + (n = 1)
@@ -65,7 +67,7 @@ mul(mul(2, 3), add(2, 3)) # 30
     }
     else
     {
-        return
+        return fib(n-1) + fib(n-2)
     }
 }
 
@@ -80,12 +82,21 @@ while a
 
 @a: 0
 do {
+    @a: a + 1
+    if a = 3
+    {
+        break
+    }
     print(a)
-} while a
+} while a < 5
 
-for 1 to 10
+for 1 to 5
 {
     @a: a + 1
+    if a = 3
+    {
+        continue
+    }
     print(a)
 }
 ```

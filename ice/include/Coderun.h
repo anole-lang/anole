@@ -16,13 +16,16 @@ namespace Ice
 	private:
 		std::map<std::string, std::shared_ptr<IceObject>> objects;
 		std::map<std::string, std::shared_ptr<FunctionDeclarationStmt>> functions;
+
 		std::shared_ptr<IceObject> returnValue;
+		bool breakStatus;
+		bool continueStatus;
 
 		void genPrintFunction();
 
 	public:
 		std::shared_ptr<Env> prev;
-		Env(std::shared_ptr<Env> prev) : prev(prev) {}
+		Env(std::shared_ptr<Env> prev) : prev(prev) { returnValue = nullptr; breakStatus = false; continueStatus = false; }
 
 		void genBuildInFunction();
 
@@ -34,6 +37,12 @@ namespace Ice
 		
 		void setReturnValue(std::shared_ptr<IceObject> returnValue) { this->returnValue = returnValue; }
 		std::shared_ptr<IceObject> getReturnValue() { return returnValue; }
+
+		void setBreakStatus(bool status) { breakStatus = status; }
+		bool getBreakStatus() { return breakStatus; }
+
+		void setContinueStatus(bool status) { continueStatus = status; }
+		bool getContinueStatus() { return continueStatus; }
 	};
 }
 
