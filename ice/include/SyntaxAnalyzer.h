@@ -30,6 +30,7 @@ stmt
 	| for_stmt
 	| expr
 	| break_stmt
+	| continue_stmt
 	| return_stmt
 	;
 
