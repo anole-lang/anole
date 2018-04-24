@@ -17,6 +17,9 @@ namespace Ice
 			case Token::TOKEN::TWHILE:
 				node = genNode[Symbol::while_stmt]();
 				break;
+			case Token::TOKEN::TDO:
+				node = genNode[Symbol::do_while_stmt]();
+				break;
 			case Token::TOKEN::TFOR:
 				node = genNode[Symbol::for_stmt]();
 				break;
@@ -111,6 +114,7 @@ namespace Ice
 				case Token::TOKEN::TLPAREN:
 				case Token::TOKEN::TIF:
 				case Token::TOKEN::TWHILE:
+				case Token::TOKEN::TDO:
 				case Token::TOKEN::TFOR:
 				case Token::TOKEN::TRETURN:
 					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
@@ -350,6 +354,19 @@ namespace Ice
 			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
 			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
 			return std::dynamic_pointer_cast<Node>(std::make_shared<WhileStmt>(cond, block));
+		};
+
+		genNode[Symbol::do_while_stmt] = [&]() {
+			iToken++;
+			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+			if (iToken->token_id != Token::TOKEN::TWHILE)
+			{
+				std::cout << "missing keyword 'while' after 'do'" << std::endl;
+				exit(0);
+			}
+			iToken++;
+			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			return std::dynamic_pointer_cast<Node>(std::make_shared<DoWhileStmt>(cond, block));
 		};
 
 		genNode[Symbol::for_stmt] = [&]() {

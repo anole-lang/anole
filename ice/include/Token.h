@@ -20,6 +20,7 @@ namespace Ice
 			TIF,     // if
 			TELSE,   // else
 			TWHILE,  // while
+			TDO,	// do
 			TFOR,	// for
 			TTO,	// to
 			TRETURN, // return

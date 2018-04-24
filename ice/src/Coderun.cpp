@@ -156,6 +156,31 @@ namespace Ice
 		return returnValue;
 	}
 
+	std::shared_ptr<IceObject> DoWhileStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> cond = this->cond->runCode(top);
+		std::shared_ptr<IceObject> returnValue = nullptr;
+
+		returnValue = block->runCode(top);
+		if (returnValue != nullptr)
+		{
+			top->setReturnValue(returnValue);
+			return returnValue;
+		}
+
+		while (cond->isTrue())
+		{
+			returnValue = block->runCode(top);
+			if (returnValue != nullptr)
+			{
+				top->setReturnValue(returnValue);
+				return returnValue;
+			}
+			cond = this->cond->runCode(top);
+		}
+		return returnValue;
+	}
+
 	std::shared_ptr<IceObject> ForStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> begin = this->begin->runCode(top);

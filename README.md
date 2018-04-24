@@ -77,6 +77,17 @@ while a
     print(a)
     @a: a - 1
 }
+
+@a: 0
+do {
+    print(a)
+} while a
+
+for 1 to 10
+{
+    @a: a + 1
+    print(a)
+}
 ```
 
 ### TODO

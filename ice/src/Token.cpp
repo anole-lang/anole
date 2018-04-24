@@ -10,6 +10,8 @@ namespace Ice
 			token_id = TOKEN::TELSE;
 		else if (value == "while")
 			token_id = TOKEN::TWHILE;
+		else if (value == "do")
+			token_id = TOKEN::TDO;
 		else if (value == "for")
 			token_id = TOKEN::TFOR;
 		else if (value == "to")

@@ -140,6 +140,15 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class DoWhileStmt : public Stmt
+	{
+	public:
+		std::shared_ptr<Expr> cond;
+		std::shared_ptr<BlockExpr> block;
+		DoWhileStmt(std::shared_ptr<Expr> cond, std::shared_ptr<BlockExpr> block) : cond(cond), block(block) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class ForStmt : public Stmt
 	{
 	public:

@@ -26,6 +26,7 @@ stmt
 	: var_decl_or_func_decl
 	| if_else
 	| while_stmt
+	| do_while_stmt
 	| for_stmt
 	| expr
 	| return_stmt
@@ -158,6 +159,10 @@ while_stmt
 	: TWHILE expr block
 	;
 
+do_while_stmt
+	: TDO block TWHILE expr
+	;
+
 for_stmt
 	: TFOR expr TTO expr block
 	;
@@ -177,6 +182,7 @@ namespace Ice
 			var_decl_or_func_decl,
 			if_else,
 			while_stmt,
+			do_while_stmt,
 			for_stmt,
 			expr,
 			return_stmt,
