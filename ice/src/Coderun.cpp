@@ -156,6 +156,24 @@ namespace Ice
 		return returnValue;
 	}
 
+	std::shared_ptr<IceObject> ForStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> begin = this->begin->runCode(top);
+		std::shared_ptr<IceObject> end = this->end->runCode(top);
+		std::shared_ptr<IceObject> returnValue = nullptr;
+		while (begin->binaryOperate(end, Token::TOKEN::TCLT)->isTrue())
+		{
+			returnValue = block->runCode(top);
+			if (returnValue != nullptr)
+			{
+				top->setReturnValue(returnValue);
+				return returnValue;
+			}
+			begin = begin->binaryOperate(std::make_shared<IceIntegerObject>(1), Token::TOKEN::TADD);
+		}
+		return returnValue;
+	}
+
 	// build_in_function_implement
 
 	std::shared_ptr<IceObject> PrintStmt::runCode(std::shared_ptr<Env> &top)

@@ -20,6 +20,8 @@ namespace Ice
 			TIF,     // if
 			TELSE,   // else
 			TWHILE,  // while
+			TFOR,	// for
+			TTO,	// to
 			TRETURN, // return
 
 			TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*

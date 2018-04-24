@@ -140,6 +140,16 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class ForStmt : public Stmt
+	{
+	public:
+		std::shared_ptr<Expr> begin;
+		std::shared_ptr<Expr> end;
+		std::shared_ptr<BlockExpr> block;
+		ForStmt(std::shared_ptr<Expr> begin, std::shared_ptr<Expr> end, std::shared_ptr<BlockExpr> block) : begin(begin), end(end), block(block) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	// build_in_function
 
 	class PrintStmt : public Stmt

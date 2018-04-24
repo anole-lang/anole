@@ -17,6 +17,9 @@ namespace Ice
 			case Token::TOKEN::TWHILE:
 				node = genNode[Symbol::while_stmt]();
 				break;
+			case Token::TOKEN::TFOR:
+				node = genNode[Symbol::for_stmt]();
+				break;
 			case Token::TOKEN::TRETURN:
 				node = genNode[Symbol::return_stmt]();
 				break;
@@ -78,26 +81,6 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::if_else] = [&]() {
-			iToken++;
-			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
-			std::shared_ptr<BlockExpr> blockTrue = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
-			std::shared_ptr<BlockExpr> blockFalse = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::if_else_tail]());
-			return std::dynamic_pointer_cast<Node>(std::make_shared<IfElseStmt>(cond, blockTrue, blockFalse));
-		};
-
-		genNode[Symbol::while_stmt] = [&]() {
-			iToken++;
-			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
-			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
-			return std::dynamic_pointer_cast<Node>(std::make_shared<WhileStmt>(cond, block));
-		};
-		
-		genNode[Symbol::return_stmt] = [&]() {
-			iToken++;
-			return std::dynamic_pointer_cast<Node>(std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]())));
-		};
-
 		genNode[Symbol::block] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
 			if (iToken->token_id == Token::TOKEN::TEND) iToken = lexicalAnalyzer.cont();
@@ -127,6 +110,8 @@ namespace Ice
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TLPAREN:
 				case Token::TOKEN::TIF:
+				case Token::TOKEN::TWHILE:
+				case Token::TOKEN::TFOR:
 				case Token::TOKEN::TRETURN:
 					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 					break;
@@ -338,6 +323,14 @@ namespace Ice
 			}
 			return node;
 		};
+		
+		genNode[Symbol::if_else] = [&]() {
+			iToken++;
+			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			std::shared_ptr<BlockExpr> blockTrue = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+			std::shared_ptr<BlockExpr> blockFalse = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::if_else_tail]());
+			return std::dynamic_pointer_cast<Node>(std::make_shared<IfElseStmt>(cond, blockTrue, blockFalse));
+		};
 
 		genNode[Symbol::if_else_tail] = [&]() {
 			auto node = std::make_shared<BlockExpr>();
@@ -350,6 +343,32 @@ namespace Ice
 				break;
 			}
 			return node;
+		};
+		
+		genNode[Symbol::while_stmt] = [&]() {
+			iToken++;
+			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+			return std::dynamic_pointer_cast<Node>(std::make_shared<WhileStmt>(cond, block));
+		};
+
+		genNode[Symbol::for_stmt] = [&]() {
+			iToken++;
+			std::shared_ptr<Expr> begin = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			if (iToken->token_id != Token::TOKEN::TTO)
+			{
+				std::cout << "missing keyword 'to' in for" << std::endl;
+				exit(0);
+			}
+			iToken++;
+			std::shared_ptr<Expr> end = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+			return std::dynamic_pointer_cast<Node>(std::make_shared<ForStmt>(begin, end, block));
+		};
+		
+		genNode[Symbol::return_stmt] = [&]() {
+			iToken++;
+			return std::dynamic_pointer_cast<Node>(std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]())));
 		};
 	}
 
