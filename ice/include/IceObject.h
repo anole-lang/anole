@@ -45,10 +45,9 @@ namespace Ice
 
 	class IceIntegerObject : public IceObject
 	{
-	private:
+	public:
 		long value;
 
-	public:
 		IceIntegerObject(long value);
 		virtual ~IceIntegerObject() {}
 		virtual void show();
@@ -58,12 +57,23 @@ namespace Ice
 
 	class IceDoubleObject : public IceObject
 	{
-	private:
+	public:
 		double value;
 
-	public:
 		IceDoubleObject(double value);
 		virtual ~IceDoubleObject() {}
+		virtual void show();
+		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
+		virtual bool isTrue();
+	};
+
+	class IceStringObject : public IceObject
+	{
+	public:
+		std::string value;
+
+		IceStringObject(std::string value);
+		virtual ~IceStringObject() {}
 		virtual void show();
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
 		virtual bool isTrue();

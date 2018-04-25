@@ -38,6 +38,8 @@ namespace Ice
 				break;
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TLPAREN:
 				node = std::make_shared<ExprStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 				break;
@@ -121,6 +123,8 @@ namespace Ice
 				case Token::TOKEN::TAT:
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
+				case Token::TOKEN::TDOUBLE:
+				case Token::TOKEN::TSTRING:
 				case Token::TOKEN::TLPAREN:
 				case Token::TOKEN::TIF:
 				case Token::TOKEN::TWHILE:
@@ -179,6 +183,24 @@ namespace Ice
 			{
 			case Token::TOKEN::TINTEGER:
 				node = std::make_shared<IntegerExpr>(std::stoi(iToken->value));
+				iToken++;
+				break;
+			case Token::TOKEN::TDOUBLE:
+				node = std::make_shared<DoubleExpr>(std::stod(iToken->value));
+				iToken++;
+				break;
+			default:
+				break;
+			}
+			return node;
+		};
+
+		genNode[Symbol::string] = [&]() {
+			std::shared_ptr<Node> node = nullptr;
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TSTRING:
+				node = std::make_shared<StringExpr>(iToken->value);
 				iToken++;
 				break;
 			default:
@@ -324,7 +346,11 @@ namespace Ice
 				}
 				break;
 			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TDOUBLE:
 				node = genNode[Symbol::numeric]();
+				break;
+			case Token::TOKEN::TSTRING:
+				node = genNode[Symbol::string]();
 				break;
 			case Token::TOKEN::TLPAREN:
 				iToken++;

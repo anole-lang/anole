@@ -108,7 +108,7 @@ namespace Ice
 						state = State::InIdentifier;
 						value += *reading;
 					}
-					else if (*reading == '\"')
+					else if (*reading == '"')
 					{
 						state = State::InString;
 					}

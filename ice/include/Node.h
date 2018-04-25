@@ -59,6 +59,14 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class StringExpr : public Expr
+	{
+	public:
+		std::string value;
+		StringExpr(std::string value) : value(value) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class IdentifierExpr : public Expr
 	{
 	public:

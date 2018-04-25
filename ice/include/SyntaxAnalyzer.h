@@ -87,6 +87,10 @@ numeric
 	| TDOUBLE
 	;
 
+string
+	: TSTRING
+	;
+
 expr
 	: cmp cmp_rest
 	;
@@ -119,6 +123,7 @@ factor_rest
 term
 	: ident method_call_tail
 	| numeric
+	| string
 	| TLPAREN expr TRPAREN
 	| lambda_expr
 	;
@@ -202,6 +207,7 @@ namespace Ice
 			func_decl_args_tail,
 			ident,
 			numeric,
+			string,
 			cmp,
 			factor,
 			term,

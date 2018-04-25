@@ -53,6 +53,11 @@ namespace Ice
 		return std::make_shared<IceDoubleObject>(value);
 	}
 
+	std::shared_ptr<IceObject> StringExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		return std::make_shared<IceStringObject>(value);
+	}
+
 	std::shared_ptr<IceObject> IdentifierExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		return top->getObject(name);
