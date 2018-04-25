@@ -8,11 +8,6 @@ namespace Ice
 		objects[name] = obj;
 	}
 
-	void Env::put(std::string &name, std::shared_ptr<FunctionDeclarationStmt> func)
-	{
-		functions[name] = func;
-	}
-
 	std::shared_ptr<IceObject> Env::getObject(std::string &name)
 	{
 		std::shared_ptr<Env> tmp = shared_from_this();
@@ -24,21 +19,6 @@ namespace Ice
 				tmp = tmp->prev;
 		}
 		std::cout << "cannot find var " << name << std::endl;
-		exit(0);
-		return nullptr;
-	}
-
-	std::shared_ptr<FunctionDeclarationStmt> Env::getFunction(std::string &name)
-	{
-		std::shared_ptr<Env> tmp = shared_from_this();
-		while (tmp != nullptr)
-		{
-			if (tmp->functions.find(name) != tmp->functions.end())
-				return tmp->functions[name];
-			else
-				tmp = tmp->prev;
-		}
-		std::cout << "cannot find function " << name << std::endl;
 		exit(0);
 		return nullptr;
 	}
@@ -81,7 +61,7 @@ namespace Ice
 	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		top = std::make_shared<Env>(top);
-		std::shared_ptr<FunctionDeclarationStmt> func = top->getFunction(id->name);
+		std::shared_ptr<IceFunctionObject> func = std::dynamic_pointer_cast<IceFunctionObject>(top->getObject(id->name));
 		if (arguments.size() != func->arguments.size())
 		{
 			std::cout << "The number of arguments does not match" << std::endl;
@@ -122,7 +102,8 @@ namespace Ice
 
 	std::shared_ptr<IceObject> FunctionDeclarationStmt::runCode(std::shared_ptr<Env> &top)
 	{
-		top->put(id->name, shared_from_this());
+		std::shared_ptr<IceObject> obj = std::make_shared<IceFunctionObject>(arguments, block);
+		top->put(id->name, obj);
 		return nullptr;
 	}
 
@@ -254,6 +235,33 @@ namespace Ice
 		return returnValue;
 	}
 
+	std::shared_ptr<IceObject> LambdaExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		return std::make_shared<IceFunctionObject>(arguments, block);
+	}
+
+	std::shared_ptr<IceObject> LambdaCallExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		top = std::make_shared<Env>(top);
+		if (args.size() != exprs.size())
+		{
+			std::cout << "The number of arguments does not match" << std::endl;
+			exit(0);
+		}
+		std::vector<std::shared_ptr<IceObject>> argValues;
+		for (auto expr : exprs)
+		{
+			argValues.push_back(expr->runCode(top));
+		}
+		for (size_t i = 0; i < args.size(); i++)
+		{
+			top->put(args[i]->name, argValues[i]);
+		}
+		std::shared_ptr<IceObject> returnValue = block->runCode(top);
+		top = top->prev;
+		return returnValue;
+	}
+
 	// build_in_function_implement
 
 	std::shared_ptr<IceObject> PrintStmt::runCode(std::shared_ptr<Env> &top)
@@ -276,6 +284,6 @@ namespace Ice
 		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
 		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
 		block->statements.push_back(std::make_shared<PrintStmt>());
-		put(func_name, std::make_shared<FunctionDeclarationStmt>(std::make_shared<IdentifierExpr>(func_name), args, block));
+		put(func_name, std::make_shared<IceFunctionObject>(args, block));
 	}
 }

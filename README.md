@@ -101,5 +101,20 @@ for 1 to 5
 }
 ```
 
+###### Lambda Expression
+```ice
+@add: @(a, b): a+b
+@mul: @(a, b){
+    return a * b
+}
+@(a, b){ return a / b }(9, 3)
+
+@quadraticSum: @(a, b){
+    @sqrt: @(n){ return n * n }
+    return @(a, b){ return a + b }(sqrt(a), sqrt(b))
+}
+```
+
 ### TODO
-* Complete Control Flow & Fix Bugs
+* Fix Bugs
+* Add Double & String type Support

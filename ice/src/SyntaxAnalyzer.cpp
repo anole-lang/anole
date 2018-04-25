@@ -9,7 +9,9 @@ namespace Ice
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TAT:
-				node = genNode[Symbol::var_decl_or_func_decl]();
+				if ((iToken+1)->token_id==Token::TOKEN::TIDENTIFIER)
+					node = genNode[Symbol::var_decl_or_func_decl]();
+				else node = genNode[Symbol::expr]();
 				break;
 			case Token::TOKEN::TIF:
 				node = genNode[Symbol::if_else]();
@@ -215,6 +217,7 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TAT:
 				goto cmp;
 			default:
 				return node;
@@ -251,6 +254,7 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TAT:
 				goto factor;
 			default:
 				return node;
@@ -288,6 +292,7 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TLPAREN:
+			case Token::TOKEN::TAT:
 				goto item;
 			default:
 				return node;
@@ -332,6 +337,9 @@ namespace Ice
 					exit(0);
 				}
 				return node;
+			case Token::TOKEN::TAT:
+				node = genNode[Symbol::lambda_expr]();
+				break;
 			default:
 				break;
 			}
@@ -396,6 +404,52 @@ namespace Ice
 		genNode[Symbol::return_stmt] = [&]() {
 			iToken++;
 			return std::dynamic_pointer_cast<Node>(std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]())));
+		};
+
+		genNode[Symbol::lambda_expr] = [&]() {
+			std::function<VariableList()> genArguments;
+			genArguments = [&]() {
+				VariableList args;
+				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
+				{
+					args.push_back(std::make_shared<IdentifierExpr>(iToken->value));
+					iToken++;
+					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+					else break;
+				}
+				return args;
+			};
+			std::shared_ptr<Node> node = nullptr;
+			iToken++;
+			if (iToken->token_id != Token::TOKEN::TLPAREN)
+			{
+				std::cout << "missing symbol '('" << std::endl;
+				exit(0);
+			}
+			iToken++;
+			VariableList args = genArguments();
+			if (iToken->token_id != Token::TOKEN::TRPAREN)
+			{
+				std::cout << "missing symbol ')'" << std::endl;
+				exit(0);
+			}
+			iToken++;
+			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
+			if (iToken->token_id == Token::TOKEN::TLPAREN)
+			{
+				ExpressionList exprs;
+				iToken++;
+				while (iToken->token_id != Token::TOKEN::TRPAREN)
+				{
+					exprs.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+					else break;
+				}
+				iToken++;
+				node = std::make_shared<LambdaCallExpr>(args, block, exprs);
+			}
+			else node = std::make_shared<LambdaExpr>(args, block);
+			return node;
 		};
 	}
 

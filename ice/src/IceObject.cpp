@@ -2,6 +2,11 @@
 
 namespace Ice
 {
+	IceFunctionObject::IceFunctionObject(const VariableList &arguments, std::shared_ptr<BlockExpr> block) : arguments(arguments), block(block)
+	{
+		type = TYPE::FUNCTION;
+	}
+
 	IceIntegerObject::IceIntegerObject(long value) : value(value)
 	{
 		type = TYPE::INT;

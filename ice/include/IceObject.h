@@ -3,12 +3,17 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <memory>
 #include <cstring>
 #include "Token.h"
 
 namespace Ice
 {
+	class BlockExpr;
+	class IdentifierExpr;
+	typedef std::vector<std::shared_ptr<IdentifierExpr>> VariableList;
+
 	class IceObject
 	{
 	public:
@@ -16,12 +21,26 @@ namespace Ice
 		{
 			INT,
 			DOUBLE,
-			STRING
+			STRING,
+			FUNCTION
 		} type;
 		virtual ~IceObject() {}
 		virtual void show() = 0;
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op) = 0;
 		virtual bool isTrue() = 0;
+	};
+
+	class IceFunctionObject : public IceObject
+	{
+	public:
+		VariableList arguments;
+		std::shared_ptr<BlockExpr> block;
+		IceFunctionObject(const VariableList &, std::shared_ptr<BlockExpr>);
+
+		virtual ~IceFunctionObject() {}
+		virtual void show() {}
+		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op) { return nullptr; }
+		virtual bool isTrue() { return true; }
 	};
 
 	class IceIntegerObject : public IceObject

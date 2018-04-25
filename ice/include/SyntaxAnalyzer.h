@@ -120,6 +120,7 @@ term
 	: ident method_call_tail
 	| numeric
 	| TLPAREN expr TRPAREN
+	| lambda_expr
 	;
 
 term_rest
@@ -168,6 +169,10 @@ do_while_stmt
 for_stmt
 	: TFOR expr TTO expr block
 	;
+
+lambda_expr
+	: TAT TLPAREN func_decl_args TRPAREN block method_call_tail
+	;
 */
 
 namespace Ice
@@ -204,7 +209,8 @@ namespace Ice
 			call_args,
 			call_args_tail,
 			comparison,
-			if_else_tail
+			if_else_tail,
+			lambda_expr
 		};
 		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 

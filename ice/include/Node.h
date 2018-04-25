@@ -6,12 +6,12 @@
 #include <memory>
 #include <string>
 #include <cstring>
-#include "IceObject.h"
 #include "Token.h"
 
 namespace Ice
 {
 	class Env;
+	class IceObject;
 
 	class Stmt;
 	class Expr;
@@ -170,6 +170,25 @@ namespace Ice
 		std::shared_ptr<Expr> end;
 		std::shared_ptr<BlockExpr> block;
 		ForStmt(std::shared_ptr<Expr> begin, std::shared_ptr<Expr> end, std::shared_ptr<BlockExpr> block) : begin(begin), end(end), block(block) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class LambdaExpr : public Expr
+	{
+	public:
+		VariableList arguments;
+		std::shared_ptr<BlockExpr> block;
+		LambdaExpr(const VariableList &arguments, std::shared_ptr<BlockExpr> block) : arguments(arguments), block(block) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class LambdaCallExpr : public Expr
+	{
+	public:
+		VariableList args;
+		std::shared_ptr<BlockExpr> block;
+		ExpressionList exprs;
+		LambdaCallExpr(const VariableList &args, std::shared_ptr<BlockExpr> block, const ExpressionList &exprs) : args(args), block(block), exprs(exprs) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
