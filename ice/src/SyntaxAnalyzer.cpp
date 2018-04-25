@@ -239,6 +239,8 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TAT:
 				goto cmp;
 			default:
@@ -276,6 +278,8 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TAT:
 				goto factor;
 			default:
@@ -313,6 +317,8 @@ namespace Ice
 			{
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TAT:
 				goto item;

@@ -256,6 +256,7 @@ namespace Ice
 				case '"':
 					tokens.push_back(Token(Token::TOKEN::TSTRING, value));
 					state = State::Begin;
+					value = "";
 					break;
 				default:
 					value += *reading;

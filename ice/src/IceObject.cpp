@@ -91,7 +91,7 @@ namespace Ice
 		return value != 0;
 	}
 
-	IceDoubleObject::IceDoubleObject(double value)
+	IceDoubleObject::IceDoubleObject(double value) : value(value)
 	{
 		type = TYPE::DOUBLE;
 	}
@@ -118,7 +118,7 @@ namespace Ice
 
 	void IceStringObject::show()
 	{
-		std::cout << value << std::endl;
+		std::cout << '"' << value << '"' << std::endl;
 	}
 
 	std::shared_ptr<IceObject> IceStringObject::binaryOperate(std::shared_ptr<IceObject> obj, Token::TOKEN op)
