@@ -17,7 +17,7 @@ namespace Ice
 
 	void Interpreter::run()
 	{
-		while (true)
+		while (!std::cin.eof())
 		{
 			std::cout << ">> ";
 			auto node = syntaxAnalyzer.getNode();
