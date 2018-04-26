@@ -224,6 +224,7 @@ namespace Ice
 	public:
 		SyntaxAnalyzer();
 		std::shared_ptr<Node> getNode();
+		std::shared_ptr<Node> getNode(std::string);
 	};
 }
 

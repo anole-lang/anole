@@ -14,6 +14,11 @@ make
 ```
 Also you can use Visual Studio, just open ice/ice.sln by Visual Studio.
 
+###### Hello World
+```ice
+print("Hello World")
+```
+
 ### Progress
 
 ###### Comments
@@ -108,7 +113,7 @@ for 1 to 5
 
 ###### Lambda Expression
 ```ice
-@add: @(a, b): a+b
+@add(a, b): a + b
 @mul: @(a, b){
     return a * b
 }
@@ -120,6 +125,10 @@ for 1 to 5
 }
 ```
 
+###### Support Interpret Single-File
+```shell
+/path/to/ice /path/to/source.ice
+```
+
 ### TODO
 * Add Built-in Functions & Fix Bugs
-* Add Support for interpretation execution from file input

@@ -4,6 +4,36 @@ namespace Ice
 {
 	SyntaxAnalyzer::SyntaxAnalyzer()
 	{
+		genNode[Symbol::stmts] = [&]() {
+			std::shared_ptr<BlockExpr> node = std::make_shared<BlockExpr>();
+			while (iToken->token_id != Token::TOKEN::TEND)
+			{
+				switch (iToken->token_id)
+				{
+				case Token::TOKEN::TAT:
+				case Token::TOKEN::TIDENTIFIER:
+				case Token::TOKEN::TINTEGER:
+				case Token::TOKEN::TDOUBLE:
+				case Token::TOKEN::TSTRING:
+				case Token::TOKEN::TSUB:
+				case Token::TOKEN::TLPAREN:
+				case Token::TOKEN::TIF:
+				case Token::TOKEN::TWHILE:
+				case Token::TOKEN::TDO:
+				case Token::TOKEN::TFOR:
+				case Token::TOKEN::TBREAK:
+				case Token::TOKEN::TCONTINUE:
+				case Token::TOKEN::TRETURN:
+					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
+					break;
+				default:
+					std::cout << "syntax error" << std::endl;
+					exit(0);
+				}
+			}
+			return node;
+		};
+
 		genNode[Symbol::stmt] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
@@ -496,8 +526,18 @@ namespace Ice
 
 	std::shared_ptr<Node> SyntaxAnalyzer::getNode()
 	{
-		auto &tokens = lexicalAnalyzer.getTokens();
+		std::string line;
+		std::getline(std::cin, line);
+		line += "$";
+		auto &tokens = lexicalAnalyzer.getTokens(line);
 		iToken = tokens.begin();
 		return (iToken == tokens.end()) ? nullptr : genNode[Symbol::stmt]();
+	}
+
+	std::shared_ptr<Node> SyntaxAnalyzer::getNode(std::string code)
+	{
+		auto &tokens = lexicalAnalyzer.getTokens(code);
+		iToken = tokens.begin();
+		return (iToken == tokens.end()) ? nullptr : genNode[Symbol::stmts]();
 	}
 }

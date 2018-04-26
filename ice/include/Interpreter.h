@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <fstream>
 #include <cstring>
 #include <cstdio>
 #include "Token.h"
@@ -26,6 +27,7 @@ namespace Ice
 	public:
 		Interpreter();
 		void run();
+		void run(std::string);
 	};
 }
 

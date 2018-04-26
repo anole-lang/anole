@@ -2,11 +2,8 @@
 
 namespace Ice
 {
-	void LexicalAnalyzer::analy()
+	void LexicalAnalyzer::analy(std::string line)
 	{
-		std::string line;
-		std::getline(std::cin, line);
-		line += "$";
 		State state = State::Begin;
 		std::string value;
 		const char *reading = line.c_str();
@@ -291,10 +288,10 @@ namespace Ice
 		}
 	}
 
-	std::vector<Token> &LexicalAnalyzer::getTokens()
+	std::vector<Token> &LexicalAnalyzer::getTokens(std::string line)
 	{
 		tokens.clear();
-		analy();
+		analy(line);
 		return tokens;
 	}
 
@@ -303,7 +300,12 @@ namespace Ice
 		int offset = tokens.size() - 1;
 		std::cout << ".. ";
 		tokens.pop_back();
-		analy();
+
+		std::string line;
+		std::getline(std::cin, line);
+		line += "$";
+
+		analy(line);
 		return tokens.begin() + offset;
 	}
 }

@@ -29,11 +29,11 @@ namespace Ice
 			InString,
 			InStringEscaping
 		};
-		void analy();
+		void analy(std::string);
 
 	public:
 		LexicalAnalyzer() {}
-		std::vector<Token> &getTokens();
+		std::vector<Token> &getTokens(std::string);
 		std::vector<Token>::iterator cont();
 	};
 }
