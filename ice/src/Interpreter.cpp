@@ -4,12 +4,11 @@ namespace Ice
 {
 	Interpreter::Interpreter()
 	{
-		std::cout << "      /////////\n"
-					 "        ///    ///////// /////////\n"
-					 "       ///    ///       ///   ///    Version 0.0.1 \n"
-					 "      ///    ///       /////////     http://www.jusot.com/ice\n"
-					 "     ///    ///       ///\n"
-					 " ///////// ///////// /////////\n"
+		std::cout << "    _____________________\n"
+					 "   /_  ___/ _____/ _____/\n"
+					 "    / /  / /    / /____      Version 0.0.1 \n"
+					 " __/ /__/ /____/ /____       http://www.jusot.com/ice\n"
+					 "/______/______/______/\n"
 					<< std::endl;
 		top = std::make_shared<Env>(nullptr);
 		top->genBuildInFunction();
