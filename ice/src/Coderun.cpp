@@ -18,7 +18,7 @@ namespace Ice
 			else
 				tmp = tmp->prev;
 		}
-		std::cout << "cannot find var " << name << std::endl;
+		std::cout << "cannot find " << name << std::endl;
 		exit(0);
 		return nullptr;
 	}
@@ -84,6 +84,12 @@ namespace Ice
 		std::shared_ptr<IceObject> returnValue = func->block->runCode(top);
 		top = top->prev;
 		return returnValue;
+	}
+
+	std::shared_ptr<IceObject> UnaryOperatorExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> obj = expression->runCode(top);
+		return obj->unaryOperate(op);
 	}
 
 	std::shared_ptr<IceObject> BinaryOperatorExpr::runCode(std::shared_ptr<Env> &top)
@@ -269,6 +275,12 @@ namespace Ice
 
 	// build_in_function_implement
 
+	std::shared_ptr<IceObject> InputExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		std::getline(std::cin, input);
+		return std::make_shared<IceStringObject>(input);
+	}
+
 	std::shared_ptr<IceObject> PrintStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		top->getObject(id)->show();
@@ -277,7 +289,20 @@ namespace Ice
 
 	void Env::genBuildInFunction()
 	{
+		genInputFunction();
 		genPrintFunction();
+	}
+
+	void Env::genInputFunction()
+	{
+		std::string func_name = "input";
+
+		VariableList args;
+		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
+
+		block->statements.push_back(std::make_shared<ReturnStmt>(std::make_shared<InputExpr>()));
+		
+		put(func_name, std::make_shared<IceFunctionObject>(args, block));
 	}
 
 	void Env::genPrintFunction()
@@ -287,8 +312,10 @@ namespace Ice
 
 		VariableList args;
 		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
+
 		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
 		block->statements.push_back(std::make_shared<PrintStmt>());
+
 		put(func_name, std::make_shared<IceFunctionObject>(args, block));
 	}
 }

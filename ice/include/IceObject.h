@@ -2,6 +2,7 @@
 #define __ICE_OBJECT_H__
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <memory>
@@ -26,6 +27,7 @@ namespace Ice
 		} type;
 		virtual ~IceObject() {}
 		virtual void show() = 0;
+		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op) = 0;
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op) = 0;
 		virtual bool isTrue() = 0;
 	};
@@ -39,6 +41,7 @@ namespace Ice
 
 		virtual ~IceFunctionObject() {}
 		virtual void show() {}
+		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op) { return nullptr; };
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op) { return nullptr; }
 		virtual bool isTrue() { return true; }
 	};
@@ -51,6 +54,7 @@ namespace Ice
 		IceIntegerObject(long value);
 		virtual ~IceIntegerObject() {}
 		virtual void show();
+		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
 		virtual bool isTrue();
 	};
@@ -63,6 +67,7 @@ namespace Ice
 		IceDoubleObject(double value);
 		virtual ~IceDoubleObject() {}
 		virtual void show();
+		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
 		virtual bool isTrue();
 	};
@@ -75,6 +80,7 @@ namespace Ice
 		IceStringObject(std::string value);
 		virtual ~IceStringObject() {}
 		virtual void show();
+		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN op);
 		virtual bool isTrue();
 	};

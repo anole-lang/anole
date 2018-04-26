@@ -125,6 +125,7 @@ term
 	| numeric
 	| string
 	| TLPAREN expr TRPAREN
+	| TSUB term
 	| lambda_expr
 	;
 

@@ -84,6 +84,15 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class UnaryOperatorExpr : public Expr
+	{
+	public:
+		Token::TOKEN op;
+		std::shared_ptr<Expr> expression;
+		UnaryOperatorExpr(Token::TOKEN op, std::shared_ptr<Expr> expression) : op(op), expression(expression) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class BinaryOperatorExpr : public Expr
 	{
 	public:
@@ -201,6 +210,14 @@ namespace Ice
 	};
 
 	// build_in_function
+
+	class InputExpr : public Expr
+	{
+	public:
+		std::string input;
+		InputExpr() {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
 
 	class PrintStmt : public Stmt
 	{

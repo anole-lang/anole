@@ -37,6 +37,7 @@ namespace Ice
 				node = genNode[Symbol::return_stmt]();
 				break;
 			case Token::TOKEN::TIDENTIFIER:
+			case Token::TOKEN::TSUB:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
 			case Token::TOKEN::TSTRING:
@@ -125,6 +126,7 @@ namespace Ice
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TDOUBLE:
 				case Token::TOKEN::TSTRING:
+				case Token::TOKEN::TSUB:
 				case Token::TOKEN::TLPAREN:
 				case Token::TOKEN::TIF:
 				case Token::TOKEN::TWHILE:
@@ -237,6 +239,7 @@ namespace Ice
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TIDENTIFIER:
+			case Token::TOKEN::TSUB:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
@@ -276,6 +279,7 @@ namespace Ice
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TIDENTIFIER:
+			case Token::TOKEN::TSUB:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
@@ -319,6 +323,7 @@ namespace Ice
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
 			case Token::TOKEN::TSTRING:
+			case Token::TOKEN::TSUB:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TAT:
 				goto item;
@@ -368,7 +373,11 @@ namespace Ice
 					std::cout << "missing symbol '(' ." << std::endl;
 					exit(0);
 				}
-				return node;
+				break;
+			case Token::TOKEN::TSUB:
+				iToken++;
+				node = std::make_shared<UnaryOperatorExpr>(Token::TOKEN::TSUB, std::dynamic_pointer_cast<Expr>(genNode[Symbol::term]()));
+				break;
 			case Token::TOKEN::TAT:
 				node = genNode[Symbol::lambda_expr]();
 				break;

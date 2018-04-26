@@ -19,6 +19,7 @@ namespace Ice
 		bool breakStatus;
 		bool continueStatus;
 
+		void genInputFunction();
 		void genPrintFunction();
 
 	public:

@@ -23,6 +23,7 @@ Also you can use Visual Studio, just open ice/ice.sln by Visual Studio.
 
 ###### Built-Functions
 ```ice
+@a: input()
 print(1)
 ```
 
@@ -32,15 +33,19 @@ print(1)
 @b: a
 ```
 
+###### Unary Operator
+```ice
+@a: "abc"
+@b: -a # "cba"
+```
+
 ###### Binary Operator
 ```ice
 # support + - * / % = != <= > >=
 @a: 1 + 1
-@b: 4 - 1
+@b: input()
 @c: (a + b) - a * b / a % b # support ()
-1 = 1 # 1
-1 != 1 # 0
-a <= 3 # 1
+a = b
 ```
 
 ###### Function Declaration & Call
@@ -116,5 +121,5 @@ for 1 to 5
 ```
 
 ### TODO
-* Fix Bugs
-* Add Double & String type Support
+* Add Built-in Functions & Fix Bugs
+* Add Support for interpretation execution from file input
