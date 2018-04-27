@@ -112,6 +112,7 @@ namespace Ice
 				}
 				return args;
 			};
+
 			VariableList arguments = genArguments();
 			switch (iToken->token_id)
 			{
@@ -129,12 +130,7 @@ namespace Ice
 
 		genNode[Symbol::block] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
-			if (iToken->token_id == Token::TOKEN::TEND) iToken = lexicalAnalyzer.cont();
-			else if (iToken->token_id != Token::TOKEN::TLBRACE)
-			{
-				std::cout << "missing symbol '{'" << std::endl;
-				exit(0);
-			}
+			updateiToken();
 			if (iToken->token_id != Token::TOKEN::TLBRACE)
 			{
 				std::cout << "missing symbol '{'" << std::endl;
@@ -168,7 +164,7 @@ namespace Ice
 					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 					break;
 				case Token::TOKEN::TEND:
-					iToken = lexicalAnalyzer.cont();
+					updateiToken();
 					break;
 				default:
 					std::cout << "missing '}'" << std::endl;
@@ -265,6 +261,7 @@ namespace Ice
 				node = genCmpRest(_lhs);
 				return node;
 			};
+
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
@@ -305,6 +302,7 @@ namespace Ice
 				node = genFactorRest(_lhs);
 				return node;
 			};
+
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
@@ -346,6 +344,7 @@ namespace Ice
 				node = genTermRest(_lhs);
 				return node;
 			};
+
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
@@ -427,6 +426,7 @@ namespace Ice
 
 		genNode[Symbol::if_else_tail] = [&]() {
 			auto node = std::make_shared<BlockExpr>();
+			updateiToken();
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TELSE:
@@ -490,6 +490,7 @@ namespace Ice
 				}
 				return args;
 			};
+
 			std::shared_ptr<Node> node = nullptr;
 			iToken++;
 			if (iToken->token_id != Token::TOKEN::TLPAREN)
@@ -522,6 +523,11 @@ namespace Ice
 			else node = std::make_shared<LambdaExpr>(args, block);
 			return node;
 		};
+	}
+
+	void SyntaxAnalyzer::updateiToken()
+	{
+		if (iToken->token_id == Token::TOKEN::TEND) iToken = lexicalAnalyzer.cont();
 	}
 
 	std::shared_ptr<Node> SyntaxAnalyzer::getNode()

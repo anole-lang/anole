@@ -221,6 +221,8 @@ namespace Ice
 		};
 		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 
+		void updateiToken();
+
 	public:
 		SyntaxAnalyzer();
 		std::shared_ptr<Node> getNode();
