@@ -59,6 +59,14 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class BooleanExpr : public Expr
+	{
+	public:
+		bool value;
+		BooleanExpr(bool value) : value(value) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class StringExpr : public Expr
 	{
 	public:
@@ -224,6 +232,14 @@ namespace Ice
 	public:
 		std::string id;
 		PrintStmt() : id("to_print") {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class StrExpr : public Expr
+	{
+	public:
+		std::string id;
+		StrExpr() : id("to_str") {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 }

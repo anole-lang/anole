@@ -27,6 +27,9 @@ namespace Ice
 			TCONTINUE,	// continue
 			TRETURN, // return
 
+			TTRUE, // true
+			TFALSE, // false
+
 			TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
 			TINTEGER,    // [0-9]+
 			TDOUBLE,     // [0-9]+\.[0-9]*

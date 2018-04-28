@@ -87,6 +87,11 @@ numeric
 	| TDOUBLE
 	;
 
+boolean
+	: TTRUE
+	| TFALSE
+	;
+
 string
 	: TSTRING
 	;
@@ -123,6 +128,7 @@ factor_rest
 term
 	: ident method_call_tail
 	| numeric
+	| boolean
 	| string
 	| TLPAREN expr TRPAREN
 	| TSUB term
@@ -208,6 +214,7 @@ namespace Ice
 			func_decl_args_tail,
 			ident,
 			numeric,
+			boolean,
 			string,
 			cmp,
 			factor,

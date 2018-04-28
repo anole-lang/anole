@@ -14,6 +14,8 @@ namespace Ice
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TDOUBLE:
+				case Token::TOKEN::TTRUE:
+				case Token::TOKEN::TFALSE:
 				case Token::TOKEN::TSTRING:
 				case Token::TOKEN::TSUB:
 				case Token::TOKEN::TLPAREN:
@@ -70,6 +72,8 @@ namespace Ice
 			case Token::TOKEN::TSUB:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TTRUE:
+			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TLPAREN:
 				node = std::make_shared<ExprStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
@@ -151,6 +155,8 @@ namespace Ice
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TDOUBLE:
+				case Token::TOKEN::TTRUE:
+				case Token::TOKEN::TFALSE:
 				case Token::TOKEN::TSTRING:
 				case Token::TOKEN::TSUB:
 				case Token::TOKEN::TLPAREN:
@@ -223,6 +229,24 @@ namespace Ice
 			return node;
 		};
 
+		genNode[Symbol::boolean] = [&]() {
+			std::shared_ptr<Node> node = nullptr;
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TTRUE:
+				node = std::make_shared<BooleanExpr>(true);
+				iToken++;
+				break;
+			case Token::TOKEN::TFALSE:
+				node = std::make_shared<BooleanExpr>(false);
+				iToken++;
+				break;
+			default:
+				break;
+			}
+			return node;
+		};
+
 		genNode[Symbol::string] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
@@ -270,6 +294,8 @@ namespace Ice
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TTRUE:
+			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TAT:
 				goto cmp;
@@ -311,6 +337,8 @@ namespace Ice
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TTRUE:
+			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TAT:
 				goto factor;
@@ -351,6 +379,8 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TTRUE:
+			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TSUB:
 			case Token::TOKEN::TLPAREN:
@@ -388,6 +418,10 @@ namespace Ice
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
 				node = genNode[Symbol::numeric]();
+				break;
+			case Token::TOKEN::TTRUE:
+			case Token::TOKEN::TFALSE:
+				node = genNode[Symbol::boolean]();
 				break;
 			case Token::TOKEN::TSTRING:
 				node = genNode[Symbol::string]();

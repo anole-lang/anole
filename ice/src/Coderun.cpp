@@ -53,6 +53,11 @@ namespace Ice
 		return std::make_shared<IceDoubleObject>(value);
 	}
 
+	std::shared_ptr<IceObject> BooleanExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		return std::make_shared<IceBooleanObject>(value);
+	}
+
 	std::shared_ptr<IceObject> StringExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		return std::make_shared<IceStringObject>(value);
@@ -287,10 +292,16 @@ namespace Ice
 		return nullptr;
 	}
 
+	std::shared_ptr<IceObject> StrExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		return std::make_shared<IceStringObject>(top->getObject(id)->toStr());
+	}
+
 	void Env::genBuildInFunction()
 	{
 		genInputFunction();
 		genPrintFunction();
+		genStrFunction();
 	}
 
 	void Env::genInputFunction()
@@ -315,6 +326,20 @@ namespace Ice
 
 		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
 		block->statements.push_back(std::make_shared<PrintStmt>());
+
+		put(func_name, std::make_shared<IceFunctionObject>(args, block));
+	}
+
+	void Env::genStrFunction()
+	{
+		std::string func_name = "str";
+		std::string obj_name = "to_str";
+
+		VariableList args;
+		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
+
+		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
+		block->statements.push_back(std::make_shared<ReturnStmt>(std::make_shared<StrExpr>()));
 
 		put(func_name, std::make_shared<IceFunctionObject>(args, block));
 	}

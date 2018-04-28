@@ -22,6 +22,10 @@ namespace Ice
 			token_id = TOKEN::TCONTINUE;
 		else if (value == "return")
 			token_id = TOKEN::TRETURN;
+		else if (value == "true")
+			token_id = TOKEN::TTRUE;
+		else if (value == "false")
+			token_id = TOKEN::TFALSE;
 		else if (value == "and")
 			token_id = TOKEN::TAND;
 		else if (value == "or")

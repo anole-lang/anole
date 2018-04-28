@@ -21,6 +21,7 @@ namespace Ice
 
 		void genInputFunction();
 		void genPrintFunction();
+		void genStrFunction();
 
 	public:
 		std::shared_ptr<Env> prev;
