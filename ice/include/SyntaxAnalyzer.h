@@ -76,7 +76,8 @@ func_decl_args
 
 func_decl_args_tail
 	:
-	| TCOMMA ident func_decl_args_tail
+	| TASSIGN expr TCOMMA func_decl_args
+	| TCOMMA func_decl_args
 
 ident
 	: TIDENTIFIER

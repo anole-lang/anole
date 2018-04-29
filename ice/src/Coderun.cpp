@@ -43,6 +43,11 @@ namespace Ice
 		return nullptr;
 	}
 
+	std::shared_ptr<IceObject> NoneExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		return std::make_shared<IceNoneObject>();
+	}
+
 	std::shared_ptr<IceObject> IntegerExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		return std::make_shared<IceIntegerObject>(value);
@@ -71,22 +76,22 @@ namespace Ice
 	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		top = std::make_shared<Env>(top);
+
 		std::shared_ptr<IceFunctionObject> func = std::dynamic_pointer_cast<IceFunctionObject>(top->getObject(id->name));
-		if (arguments.size() != func->arguments.size())
+		if (arguments.size() > func->argDecls.size())
 		{
 			std::cout << "The number of arguments does not match" << std::endl;
 			exit(0);
 		}
-		std::vector<std::shared_ptr<IceObject>> argValues;
-		for (auto argument : arguments)
-		{
-			argValues.push_back(argument->runCode(top));
-		}
-		for (size_t i = 0; i < this->arguments.size(); i++)
-		{
-			top->put(func->arguments[i]->name, argValues[i]);
-		}
+
+		for (size_t i = 0; i < arguments.size(); i++) 
+			func->argDecls[i]->assignment = arguments[i];
+
+		for (auto &argDecl : func->argDecls)
+			top->put(argDecl->id->name, argDecl->assignment->runCode(top));
+
 		std::shared_ptr<IceObject> returnValue = func->block->runCode(top);
+
 		top = top->prev;
 		return returnValue;
 	}
@@ -118,7 +123,7 @@ namespace Ice
 
 	std::shared_ptr<IceObject> FunctionDeclarationStmt::runCode(std::shared_ptr<Env> &top)
 	{
-		std::shared_ptr<IceObject> obj = std::make_shared<IceFunctionObject>(arguments, block);
+		std::shared_ptr<IceObject> obj = std::make_shared<IceFunctionObject>(argDecls, block);
 		top->put(id->name, obj);
 		return nullptr;
 	}
@@ -253,27 +258,33 @@ namespace Ice
 
 	std::shared_ptr<IceObject> LambdaExpr::runCode(std::shared_ptr<Env> &top)
 	{
-		return std::make_shared<IceFunctionObject>(arguments, block);
+		return std::make_shared<IceFunctionObject>(argDecls, block);
 	}
 
 	std::shared_ptr<IceObject> LambdaCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
+
 		top = std::make_shared<Env>(top);
-		if (args.size() != exprs.size())
+
+		if (expressions.size() > argDecls.size())
 		{
 			std::cout << "The number of arguments does not match" << std::endl;
 			exit(0);
 		}
+
 		std::vector<std::shared_ptr<IceObject>> argValues;
-		for (auto expr : exprs)
+
+		for (size_t i = 0; i < expressions.size(); i++)
 		{
-			argValues.push_back(expr->runCode(top));
+			argDecls[i]->assignment = expressions[i];
 		}
-		for (size_t i = 0; i < args.size(); i++)
+		for (auto &argDecl : argDecls)
 		{
-			top->put(args[i]->name, argValues[i]);
+			top->put(argDecl->id->name, argDecl->assignment->runCode(top));
 		}
+
 		std::shared_ptr<IceObject> returnValue = block->runCode(top);
+
 		top = top->prev;
 		return returnValue;
 	}
@@ -324,7 +335,7 @@ namespace Ice
 		VariableList args;
 		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
 
-		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
+		args.push_back(std::make_shared<VariableDeclarationStmt>(std::make_shared<IdentifierExpr>(obj_name), std::make_shared<NoneExpr>()));
 		block->statements.push_back(std::make_shared<PrintStmt>());
 
 		put(func_name, std::make_shared<IceFunctionObject>(args, block));
@@ -338,7 +349,7 @@ namespace Ice
 		VariableList args;
 		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
 
-		args.push_back(std::make_shared<IdentifierExpr>(obj_name));
+		args.push_back(std::make_shared<VariableDeclarationStmt>(std::make_shared<IdentifierExpr>(obj_name), std::make_shared<NoneExpr>()));
 		block->statements.push_back(std::make_shared<ReturnStmt>(std::make_shared<StrExpr>()));
 
 		put(func_name, std::make_shared<IceFunctionObject>(args, block));

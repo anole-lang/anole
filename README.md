@@ -62,7 +62,18 @@ a = b
     return a * b
 }
 
-mul(mul(2, 3), add(2, 3)) # 30
+@pow(num, n)
+{
+    @res: 1
+    while n > 0:
+    {
+        @res: res * num
+        @n: n - 1
+    }
+    return res
+}
+
+mul(mul(2, 3), pow(3)) # 54
 ```
 
 ###### Control Flow

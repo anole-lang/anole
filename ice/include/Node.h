@@ -15,11 +15,11 @@ namespace Ice
 
 	class Stmt;
 	class Expr;
-	class IdentifierExpr;
+	class VariableDeclarationStmt;
 
 	typedef std::vector<std::shared_ptr<Stmt>> StatementList;
 	typedef std::vector<std::shared_ptr<Expr>> ExpressionList;
-	typedef std::vector<std::shared_ptr<IdentifierExpr>> VariableList;
+	typedef std::vector<std::shared_ptr<VariableDeclarationStmt>> VariableList;
 
 	class Node
 	{
@@ -40,6 +40,13 @@ namespace Ice
 	public:
 		StatementList statements;
 		BlockExpr() {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class NoneExpr : public Expr
+	{
+	public:
+		NoneExpr() {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -132,9 +139,9 @@ namespace Ice
 	{
 	public:
 		std::shared_ptr<IdentifierExpr> id;
-		VariableList arguments;
+		VariableList argDecls;
 		std::shared_ptr<BlockExpr> block;
-		FunctionDeclarationStmt(std::shared_ptr<IdentifierExpr> id, const VariableList &arguments, std::shared_ptr<BlockExpr> block) : id(id), arguments(arguments), block(block) {}
+		FunctionDeclarationStmt(std::shared_ptr<IdentifierExpr> id, const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : id(id), argDecls(argDecls), block(block) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -201,19 +208,19 @@ namespace Ice
 	class LambdaExpr : public Expr
 	{
 	public:
-		VariableList arguments;
+		VariableList argDecls;
 		std::shared_ptr<BlockExpr> block;
-		LambdaExpr(const VariableList &arguments, std::shared_ptr<BlockExpr> block) : arguments(arguments), block(block) {}
+		LambdaExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
 	class LambdaCallExpr : public Expr
 	{
 	public:
-		VariableList args;
+		VariableList argDecls;
 		std::shared_ptr<BlockExpr> block;
-		ExpressionList exprs;
-		LambdaCallExpr(const VariableList &args, std::shared_ptr<BlockExpr> block, const ExpressionList &exprs) : args(args), block(block), exprs(exprs) {}
+		ExpressionList expressions;
+		LambdaCallExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block, const ExpressionList &expressions) : argDecls(argDecls), block(block), expressions(expressions) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 

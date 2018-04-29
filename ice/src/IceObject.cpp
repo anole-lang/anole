@@ -2,7 +2,7 @@
 
 namespace Ice
 {
-	IceFunctionObject::IceFunctionObject(const VariableList &arguments, std::shared_ptr<BlockExpr> block) : arguments(arguments), block(block)
+	IceFunctionObject::IceFunctionObject(const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block)
 	{
 		type = TYPE::FUNCTION;
 	}

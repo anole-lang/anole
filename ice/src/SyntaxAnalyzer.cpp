@@ -109,8 +109,14 @@ namespace Ice
 				VariableList args;
 				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
 				{
-					args.push_back(std::make_shared<IdentifierExpr>(iToken->value));
-					iToken++;
+					std::shared_ptr<IdentifierExpr> id = std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]());
+					std::shared_ptr<Expr> expression = std::make_shared<NoneExpr>();
+					if (iToken->token_id == Token::TOKEN::TASSIGN)
+					{
+						iToken++;
+						expression = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+					}
+					args.push_back(std::make_shared<VariableDeclarationStmt>(id, expression));
 					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
 					else break;
 				}
@@ -517,8 +523,14 @@ namespace Ice
 				VariableList args;
 				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
 				{
-					args.push_back(std::make_shared<IdentifierExpr>(iToken->value));
-					iToken++;
+					std::shared_ptr<IdentifierExpr> id = std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]());
+					std::shared_ptr<Expr> expression = std::make_shared<NoneExpr>();
+					if (iToken->token_id == Token::TOKEN::TASSIGN)
+					{
+						iToken++;
+						expression = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+					}
+					args.push_back(std::make_shared<VariableDeclarationStmt>(id, expression));
 					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
 					else break;
 				}
