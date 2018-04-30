@@ -32,6 +32,7 @@ stmt
 	| break_stmt
 	| continue_stmt
 	| return_stmt
+	| using_stmt
 	;
 
 var_decl_or_func_decl
@@ -45,6 +46,10 @@ var_decl_or_func_decl_tail
 
 return_stmt
 	: TRETURN expr
+	;
+
+using_stmt
+	: TUSING TIDENTIFIER
 	;
 
 block
@@ -206,6 +211,7 @@ namespace Ice
 			for_stmt,
 			expr,
 			return_stmt,
+			using_stmt,
 			block,
 			block_tail,
 			var_decl_tail,

@@ -4,7 +4,9 @@ namespace Ice
 {
 	Token::Token(std::string value) : value(value)
 	{
-		if (value == "if")
+		if (value == "using")
+			token_id = TOKEN::TUSING;
+		else if (value == "if")
 			token_id = TOKEN::TIF;
 		else if (value == "else")
 			token_id = TOKEN::TELSE;

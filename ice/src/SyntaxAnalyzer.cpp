@@ -11,6 +11,7 @@ namespace Ice
 				switch (iToken->token_id)
 				{
 				case Token::TOKEN::TAT:
+				case Token::TOKEN::TUSING:
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TDOUBLE:
@@ -44,6 +45,9 @@ namespace Ice
 				if ((iToken+1)->token_id==Token::TOKEN::TIDENTIFIER)
 					node = genNode[Symbol::var_decl_or_func_decl]();
 				else node = genNode[Symbol::expr]();
+				break;
+			case Token::TOKEN::TUSING:
+				node = genNode[Symbol::using_stmt]();
 				break;
 			case Token::TOKEN::TIF:
 				node = genNode[Symbol::if_else]();
@@ -158,6 +162,7 @@ namespace Ice
 				switch (iToken->token_id)
 				{
 				case Token::TOKEN::TAT:
+				case Token::TOKEN::TUSING:
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TDOUBLE:
@@ -515,6 +520,16 @@ namespace Ice
 		genNode[Symbol::return_stmt] = [&]() {
 			iToken++;
 			return std::dynamic_pointer_cast<Node>(std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]())));
+		};
+
+		genNode[Symbol::using_stmt] = [&]() {
+			iToken++;
+			if (iToken->token_id != Token::TOKEN::TIDENTIFIER)
+			{
+				std::cout << "missing an identifier after 'using'" << std::endl;
+				exit(0);
+			}
+			return std::dynamic_pointer_cast<Node>(std::make_shared<UsingStmt>((iToken++)->value));
 		};
 
 		genNode[Symbol::lambda_expr] = [&]() {

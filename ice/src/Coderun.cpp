@@ -1,8 +1,30 @@
 #include "Coderun.h"
 #include "Node.h"
+#include "SyntaxAnalyzer.h"
 
 namespace Ice
 {
+	void runUsingStmt(std::string &name, std::shared_ptr<Env> &top)
+	{
+		std::ifstream fin(name + ".ice");
+		SyntaxAnalyzer syntaxAnalyzer;
+		if (fin.bad())
+		{
+			std::cout << "cannot open module " << name << std::endl;
+			exit(0);
+		}
+		std::string code, new_line;
+		while (!fin.eof())
+		{
+			std::getline(fin, new_line);
+			code += new_line + "\n";
+		}
+		code += "$";
+		fin.close();
+		auto node = syntaxAnalyzer.getNode(code);
+		node->runCode(top);
+	}
+
 	void Env::put(std::string &name, std::shared_ptr<IceObject> obj)
 	{
 		objects[name] = obj;
@@ -144,6 +166,12 @@ namespace Ice
 	{
 		std::shared_ptr<IceObject> returnValue = assignment->runCode(top);
 		top->setReturnValue(returnValue);
+		return nullptr;
+	}
+
+	std::shared_ptr<IceObject> UsingStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		runUsingStmt(name, top);
 		return nullptr;
 	}
 

@@ -2,6 +2,7 @@
 #define __NODE_H__
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <memory>
 #include <string>
@@ -12,6 +13,8 @@ namespace Ice
 {
 	class Env;
 	class IceObject;
+
+	extern void runUsingStmt(std::string &, std::shared_ptr<Env> &);
 
 	class Stmt;
 	class Expr;
@@ -118,6 +121,33 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class LambdaExpr : public Expr
+	{
+	public:
+		VariableList argDecls;
+		std::shared_ptr<BlockExpr> block;
+		LambdaExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class LambdaCallExpr : public Expr
+	{
+	public:
+		VariableList argDecls;
+		std::shared_ptr<BlockExpr> block;
+		ExpressionList expressions;
+		LambdaCallExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block, const ExpressionList &expressions) : argDecls(argDecls), block(block), expressions(expressions) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class UsingStmt : public Stmt
+	{
+	public:
+		std::string name;
+		UsingStmt(std::string name) : name(name) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class ExprStmt : public Stmt
 	{
 	public:
@@ -202,25 +232,6 @@ namespace Ice
 		std::shared_ptr<Expr> end;
 		std::shared_ptr<BlockExpr> block;
 		ForStmt(std::shared_ptr<Expr> begin, std::shared_ptr<Expr> end, std::shared_ptr<BlockExpr> block) : begin(begin), end(end), block(block) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
-	};
-
-	class LambdaExpr : public Expr
-	{
-	public:
-		VariableList argDecls;
-		std::shared_ptr<BlockExpr> block;
-		LambdaExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
-	};
-
-	class LambdaCallExpr : public Expr
-	{
-	public:
-		VariableList argDecls;
-		std::shared_ptr<BlockExpr> block;
-		ExpressionList expressions;
-		LambdaCallExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block, const ExpressionList &expressions) : argDecls(argDecls), block(block), expressions(expressions) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 

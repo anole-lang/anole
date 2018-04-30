@@ -17,6 +17,7 @@ namespace Ice
 
 			TAT, // @
 
+			TUSING, // using
 			TIF,     // if
 			TELSE,   // else
 			TWHILE,  // while
