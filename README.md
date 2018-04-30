@@ -136,9 +136,31 @@ for 1 to 5
 }
 ```
 
-###### Support Interpret Single-File
+###### Interpret Single-File
 ```shell
 /path/to/ice /path/to/source.ice
+```
+
+###### Using Module
+```ice
+# demo.ice
+
+@add(a, b): a + b
+
+@mul: @(a, b){
+    return a * b
+}
+
+@quadraticSum: @(a, b){
+    @sqrt: @(n){ return n * n }
+    return @(a, b){ return a + b }(sqrt(a), sqrt(b))
+}
+```
+
+```ice
+# run.ice
+using demo
+quadraticSum(3, 4)
 ```
 
 ### TODO
