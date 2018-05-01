@@ -30,6 +30,8 @@ print("Hello World")
 ```ice
 @a: input()
 print(1)
+str(10)
+exit()
 ```
 
 ###### Variable Declaration
@@ -141,27 +143,33 @@ for 1 to 5
 /path/to/ice /path/to/source.ice
 ```
 
-###### Using Module
+###### Using Module & Simple OOP
 ```ice
 # demo.ice
+@@Math()
+{
+    @add(a, b): a + b
 
-@add(a, b): a + b
+    @mul: @(a, b){
+        return a * b
+    }
 
-@mul: @(a, b){
-    return a * b
-}
-
-@quadraticSum: @(a, b){
-    @sqrt: @(n){ return n * n }
-    return @(a, b){ return a + b }(sqrt(a), sqrt(b))
+    @quadraticSum: @(a, b){
+        @sqrt: @(n){ return n * n }
+        return @(a, b){ return a + b }(sqrt(a), sqrt(b))
+    }
 }
 ```
 
 ```ice
 # run.ice
 using demo
-quadraticSum(3, 4)
+
+@math: new Math()
+math.quadraticSum(3, 4)
 ```
 
 ### TODO
-* Add Built-in Functions & Fix Bugs
+* Simple OOP
+* Fix Bugs 
+* Refactoring

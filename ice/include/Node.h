@@ -19,10 +19,12 @@ namespace Ice
 	class Stmt;
 	class Expr;
 	class VariableDeclarationStmt;
+	class IdentifierExpr;
 
 	typedef std::vector<std::shared_ptr<Stmt>> StatementList;
 	typedef std::vector<std::shared_ptr<Expr>> ExpressionList;
 	typedef std::vector<std::shared_ptr<VariableDeclarationStmt>> VariableList;
+	typedef std::vector<std::shared_ptr<IdentifierExpr>> IdentifierList;
 
 	class Node
 	{
@@ -98,7 +100,7 @@ namespace Ice
 	public:
 		std::shared_ptr<IdentifierExpr> id;
 		ExpressionList arguments;
-		MethodCallExpr(std::shared_ptr<IdentifierExpr> id, ExpressionList &arguments) :id(id), arguments(arguments) {}
+		MethodCallExpr(std::shared_ptr<IdentifierExpr> id, const ExpressionList &arguments) :id(id), arguments(arguments) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -140,6 +142,24 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class NewExpr : public Expr
+	{
+	public:
+		std::shared_ptr<IdentifierExpr> id;
+		ExpressionList arguments;
+		NewExpr(std::shared_ptr<IdentifierExpr> id, const ExpressionList &arguments) : id(id), arguments(arguments) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class DotExpr : public Expr
+	{
+	public:
+		std::shared_ptr<IdentifierExpr> left;
+		std::shared_ptr<Expr> right;
+		DotExpr(std::shared_ptr<IdentifierExpr> left, std::shared_ptr<Expr> right) : left(left), right(right) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class UsingStmt : public Stmt
 	{
 	public:
@@ -165,13 +185,23 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
-	class FunctionDeclarationStmt : public Stmt, public std::enable_shared_from_this<FunctionDeclarationStmt>
+	class FunctionDeclarationStmt : public Stmt
 	{
 	public:
 		std::shared_ptr<IdentifierExpr> id;
 		VariableList argDecls;
 		std::shared_ptr<BlockExpr> block;
 		FunctionDeclarationStmt(std::shared_ptr<IdentifierExpr> id, const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : id(id), argDecls(argDecls), block(block) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class ClassDeclarationStmt : public Stmt
+	{
+	public:
+		std::shared_ptr<IdentifierExpr> id;
+		IdentifierList bases;
+		std::shared_ptr<BlockExpr> block;
+		ClassDeclarationStmt(std::shared_ptr<IdentifierExpr> id, const IdentifierList &bases, std::shared_ptr<BlockExpr> block) : id(id), bases(bases), block(block) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -258,6 +288,13 @@ namespace Ice
 	public:
 		std::string id;
 		StrExpr() : id("to_str") {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class ExitStmt : public Stmt
+	{
+	public:
+		ExitStmt() {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 }

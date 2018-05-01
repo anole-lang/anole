@@ -21,7 +21,7 @@ namespace Ice
 					state = State::InComment;
 					break;
 				case '@':
-					tokens.push_back(Token(Token::TOKEN::TAT));
+					state = State::InAT;
 					break;
 				case '"':
 					state = State::InString;
@@ -31,6 +31,9 @@ namespace Ice
 					break;
 				case ',':
 					tokens.push_back(Token(Token::TOKEN::TCOMMA));
+					break;
+				case '.':
+					tokens.push_back(Token(Token::TOKEN::TDOT));
 					break;
 				case '\\':
 					tokens.push_back(Token(Token::TOKEN::TESCAPE));
@@ -109,6 +112,21 @@ namespace Ice
 					{
 						state = State::InString;
 					}
+					break;
+				}
+				break;
+
+			case State::InAT:
+				switch (*reading)
+				{
+				case '@':
+					tokens.push_back(Token(Token::TOKEN::TATAT));
+					state = State::Begin;
+					break;
+				default:
+					tokens.push_back(Token(Token::TOKEN::TAT));
+					state = State::Begin;
+					reading--;
 					break;
 				}
 				break;

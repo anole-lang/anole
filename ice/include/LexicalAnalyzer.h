@@ -18,6 +18,7 @@ namespace Ice
 		{
 			Begin,
 
+			InAT,
 			InNot,
 			InCLT,
 			InCGT,

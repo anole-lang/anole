@@ -8,12 +8,15 @@
 #include <memory>
 #include <cstring>
 #include "Token.h"
+#include "Coderun.h"
 
 namespace Ice
 {
 	class BlockExpr;
 	class VariableDeclarationStmt;
 	typedef std::vector<std::shared_ptr<VariableDeclarationStmt>> VariableList;
+	class IdentifierExpr;
+	typedef std::vector<std::shared_ptr<IdentifierExpr>> IdentifierList;
 
 	class IceObject
 	{
@@ -24,12 +27,14 @@ namespace Ice
 			DOUBLE,
 			BOOLEAN,
 			STRING,
-			FUNCTION
+			FUNCTION,
+			CLASS,
+			INSTANCE
 		} type;
 		virtual ~IceObject() {}
-		virtual void show() = 0;
-		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op) = 0;
-		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN) = 0;
+		virtual void show() {}
+		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op) { return nullptr; }
+		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN) { return nullptr; }
 		virtual bool isTrue() = 0;
 		virtual std::string toStr() = 0;
 	};
@@ -42,11 +47,31 @@ namespace Ice
 		IceFunctionObject(const VariableList &, std::shared_ptr<BlockExpr>);
 
 		virtual ~IceFunctionObject() {}
-		virtual void show() {}
-		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op) { return nullptr; };
-		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN) { return nullptr; }
 		virtual bool isTrue() { return true; }
 		virtual std::string toStr() { return "function at " + (int)this; }
+	};
+
+	class IceClassObject : public IceObject
+	{
+	public:
+		IdentifierList bases;
+		std::shared_ptr<BlockExpr> block;
+		IceClassObject(const IdentifierList &, std::shared_ptr<BlockExpr>);
+
+		virtual ~IceClassObject() {}
+		virtual bool isTrue() { return true; }
+		virtual std::string toStr() { return "Class at " + (int)this; }
+	};
+
+	class IceInstanceObject : public IceObject
+	{
+	public:
+		std::shared_ptr<Env> top;
+		IceInstanceObject(std::shared_ptr<Env> top);
+
+		virtual ~IceInstanceObject() {}
+		virtual bool isTrue() { return true; }
+		virtual std::string toStr() { return "Instance at " + (int)this; }
 	};
 
 	class IceNoneObject : public IceObject
@@ -68,10 +93,10 @@ namespace Ice
 
 		IceIntegerObject(long value);
 		virtual ~IceIntegerObject() {}
-		virtual void show();
+		virtual void show() { std::cout << value << std::endl; }
 		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
-		virtual bool isTrue();
+		virtual bool isTrue() { return value != 0; }
 		virtual std::string toStr() { return std::to_string(value); }
 	};
 
@@ -82,10 +107,10 @@ namespace Ice
 
 		IceDoubleObject(double value);
 		virtual ~IceDoubleObject() {}
-		virtual void show();
+		virtual void show() { std::cout << value << std::endl; }
 		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
-		virtual bool isTrue();
+		virtual bool isTrue() { return value != 0.0; }
 		virtual std::string toStr() { return std::to_string(value); }
 	};
 
@@ -99,7 +124,7 @@ namespace Ice
 		virtual void show();
 		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
-		virtual bool isTrue();
+		virtual bool isTrue() { return value; }
 		virtual std::string toStr() { return std::to_string(value); }
 	};
 
@@ -110,10 +135,10 @@ namespace Ice
 
 		IceStringObject(std::string value);
 		virtual ~IceStringObject() {}
-		virtual void show();
+		virtual void show() { std::cout << '"' << value << '"' << std::endl; }
 		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
-		virtual bool isTrue();
+		virtual bool isTrue() { return value != ""; }
 		virtual std::string toStr() { return value; }
 	};
 }

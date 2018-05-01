@@ -16,6 +16,7 @@ namespace Ice
 			TEND, // #
 
 			TAT, // @
+			TATAT, // @@
 
 			TUSING, // using
 			TIF,     // if
@@ -28,6 +29,8 @@ namespace Ice
 			TCONTINUE,	// continue
 			TRETURN, // return
 
+			TNEW, // new
+
 			TTRUE, // true
 			TFALSE, // false
 
@@ -38,6 +41,7 @@ namespace Ice
 
 			TASSIGN, // :
 			TCOMMA,  // ,
+			TDOT, // .
 
 			TESCAPE, // "\"
 

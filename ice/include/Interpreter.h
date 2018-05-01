@@ -11,6 +11,7 @@
 #include "Node.h"
 #include "SyntaxAnalyzer.h"
 #include "Coderun.h"
+#include "IceObject.h"
 
 namespace Ice
 {

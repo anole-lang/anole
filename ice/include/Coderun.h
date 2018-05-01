@@ -6,10 +6,11 @@
 #include <string>
 #include <memory>
 #include <cstring>
-#include "IceObject.h"
 
 namespace Ice
 {
+	class IceObject;
+
 	class Env : public std::enable_shared_from_this<Env>
 	{
 	private:
@@ -22,6 +23,7 @@ namespace Ice
 		void genInputFunction();
 		void genPrintFunction();
 		void genStrFunction();
+		void genExitFunction();
 
 	public:
 		std::shared_ptr<Env> prev;

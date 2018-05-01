@@ -24,6 +24,7 @@ stmts
 
 stmt
 	: var_decl_or_func_decl
+	| class_decl
 	| if_else
 	| while_stmt
 	| do_while_stmt
@@ -139,6 +140,7 @@ term
 	| TLPAREN expr TRPAREN
 	| TSUB term
 	| lambda_expr
+	| new_expr
 	;
 
 term_rest
@@ -151,6 +153,7 @@ term_rest
 method_call_tail
 	:
 	| TLPAREN call_args TRPAREN
+	| TDOT ident method_call_tail
 	;
 
 call_args
@@ -190,6 +193,14 @@ for_stmt
 
 lambda_expr
 	: TAT TLPAREN func_decl_args TRPAREN block method_call_tail
+	;
+
+class_decl
+	: TATAT ident TLPAREN func_decl_args TRPAREN block
+	;
+
+new_expr
+	: TNEW ident TLPAREN call_args TRPAREN
 	;
 */
 
@@ -231,7 +242,9 @@ namespace Ice
 			call_args_tail,
 			comparison,
 			if_else_tail,
-			lambda_expr
+			lambda_expr,
+			class_decl,
+			new_expr
 		};
 		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 

@@ -7,14 +7,20 @@ namespace Ice
 		type = TYPE::FUNCTION;
 	}
 
+	IceClassObject::IceClassObject(const IdentifierList &bases, std::shared_ptr<BlockExpr> block) : bases(bases), block(block)
+	{
+		type = TYPE::CLASS;
+	}
+
+	IceInstanceObject::IceInstanceObject(std::shared_ptr<Env> top)
+	{
+		type = TYPE::INSTANCE;
+		this->top = std::make_shared<Env>(top);
+	}
+
 	IceIntegerObject::IceIntegerObject(long value) : value(value)
 	{
 		type = TYPE::INT;
-	}
-
-	void IceIntegerObject::show()
-	{
-		std::cout << value << std::endl;
 	}
 
 	std::shared_ptr<IceObject> IceIntegerObject::unaryOperate(Token::TOKEN op)
@@ -101,19 +107,10 @@ namespace Ice
 		return nullptr;
 	}
 
-	bool IceIntegerObject::isTrue()
-	{
-		return value != 0;
-	}
 
 	IceDoubleObject::IceDoubleObject(double value) : value(value)
 	{
 		type = TYPE::DOUBLE;
-	}
-
-	void IceDoubleObject::show()
-	{
-		std::cout << value << std::endl;
 	}
 
 	std::shared_ptr<IceObject> IceDoubleObject::unaryOperate(Token::TOKEN op)
@@ -199,11 +196,6 @@ namespace Ice
 		std::cout << "doesn't support this operator" << std::endl;
 		exit(0);
 		return nullptr;
-	}
-
-	bool IceDoubleObject::isTrue()
-	{
-		return value != 0.0;
 	}
 
 	IceBooleanObject::IceBooleanObject(bool value) :value(value)
@@ -300,19 +292,9 @@ namespace Ice
 		return nullptr;
 	}
 
-	bool IceBooleanObject::isTrue()
-	{
-		return value;
-	}
-
 	IceStringObject::IceStringObject(std::string value) : value(value)
 	{
 		type = TYPE::STRING;
-	}
-
-	void IceStringObject::show()
-	{
-		std::cout << '"' << value << '"' << std::endl;
 	}
 
 	std::shared_ptr<IceObject> IceStringObject::unaryOperate(Token::TOKEN op)
@@ -369,11 +351,6 @@ namespace Ice
 		std::cout << "doesn't support this operator" << std::endl;
 		exit(0);
 		return nullptr;
-	}
-
-	bool IceStringObject::isTrue()
-	{
-		return value != "";
 	}
 }
 

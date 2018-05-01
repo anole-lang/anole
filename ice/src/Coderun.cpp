@@ -1,6 +1,7 @@
 #include "Coderun.h"
 #include "Node.h"
 #include "SyntaxAnalyzer.h"
+#include "IceObject.h"
 
 namespace Ice
 {
@@ -146,6 +147,13 @@ namespace Ice
 	std::shared_ptr<IceObject> FunctionDeclarationStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> obj = std::make_shared<IceFunctionObject>(argDecls, block);
+		top->put(id->name, obj);
+		return nullptr;
+	}
+
+	std::shared_ptr<IceObject> ClassDeclarationStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> obj = std::make_shared<IceClassObject>(bases, block);
 		top->put(id->name, obj);
 		return nullptr;
 	}
@@ -317,6 +325,23 @@ namespace Ice
 		return returnValue;
 	}
 
+	std::shared_ptr<IceObject> NewExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceClassObject> obj = std::dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
+		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
+		obj->block->runCode(_top);
+		return std::make_shared<IceInstanceObject>(_top);
+	}
+
+	std::shared_ptr<IceObject> DotExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(top->getObject(left->name));
+		top = obj->top;
+		std::shared_ptr<IceObject> res = right->runCode(top);
+		top = top->prev;
+		return res;
+	}
+
 	// build_in_function_implement
 
 	std::shared_ptr<IceObject> InputExpr::runCode(std::shared_ptr<Env> &top)
@@ -336,11 +361,18 @@ namespace Ice
 		return std::make_shared<IceStringObject>(top->getObject(id)->toStr());
 	}
 
+	std::shared_ptr<IceObject> ExitStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		exit(0);
+		return nullptr;
+	}
+
 	void Env::genBuildInFunction()
 	{
 		genInputFunction();
 		genPrintFunction();
 		genStrFunction();
+		genExitFunction();
 	}
 
 	void Env::genInputFunction()
@@ -379,6 +411,18 @@ namespace Ice
 
 		args.push_back(std::make_shared<VariableDeclarationStmt>(std::make_shared<IdentifierExpr>(obj_name), std::make_shared<NoneExpr>()));
 		block->statements.push_back(std::make_shared<ReturnStmt>(std::make_shared<StrExpr>()));
+
+		put(func_name, std::make_shared<IceFunctionObject>(args, block));
+	}
+
+	void Env::genExitFunction()
+	{
+		std::string func_name = "exit";
+
+		VariableList args;
+		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
+
+		block->statements.push_back(std::make_shared<ExitStmt>());
 
 		put(func_name, std::make_shared<IceFunctionObject>(args, block));
 	}
