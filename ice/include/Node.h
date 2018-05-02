@@ -265,6 +265,15 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class DotStmt : public Stmt
+	{
+	public:
+		std::shared_ptr<IdentifierExpr> left;
+		std::shared_ptr<Stmt> right;
+		DotStmt(std::shared_ptr<IdentifierExpr> left, std::shared_ptr<Stmt> right) : left(left), right(right) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	// build_in_function
 
 	class InputExpr : public Expr

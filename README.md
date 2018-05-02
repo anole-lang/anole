@@ -67,7 +67,7 @@ a = b
 @pow(num, n)
 {
     @res: 1
-    while n > 0:
+    while n > 0
     {
         @res: res * num
         @n: n - 1
@@ -84,14 +84,8 @@ mul(mul(2, 3), pow(3)) # 54
 
 @fib(n)
 {
-    if (n = 0) + (n = 1)
-    {
-        return 1
-    }
-    else
-    {
-        return fib(n-1) + fib(n-2)
-    }
+    if (n = 0) + (n = 1) { return 1 }
+    else { return fib(n-1) + fib(n-2) }
 }
 
 fib(10) # 89
@@ -106,20 +100,14 @@ while a
 @a: 0
 do {
     @a: a + 1
-    if a = 3
-    {
-        break
-    }
+    if a = 3 { break }
     print(a)
 } while a < 5
 
 for 1 to 5
 {
     @a: a + 1
-    if a = 3
-    {
-        continue
-    }
+    if a = 3 { continue }
     print(a)
 }
 ```
@@ -166,7 +154,21 @@ for 1 to 5
 using demo
 
 @math: new Math()
+
 math.quadraticSum(3, 4)
+
+@math.pow(num, n)
+{
+    @res: 1
+    while n > 0
+    {
+        @res: res * num
+        @n: n - 1
+    }
+    return res
+}
+
+math.pow(5, 3)
 ```
 
 ### TODO

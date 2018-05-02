@@ -37,7 +37,13 @@ stmt
 	;
 
 var_decl_or_func_decl
-	: TAT ident var_decl_or_func_decl_tail
+	: TAT ident dot_tail var_decl_or_func_decl_tail
+	;
+
+dot_tail
+	:
+	| TLPAREN func_decl_args TRPAREN
+	| TDOT ident dot_tail
 	;
 
 var_decl_or_func_decl_tail

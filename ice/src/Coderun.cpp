@@ -342,6 +342,15 @@ namespace Ice
 		return res;
 	}
 
+	std::shared_ptr<IceObject> DotStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(top->getObject(left->name));
+		top = obj->top;
+		std::shared_ptr<IceObject> res = right->runCode(top);
+		top = top->prev;
+		return res;
+	}
+
 	// build_in_function_implement
 
 	std::shared_ptr<IceObject> InputExpr::runCode(std::shared_ptr<Env> &top)
