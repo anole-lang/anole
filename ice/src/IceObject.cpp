@@ -295,6 +295,46 @@ namespace Ice
 	IceStringObject::IceStringObject(std::string value) : value(value)
 	{
 		type = TYPE::STRING;
+
+		raw_value = "";
+		const char *p = value.c_str();
+		while (*p)
+		{
+			switch (*p)
+			{
+			case '\n':
+				raw_value += "\\n";
+				break;
+			case '\\':
+				raw_value += "\\\\";
+				break;
+			case '\"':
+				raw_value += "\\\"";
+				break;
+			case '\a':
+				raw_value += "\\a";
+				break;
+			case '\b':
+				raw_value += "\\b";
+				break;
+			case '\0':
+				raw_value += "\\0";
+				break;
+			case '\t':
+				raw_value += "\\t";
+				break;
+			case '\r':
+				raw_value += "\\r";
+				break;
+			case '\f':
+				raw_value += "\\f";
+				break;
+			default:
+				raw_value += *p;
+				break;
+			}
+			p++;
+		}
 	}
 
 	std::shared_ptr<IceObject> IceStringObject::unaryOperate(Token::TOKEN op)
@@ -314,7 +354,7 @@ namespace Ice
 	}
 
 	std::shared_ptr<IceObject> IceStringObject::binaryOperate(std::shared_ptr<IceObject> obj, Token::TOKEN op)
-	{	
+	{
 		std::string dup = value;
 		switch (obj->type)
 		{

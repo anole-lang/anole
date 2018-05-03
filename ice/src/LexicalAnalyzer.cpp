@@ -288,6 +288,30 @@ namespace Ice
 				case 'n':
 					value += '\n';
 					break;
+				case '\\':
+					value += '\\';
+					break;
+				case '\"':
+					value += '\"';
+					break;
+				case 'a':
+					value += '\a';
+					break;
+				case 'b':
+					value += '\b';
+					break;
+				case '0':
+					value += '\0';
+					break;
+				case 't':
+					value += '\t';
+					break;
+				case 'r':
+					value += '\t';
+					break;
+				case 'f':
+					value += '\f';
+					break;
 				default:
 					value += '\\';
 					value += *reading;

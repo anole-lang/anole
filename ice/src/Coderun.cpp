@@ -361,7 +361,7 @@ namespace Ice
 
 	std::shared_ptr<IceObject> PrintStmt::runCode(std::shared_ptr<Env> &top)
 	{
-		top->getObject(id)->show();
+		std::cout << top->getObject(id)->toStr() << std::endl;
 		return nullptr;
 	}
 

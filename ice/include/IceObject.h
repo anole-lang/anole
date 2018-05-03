@@ -130,12 +130,15 @@ namespace Ice
 
 	class IceStringObject : public IceObject
 	{
+	private:
+		std::string raw_value;
+
 	public:
 		std::string value;
 
 		IceStringObject(std::string value);
 		virtual ~IceStringObject() {}
-		virtual void show() { std::cout << '"' << value << '"' << std::endl; }
+		virtual void show() { std::cout << '\"' << raw_value << "\"" << std::endl; }
 		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
 		virtual bool isTrue() { return value != ""; }
