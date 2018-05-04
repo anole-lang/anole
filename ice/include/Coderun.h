@@ -29,11 +29,6 @@ namespace Ice
 		std::shared_ptr<Env> prev;
 		Env(std::shared_ptr<Env> prev) : prev(prev) { returnValue = nullptr; breakStatus = false; continueStatus = false; }
 
-		void genBuildInFunction();
-
-		void put(std::string &, std::shared_ptr<IceObject>);
-		std::shared_ptr<IceObject> getObject(std::string &);
-		
 		void setReturnValue(std::shared_ptr<IceObject> returnValue) { this->returnValue = returnValue; }
 		std::shared_ptr<IceObject> getReturnValue() { return returnValue; }
 
@@ -42,6 +37,12 @@ namespace Ice
 
 		void setContinueStatus(bool status) { continueStatus = status; }
 		bool getContinueStatus() { return continueStatus; }
+
+		void genBuildInFunction();
+
+		void put(std::string &, std::shared_ptr<IceObject>);
+		void replace(std::string &, std::shared_ptr<IceObject>);
+		std::shared_ptr<IceObject> getObject(std::string &);
 	};
 }
 

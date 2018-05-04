@@ -31,6 +31,23 @@ namespace Ice
 		objects[name] = obj;
 	}
 
+	void Env::replace(std::string &name, std::shared_ptr<IceObject> obj)
+	{
+		std::shared_ptr<Env> tmp = shared_from_this();
+		while (tmp != nullptr)
+		{
+			if (tmp->objects.find(name) != tmp->objects.end())
+			{
+				tmp->objects[name] = obj;
+				return;
+			}
+			else
+				tmp = tmp->prev;
+		}
+		std::cout << "cannot find " << name << std::endl;
+		exit(0);
+	}
+
 	std::shared_ptr<IceObject> Env::getObject(std::string &name)
 	{
 		std::shared_ptr<Env> tmp = shared_from_this();
@@ -141,6 +158,13 @@ namespace Ice
 	{
 		std::shared_ptr<IceObject> obj = assignment->runCode(top);
 		top->put(id->name, obj);
+		return nullptr;
+	}
+
+	std::shared_ptr<IceObject> VariableAssignStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> obj = assignment->runCode(top);
+		top->replace(id->name, obj);
 		return nullptr;
 	}
 

@@ -12,6 +12,7 @@ namespace Ice
 				{
 				case Token::TOKEN::TAT:
 				case Token::TOKEN::TATAT:
+				case Token::TOKEN::TATATAT:
 				case Token::TOKEN::TUSING:
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
@@ -50,6 +51,9 @@ namespace Ice
 				break;
 			case Token::TOKEN::TATAT:
 				node = genNode[Symbol::class_decl]();
+				break;
+			case Token::TOKEN::TATATAT:
+				node = genNode[Symbol::var_assign]();
 				break;
 			case Token::TOKEN::TUSING:
 				node = genNode[Symbol::using_stmt]();
@@ -180,6 +184,7 @@ namespace Ice
 				{
 				case Token::TOKEN::TAT:
 				case Token::TOKEN::TATAT:
+				case Token::TOKEN::TATATAT:
 				case Token::TOKEN::TUSING:
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
@@ -674,7 +679,6 @@ namespace Ice
 				return args;
 			};
 
-			std::shared_ptr<Node> node = nullptr;
 			iToken++;
 			std::shared_ptr<IdentifierExpr> id = std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]());
 			if (iToken->token_id != Token::TOKEN::TLPAREN)
@@ -689,8 +693,20 @@ namespace Ice
 				exit(0);
 			}
 			iToken++;
-			node = std::make_shared<NewExpr>(id, args);
-			return node;
+			return std::make_shared<NewExpr>(id, args);
+		};
+
+		genNode[Symbol::var_assign] = [&]() {
+			iToken++;
+			std::shared_ptr<IdentifierExpr> id = std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]());
+			if (iToken->token_id != Token::TOKEN::TASSIGN)
+			{
+				std::cout << "missing symbol ':'" << std::endl;
+				exit(0);
+			}
+			iToken++;
+			std::shared_ptr<Expr> assignment = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			return std::make_shared<VariableAssignStmt>(id, assignment);
 		};
 	}
 

@@ -19,6 +19,7 @@ namespace Ice
 			Begin,
 
 			InAT,
+			InATAT,
 			InNot,
 			InCLT,
 			InCGT,

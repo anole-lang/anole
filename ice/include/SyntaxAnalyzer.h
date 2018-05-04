@@ -24,6 +24,7 @@ stmts
 
 stmt
 	: var_decl_or_func_decl
+	| var_assign
 	| class_decl
 	| if_else
 	| while_stmt
@@ -39,6 +40,9 @@ stmt
 var_decl_or_func_decl
 	: TAT ident dot_tail var_decl_or_func_decl_tail
 	;
+
+var_assign
+	: TATATAT ident TASSIGN expr
 
 dot_tail
 	:
@@ -222,6 +226,7 @@ namespace Ice
 			stmts,
 			stmt,
 			var_decl_or_func_decl,
+			var_assign,
 			if_else,
 			while_stmt,
 			do_while_stmt,

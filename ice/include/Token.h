@@ -17,6 +17,7 @@ namespace Ice
 
 			TAT, // @
 			TATAT, // @@
+			TATATAT, // @@@
 
 			TUSING, // using
 			TIF,     // if

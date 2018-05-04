@@ -185,6 +185,15 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class VariableAssignStmt : public Stmt
+	{
+	public:
+		std::shared_ptr<IdentifierExpr> id;
+		std::shared_ptr<Expr> assignment;
+		VariableAssignStmt(std::shared_ptr<IdentifierExpr> id, std::shared_ptr<Expr>assignment) : id(id), assignment(assignment) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class FunctionDeclarationStmt : public Stmt
 	{
 	public:
