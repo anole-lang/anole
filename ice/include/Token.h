@@ -44,8 +44,6 @@ namespace Ice
 			TCOMMA,  // ,
 			TDOT, // .
 
-			TESCAPE, // "\"
-
 			TLPAREN, // (
 			TRPAREN, // )
 			TLBRACE, // {

@@ -35,9 +35,6 @@ namespace Ice
 				case '.':
 					tokens.push_back(Token(Token::TOKEN::TDOT));
 					break;
-				case '\\':
-					tokens.push_back(Token(Token::TOKEN::TESCAPE));
-					break;
 				case '(':
 					tokens.push_back(Token(Token::TOKEN::TLPAREN));
 					break;
