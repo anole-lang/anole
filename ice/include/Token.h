@@ -32,6 +32,7 @@ namespace Ice
 
 			TNEW, // new
 
+			TNONE, // none
 			TTRUE, // true
 			TFALSE, // false
 

@@ -26,6 +26,8 @@ namespace Ice
 			token_id = TOKEN::TRETURN;
 		else if (value == "new")
 			token_id = TOKEN::TNEW;
+		else if (value == "none")
+			token_id = TOKEN::TNONE;
 		else if (value == "true")
 			token_id = TOKEN::TTRUE;
 		else if (value == "false")

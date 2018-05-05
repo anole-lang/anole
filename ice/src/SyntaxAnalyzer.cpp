@@ -17,6 +17,7 @@ namespace Ice
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TDOUBLE:
+				case Token::TOKEN::TNONE:
 				case Token::TOKEN::TTRUE:
 				case Token::TOKEN::TFALSE:
 				case Token::TOKEN::TSTRING:
@@ -85,6 +86,7 @@ namespace Ice
 			case Token::TOKEN::TSUB:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TNONE:
 			case Token::TOKEN::TTRUE:
 			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
@@ -189,6 +191,7 @@ namespace Ice
 				case Token::TOKEN::TIDENTIFIER:
 				case Token::TOKEN::TINTEGER:
 				case Token::TOKEN::TDOUBLE:
+				case Token::TOKEN::TNONE:
 				case Token::TOKEN::TTRUE:
 				case Token::TOKEN::TFALSE:
 				case Token::TOKEN::TSTRING:
@@ -472,6 +475,10 @@ namespace Ice
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
 				node = genNode[Symbol::numeric]();
+				break;
+			case Token::TOKEN::TNONE:
+				iToken++;
+				node = std::make_shared<NoneExpr>();
 				break;
 			case Token::TOKEN::TTRUE:
 			case Token::TOKEN::TFALSE:
