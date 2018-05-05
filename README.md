@@ -172,6 +172,8 @@ math.pow(5, 3)
 ```
 
 ### TODO
-* Simple OOP
+* Case Stmt
+* Enum type
+* Class Constructors
 * Fix Bugs 
 * Refactoring
