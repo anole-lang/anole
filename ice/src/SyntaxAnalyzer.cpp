@@ -332,18 +332,43 @@ namespace Ice
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TNONE:
 			case Token::TOKEN::TTRUE:
 			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TAT:
 			case Token::TOKEN::TNEW:
 				goto cmp;
+			case Token::TOKEN::TLBRACE:
+				goto enum_expr;
 			default:
 				return node;
 			};
 		cmp:
-			std::shared_ptr<Expr> lhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::cmp]());
-			node = genCmpRest(lhs);
+			node = genNode[Symbol::cmp]();
+			node = genCmpRest(std::dynamic_pointer_cast<Expr>(node));
+			return node;
+		enum_expr:
+			std::function<IdentifierList()> genEnumerators;
+			genEnumerators = [&]() {
+				iToken++;
+				IdentifierList enumerators;
+				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
+				{
+					enumerators.push_back(std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]()));
+					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+					else break;
+				}
+				if (iToken->token_id != Token::TOKEN::TRBRACE)
+				{
+					std::cout << "missing symbol '}'" << std::endl;
+					exit(0);
+				}
+				iToken++;
+				return enumerators;
+			};
+			IdentifierList enumerators = genEnumerators();
+			node = std::make_shared<EnumExpr>(enumerators);
 			return node;
 		};
 
@@ -376,6 +401,7 @@ namespace Ice
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TNONE:
 			case Token::TOKEN::TTRUE:
 			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
@@ -419,6 +445,7 @@ namespace Ice
 			case Token::TOKEN::TIDENTIFIER:
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TNONE:
 			case Token::TOKEN::TTRUE:
 			case Token::TOKEN::TFALSE:
 			case Token::TOKEN::TSTRING:
@@ -683,6 +710,12 @@ namespace Ice
 					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
 					else break;
 				}
+				if (iToken->token_id != Token::TOKEN::TRPAREN)
+				{
+					std::cout << "missing symbol ')'" << std::endl;
+					exit(0);
+				}
+				iToken++;
 				return args;
 			};
 
@@ -694,12 +727,6 @@ namespace Ice
 				exit(0);
 			}
 			ExpressionList args = genArgs();
-			if (iToken->token_id != Token::TOKEN::TRPAREN)
-			{
-				std::cout << "missing symbol ')'" << std::endl;
-				exit(0);
-			}
-			iToken++;
 			return std::make_shared<NewExpr>(id, args);
 		};
 

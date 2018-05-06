@@ -351,28 +351,38 @@ namespace Ice
 
 	std::shared_ptr<IceObject> NewExpr::runCode(std::shared_ptr<Env> &top)
 	{
-		std::shared_ptr<IceClassObject> obj = std::dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
-		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
-		obj->block->runCode(_top);
-		return std::make_shared<IceInstanceObject>(_top);
+		std::shared_ptr<IceClassObject> class_obj = std::dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
+		std::shared_ptr<IceInstanceObject> ins_obj = std::make_shared<IceInstanceObject>(top);
+
+		class_obj->block->runCode(ins_obj->top);
+		std::shared_ptr<MethodCallExpr> call = std::make_shared<MethodCallExpr>(std::make_shared<IdentifierExpr>(id->name), arguments);
+		call->runCode(ins_obj->top);
+		return ins_obj;
 	}
 
 	std::shared_ptr<IceObject> DotExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(top->getObject(left->name));
-		top = obj->top;
-		std::shared_ptr<IceObject> res = right->runCode(top);
-		top = top->prev;
+		std::shared_ptr<IceObject> res = right->runCode(obj->top);
 		return res;
 	}
 
 	std::shared_ptr<IceObject> DotStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(top->getObject(left->name));
-		top = obj->top;
-		std::shared_ptr<IceObject> res = right->runCode(top);
-		top = top->prev;
+		std::shared_ptr<IceObject> res = right->runCode(obj->top);
 		return res;
+	}
+
+	std::shared_ptr<IceObject> EnumExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceInstanceObject> obj = std::make_shared<IceInstanceObject>(top);;
+
+		long i = 0;
+		for (auto &enumerator : enumerators)
+			obj->top->put(enumerator->name, std::make_shared<IceIntegerObject>(i++));
+
+		return obj;
 	}
 
 	// build_in_function_implement

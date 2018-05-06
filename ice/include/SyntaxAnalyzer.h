@@ -12,7 +12,7 @@
 #include "Node.h"
 #include "LexicalAnalyzer.h"
 
-/* LL(1) Grammer
+/* Grammer
 program
 	: stmts
 	;
@@ -52,7 +52,7 @@ dot_tail
 
 var_decl_or_func_decl_tail
 	: var_decl_tail
-	| func_decl_tail
+	| TLPAREN func_decl_tail
 	;
 
 return_stmt
@@ -77,7 +77,8 @@ var_decl_tail
 	;
 
 func_decl_tail
-	: TLPAREN func_decl_args TRPAREN func_decl_rest
+	: func_decl_args TRPAREN func_decl_rest
+	| TRPAREN func_decl_rest
 	;
 
 func_decl_rest
@@ -86,7 +87,6 @@ func_decl_rest
 	;
 
 func_decl_args
-	:
 	| ident func_decl_args_tail
 	;
 
@@ -115,6 +115,7 @@ string
 
 expr
 	: cmp cmp_rest
+	| TLBRACE enum_expr
 	;
 
 cmp
@@ -212,6 +213,20 @@ class_decl
 new_expr
 	: TNEW ident TLPAREN call_args TRPAREN
 	;
+
+enum_expr
+	: enumerators TRBRACE
+	| TRBRACE
+	;
+
+enumerators
+	| ident enumerators_rest
+	;
+
+enumerators_rest
+	: 
+	| TCOMMA enumerators
+	;
 */
 
 namespace Ice
@@ -255,7 +270,8 @@ namespace Ice
 			if_else_tail,
 			lambda_expr,
 			class_decl,
-			new_expr
+			new_expr,
+			enum_expr,
 		};
 		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 

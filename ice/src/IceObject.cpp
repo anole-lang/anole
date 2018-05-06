@@ -12,7 +12,7 @@ namespace Ice
 		type = TYPE::CLASS;
 	}
 
-	IceInstanceObject::IceInstanceObject(std::shared_ptr<Env> top)
+	IceInstanceObject::IceInstanceObject(std::shared_ptr<Env> &top)
 	{
 		type = TYPE::INSTANCE;
 		this->top = std::make_shared<Env>(top);

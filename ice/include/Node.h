@@ -160,6 +160,14 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class EnumExpr : public Expr
+	{
+	public:
+		IdentifierList	enumerators;
+		EnumExpr(const IdentifierList &enumerators) : enumerators(enumerators) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class UsingStmt : public Stmt
 	{
 	public:

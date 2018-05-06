@@ -67,7 +67,7 @@ namespace Ice
 	{
 	public:
 		std::shared_ptr<Env> top;
-		IceInstanceObject(std::shared_ptr<Env> top);
+		IceInstanceObject(std::shared_ptr<Env> &top);
 
 		virtual ~IceInstanceObject() {}
 		virtual bool isTrue() { return true; }
