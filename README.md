@@ -171,9 +171,13 @@ math.quadraticSum(3, 4)
 math.pow(5, 3)
 ```
 
+###### Enum Expression
+```ice
+@TOKEN: { TBEGIN, TEND }
+TOKEN.TBEGIN
+```
+
 ### TODO
-* Case Stmt
-* Enum type
-* Class Constructors
+* Match Expr
 * Fix Bugs 
 * Refactoring
