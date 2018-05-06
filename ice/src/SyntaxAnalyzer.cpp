@@ -31,6 +31,7 @@ namespace Ice
 				case Token::TOKEN::TCONTINUE:
 				case Token::TOKEN::TRETURN:
 				case Token::TOKEN::TNEW:
+				case Token::TOKEN::TMATCH:
 					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 					break;
 				default:
@@ -92,6 +93,7 @@ namespace Ice
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TNEW:
+			case Token::TOKEN::TMATCH:
 				node = std::make_shared<ExprStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 				break;
 			default:
@@ -122,13 +124,14 @@ namespace Ice
 				return args;
 			};
 
-			std::function<std::shared_ptr<Node>(std::shared_ptr<IdentifierExpr>)> genDeclWithDot;
-			genDeclWithDot = [&](std::shared_ptr<IdentifierExpr> left) {
-				std::shared_ptr<Node> node = nullptr;
+			std::function<std::shared_ptr<Node>(IdentifierList &)> genDeclWithDot;
+			genDeclWithDot = [&](IdentifierList &ids) {
+				std::string type;
 				iToken++;
-				node = genNode[Symbol::ident]();
+				std::shared_ptr<Node> node = genNode[Symbol::ident]();
 				if (iToken->token_id == Token::TOKEN::TASSIGN)
 				{
+					type = "vardecl";
 					iToken++;
 					node = std::make_shared<VariableDeclarationStmt>(std::dynamic_pointer_cast<IdentifierExpr>(node), std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 				}
@@ -138,8 +141,11 @@ namespace Ice
 					node = std::make_shared<FunctionDeclarationStmt>(std::dynamic_pointer_cast<IdentifierExpr>(node), args, std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::func_decl_rest]()));
 				}
 				else if (iToken->token_id == Token::TOKEN::TDOT)
-					node = genDeclWithDot(std::dynamic_pointer_cast<IdentifierExpr>(node));
-				return std::make_shared<DotStmt>(left, std::dynamic_pointer_cast<Stmt>(node));
+				{
+					ids.push_back(std::dynamic_pointer_cast<IdentifierExpr>(node));
+					return genDeclWithDot(ids);
+				}
+				return std::dynamic_pointer_cast<Node>(std::make_shared<DotStmt>(ids, std::dynamic_pointer_cast<Stmt>(node), type));
 			};
 
 			std::shared_ptr<Node> node = nullptr;
@@ -156,7 +162,11 @@ namespace Ice
 				node = std::make_shared<FunctionDeclarationStmt>(std::dynamic_pointer_cast<IdentifierExpr>(node), args, std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::func_decl_rest]()));
 			}
 			else if (iToken->token_id == Token::TOKEN::TDOT)
-				node = genDeclWithDot(std::dynamic_pointer_cast<IdentifierExpr>(node));
+			{
+				IdentifierList ids;
+				ids.push_back(std::dynamic_pointer_cast<IdentifierExpr>(node));
+				node = genDeclWithDot(ids);
+			}
 			else
 			{
 				std::cout << "missing ':' or '('" << std::endl;
@@ -205,6 +215,7 @@ namespace Ice
 				case Token::TOKEN::TCONTINUE:
 				case Token::TOKEN::TRETURN:
 				case Token::TOKEN::TNEW:
+				case Token::TOKEN::TMATCH:
 					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 					break;
 				case Token::TOKEN::TEND:
@@ -324,31 +335,6 @@ namespace Ice
 				return node;
 			};
 
-			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TIDENTIFIER:
-			case Token::TOKEN::TSUB:
-			case Token::TOKEN::TLPAREN:
-			case Token::TOKEN::TINTEGER:
-			case Token::TOKEN::TDOUBLE:
-			case Token::TOKEN::TNONE:
-			case Token::TOKEN::TTRUE:
-			case Token::TOKEN::TFALSE:
-			case Token::TOKEN::TSTRING:
-			case Token::TOKEN::TAT:
-			case Token::TOKEN::TNEW:
-				goto cmp;
-			case Token::TOKEN::TLBRACE:
-				goto enum_expr;
-			default:
-				return node;
-			};
-		cmp:
-			node = genNode[Symbol::cmp]();
-			node = genCmpRest(std::dynamic_pointer_cast<Expr>(node));
-			return node;
-		enum_expr:
 			std::function<IdentifierList()> genEnumerators;
 			genEnumerators = [&]() {
 				iToken++;
@@ -367,8 +353,37 @@ namespace Ice
 				iToken++;
 				return enumerators;
 			};
-			IdentifierList enumerators = genEnumerators();
-			node = std::make_shared<EnumExpr>(enumerators);
+
+			std::shared_ptr<Node> node = nullptr;
+			switch (iToken->token_id)
+			{
+			case Token::TOKEN::TIDENTIFIER:
+			case Token::TOKEN::TSUB:
+			case Token::TOKEN::TLPAREN:
+			case Token::TOKEN::TINTEGER:
+			case Token::TOKEN::TDOUBLE:
+			case Token::TOKEN::TNONE:
+			case Token::TOKEN::TTRUE:
+			case Token::TOKEN::TFALSE:
+			case Token::TOKEN::TSTRING:
+			case Token::TOKEN::TAT:
+			case Token::TOKEN::TNEW:
+				goto cmp;
+			case Token::TOKEN::TLBRACE:
+				goto enum_expr;
+			case Token::TOKEN::TMATCH:
+				goto match_expr;
+			default:
+				return node;
+			};
+		cmp:
+			node = genNode[Symbol::cmp]();
+			node = genCmpRest(std::dynamic_pointer_cast<Expr>(node));
+			return node;
+		enum_expr:
+			node = std::make_shared<EnumExpr>(genEnumerators());
+			return node;
+		match_expr:
 			return node;
 		};
 

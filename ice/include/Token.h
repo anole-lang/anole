@@ -29,6 +29,7 @@ namespace Ice
 			TBREAK,	// break
 			TCONTINUE,	// continue
 			TRETURN, // return
+			TMATCH, // match
 
 			TNEW, // new
 
@@ -72,7 +73,9 @@ namespace Ice
 			TCLT, // <
 			TCLE, // <=
 			TCGT, // >
-			TCGE  // >=
+			TCGE, // >=
+
+			TRET, // =>
 		} token_id;
 		std::string value;
 		Token(TOKEN token_id, std::string value) : token_id(token_id), value(value) {}

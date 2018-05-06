@@ -23,6 +23,7 @@ namespace Ice
 			InNot,
 			InCLT,
 			InCGT,
+			InRET,
 
 			InComment,
 			InInteger,

@@ -115,9 +115,9 @@ namespace Ice
 
 	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
-		top = std::make_shared<Env>(top);
+		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
 
-		std::shared_ptr<IceFunctionObject> func = std::dynamic_pointer_cast<IceFunctionObject>(top->getObject(id->name));
+		std::shared_ptr<IceFunctionObject> func = std::dynamic_pointer_cast<IceFunctionObject>(_top->getObject(id->name));
 		if (arguments.size() > func->argDecls.size())
 		{
 			std::cout << "The number of arguments does not match" << std::endl;
@@ -128,11 +128,9 @@ namespace Ice
 			func->argDecls[i]->assignment = arguments[i];
 
 		for (auto &argDecl : func->argDecls)
-			top->put(argDecl->id->name, argDecl->assignment->runCode(top));
+			_top->put(argDecl->id->name, argDecl->assignment->runCode(_top));
 
-		std::shared_ptr<IceObject> returnValue = func->block->runCode(top);
-
-		top = top->prev;
+		std::shared_ptr<IceObject> returnValue = func->block->runCode(_top);
 		return returnValue;
 	}
 
@@ -324,7 +322,7 @@ namespace Ice
 	std::shared_ptr<IceObject> LambdaCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
 
-		top = std::make_shared<Env>(top);
+		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
 
 		if (expressions.size() > argDecls.size())
 		{
@@ -340,12 +338,10 @@ namespace Ice
 		}
 		for (auto &argDecl : argDecls)
 		{
-			top->put(argDecl->id->name, argDecl->assignment->runCode(top));
+			_top->put(argDecl->id->name, argDecl->assignment->runCode(_top));
 		}
 
-		std::shared_ptr<IceObject> returnValue = block->runCode(top);
-
-		top = top->prev;
+		std::shared_ptr<IceObject> returnValue = block->runCode(_top);
 		return returnValue;
 	}
 
@@ -355,6 +351,8 @@ namespace Ice
 		std::shared_ptr<IceInstanceObject> ins_obj = std::make_shared<IceInstanceObject>(top);
 
 		class_obj->block->runCode(ins_obj->top);
+		std::string self("self");
+		ins_obj->top->put(self, ins_obj);
 		std::shared_ptr<MethodCallExpr> call = std::make_shared<MethodCallExpr>(std::make_shared<IdentifierExpr>(id->name), arguments);
 		call->runCode(ins_obj->top);
 		return ins_obj;
@@ -369,9 +367,18 @@ namespace Ice
 
 	std::shared_ptr<IceObject> DotStmt::runCode(std::shared_ptr<Env> &top)
 	{
-		std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(top->getObject(left->name));
-		std::shared_ptr<IceObject> res = right->runCode(obj->top);
-		return res;
+		std::shared_ptr<Env> _top = top;
+		for (auto &id : ids)
+		{
+			_top = std::dynamic_pointer_cast<IceInstanceObject>(_top->getObject(id->name))->top;
+		}
+		if (type == "vardecl")
+		{
+			std::shared_ptr<VariableDeclarationStmt> vardecl = std::dynamic_pointer_cast<VariableDeclarationStmt>(to_run);
+			_top->put(vardecl->id->name, vardecl->assignment->runCode(top));
+		}
+		else to_run->runCode(_top);
+		return nullptr;
 	}
 
 	std::shared_ptr<IceObject> EnumExpr::runCode(std::shared_ptr<Env> &top)

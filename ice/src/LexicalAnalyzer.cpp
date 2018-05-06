@@ -75,7 +75,7 @@ namespace Ice
 					tokens.push_back(Token(Token::TOKEN::TBNEG));
 					break;
 				case '=':
-					tokens.push_back(Token(Token::TOKEN::TCEQ));
+					state = State::InRET;
 					break;
 				case '!':
 					state = State::InNot;
@@ -141,6 +141,21 @@ namespace Ice
 					break;
 				}
 				break;
+			
+			case State::InRET:
+				switch (*reading)
+				{
+				case '>':
+					tokens.push_back(Token(Token::TOKEN::TRET));
+					state = State::Begin;
+					break;
+				default:
+					tokens.push_back(Token(Token::TOKEN::TCEQ));
+					state = State::Begin;
+					reading--;
+					break;
+				}
+				break;
 
 			case State::InNot:
 				switch (*reading)
@@ -150,8 +165,8 @@ namespace Ice
 					state = State::Begin;
 					break;
 				default:
-					reading--;
 					state = State::Begin;
+					reading--;
 					break;
 				}
 				break;

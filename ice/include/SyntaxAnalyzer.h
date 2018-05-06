@@ -116,6 +116,7 @@ string
 expr
 	: cmp cmp_rest
 	| TLBRACE enum_expr
+	| TMATCH expr TLBRACE match_expr
 	;
 
 cmp
@@ -227,6 +228,19 @@ enumerators_rest
 	: 
 	| TCOMMA enumerators
 	;
+
+match_expr
+	: matches TRBRACE
+	;
+
+matches
+	: expr TRET expr matches_rest
+	;
+
+matches_rest
+	|
+	: TCOMMA matches
+	;
 */
 
 namespace Ice
@@ -272,6 +286,7 @@ namespace Ice
 			class_decl,
 			new_expr,
 			enum_expr,
+			match_expr
 		};
 		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 

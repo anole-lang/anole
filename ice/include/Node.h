@@ -168,6 +168,16 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class MatchExpr : public Expr
+	{
+	public:
+		std::shared_ptr<Expr> expression;
+		ExpressionList mat_expressions;
+		ExpressionList ret_expressions;
+		MatchExpr(std::shared_ptr<Expr> expression, const ExpressionList &mat_expressions, const ExpressionList &ret_expressions) : expression(expression), mat_expressions(mat_expressions), ret_expressions(ret_expressions) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class UsingStmt : public Stmt
 	{
 	public:
@@ -285,9 +295,10 @@ namespace Ice
 	class DotStmt : public Stmt
 	{
 	public:
-		std::shared_ptr<IdentifierExpr> left;
-		std::shared_ptr<Stmt> right;
-		DotStmt(std::shared_ptr<IdentifierExpr> left, std::shared_ptr<Stmt> right) : left(left), right(right) {}
+		IdentifierList ids;
+		std::shared_ptr<Stmt> to_run;
+		std::string type;
+		DotStmt(const IdentifierList &ids, std::shared_ptr<Stmt> to_run, std::string type) : ids(ids), to_run(to_run), type(type) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
