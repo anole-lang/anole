@@ -392,6 +392,19 @@ namespace Ice
 		return obj;
 	}
 
+	std::shared_ptr<IceObject> MatchExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> obj = expression->runCode(top);
+		for (size_t i = 0; i < mat_expressions.size(); i++)
+		{
+			if (mat_expressions[i]->runCode(top)->binaryOperate(obj, Token::TOKEN::TCEQ)->isTrue())
+			{
+				return ret_expressions[i]->runCode(top);
+			}
+		}
+		return else_expression->runCode(top);
+	}
+
 	// build_in_function_implement
 
 	std::shared_ptr<IceObject> InputExpr::runCode(std::shared_ptr<Env> &top)

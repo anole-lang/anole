@@ -335,25 +335,6 @@ namespace Ice
 				return node;
 			};
 
-			std::function<IdentifierList()> genEnumerators;
-			genEnumerators = [&]() {
-				iToken++;
-				IdentifierList enumerators;
-				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
-				{
-					enumerators.push_back(std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]()));
-					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
-					else break;
-				}
-				if (iToken->token_id != Token::TOKEN::TRBRACE)
-				{
-					std::cout << "missing symbol '}'" << std::endl;
-					exit(0);
-				}
-				iToken++;
-				return enumerators;
-			};
-
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
@@ -370,20 +351,15 @@ namespace Ice
 			case Token::TOKEN::TNEW:
 				goto cmp;
 			case Token::TOKEN::TLBRACE:
-				goto enum_expr;
+				return genNode[Symbol::enum_expr]();
 			case Token::TOKEN::TMATCH:
-				goto match_expr;
+				return genNode[Symbol::match_expr]();
 			default:
 				return node;
 			};
 		cmp:
 			node = genNode[Symbol::cmp]();
 			node = genCmpRest(std::dynamic_pointer_cast<Expr>(node));
-			return node;
-		enum_expr:
-			node = std::make_shared<EnumExpr>(genEnumerators());
-			return node;
-		match_expr:
 			return node;
 		};
 
@@ -756,6 +732,65 @@ namespace Ice
 			iToken++;
 			std::shared_ptr<Expr> assignment = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
 			return std::make_shared<VariableAssignStmt>(id, assignment);
+		};
+	
+		genNode[Symbol::enum_expr] = [&]() {
+			std::function<IdentifierList()> genEnumerators;
+			genEnumerators = [&]() {
+				iToken++;
+				IdentifierList enumerators;
+				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
+				{
+					enumerators.push_back(std::dynamic_pointer_cast<IdentifierExpr>(genNode[Symbol::ident]()));
+					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+					else break;
+				}
+				if (iToken->token_id != Token::TOKEN::TRBRACE)
+				{
+					std::cout << "missing symbol '}'" << std::endl;
+					exit(0);
+				}
+				iToken++;
+				return enumerators;
+			};
+
+			return std::make_shared<EnumExpr>(genEnumerators());
+		};
+		
+		genNode[Symbol::match_expr] = [&]() {
+			iToken++;
+			std::shared_ptr<Expr> expression = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			ExpressionList mat_expressions;
+			ExpressionList ret_expressions;
+			std::shared_ptr<Expr> else_expression = std::make_shared<NoneExpr>();
+			if (iToken->token_id != Token::TOKEN::TLBRACE)
+			{
+				std::cout << "missing symbol '{'" << std::endl;
+				exit(0);
+			}
+			iToken++;
+			while (iToken->token_id != Token::TOKEN::TRBRACE)
+			{
+				mat_expressions.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+				if (iToken->token_id != Token::TOKEN::TRET)
+				{
+					std::cout << "missing symbol '=>'" << std::endl;
+					exit(0);
+				}
+				iToken++;
+				ret_expressions.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+				if (iToken->token_id == Token::TOKEN::TCOMMA)
+				{
+					iToken++;
+				}
+			}
+			iToken++;
+			if (iToken->token_id == Token::TOKEN::TELSE)
+			{
+				iToken++;
+				else_expression = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+			}
+			return std::make_shared<MatchExpr>(expression, mat_expressions, ret_expressions, else_expression);
 		};
 	}
 

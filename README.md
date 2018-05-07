@@ -146,6 +146,10 @@ for 1 to 5
         @sqrt: @(n){ return n * n }
         return @(a, b){ return a + b }(sqrt(a), sqrt(b))
     }
+
+    @Math(base){
+        @self.base: base
+    }
 }
 ```
 
@@ -177,7 +181,17 @@ math.pow(5, 3)
 TOKEN.TBEGIN
 ```
 
+###### Match Expression
+```ice
+@numeber: 1 # or 2, 3, 4, ...
+@name: match numeber{
+        1 => "one",
+        2 => "two",
+        3 => "three"
+    } else "other"
+```
+
 ### TODO
-* Match Expr
+* Class Symbol Table
 * Fix Bugs 
 * Refactoring

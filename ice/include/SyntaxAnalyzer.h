@@ -230,7 +230,7 @@ enumerators_rest
 	;
 
 match_expr
-	: matches TRBRACE
+	: matches TRBRACE (TELSE expr)
 	;
 
 matches

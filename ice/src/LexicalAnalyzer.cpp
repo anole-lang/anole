@@ -347,6 +347,14 @@ namespace Ice
 				break;
 
 			case State::InComment:
+				switch (*reading)
+				{
+				case '\n':
+					state = State::Begin;
+					break;
+				default:
+					break;
+				}
 				break;
 
 			default:

@@ -100,7 +100,7 @@ namespace Ice
 	public:
 		std::shared_ptr<IdentifierExpr> id;
 		ExpressionList arguments;
-		MethodCallExpr(std::shared_ptr<IdentifierExpr> id, const ExpressionList &arguments) :id(id), arguments(arguments) {}
+		MethodCallExpr(std::shared_ptr<IdentifierExpr> id, ExpressionList arguments) :id(id), arguments(arguments) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -128,7 +128,7 @@ namespace Ice
 	public:
 		VariableList argDecls;
 		std::shared_ptr<BlockExpr> block;
-		LambdaExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
+		LambdaExpr(VariableList argDecls, std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -138,7 +138,7 @@ namespace Ice
 		VariableList argDecls;
 		std::shared_ptr<BlockExpr> block;
 		ExpressionList expressions;
-		LambdaCallExpr(const VariableList &argDecls, std::shared_ptr<BlockExpr> block, const ExpressionList &expressions) : argDecls(argDecls), block(block), expressions(expressions) {}
+		LambdaCallExpr(VariableList argDecls, std::shared_ptr<BlockExpr> block, ExpressionList expressions) : argDecls(argDecls), block(block), expressions(expressions) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -147,7 +147,7 @@ namespace Ice
 	public:
 		std::shared_ptr<IdentifierExpr> id;
 		ExpressionList arguments;
-		NewExpr(std::shared_ptr<IdentifierExpr> id, const ExpressionList &arguments) : id(id), arguments(arguments) {}
+		NewExpr(std::shared_ptr<IdentifierExpr> id, ExpressionList arguments) : id(id), arguments(arguments) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -164,7 +164,7 @@ namespace Ice
 	{
 	public:
 		IdentifierList	enumerators;
-		EnumExpr(const IdentifierList &enumerators) : enumerators(enumerators) {}
+		EnumExpr(IdentifierList enumerators) : enumerators(enumerators) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -174,7 +174,8 @@ namespace Ice
 		std::shared_ptr<Expr> expression;
 		ExpressionList mat_expressions;
 		ExpressionList ret_expressions;
-		MatchExpr(std::shared_ptr<Expr> expression, const ExpressionList &mat_expressions, const ExpressionList &ret_expressions) : expression(expression), mat_expressions(mat_expressions), ret_expressions(ret_expressions) {}
+		std::shared_ptr<Expr> else_expression;
+		MatchExpr(std::shared_ptr<Expr> expression, ExpressionList mat_expressions, ExpressionList ret_expressions, std::shared_ptr<Expr> else_expression) : expression(expression), mat_expressions(mat_expressions), ret_expressions(ret_expressions), else_expression(else_expression) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -218,7 +219,7 @@ namespace Ice
 		std::shared_ptr<IdentifierExpr> id;
 		VariableList argDecls;
 		std::shared_ptr<BlockExpr> block;
-		FunctionDeclarationStmt(std::shared_ptr<IdentifierExpr> id, const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : id(id), argDecls(argDecls), block(block) {}
+		FunctionDeclarationStmt(std::shared_ptr<IdentifierExpr> id, VariableList argDecls, std::shared_ptr<BlockExpr> block) : id(id), argDecls(argDecls), block(block) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -228,7 +229,7 @@ namespace Ice
 		std::shared_ptr<IdentifierExpr> id;
 		IdentifierList bases;
 		std::shared_ptr<BlockExpr> block;
-		ClassDeclarationStmt(std::shared_ptr<IdentifierExpr> id, const IdentifierList &bases, std::shared_ptr<BlockExpr> block) : id(id), bases(bases), block(block) {}
+		ClassDeclarationStmt(std::shared_ptr<IdentifierExpr> id, IdentifierList bases, std::shared_ptr<BlockExpr> block) : id(id), bases(bases), block(block) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -298,7 +299,7 @@ namespace Ice
 		IdentifierList ids;
 		std::shared_ptr<Stmt> to_run;
 		std::string type;
-		DotStmt(const IdentifierList &ids, std::shared_ptr<Stmt> to_run, std::string type) : ids(ids), to_run(to_run), type(type) {}
+		DotStmt(IdentifierList ids, std::shared_ptr<Stmt> to_run, std::string type) : ids(ids), to_run(to_run), type(type) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
