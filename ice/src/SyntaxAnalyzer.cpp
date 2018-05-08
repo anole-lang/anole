@@ -8,36 +8,7 @@ namespace Ice
 			std::shared_ptr<BlockExpr> node = std::make_shared<BlockExpr>();
 			while (iToken->token_id != Token::TOKEN::TEND)
 			{
-				switch (iToken->token_id)
-				{
-				case Token::TOKEN::TAT:
-				case Token::TOKEN::TATAT:
-				case Token::TOKEN::TATATAT:
-				case Token::TOKEN::TUSING:
-				case Token::TOKEN::TIDENTIFIER:
-				case Token::TOKEN::TINTEGER:
-				case Token::TOKEN::TDOUBLE:
-				case Token::TOKEN::TNONE:
-				case Token::TOKEN::TTRUE:
-				case Token::TOKEN::TFALSE:
-				case Token::TOKEN::TSTRING:
-				case Token::TOKEN::TSUB:
-				case Token::TOKEN::TLPAREN:
-				case Token::TOKEN::TIF:
-				case Token::TOKEN::TWHILE:
-				case Token::TOKEN::TDO:
-				case Token::TOKEN::TFOR:
-				case Token::TOKEN::TBREAK:
-				case Token::TOKEN::TCONTINUE:
-				case Token::TOKEN::TRETURN:
-				case Token::TOKEN::TNEW:
-				case Token::TOKEN::TMATCH:
-					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
-					break;
-				default:
-					std::cout << "syntax error" << std::endl;
-					exit(0);
-				}
+				node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 			}
 			return node;
 		};
@@ -192,39 +163,12 @@ namespace Ice
 			std::shared_ptr<BlockExpr> node = std::make_shared<BlockExpr>();
 			while (iToken->token_id != Token::TOKEN::TRBRACE)
 			{
-				switch (iToken->token_id)
-				{
-				case Token::TOKEN::TAT:
-				case Token::TOKEN::TATAT:
-				case Token::TOKEN::TATATAT:
-				case Token::TOKEN::TUSING:
-				case Token::TOKEN::TIDENTIFIER:
-				case Token::TOKEN::TINTEGER:
-				case Token::TOKEN::TDOUBLE:
-				case Token::TOKEN::TNONE:
-				case Token::TOKEN::TTRUE:
-				case Token::TOKEN::TFALSE:
-				case Token::TOKEN::TSTRING:
-				case Token::TOKEN::TSUB:
-				case Token::TOKEN::TLPAREN:
-				case Token::TOKEN::TIF:
-				case Token::TOKEN::TWHILE:
-				case Token::TOKEN::TDO:
-				case Token::TOKEN::TFOR:
-				case Token::TOKEN::TBREAK:
-				case Token::TOKEN::TCONTINUE:
-				case Token::TOKEN::TRETURN:
-				case Token::TOKEN::TNEW:
-				case Token::TOKEN::TMATCH:
-					node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
-					break;
-				case Token::TOKEN::TEND:
-					updateiToken();
-					break;
-				default:
+				if (iToken->token_id == Token::TOKEN::TEND) updateiToken();
+				else {
 					std::cout << "missing '}'" << std::endl;
 					exit(0);
 				}
+				node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 			}
 			iToken++;
 			return node;
@@ -349,11 +293,10 @@ namespace Ice
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TAT:
 			case Token::TOKEN::TNEW:
+			case Token::TOKEN::TMATCH:
 				goto cmp;
 			case Token::TOKEN::TLBRACE:
 				return genNode[Symbol::enum_expr]();
-			case Token::TOKEN::TMATCH:
-				return genNode[Symbol::match_expr]();
 			default:
 				return node;
 			};
@@ -398,6 +341,7 @@ namespace Ice
 			case Token::TOKEN::TSTRING:
 			case Token::TOKEN::TAT:
 			case Token::TOKEN::TNEW:
+			case Token::TOKEN::TMATCH:
 				goto factor;
 			default:
 				return node;
@@ -444,6 +388,7 @@ namespace Ice
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TAT:
 			case Token::TOKEN::TNEW:
+			case Token::TOKEN::TMATCH:
 				goto item;
 			default:
 				return node;
@@ -525,6 +470,9 @@ namespace Ice
 				break;
 			case Token::TOKEN::TNEW:
 				node = genNode[Symbol::new_expr]();
+				break;
+			case Token::TOKEN::TMATCH:
+				node = genNode[Symbol::match_expr]();
 				break;
 			default:
 				break;

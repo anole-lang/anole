@@ -192,6 +192,6 @@ TOKEN.TBEGIN
 ```
 
 ### TODO
-* Class Symbol Table
+* List Type
 * Fix Bugs 
 * Refactoring

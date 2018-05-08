@@ -41,6 +41,12 @@ namespace Ice
 				case ')':
 					tokens.push_back(Token(Token::TOKEN::TRPAREN));
 					break;
+				case '[':
+					tokens.push_back(Token(Token::TOKEN::TLBRACKET));
+					break;
+				case ']':
+					tokens.push_back(Token(Token::TOKEN::TRBRACKET));
+					break;
 				case '{':
 					tokens.push_back(Token(Token::TOKEN::TLBRACE));
 					break;

@@ -116,7 +116,6 @@ string
 expr
 	: cmp cmp_rest
 	| TLBRACE enum_expr
-	| TMATCH expr TLBRACE match_expr
 	;
 
 cmp
@@ -153,6 +152,8 @@ term
 	| TSUB term
 	| lambda_expr
 	| new_expr
+	| match_expr
+	| list_expr
 	;
 
 term_rest
@@ -228,9 +229,9 @@ enumerators_rest
 	: 
 	| TCOMMA enumerators
 	;
-
+	
 match_expr
-	: matches TRBRACE (TELSE expr)
+	: TMATCH expr TLBRACE matches TRBRACE (TELSE expr)
 	;
 
 matches
@@ -238,8 +239,12 @@ matches
 	;
 
 matches_rest
-	|
-	: TCOMMA matches
+	:
+	| TCOMMA matches
+	;
+
+list_expr
+	: TLBRACKET call_args TRBRACKET
 	;
 */
 

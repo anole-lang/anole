@@ -48,6 +48,8 @@ namespace Ice
 
 			TLPAREN, // (
 			TRPAREN, // )
+			TLBRACKET, // [
+			TRBRACKET, // ]
 			TLBRACE, // {
 			TRBRACE, // }
 
