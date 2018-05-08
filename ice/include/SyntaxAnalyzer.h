@@ -291,7 +291,8 @@ namespace Ice
 			class_decl,
 			new_expr,
 			enum_expr,
-			match_expr
+			match_expr,
+			list_expr
 		};
 		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 

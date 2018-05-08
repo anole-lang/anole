@@ -179,6 +179,14 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class ListExpr : public Expr
+	{
+	public:
+		ExpressionList expressions;
+		ListExpr(ExpressionList expressions) :expressions(expressions) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	class UsingStmt : public Stmt
 	{
 	public:

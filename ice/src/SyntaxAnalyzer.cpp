@@ -65,6 +65,7 @@ namespace Ice
 			case Token::TOKEN::TLPAREN:
 			case Token::TOKEN::TNEW:
 			case Token::TOKEN::TMATCH:
+			case Token::TOKEN::TLBRACKET:
 				node = std::make_shared<ExprStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 				break;
 			default:
@@ -164,10 +165,6 @@ namespace Ice
 			while (iToken->token_id != Token::TOKEN::TRBRACE)
 			{
 				if (iToken->token_id == Token::TOKEN::TEND) updateiToken();
-				else {
-					std::cout << "missing '}'" << std::endl;
-					exit(0);
-				}
 				node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
 			}
 			iToken++;
@@ -282,25 +279,11 @@ namespace Ice
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
-			case Token::TOKEN::TIDENTIFIER:
-			case Token::TOKEN::TSUB:
-			case Token::TOKEN::TLPAREN:
-			case Token::TOKEN::TINTEGER:
-			case Token::TOKEN::TDOUBLE:
-			case Token::TOKEN::TNONE:
-			case Token::TOKEN::TTRUE:
-			case Token::TOKEN::TFALSE:
-			case Token::TOKEN::TSTRING:
-			case Token::TOKEN::TAT:
-			case Token::TOKEN::TNEW:
-			case Token::TOKEN::TMATCH:
-				goto cmp;
 			case Token::TOKEN::TLBRACE:
 				return genNode[Symbol::enum_expr]();
 			default:
-				return node;
+				break;
 			};
-		cmp:
 			node = genNode[Symbol::cmp]();
 			node = genCmpRest(std::dynamic_pointer_cast<Expr>(node));
 			return node;
@@ -327,29 +310,8 @@ namespace Ice
 				return node;
 			};
 
-			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TIDENTIFIER:
-			case Token::TOKEN::TSUB:
-			case Token::TOKEN::TLPAREN:
-			case Token::TOKEN::TINTEGER:
-			case Token::TOKEN::TDOUBLE:
-			case Token::TOKEN::TNONE:
-			case Token::TOKEN::TTRUE:
-			case Token::TOKEN::TFALSE:
-			case Token::TOKEN::TSTRING:
-			case Token::TOKEN::TAT:
-			case Token::TOKEN::TNEW:
-			case Token::TOKEN::TMATCH:
-				goto factor;
-			default:
-				return node;
-			};
-		factor:
 			std::shared_ptr<Expr> lhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::factor]());
-			node = genFactorRest(lhs);
-			return node;
+			return genFactorRest(lhs);
 		};
 
 		genNode[Symbol::factor] = [&]() {
@@ -374,29 +336,8 @@ namespace Ice
 				return node;
 			};
 
-			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TIDENTIFIER:
-			case Token::TOKEN::TINTEGER:
-			case Token::TOKEN::TDOUBLE:
-			case Token::TOKEN::TNONE:
-			case Token::TOKEN::TTRUE:
-			case Token::TOKEN::TFALSE:
-			case Token::TOKEN::TSTRING:
-			case Token::TOKEN::TSUB:
-			case Token::TOKEN::TLPAREN:
-			case Token::TOKEN::TAT:
-			case Token::TOKEN::TNEW:
-			case Token::TOKEN::TMATCH:
-				goto item;
-			default:
-				return node;
-			}
-		item:
 			std::shared_ptr<Expr> lhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::term]());
-			node = genTermRest(lhs);
-			return node;
+			return genTermRest(lhs);
 		};
 
 		genNode[Symbol::term] = [&]() {
@@ -408,7 +349,6 @@ namespace Ice
 				{
 					args.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
-					else break;
 				}
 				iToken++;
 				return args;
@@ -473,6 +413,9 @@ namespace Ice
 				break;
 			case Token::TOKEN::TMATCH:
 				node = genNode[Symbol::match_expr]();
+				break;
+			case Token::TOKEN::TLBRACKET:
+				node = genNode[Symbol::list_expr]();
 				break;
 			default:
 				break;
@@ -739,6 +682,24 @@ namespace Ice
 				else_expression = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
 			}
 			return std::make_shared<MatchExpr>(expression, mat_expressions, ret_expressions, else_expression);
+		};
+	
+		genNode[Symbol::list_expr] = [&]() {
+			std::function<ExpressionList()> genArgs;
+			genArgs = [&]() {
+				ExpressionList args;
+				iToken++;
+				while (iToken->token_id != Token::TOKEN::TRBRACKET)
+				{
+					args.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+				}
+				iToken++;
+				return args;
+			};
+
+			iToken++;
+			return std::make_shared<ListExpr>(genArgs());
 		};
 	}
 

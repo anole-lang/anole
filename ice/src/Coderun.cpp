@@ -405,6 +405,16 @@ namespace Ice
 		return else_expression->runCode(top);
 	}
 
+	std::shared_ptr<IceObject> ListExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		Objects objects;
+		for (auto &expression : expressions)
+		{
+			objects.push_back(expression->runCode(top));
+		}
+		return std::make_shared<IceListObject>(objects);
+	}
+
 	// build_in_function_implement
 
 	std::shared_ptr<IceObject> InputExpr::runCode(std::shared_ptr<Env> &top)
