@@ -19,97 +19,11 @@ Also you can use Visual Studio, just open ice/ice.sln by Visual Studio.
 print("Hello World")
 ```
 
-### Progress
+<hr><hr><hr>
 
 ###### Comments
 ```ice
 # this is a comment
-```
-
-###### Built-Functions
-```ice
-@a: input()
-print(1)
-str(10)
-exit()
-```
-
-###### Variable Declaration
-```ice
-@a: 1
-@b: a
-```
-
-###### Unary Operator
-```ice
-@a: "abc"
-@b: -a # "cba"
-```
-
-###### Binary Operator
-```ice
-# support + - * / % = != <= > >=
-@a: 1 + 1
-@b: input()
-@c: (a + b) - a * b / a % b # support ()
-a = b
-```
-
-###### Function Declaration & Call
-```ice
-@add(a, b): a + b
-
-@mul(a, b)
-{
-    return a * b
-}
-
-@pow(num, n)
-{
-    @res: 1
-    while n > 0
-    {
-        @res: res * num
-        @n: n - 1
-    }
-    return res
-}
-
-mul(mul(2, 3), pow(3)) # 54
-```
-
-###### Control Flow
-```ice
-# support if_else while do_while for break continue
-
-@fib(n)
-{
-    if (n = 0) + (n = 1) { return 1 }
-    else { return fib(n-1) + fib(n-2) }
-}
-
-fib(10) # 89
-
-@a: 3
-while a
-{
-    print(a)
-    @a: a - 1
-}
-
-@a: 0
-do {
-    @a: a + 1
-    if a = 3 { break }
-    print(a)
-} while a < 5
-
-for 1 to 5
-{
-    @a: a + 1
-    if a = 3 { continue }
-    print(a)
-}
 ```
 
 ###### Lambda Expression
@@ -124,11 +38,6 @@ for 1 to 5
     @sqrt: @(n){ return n * n }
     return @(a, b){ return a + b }(sqrt(a), sqrt(b))
 }
-```
-
-###### Interpret Single-File
-```shell
-/path/to/ice /path/to/source.ice
 ```
 
 ###### Using Module & Simple OOP
@@ -191,7 +100,13 @@ TOKEN.TBEGIN
     } else "other"
 ```
 
+###### List Type
+```ice
+@list: [{}, [{}], [1, 2, 3]], []]
+@list[0].add(a, b): a + b
+list[0].add(3, 4)
+```
+
 ### TODO
-* List Type
 * Fix Bugs 
 * Refactoring

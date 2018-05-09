@@ -18,7 +18,7 @@ namespace Ice
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TAT:
-				if ((iToken+1)->token_id==Token::TOKEN::TIDENTIFIER)
+				if ((iToken + 1)->token_id == Token::TOKEN::TIDENTIFIER)
 					node = genNode[Symbol::var_decl_or_func_decl]();
 				else node = genNode[Symbol::expr]();
 				break;
@@ -74,8 +74,11 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::var_decl_or_func_decl] = [&]() {
+		genNode[Symbol::var_decl_or_func_decl] = [&]() { 
 			std::function<VariableList()> genArguments;
+			std::function<std::shared_ptr<Node>(ExpressionList &)> genDeclWithDot;
+			std::function<std::shared_ptr<IndexExpr>(std::shared_ptr<Expr>)> genIndexExpr;
+
 			genArguments = [&]() {
 				VariableList args;
 				iToken++;
@@ -96,8 +99,7 @@ namespace Ice
 				return args;
 			};
 
-			std::function<std::shared_ptr<Node>(IdentifierList &)> genDeclWithDot;
-			genDeclWithDot = [&](IdentifierList &ids) {
+			genDeclWithDot = [&](ExpressionList &expressions) {
 				std::string type;
 				iToken++;
 				std::shared_ptr<Node> node = genNode[Symbol::ident]();
@@ -112,12 +114,42 @@ namespace Ice
 					VariableList args = genArguments();
 					node = std::make_shared<FunctionDeclarationStmt>(std::dynamic_pointer_cast<IdentifierExpr>(node), args, std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::func_decl_rest]()));
 				}
+				else if (iToken->token_id == Token::TOKEN::TLBRACKET)
+				{
+					while (iToken->token_id == Token::TOKEN::TLBRACKET)
+						node = genIndexExpr(std::dynamic_pointer_cast<Expr>(node));
+					if (iToken->token_id != Token::TOKEN::TDOT)
+					{
+						std::cout << "missing symbol '.'" << std::endl;
+						exit(0);
+					}
+					expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
+					node = genDeclWithDot(expressions);
+				}
 				else if (iToken->token_id == Token::TOKEN::TDOT)
 				{
-					ids.push_back(std::dynamic_pointer_cast<IdentifierExpr>(node));
-					return genDeclWithDot(ids);
+					ExpressionList expressions;
+					expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
+					node = genDeclWithDot(expressions);
 				}
-				return std::dynamic_pointer_cast<Node>(std::make_shared<DotStmt>(ids, std::dynamic_pointer_cast<Stmt>(node), type));
+				else
+				{
+					std::cout << "missing ':' or '('" << std::endl;
+					exit(0);
+				}
+				return std::dynamic_pointer_cast<Node>(std::make_shared<DotStmt>(expressions, std::dynamic_pointer_cast<Stmt>(node), type));
+			};
+
+			genIndexExpr = [&](std::shared_ptr<Expr> expression) {
+				iToken++;
+				std::shared_ptr<Expr> node = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+				if (iToken->token_id != Token::TOKEN::TRBRACKET)
+				{
+					std::cout << "missing symbol ']'" << std::endl;
+					exit(0);
+				}
+				iToken++;
+				return std::make_shared<IndexExpr>(expression, node);
 			};
 
 			std::shared_ptr<Node> node = nullptr;
@@ -133,11 +165,24 @@ namespace Ice
 				VariableList args = genArguments();
 				node = std::make_shared<FunctionDeclarationStmt>(std::dynamic_pointer_cast<IdentifierExpr>(node), args, std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::func_decl_rest]()));
 			}
+			else if (iToken->token_id == Token::TOKEN::TLBRACKET)
+			{
+				while (iToken->token_id == Token::TOKEN::TLBRACKET)
+					node = genIndexExpr(std::dynamic_pointer_cast<Expr>(node));
+				if (iToken->token_id != Token::TOKEN::TDOT)
+				{
+					std::cout << "missing symbol '.'" << std::endl;
+					exit(0);
+				}
+				ExpressionList expressions;
+				expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
+				node = genDeclWithDot(expressions);
+			}
 			else if (iToken->token_id == Token::TOKEN::TDOT)
 			{
-				IdentifierList ids;
-				ids.push_back(std::dynamic_pointer_cast<IdentifierExpr>(node));
-				node = genDeclWithDot(ids);
+				ExpressionList expressions;
+				expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
+				node = genDeclWithDot(expressions);
 			}
 			else
 			{
@@ -394,7 +439,7 @@ namespace Ice
 			}
 			return node;
 		};
-		
+
 		genNode[Symbol::ident_or_other] = [&]() {
 			std::function<ExpressionList()> genArgs;
 			std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genDotExpr;
@@ -413,8 +458,8 @@ namespace Ice
 			};
 
 			genDotExpr = [&](std::shared_ptr<Expr> left) {
-				std::shared_ptr<Node> node = nullptr;
 				iToken++;
+				std::shared_ptr<Node> node = genNode[Symbol::ident]();
 				if (iToken->token_id == Token::TOKEN::TLPAREN)
 					node = std::make_shared<MethodCallExpr>(std::dynamic_pointer_cast<Expr>(node), genArgs());
 				else if (iToken->token_id == Token::TOKEN::TDOT)
@@ -472,7 +517,7 @@ namespace Ice
 			}
 			return node;
 		};
-		
+
 		genNode[Symbol::while_stmt] = [&]() {
 			iToken++;
 			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
@@ -506,7 +551,7 @@ namespace Ice
 			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
 			return std::dynamic_pointer_cast<Node>(std::make_shared<ForStmt>(begin, end, block));
 		};
-		
+
 		genNode[Symbol::return_stmt] = [&]() {
 			iToken++;
 			return std::dynamic_pointer_cast<Node>(std::make_shared<ReturnStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]())));
@@ -652,7 +697,7 @@ namespace Ice
 			std::shared_ptr<Expr> assignment = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
 			return std::make_shared<VariableAssignStmt>(id, assignment);
 		};
-	
+
 		genNode[Symbol::enum_expr] = [&]() {
 			std::function<IdentifierList()> genEnumerators;
 			genEnumerators = [&]() {
@@ -675,7 +720,7 @@ namespace Ice
 
 			return std::make_shared<EnumExpr>(genEnumerators());
 		};
-		
+
 		genNode[Symbol::match_expr] = [&]() {
 			iToken++;
 			std::shared_ptr<Expr> expression = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
@@ -711,7 +756,7 @@ namespace Ice
 			}
 			return std::make_shared<MatchExpr>(expression, mat_expressions, ret_expressions, else_expression);
 		};
-	
+
 		genNode[Symbol::list_expr] = [&]() {
 			std::function<ExpressionList()> genArgs;
 			genArgs = [&]() {

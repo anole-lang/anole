@@ -381,9 +381,17 @@ namespace Ice
 	std::shared_ptr<IceObject> DotStmt::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<Env> _top = top;
-		for (auto &id : ids)
+		for (auto &expression : expressions)
 		{
-			_top = std::dynamic_pointer_cast<IceInstanceObject>(_top->getObject(id->name))->top;
+			std::shared_ptr<IceObject> _obj = expression->runCode(_top);
+			if (_obj->type != IceObject::TYPE::INSTANCE)
+			{
+				std::cout << "it doesn't '.' operator" << std::endl;
+				exit(0);
+			}
+			
+			std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(_obj);
+			_top = obj->top;
 		}
 		if (type == "vardecl")
 		{

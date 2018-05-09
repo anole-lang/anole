@@ -313,10 +313,10 @@ namespace Ice
 	class DotStmt : public Stmt
 	{
 	public:
-		IdentifierList ids;
+		ExpressionList expressions;
 		std::shared_ptr<Stmt> to_run;
 		std::string type;
-		DotStmt(IdentifierList ids, std::shared_ptr<Stmt> to_run, std::string type) : ids(ids), to_run(to_run), type(type) {}
+		DotStmt(ExpressionList expressions, std::shared_ptr<Stmt> to_run, std::string type) : expressions(expressions), to_run(to_run), type(type) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
