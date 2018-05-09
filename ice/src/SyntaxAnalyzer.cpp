@@ -341,39 +341,11 @@ namespace Ice
 		};
 
 		genNode[Symbol::term] = [&]() {
-			std::function<ExpressionList()> genArgs;
-			genArgs = [&]() {
-				ExpressionList args;
-				iToken++;
-				while (iToken->token_id != Token::TOKEN::TRPAREN)
-				{
-					args.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
-					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
-				}
-				iToken++;
-				return args;
-			};
-			std::function<std::shared_ptr<Node>(std::shared_ptr<IdentifierExpr>)> genDotExpr;
-			genDotExpr = [&](std::shared_ptr<IdentifierExpr> left) {
-				std::shared_ptr<Node> node = nullptr;
-				iToken++;
-				node = genNode[Symbol::ident]();
-				if (iToken->token_id == Token::TOKEN::TLPAREN)
-					node = std::make_shared<MethodCallExpr>(std::dynamic_pointer_cast<IdentifierExpr>(node), genArgs());
-				else if (iToken->token_id == Token::TOKEN::TDOT)
-					node = genDotExpr(std::dynamic_pointer_cast<IdentifierExpr>(node));
-				return std::make_shared<DotExpr>(left, std::dynamic_pointer_cast<Expr>(node));
-			};
-
 			std::shared_ptr<Node> node = nullptr;
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TIDENTIFIER:
-				node = genNode[Symbol::ident]();
-				if (iToken->token_id == Token::TOKEN::TLPAREN)
-					node = std::make_shared<MethodCallExpr>(std::dynamic_pointer_cast<IdentifierExpr>(node), genArgs());
-				else if (iToken->token_id == Token::TOKEN::TDOT)
-					node = genDotExpr(std::dynamic_pointer_cast<IdentifierExpr>(node));
+				node = genNode[Symbol::ident_or_other]();
 				break;
 			case Token::TOKEN::TINTEGER:
 			case Token::TOKEN::TDOUBLE:
@@ -423,6 +395,62 @@ namespace Ice
 			return node;
 		};
 		
+		genNode[Symbol::ident_or_other] = [&]() {
+			std::function<ExpressionList()> genArgs;
+			std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genDotExpr;
+			std::function<std::shared_ptr<IndexExpr>(std::shared_ptr<Expr>)> genIndexExpr;
+
+			genArgs = [&]() {
+				ExpressionList args;
+				iToken++;
+				while (iToken->token_id != Token::TOKEN::TRPAREN)
+				{
+					args.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
+				}
+				iToken++;
+				return args;
+			};
+
+			genDotExpr = [&](std::shared_ptr<Expr> left) {
+				std::shared_ptr<Node> node = nullptr;
+				iToken++;
+				if (iToken->token_id == Token::TOKEN::TLPAREN)
+					node = std::make_shared<MethodCallExpr>(std::dynamic_pointer_cast<Expr>(node), genArgs());
+				else if (iToken->token_id == Token::TOKEN::TDOT)
+					node = genDotExpr(std::dynamic_pointer_cast<Expr>(node));
+				else if (iToken->token_id == Token::TOKEN::TLBRACKET)
+					node = genIndexExpr(std::dynamic_pointer_cast<Expr>(node));
+				return std::make_shared<DotExpr>(left, std::dynamic_pointer_cast<Expr>(node));
+			};
+
+			genIndexExpr = [&](std::shared_ptr<Expr> expression) {
+				iToken++;
+				std::shared_ptr<Expr> node = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+				if (iToken->token_id != Token::TOKEN::TRBRACKET)
+				{
+					std::cout << "missing symbol ']'" << std::endl;
+					exit(0);
+				}
+				iToken++;
+				return std::make_shared<IndexExpr>(expression, node);
+			};
+
+
+			std::shared_ptr<Node> node = genNode[Symbol::ident]();
+
+			while (iToken->token_id == Token::TOKEN::TLPAREN || iToken->token_id == Token::TOKEN::TDOT || iToken->token_id == Token::TOKEN::TLBRACKET)
+			{
+				if (iToken->token_id == Token::TOKEN::TLPAREN)
+					node = std::make_shared<MethodCallExpr>(std::dynamic_pointer_cast<Expr>(node), genArgs());
+				else if (iToken->token_id == Token::TOKEN::TDOT)
+					node = genDotExpr(std::dynamic_pointer_cast<Expr>(node));
+				else if (iToken->token_id == Token::TOKEN::TLBRACKET)
+					node = genIndexExpr(std::dynamic_pointer_cast<Expr>(node));
+			}
+			return node;
+		};
+
 		genNode[Symbol::if_else] = [&]() {
 			iToken++;
 			std::shared_ptr<Expr> cond = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
@@ -688,7 +716,6 @@ namespace Ice
 			std::function<ExpressionList()> genArgs;
 			genArgs = [&]() {
 				ExpressionList args;
-				iToken++;
 				while (iToken->token_id != Token::TOKEN::TRBRACKET)
 				{
 					args.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));

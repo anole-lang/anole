@@ -98,9 +98,9 @@ namespace Ice
 	class MethodCallExpr : public Expr
 	{
 	public:
-		std::shared_ptr<IdentifierExpr> id;
+		std::shared_ptr<Expr> expression;
 		ExpressionList arguments;
-		MethodCallExpr(std::shared_ptr<IdentifierExpr> id, ExpressionList arguments) :id(id), arguments(arguments) {}
+		MethodCallExpr(std::shared_ptr<Expr> expression, ExpressionList arguments) : expression(expression), arguments(arguments) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -154,9 +154,9 @@ namespace Ice
 	class DotExpr : public Expr
 	{
 	public:
-		std::shared_ptr<IdentifierExpr> left;
+		std::shared_ptr<Expr> left;
 		std::shared_ptr<Expr> right;
-		DotExpr(std::shared_ptr<IdentifierExpr> left, std::shared_ptr<Expr> right) : left(left), right(right) {}
+		DotExpr(std::shared_ptr<Expr> left, std::shared_ptr<Expr> right) : left(left), right(right) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
@@ -184,6 +184,15 @@ namespace Ice
 	public:
 		ExpressionList expressions;
 		ListExpr(ExpressionList expressions) :expressions(expressions) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
+	class IndexExpr : public Expr
+	{
+	public:
+		std::shared_ptr<Expr> expression;
+		std::shared_ptr<Expr> index;
+		IndexExpr(std::shared_ptr<Expr> expression, std::shared_ptr<Expr> index) : expression(expression), index(index) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 

@@ -144,7 +144,7 @@ factor_rest
 	;
 
 term
-	: ident method_call_tail
+	: ident_or_other
 	| numeric
 	| boolean
 	| string
@@ -163,10 +163,15 @@ term_rest
 	| TMOD term term_rest
 	;
 
-method_call_tail
+ident_or_other
+	: ident other_tail
+	;
+
+other_tail
 	:
-	| TLPAREN call_args TRPAREN
-	| TDOT ident method_call_tail
+	| TLPAREN call_args TRPAREN other_tail
+	| TDOT ident other_tail
+	| TLBRACKET expr TRBRACKET other_tail
 	;
 
 call_args
@@ -282,7 +287,7 @@ namespace Ice
 			cmp,
 			factor,
 			term,
-			method_call_tail,
+			ident_or_other,
 			call_args,
 			call_args_tail,
 			comparison,

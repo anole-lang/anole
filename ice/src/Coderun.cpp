@@ -115,9 +115,15 @@ namespace Ice
 
 	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
-		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
+		std::shared_ptr<IceObject> _obj = expression->runCode(top);
+		if (_obj->type != IceObject::TYPE::FUNCTION)
+		{
+			std::cout << "method need function type" << std::endl;
+			exit(0);
+		}
 
-		std::shared_ptr<IceFunctionObject> func = std::dynamic_pointer_cast<IceFunctionObject>(_top->getObject(id->name));
+		std::shared_ptr<IceFunctionObject> func = std::dynamic_pointer_cast<IceFunctionObject>(_obj);
+		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
 		if (arguments.size() > func->argDecls.size())
 		{
 			std::cout << "The number of arguments does not match" << std::endl;
@@ -360,7 +366,14 @@ namespace Ice
 
 	std::shared_ptr<IceObject> DotExpr::runCode(std::shared_ptr<Env> &top)
 	{
-		std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(top->getObject(left->name));
+		std::shared_ptr<IceObject> _obj = left->runCode(top);
+		if (_obj->type != IceObject::TYPE::INSTANCE)
+		{
+			std::cout << "it doesn't support for '.'" << std::endl;
+			exit(0);
+		}
+
+		std::shared_ptr<IceInstanceObject> obj = std::dynamic_pointer_cast<IceInstanceObject>(_obj);
 		std::shared_ptr<IceObject> res = right->runCode(obj->top);
 		return res;
 	}
@@ -407,12 +420,25 @@ namespace Ice
 
 	std::shared_ptr<IceObject> ListExpr::runCode(std::shared_ptr<Env> &top)
 	{
-		Objects objects;
+		std::shared_ptr<IceListObject> obj = std::make_shared<IceListObject>();
 		for (auto &expression : expressions)
 		{
-			objects.push_back(expression->runCode(top));
+			obj->objects.push_back(expression->runCode(top));
 		}
-		return std::make_shared<IceListObject>(objects);
+		return obj;
+	}
+
+	std::shared_ptr<IceObject> IndexExpr::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> _obj = expression->runCode(top);
+		if (_obj->type != IceObject::TYPE::LIST)
+		{
+			std::cout << "it doesn't support for [expr]" << std::endl;
+			exit(0);
+		}
+
+		std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
+		return obj->getByIndex(index->runCode(top));
 	}
 
 	// build_in_function_implement

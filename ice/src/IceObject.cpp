@@ -18,9 +18,74 @@ namespace Ice
 		this->top = std::make_shared<Env>(top);
 	}
 
+	IceNoneObject::IceNoneObject()
+	{
+		type = TYPE::NONE;
+	}
+
 	IceIntegerObject::IceIntegerObject(long value) : value(value)
 	{
 		type = TYPE::INT;
+	}
+
+	IceDoubleObject::IceDoubleObject(double value) : value(value)
+	{
+		type = TYPE::DOUBLE;
+	}
+
+	IceBooleanObject::IceBooleanObject(bool value) : value(value)
+	{
+		type = TYPE::BOOLEAN;
+	}
+
+	IceStringObject::IceStringObject(std::string value) : value(value)
+	{
+		type = TYPE::STRING;
+
+		raw_value = "";
+		const char *p = value.c_str();
+		while (*p)
+		{
+			switch (*p)
+			{
+			case '\n':
+				raw_value += "\\n";
+				break;
+			case '\\':
+				raw_value += "\\\\";
+				break;
+			case '\"':
+				raw_value += "\\\"";
+				break;
+			case '\a':
+				raw_value += "\\a";
+				break;
+			case '\b':
+				raw_value += "\\b";
+				break;
+			case '\0':
+				raw_value += "\\0";
+				break;
+			case '\t':
+				raw_value += "\\t";
+				break;
+			case '\r':
+				raw_value += "\\r";
+				break;
+			case '\f':
+				raw_value += "\\f";
+				break;
+			default:
+				raw_value += *p;
+				break;
+			}
+			p++;
+		}
+	}
+
+	IceListObject::IceListObject()
+	{
+		type = TYPE::LIST;
 	}
 
 	std::shared_ptr<IceObject> IceIntegerObject::unaryOperate(Token::TOKEN op)
@@ -105,12 +170,6 @@ namespace Ice
 		std::cout << "doesn't support this operator" << std::endl;
 		exit(0);
 		return nullptr;
-	}
-
-
-	IceDoubleObject::IceDoubleObject(double value) : value(value)
-	{
-		type = TYPE::DOUBLE;
 	}
 
 	std::shared_ptr<IceObject> IceDoubleObject::unaryOperate(Token::TOKEN op)
@@ -198,15 +257,10 @@ namespace Ice
 		return nullptr;
 	}
 
-	IceBooleanObject::IceBooleanObject(bool value) :value(value)
-	{
-		type = TYPE::BOOLEAN;
-	}
-
 	void IceBooleanObject::show()
 	{
-		if (value) std::cout << "true" << std::endl;
-		else std::cout << "false" << std::endl;
+		if (value) std::cout << "true";
+		else std::cout << "false";
 	}
 
 	std::shared_ptr<IceObject> IceBooleanObject::unaryOperate(Token::TOKEN op)
@@ -292,51 +346,6 @@ namespace Ice
 		return nullptr;
 	}
 
-	IceStringObject::IceStringObject(std::string value) : value(value)
-	{
-		type = TYPE::STRING;
-
-		raw_value = "";
-		const char *p = value.c_str();
-		while (*p)
-		{
-			switch (*p)
-			{
-			case '\n':
-				raw_value += "\\n";
-				break;
-			case '\\':
-				raw_value += "\\\\";
-				break;
-			case '\"':
-				raw_value += "\\\"";
-				break;
-			case '\a':
-				raw_value += "\\a";
-				break;
-			case '\b':
-				raw_value += "\\b";
-				break;
-			case '\0':
-				raw_value += "\\0";
-				break;
-			case '\t':
-				raw_value += "\\t";
-				break;
-			case '\r':
-				raw_value += "\\r";
-				break;
-			case '\f':
-				raw_value += "\\f";
-				break;
-			default:
-				raw_value += *p;
-				break;
-			}
-			p++;
-		}
-	}
-
 	std::shared_ptr<IceObject> IceStringObject::unaryOperate(Token::TOKEN op)
 	{
 		std::string dup = value;
@@ -391,6 +400,34 @@ namespace Ice
 		std::cout << "doesn't support this operator" << std::endl;
 		exit(0);
 		return nullptr;
+	}
+
+	void IceListObject::show()
+	{
+		std::cout << "[";
+		for (auto &obj : objects)
+		{
+			obj->show();
+			std::cout << ", ";
+		}
+		std::cout << "]";
+	}
+
+	std::shared_ptr<IceObject> IceListObject::getByIndex(std::shared_ptr<IceObject> _obj)
+	{
+		if (_obj->type != TYPE::INT)
+		{
+			std::cout << "index type should be int" << std::endl;
+			exit(0);
+		}
+		std::shared_ptr<IceIntegerObject> obj = std::dynamic_pointer_cast<IceIntegerObject>(_obj);
+
+		if (obj->value >= (int)objects.size())
+		{
+			std::cout << "index out of range" << std::endl;
+			exit(0);
+		}
+		return objects[obj->value];
 	}
 }
 
