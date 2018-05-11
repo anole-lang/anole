@@ -116,7 +116,14 @@ namespace Ice
 	std::shared_ptr<IceObject> MethodCallExpr::runCode(std::shared_ptr<Env> &top)
 	{
 		std::shared_ptr<IceObject> _obj = expression->runCode(top);
-		if (_obj->type != IceObject::TYPE::FUNCTION)
+		if (_obj->type == IceObject::TYPE::BUILT_IN_FUNCTION)
+		{
+			Objects objects;
+			for (auto &argument : arguments)
+				objects.push_back(argument->runCode(top));
+			return std::dynamic_pointer_cast<IceBuiltInFunctionObject>(_obj)->func(objects);
+		}
+		else if (_obj->type != IceObject::TYPE::FUNCTION)
 		{
 			std::cout << "method need function type" << std::endl;
 			exit(0);
@@ -366,6 +373,9 @@ namespace Ice
 
 	std::shared_ptr<IceObject> DotExpr::runCode(std::shared_ptr<Env> &top)
 	{
+		/*
+			BUG: instance.method(arguments), arguments will run in the Env of th instance
+		*/
 		std::shared_ptr<IceObject> _obj = left->runCode(top);
 		if (_obj->type != IceObject::TYPE::INSTANCE)
 		{
@@ -380,6 +390,9 @@ namespace Ice
 
 	std::shared_ptr<IceObject> DotStmt::runCode(std::shared_ptr<Env> &top)
 	{
+		/*
+		BUG: @instance.list[index]: var , index and var will run in the Env of th instance
+		*/
 		std::shared_ptr<Env> _top = top;
 		for (auto &expression : expressions)
 		{
@@ -467,29 +480,6 @@ namespace Ice
 
 	// build_in_function_implement
 
-	std::shared_ptr<IceObject> InputExpr::runCode(std::shared_ptr<Env> &top)
-	{
-		std::getline(std::cin, input);
-		return std::make_shared<IceStringObject>(input);
-	}
-
-	std::shared_ptr<IceObject> PrintStmt::runCode(std::shared_ptr<Env> &top)
-	{
-		std::cout << top->getObject(id)->toStr() << std::endl;
-		return nullptr;
-	}
-
-	std::shared_ptr<IceObject> StrExpr::runCode(std::shared_ptr<Env> &top)
-	{
-		return std::make_shared<IceStringObject>(top->getObject(id)->toStr());
-	}
-
-	std::shared_ptr<IceObject> ExitStmt::runCode(std::shared_ptr<Env> &top)
-	{
-		exit(0);
-		return nullptr;
-	}
-
 	void Env::genBuildInFunction()
 	{
 		genInputFunction();
@@ -501,52 +491,82 @@ namespace Ice
 	void Env::genInputFunction()
 	{
 		std::string func_name = "input";
+		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
-		VariableList args;
-		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
-
-		block->statements.push_back(std::make_shared<ReturnStmt>(std::make_shared<InputExpr>()));
+		func = [](Objects objects){
+			if (objects.size())
+			{
+				std::cout << "input() need no arguments" << std::endl;
+				exit(0);
+			}
+			std::string input;
+			std::getline(std::cin, input);
+			return std::make_shared<IceStringObject>(input);
+		};
 		
-		put(func_name, std::make_shared<IceFunctionObject>(args, block));
+		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 
 	void Env::genPrintFunction()
 	{
 		std::string func_name = "print";
-		std::string obj_name = "to_print";
+		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
-		VariableList args;
-		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
+		func = [](Objects objects) {
+			if (objects.size() != 1)
+			{
+				std::cout << "print() need 1 argument but get others" << std::endl;
+				exit(0);
+			}
+			std::cout << objects[0]->toStr() << std::endl;
+			return std::make_shared<IceNoneObject>();
+		};
 
-		args.push_back(std::make_shared<VariableDeclarationStmt>(std::make_shared<IdentifierExpr>(obj_name), std::make_shared<NoneExpr>()));
-		block->statements.push_back(std::make_shared<PrintStmt>());
-
-		put(func_name, std::make_shared<IceFunctionObject>(args, block));
+		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 
 	void Env::genStrFunction()
 	{
 		std::string func_name = "str";
-		std::string obj_name = "to_str";
+		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
-		VariableList args;
-		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
+		func = [](Objects objects) {
+			if (objects.size() != 1)
+			{
+				std::cout << "str() need 1 argument but get others" << std::endl;
+				exit(0);
+			}
+			return std::make_shared<IceStringObject>(objects[0]->toStr());
+		};
 
-		args.push_back(std::make_shared<VariableDeclarationStmt>(std::make_shared<IdentifierExpr>(obj_name), std::make_shared<NoneExpr>()));
-		block->statements.push_back(std::make_shared<ReturnStmt>(std::make_shared<StrExpr>()));
-
-		put(func_name, std::make_shared<IceFunctionObject>(args, block));
+		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 
 	void Env::genExitFunction()
 	{
-		std::string func_name = "exit";
+		std::string func_name = "str";
+		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
-		VariableList args;
-		std::shared_ptr<BlockExpr> block = std::make_shared<BlockExpr>();
+		func = [](Objects objects) {
+			if (objects.size())
+			{
+				if (objects.size() == 1)
+				{
+					if (objects[0]->type == IceObject::TYPE::INT)
+					{
+						exit(std::dynamic_pointer_cast<IceIntegerObject>(objects[0])->value);
+					}
+				}
+				else
+				{
+					std::cout << "exit() need no arguments" << std::endl;
+					exit(0);
+				}
+			}
+			exit(0);
+			return std::make_shared<IceNoneObject>();
+		};
 
-		block->statements.push_back(std::make_shared<ExitStmt>());
-
-		put(func_name, std::make_shared<IceFunctionObject>(args, block));
+		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 }

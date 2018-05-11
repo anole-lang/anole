@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 #include <cstring>
 #include "Token.h"
 #include "Coderun.h"
@@ -31,6 +32,7 @@ namespace Ice
 			BOOLEAN,
 			STRING,
 			FUNCTION,
+			BUILT_IN_FUNCTION,
 			CLASS,
 			INSTANCE,
 			NONE,
@@ -55,7 +57,18 @@ namespace Ice
 		virtual ~IceFunctionObject() {}
 
 		virtual bool isTrue() { return true; }
-		virtual std::string toStr() { return "function at " + (int)this; }
+		virtual std::string toStr() { return "function"; }
+	};
+
+	class IceBuiltInFunctionObject : public IceObject
+	{
+	public:
+		std::function<std::shared_ptr<IceObject>(Objects)> func;
+		IceBuiltInFunctionObject(std::function<std::shared_ptr<IceObject>(Objects)>);
+		virtual ~IceBuiltInFunctionObject() {}
+
+		virtual bool isTrue() { return true; }
+		virtual std::string toStr() { return "built-in function"; }
 	};
 
 	class IceClassObject : public IceObject
@@ -76,6 +89,7 @@ namespace Ice
 	public:
 		std::shared_ptr<Env> top;
 
+		IceInstanceObject();
 		IceInstanceObject(std::shared_ptr<Env> &);
 		virtual ~IceInstanceObject() {}
 
@@ -159,17 +173,18 @@ namespace Ice
 		virtual std::string toStr() { return value; }
 	};
 
-	class IceListObject : public IceObject
+	class IceListObject : public IceInstanceObject
 	{
 	public:
 		Objects objects;
 
 		IceListObject();
+		IceListObject(Objects objects);
 		virtual ~IceListObject() {}
 
 		virtual void show();
-		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op) { return nullptr; }
-		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN) { return nullptr; }
+		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op);
+		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
 		virtual bool isTrue() { return objects.size() != 0; }
 		virtual std::string toStr() { return "list"; }
 

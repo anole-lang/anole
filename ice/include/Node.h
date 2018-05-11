@@ -329,39 +329,6 @@ namespace Ice
 		IndexStmt(std::shared_ptr<IndexExpr> index_expr, std::shared_ptr<Expr>assignment) : expression(index_expr->expression), index(index_expr->index), assignment(assignment) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
-
-	// build_in_function
-
-	class InputExpr : public Expr
-	{
-	public:
-		std::string input;
-		InputExpr() {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
-	};
-
-	class PrintStmt : public Stmt
-	{
-	public:
-		std::string id;
-		PrintStmt() : id("to_print") {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
-	};
-
-	class StrExpr : public Expr
-	{
-	public:
-		std::string id;
-		StrExpr() : id("to_str") {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
-	};
-
-	class ExitStmt : public Stmt
-	{
-	public:
-		ExitStmt() {}
-		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
-	};
 }
 
 #endif //__NODE_H__

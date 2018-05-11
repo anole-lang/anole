@@ -7,9 +7,20 @@ namespace Ice
 		type = TYPE::FUNCTION;
 	}
 
+	IceBuiltInFunctionObject::IceBuiltInFunctionObject(std::function<std::shared_ptr<IceObject>(Objects)> func) : func(func)
+	{
+		type = TYPE::BUILT_IN_FUNCTION;
+	}
+
 	IceClassObject::IceClassObject(const IdentifierList &bases, std::shared_ptr<BlockExpr> block) : bases(bases), block(block)
 	{
 		type = TYPE::CLASS;
+	}
+
+	IceInstanceObject::IceInstanceObject()
+	{
+		type = TYPE::INSTANCE;
+		top = std::make_shared<Env>(nullptr);
 	}
 
 	IceInstanceObject::IceInstanceObject(std::shared_ptr<Env> &top)
@@ -85,7 +96,12 @@ namespace Ice
 
 	IceListObject::IceListObject()
 	{
-		type = TYPE::LIST;
+		type = TYPE::INSTANCE;
+	}
+
+	IceListObject::IceListObject(Objects objects) : objects(objects)
+	{
+		type = TYPE::INSTANCE;
 	}
 
 	std::shared_ptr<IceObject> IceIntegerObject::unaryOperate(Token::TOKEN op)
@@ -411,6 +427,43 @@ namespace Ice
 			objects[i]->show();
 		}
 		std::cout << "]";
+	}
+
+	std::shared_ptr<IceObject> IceListObject::unaryOperate(Token::TOKEN op)
+	{
+		std::shared_ptr<IceListObject> obj = nullptr;
+		switch (op)
+		{
+		case Token::TOKEN::TSUB:
+			obj = std::make_shared<IceListObject>();
+			for (int i = (int)objects.size() - 1; i >= 0; i--)
+				obj->objects.push_back(objects[i]);
+			break;
+		default:
+			break;
+		}
+		return obj;
+	}
+
+	std::shared_ptr<IceObject> IceListObject::binaryOperate(std::shared_ptr<IceObject> _obj, Token::TOKEN op)
+	{
+		if (_obj->type != TYPE::LIST)
+		{
+			std::cout << "doesn't support this operator" << std::endl;
+			exit(0);
+		}
+		std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
+		std::shared_ptr<IceListObject> res_obj = std::make_shared<IceListObject>(objects);
+		switch (op)
+		{
+		case Token::TOKEN::TADD:
+			for (auto &object : obj->objects)
+				res_obj->objects.push_back(object);
+			break;
+		default:
+			break;
+		}
+		return res_obj;
 	}
 
 	std::shared_ptr<IceObject> IceListObject::getByIndex(std::shared_ptr<IceObject> _index)
