@@ -23,8 +23,7 @@ stmts
 	;
 
 stmt
-	: var_decl_or_func_decl
-	| var_assign
+	: decl_or_assign
 	| class_decl
 	| if_else
 	| while_stmt
@@ -37,17 +36,24 @@ stmt
 	| using_stmt
 	;
 
-var_decl_or_func_decl
-	: TAT ident dot_tail var_decl_or_func_decl_tail
+decl_or_assign
+	: TAT ident other_tail var_decl_or_func_decl_tail
+	| var_assign
 	;
 
 var_assign
-	: TATATAT ident TASSIGN expr
+	: TDOT ident TASSIGN expr
+	;
+
+other_tail
+	: dot_tail
+	| TLBRACKET expr TRBRACKET dot_tail
+	;
 
 dot_tail
-	:
+	|
 	| TLPAREN func_decl_args TRPAREN
-	| TDOT ident dot_tail
+	| TDOT ident other_tail
 	;
 
 var_decl_or_func_decl_tail
@@ -264,7 +270,7 @@ namespace Ice
 		{
 			stmts,
 			stmt,
-			var_decl_or_func_decl,
+			decl_or_assign,
 			var_assign,
 			if_else,
 			while_stmt,

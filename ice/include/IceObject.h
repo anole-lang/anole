@@ -174,6 +174,7 @@ namespace Ice
 		virtual std::string toStr() { return "list"; }
 
 		std::shared_ptr<IceObject> getByIndex(std::shared_ptr<IceObject>);
+		void setByIndex(std::shared_ptr<IceObject>, std::shared_ptr<IceObject>);
 	};
 }
 

@@ -320,6 +320,16 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
 	};
 
+	class IndexStmt : public Stmt
+	{
+	public:
+		std::shared_ptr<Expr> expression;
+		std::shared_ptr<Expr> index;
+		std::shared_ptr<Expr> assignment;
+		IndexStmt(std::shared_ptr<IndexExpr> index_expr, std::shared_ptr<Expr>assignment) : expression(index_expr->expression), index(index_expr->index), assignment(assignment) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &);
+	};
+
 	// build_in_function
 
 	class InputExpr : public Expr

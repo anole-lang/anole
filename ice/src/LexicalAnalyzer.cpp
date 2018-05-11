@@ -123,25 +123,11 @@ namespace Ice
 				switch (*reading)
 				{
 				case '@':
-					state = State::InATAT;
+					tokens.push_back(Token(Token::TOKEN::TATAT));
+					state = State::Begin;
 					break;
 				default:
 					tokens.push_back(Token(Token::TOKEN::TAT));
-					state = State::Begin;
-					reading--;
-					break;
-				}
-				break;
-
-			case State::InATAT:
-				switch (*reading)
-				{
-				case '@':
-					tokens.push_back(Token(Token::TOKEN::TATATAT));
-					state = State::Begin;
-					break;
-				default:
-					tokens.push_back(Token(Token::TOKEN::TATAT));
 					state = State::Begin;
 					reading--;
 					break;

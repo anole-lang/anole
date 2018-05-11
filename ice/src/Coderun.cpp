@@ -441,12 +441,28 @@ namespace Ice
 		std::shared_ptr<IceObject> _obj = expression->runCode(top);
 		if (_obj->type != IceObject::TYPE::LIST)
 		{
-			std::cout << "it doesn't support for [expr]" << std::endl;
+			std::cout << "it doesn't support for []" << std::endl;
 			exit(0);
 		}
 
 		std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
 		return obj->getByIndex(index->runCode(top));
+	}
+
+	std::shared_ptr<IceObject> IndexStmt::runCode(std::shared_ptr<Env> &top)
+	{
+		std::shared_ptr<IceObject> _obj = expression->runCode(top);
+		if (_obj->type != IceObject::TYPE::LIST)
+		{
+			std::cout << "it doesn't support for []" << std::endl;
+			exit(0);
+		}
+
+		std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
+		std::shared_ptr<IceObject> index = this->index->runCode(top);
+		std::shared_ptr<IceObject> assignment = this->assignment->runCode(top);
+		obj->setByIndex(index, assignment);
+		return nullptr;
 	}
 
 	// build_in_function_implement

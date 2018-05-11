@@ -405,29 +405,46 @@ namespace Ice
 	void IceListObject::show()
 	{
 		std::cout << "[";
-		for (auto &obj : objects)
+		for (size_t i = 0; i < objects.size(); i++)
 		{
-			obj->show();
-			std::cout << ", ";
+			if (i) std::cout << ", ";
+			objects[i]->show();
 		}
 		std::cout << "]";
 	}
 
-	std::shared_ptr<IceObject> IceListObject::getByIndex(std::shared_ptr<IceObject> _obj)
+	std::shared_ptr<IceObject> IceListObject::getByIndex(std::shared_ptr<IceObject> _index)
 	{
-		if (_obj->type != TYPE::INT)
+		if (_index->type != TYPE::INT)
 		{
-			std::cout << "index type should be int" << std::endl;
+			std::cout << "index type should be integer" << std::endl;
 			exit(0);
 		}
-		std::shared_ptr<IceIntegerObject> obj = std::dynamic_pointer_cast<IceIntegerObject>(_obj);
+		std::shared_ptr<IceIntegerObject> index = std::dynamic_pointer_cast<IceIntegerObject>(_index);
 
-		if (obj->value >= (int)objects.size())
+		if (index->value >= (int)objects.size())
 		{
 			std::cout << "index out of range" << std::endl;
 			exit(0);
 		}
-		return objects[obj->value];
+		return objects[index->value];
+	}
+
+	void IceListObject::setByIndex(std::shared_ptr<IceObject> _index, std::shared_ptr<IceObject> assignment)
+	{
+		if (_index->type != TYPE::INT)
+		{
+			std::cout << "index type should be integer" << std::endl;
+			exit(0);
+		}
+		std::shared_ptr<IceIntegerObject> index = std::dynamic_pointer_cast<IceIntegerObject>(_index);
+
+		if (index->value >= (int)objects.size())
+		{
+			std::cout << "index out of range" << std::endl;
+			exit(0);
+		}
+		objects[index->value] = assignment;
 	}
 }
 

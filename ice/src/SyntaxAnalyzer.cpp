@@ -18,15 +18,13 @@ namespace Ice
 			switch (iToken->token_id)
 			{
 			case Token::TOKEN::TAT:
-				if ((iToken + 1)->token_id == Token::TOKEN::TIDENTIFIER)
-					node = genNode[Symbol::var_decl_or_func_decl]();
-				else node = genNode[Symbol::expr]();
+				if ((iToken + 1)->token_id == Token::TOKEN::TLPAREN)
+					node = genNode[Symbol::expr]();
+				else
+					node = genNode[Symbol::decl_or_assign]();
 				break;
 			case Token::TOKEN::TATAT:
 				node = genNode[Symbol::class_decl]();
-				break;
-			case Token::TOKEN::TATATAT:
-				node = genNode[Symbol::var_assign]();
 				break;
 			case Token::TOKEN::TUSING:
 				node = genNode[Symbol::using_stmt]();
@@ -74,7 +72,7 @@ namespace Ice
 			return node;
 		};
 
-		genNode[Symbol::var_decl_or_func_decl] = [&]() { 
+		genNode[Symbol::decl_or_assign] = [&]() { 
 			std::function<VariableList()> genArguments;
 			std::function<std::shared_ptr<Node>(ExpressionList &)> genDeclWithDot;
 			std::function<std::shared_ptr<IndexExpr>(std::shared_ptr<Expr>)> genIndexExpr;
@@ -118,13 +116,21 @@ namespace Ice
 				{
 					while (iToken->token_id == Token::TOKEN::TLBRACKET)
 						node = genIndexExpr(std::dynamic_pointer_cast<Expr>(node));
-					if (iToken->token_id != Token::TOKEN::TDOT)
+					if (iToken->token_id == Token::TOKEN::TASSIGN)
 					{
-						std::cout << "missing symbol '.'" << std::endl;
+						iToken++;
+						node = std::make_shared<IndexStmt>(std::dynamic_pointer_cast<IndexExpr>(node), std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+					}
+					else if (iToken->token_id == Token::TOKEN::TDOT)
+					{
+						expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
+						node = genDeclWithDot(expressions);
+					}
+					else
+					{
+						std::cout << "missing ':' or '('" << std::endl;
 						exit(0);
 					}
-					expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
-					node = genDeclWithDot(expressions);
 				}
 				else if (iToken->token_id == Token::TOKEN::TDOT)
 				{
@@ -154,6 +160,11 @@ namespace Ice
 
 			std::shared_ptr<Node> node = nullptr;
 			iToken++;
+			if (iToken->token_id == Token::TOKEN::TDOT)
+			{
+				return genNode[Symbol::var_assign]();
+			}
+
 			node = genNode[Symbol::ident]();
 			if (iToken->token_id == Token::TOKEN::TASSIGN)
 			{
@@ -169,14 +180,22 @@ namespace Ice
 			{
 				while (iToken->token_id == Token::TOKEN::TLBRACKET)
 					node = genIndexExpr(std::dynamic_pointer_cast<Expr>(node));
-				if (iToken->token_id != Token::TOKEN::TDOT)
+				if (iToken->token_id == Token::TOKEN::TASSIGN)
 				{
-					std::cout << "missing symbol '.'" << std::endl;
+					iToken++;
+					node = std::make_shared<IndexStmt>(std::dynamic_pointer_cast<IndexExpr>(node), std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+				}
+				else if (iToken->token_id == Token::TOKEN::TDOT)
+				{
+					ExpressionList expressions;
+					expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
+					node = genDeclWithDot(expressions);
+				}
+				else
+				{
+					std::cout << "missing ':' or '('" << std::endl;
 					exit(0);
 				}
-				ExpressionList expressions;
-				expressions.push_back(std::dynamic_pointer_cast<Expr>(node));
-				node = genDeclWithDot(expressions);
 			}
 			else if (iToken->token_id == Token::TOKEN::TDOT)
 			{
@@ -186,7 +205,7 @@ namespace Ice
 			}
 			else
 			{
-				std::cout << "missing ':' or '('" << std::endl;
+				std::cout << "missing ':' or '(' after @ident" << std::endl;
 				exit(0);
 			}
 			return node;
