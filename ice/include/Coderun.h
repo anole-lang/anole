@@ -38,11 +38,11 @@ namespace Ice
 		void setContinueStatus(bool status) { continueStatus = status; }
 		bool getContinueStatus() { return continueStatus; }
 
-		void genBuildInFunction();
+		void genBuildInFunctions();
 
-		void put(std::string &, std::shared_ptr<IceObject>);
-		void replace(std::string &, std::shared_ptr<IceObject>);
-		std::shared_ptr<IceObject> getObject(std::string &);
+		void put(std::string, std::shared_ptr<IceObject>);
+		void replace(std::string, std::shared_ptr<IceObject>);
+		std::shared_ptr<IceObject> getObject(std::string);
 	};
 }
 

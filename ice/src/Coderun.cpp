@@ -26,12 +26,12 @@ namespace Ice
 		node->runCode(top);
 	}
 
-	void Env::put(std::string &name, std::shared_ptr<IceObject> obj)
+	void Env::put(std::string name, std::shared_ptr<IceObject> obj)
 	{
 		objects[name] = obj;
 	}
 
-	void Env::replace(std::string &name, std::shared_ptr<IceObject> obj)
+	void Env::replace(std::string name, std::shared_ptr<IceObject> obj)
 	{
 		std::shared_ptr<Env> tmp = shared_from_this();
 		while (tmp != nullptr)
@@ -48,7 +48,7 @@ namespace Ice
 		exit(0);
 	}
 
-	std::shared_ptr<IceObject> Env::getObject(std::string &name)
+	std::shared_ptr<IceObject> Env::getObject(std::string name)
 	{
 		std::shared_ptr<Env> tmp = shared_from_this();
 		while (tmp != nullptr)
@@ -376,7 +376,7 @@ namespace Ice
 		if (normal_top == nullptr)
 		{
 			std::shared_ptr<IceObject> _obj = left->runCode(top, top);
-			if (_obj->type != IceObject::TYPE::INSTANCE)
+			if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST)
 			{
 				std::cout << "it doesn't support for '.'" << std::endl;
 				exit(0);
@@ -388,7 +388,7 @@ namespace Ice
 		}
 
 		std::shared_ptr<IceObject> _obj = left->runCode(top, normal_top);
-		if (_obj->type != IceObject::TYPE::INSTANCE)
+		if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST)
 		{
 			std::cout << "it doesn't support for '.'" << std::endl;
 			exit(0);
@@ -405,7 +405,7 @@ namespace Ice
 		for (auto &expression : expressions)
 		{
 			std::shared_ptr<IceObject> _obj = expression->runCode(_top);
-			if (_obj->type != IceObject::TYPE::INSTANCE)
+			if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST)
 			{
 				std::cout << "it doesn't '.' operator" << std::endl;
 				exit(0);
@@ -449,6 +449,7 @@ namespace Ice
 		{
 			obj->objects.push_back(expression->runCode(top));
 		}
+		obj->top->put("self", obj);
 		return obj;
 	}
 
@@ -481,9 +482,9 @@ namespace Ice
 		return nullptr;
 	}
 
-	// build_in_function_implement
+	// Built_in functions implement
 
-	void Env::genBuildInFunction()
+	void Env::genBuildInFunctions()
 	{
 		genInputFunction();
 		genPrintFunction();
@@ -493,7 +494,6 @@ namespace Ice
 
 	void Env::genInputFunction()
 	{
-		std::string func_name = "input";
 		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
 		func = [](Objects objects){
@@ -507,12 +507,11 @@ namespace Ice
 			return std::make_shared<IceStringObject>(input);
 		};
 		
-		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
+		put("input", std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 
 	void Env::genPrintFunction()
 	{
-		std::string func_name = "print";
 		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
 		func = [](Objects objects) {
@@ -525,12 +524,11 @@ namespace Ice
 			return std::make_shared<IceNoneObject>();
 		};
 
-		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
+		put("print", std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 
 	void Env::genStrFunction()
 	{
-		std::string func_name = "str";
 		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
 		func = [](Objects objects) {
@@ -542,12 +540,11 @@ namespace Ice
 			return std::make_shared<IceStringObject>(objects[0]->toStr());
 		};
 
-		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
+		put("str", std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 
 	void Env::genExitFunction()
 	{
-		std::string func_name = "str";
 		std::function<std::shared_ptr<IceObject>(Objects)> func;
 
 		func = [](Objects objects) {
@@ -570,6 +567,6 @@ namespace Ice
 			return std::make_shared<IceNoneObject>();
 		};
 
-		put(func_name, std::make_shared<IceBuiltInFunctionObject>(func));
+		put("exit", std::make_shared<IceBuiltInFunctionObject>(func));
 	}
 }

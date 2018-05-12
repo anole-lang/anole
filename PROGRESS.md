@@ -16,7 +16,7 @@ Please add feature request here.
 
 ### DONE
 + [X] Fixed bug with scope when using '.' operator
-+ [X] List type
++ [X] List type & built-in methods
 + [X] Match expression
 + [X] Enum expression
 + [X] Simple class definition

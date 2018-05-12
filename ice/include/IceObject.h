@@ -175,6 +175,9 @@ namespace Ice
 
 	class IceListObject : public IceInstanceObject
 	{
+	private:
+		void genBuiltInMethods();
+
 	public:
 		Objects objects;
 

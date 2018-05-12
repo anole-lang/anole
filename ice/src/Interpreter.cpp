@@ -5,7 +5,7 @@ namespace Ice
 	Interpreter::Interpreter()
 	{
 		top = std::make_shared<Env>(nullptr);
-		top->genBuildInFunction();
+		top->genBuildInFunctions();
 		block = std::make_shared<BlockExpr>();
 	}
 
