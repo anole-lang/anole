@@ -103,7 +103,6 @@ namespace Ice
 		IceNoneObject();
 		virtual ~IceNoneObject() {}
 
-		virtual void show() { std::cout << "None"; }
 		virtual std::shared_ptr<IceObject> unaryOperate(Token::TOKEN op) { return std::make_shared<IceNoneObject>(); };
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN) { return std::make_shared<IceNoneObject>(); }
 		virtual bool isTrue() { return false; }

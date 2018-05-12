@@ -20,11 +20,6 @@ namespace Ice
 		bool breakStatus;
 		bool continueStatus;
 
-		void genInputFunction();
-		void genPrintFunction();
-		void genStrFunction();
-		void genExitFunction();
-
 	public:
 		std::shared_ptr<Env> prev;
 		Env(std::shared_ptr<Env> prev) : prev(prev) { returnValue = nullptr; breakStatus = false; continueStatus = false; }

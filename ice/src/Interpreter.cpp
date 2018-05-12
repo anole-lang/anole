@@ -22,7 +22,7 @@ namespace Ice
 			std::cout << ">> ";
 			auto node = syntaxAnalyzer.getNode();
 			auto obj = (node == nullptr) ? nullptr : node->runCode(top);
-			if (obj != nullptr)
+			if (obj != nullptr && obj->type != IceObject::TYPE::NONE)
 			{
 				obj->show();
 				std::cout << std::endl;

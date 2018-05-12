@@ -486,17 +486,7 @@ namespace Ice
 
 	void Env::genBuildInFunctions()
 	{
-		genInputFunction();
-		genPrintFunction();
-		genStrFunction();
-		genExitFunction();
-	}
-
-	void Env::genInputFunction()
-	{
-		std::function<std::shared_ptr<IceObject>(Objects)> func;
-
-		func = [](Objects objects){
+		put("input", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
 			if (objects.size())
 			{
 				std::cout << "input() need no arguments" << std::endl;
@@ -504,50 +494,29 @@ namespace Ice
 			}
 			std::string input;
 			std::getline(std::cin, input);
-			return std::make_shared<IceStringObject>(input);
-		};
-		
-		put("input", std::make_shared<IceBuiltInFunctionObject>(func));
-	}
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceStringObject>(input));
+		}));
 
-	void Env::genPrintFunction()
-	{
-		std::function<std::shared_ptr<IceObject>(Objects)> func;
-
-		func = [](Objects objects) {
+		put("print", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
 			if (objects.size() != 1)
 			{
 				std::cout << "print() need 1 argument but get others" << std::endl;
 				exit(0);
 			}
 			std::cout << objects[0]->toStr() << std::endl;
-			return std::make_shared<IceNoneObject>();
-		};
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
 
-		put("print", std::make_shared<IceBuiltInFunctionObject>(func));
-	}
-
-	void Env::genStrFunction()
-	{
-		std::function<std::shared_ptr<IceObject>(Objects)> func;
-
-		func = [](Objects objects) {
+		put("str", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
 			if (objects.size() != 1)
 			{
 				std::cout << "str() need 1 argument but get others" << std::endl;
 				exit(0);
 			}
-			return std::make_shared<IceStringObject>(objects[0]->toStr());
-		};
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceStringObject>(objects[0]->toStr()));
+		}));
 
-		put("str", std::make_shared<IceBuiltInFunctionObject>(func));
-	}
-
-	void Env::genExitFunction()
-	{
-		std::function<std::shared_ptr<IceObject>(Objects)> func;
-
-		func = [](Objects objects) {
+		put("exit", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
 			if (objects.size())
 			{
 				if (objects.size() == 1)
@@ -564,9 +533,7 @@ namespace Ice
 				}
 			}
 			exit(0);
-			return std::make_shared<IceNoneObject>();
-		};
-
-		put("exit", std::make_shared<IceBuiltInFunctionObject>(func));
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
 	}
 }
