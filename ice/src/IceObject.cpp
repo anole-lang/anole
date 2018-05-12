@@ -96,12 +96,12 @@ namespace Ice
 
 	IceListObject::IceListObject()
 	{
-		type = TYPE::INSTANCE;
+		type = TYPE::LIST;
 	}
 
 	IceListObject::IceListObject(Objects objects) : objects(objects)
 	{
-		type = TYPE::INSTANCE;
+		type = TYPE::LIST;
 	}
 
 	std::shared_ptr<IceObject> IceIntegerObject::unaryOperate(Token::TOKEN op)

@@ -1,13 +1,31 @@
 Please add feature request here.
 
+<hr>
+
 ### Features
 + [X] Anonymous Function
++ [X] Match Expression
 
 <hr>
 
 ### TODO
 + [ ] Fix Bugs 
 + [ ] Refactoring
+
+<hr>
+
+### DONE
++ [X] Fixed bug with scope when using '.' operator
++ [X] List type
++ [X] Match expression
++ [X] Enum expression
++ [X] Simple class definition
++ [X] Anonymous function
++ [X] Common control flow
++ [X] Function definition
++ [X] Operators that act on objects
++ [X] Parsing integer, float, and string
++ [X] Filter out comments
 
 <hr>
 

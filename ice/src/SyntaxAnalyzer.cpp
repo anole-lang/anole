@@ -103,7 +103,6 @@ namespace Ice
 				std::shared_ptr<Node> node = genNode[Symbol::ident]();
 				if (iToken->token_id == Token::TOKEN::TASSIGN)
 				{
-					type = "vardecl";
 					iToken++;
 					node = std::make_shared<VariableDeclarationStmt>(std::dynamic_pointer_cast<IdentifierExpr>(node), std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 				}
