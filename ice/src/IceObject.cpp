@@ -505,9 +505,7 @@ namespace Ice
 
 	void IceListObject::genBuiltInMethods()
 	{
-		std::function<std::shared_ptr<IceObject>(Objects)> func;
-
-		func = [&](Objects objects) {
+		top->put("size", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
 			if (objects.size())
 			{
 				std::cout << "method size() need no arguments" << std::endl;
@@ -515,12 +513,10 @@ namespace Ice
 			}
 
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
-			return std::make_shared<IceIntegerObject>(obj->objects.size());
-		};
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(obj->objects.size()));
+		}));
 
-		top->put("size", std::make_shared<IceBuiltInFunctionObject>(func));
-
-		func = [&](Objects objects) {
+		top->put("empty", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
 			if (objects.size())
 			{
 				std::cout << "method empty() need no arguments" << std::endl;
@@ -528,12 +524,10 @@ namespace Ice
 			}
 
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
-			return std::make_shared<IceBooleanObject>(obj->objects.empty());
-		};
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceBooleanObject>(obj->objects.empty()));
+		}));
 
-		top->put("empty", std::make_shared<IceBuiltInFunctionObject>(func));
-
-		func = [&](Objects objects) {
+		top->put("push_back", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
 			if (objects.size() != 1)
 			{
 				std::cout << "method push_back() need 1 argument but get others" << std::endl;
@@ -542,12 +536,10 @@ namespace Ice
 
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
 			obj->objects.push_back(objects[0]);
-			return std::make_shared<IceNoneObject>();
-		};
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
 
-		top->put("push_back", std::make_shared<IceBuiltInFunctionObject>(func));
-
-		func = [&](Objects objects) {
+		top->put("pop_back", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
 			if (objects.size())
 			{
 				std::cout << "method pop_back() need no arguments" << std::endl;
@@ -556,12 +548,10 @@ namespace Ice
 
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
 			obj->objects.pop_back();
-			return std::make_shared<IceNoneObject>();
-		};
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
 
-		top->put("pop_back", std::make_shared<IceBuiltInFunctionObject>(func));
-
-		func = [&](Objects objects) {
+		top->put("front", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
 			if (objects.size())
 			{
 				std::cout << "method front() need no arguments" << std::endl;
@@ -570,11 +560,9 @@ namespace Ice
 
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
 			return obj->objects.front();
-		};
+		}));
 
-		top->put("front", std::make_shared<IceBuiltInFunctionObject>(func));
-
-		func = [&](Objects objects) {
+		top->put("back", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
 			if (objects.size())
 			{
 				std::cout << "method back() need no arguments" << std::endl;
@@ -583,11 +571,9 @@ namespace Ice
 
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
 			return obj->objects.back();
-		};
+		}));
 
-		top->put("back", std::make_shared<IceBuiltInFunctionObject>(func));
-
-		func = [&](Objects objects) {
+		top->put("clear", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
 			if (objects.size())
 			{
 				std::cout << "method clear() need no arguments" << std::endl;
@@ -596,10 +582,8 @@ namespace Ice
 
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
 			obj->objects.clear();
-			return std::make_shared<IceNoneObject>();
-		};
-
-		top->put("clear", std::make_shared<IceBuiltInFunctionObject>(func));
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
 	}
 }
 
