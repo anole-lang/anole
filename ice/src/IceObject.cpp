@@ -421,6 +421,25 @@ namespace Ice
 		return nullptr;
 	}
 
+	std::shared_ptr<IceObject> IceStringObject::getByIndex(std::shared_ptr<IceObject> _index)
+	{
+		if (_index->type != TYPE::INT)
+		{
+			std::cout << "index type should be integer" << std::endl;
+			exit(0);
+		}
+		std::shared_ptr<IceIntegerObject> index = std::dynamic_pointer_cast<IceIntegerObject>(_index);
+
+		if (index->value >= (int)value.size())
+		{
+			std::cout << "index out of range" << std::endl;
+			exit(0);
+		}
+		std::string str;
+		str += value[index->value];
+		return std::make_shared<IceStringObject>(str);
+	}
+
 	void IceListObject::show()
 	{
 		std::cout << "[";

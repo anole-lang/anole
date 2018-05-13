@@ -120,7 +120,7 @@ namespace Ice
 		{
 			Objects objects;
 			for (auto &argument : arguments)
-				objects.push_back(argument->runCode(top));
+				objects.push_back(argument->runCode((normal_top == nullptr) ? (top) : (normal_top)));
 			return std::dynamic_pointer_cast<IceBuiltInFunctionObject>(_obj)->func(objects);
 		}
 		else if (_obj->type != IceObject::TYPE::FUNCTION)
@@ -141,7 +141,7 @@ namespace Ice
 			func->argDecls[i]->assignment = arguments[i];
 
 		for (auto &argDecl : func->argDecls)
-			_top->put(argDecl->id->name, argDecl->assignment->runCode(_top));
+			_top->put(argDecl->id->name, argDecl->assignment->runCode((normal_top == nullptr) ? (_top) : (normal_top)));
 
 		std::shared_ptr<IceObject> returnValue = func->block->runCode(_top);
 		return returnValue;
@@ -456,14 +456,22 @@ namespace Ice
 	std::shared_ptr<IceObject> IndexExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
 	{
 		std::shared_ptr<IceObject> _obj = expression->runCode(top);
-		if (_obj->type != IceObject::TYPE::LIST)
+		if (_obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING)
 		{
 			std::cout << "it doesn't support for []" << std::endl;
 			exit(0);
 		}
 
-		std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
-		return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+		if (_obj->type == IceObject::TYPE::LIST) 
+		{
+			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
+			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+		}
+		else
+		{
+			std::shared_ptr<IceStringObject> obj = std::dynamic_pointer_cast<IceStringObject>(_obj);
+			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+		}
 	}
 
 	std::shared_ptr<IceObject> IndexStmt::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
@@ -534,6 +542,28 @@ namespace Ice
 			}
 			exit(0);
 			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
+
+
+		put("len", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+			if (objects.size() != 1)
+			{
+				std::cout << "len() need 1 argument but get others" << std::endl;
+				exit(0);
+			}
+			else if (objects[0]->type != IceObject::TYPE::STRING && objects[0]->type != IceObject::TYPE::LIST)
+			{
+				std::cout << "len() need string object or list object but get other types" << std::endl;
+				exit(0);
+			}
+			if (objects[0]->type == IceObject::TYPE::STRING)
+			{
+				return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.length()));
+			}
+			else
+			{
+				return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(std::dynamic_pointer_cast<IceListObject>(objects[0])->objects.size()));
+			}
 		}));
 	}
 }

@@ -93,6 +93,7 @@ namespace Ice
 		IceInstanceObject(std::shared_ptr<Env> &);
 		virtual ~IceInstanceObject() {}
 
+		virtual void show() { std::cout << "an instance"; }
 		virtual bool isTrue() { return true; }
 		virtual std::string toStr() { return "Instance"; }
 	};
@@ -170,6 +171,8 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
 		virtual bool isTrue() { return value != ""; }
 		virtual std::string toStr() { return value; }
+
+		std::shared_ptr<IceObject> getByIndex(std::shared_ptr<IceObject>);
 	};
 
 	class IceListObject : public IceInstanceObject
