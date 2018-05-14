@@ -440,6 +440,20 @@ namespace Ice
 		return std::make_shared<IceStringObject>(str);
 	}
 
+	void IceStringObject::genBuiltInMethods()
+	{
+		top->put("isalpha", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
+			if (objects.size())
+			{
+				std::cout << "method isalpha() need no arguments" << std::endl;
+				exit(0);
+			}
+
+			std::shared_ptr<IceStringObject> obj = std::dynamic_pointer_cast<IceStringObject>(top->getObject("self"));
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceBooleanObject>(obj->value.size() == 1 ? (isalpha(obj->value[0])) : false));
+		}));
+	}
+
 	void IceListObject::show()
 	{
 		std::cout << "[";

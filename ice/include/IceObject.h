@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <cctype>
 #include <functional>
 #include <cstring>
 #include "Token.h"
@@ -155,10 +156,11 @@ namespace Ice
 		virtual std::string toStr() { return std::to_string(value); }
 	};
 
-	class IceStringObject : public IceObject
+	class IceStringObject : public IceInstanceObject
 	{
 	private:
 		std::string raw_value;
+		void genBuiltInMethods();
 
 	public:
 		std::string value;

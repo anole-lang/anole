@@ -376,7 +376,7 @@ namespace Ice
 		if (normal_top == nullptr)
 		{
 			std::shared_ptr<IceObject> _obj = left->runCode(top, top);
-			if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST)
+			if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING)
 			{
 				std::cout << "it doesn't support for '.'" << std::endl;
 				exit(0);
