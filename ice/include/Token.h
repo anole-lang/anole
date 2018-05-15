@@ -67,7 +67,7 @@ namespace Ice
 
 			TAND, // and
 			TOR,  // or
-			TNOT, // not
+			TNOT, // not !
 
 			TCEQ, // =
 			TCNE, // !=

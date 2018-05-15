@@ -198,6 +198,17 @@ namespace Ice
 		std::shared_ptr<IceObject> getByIndex(std::shared_ptr<IceObject>);
 		void setByIndex(std::shared_ptr<IceObject>, std::shared_ptr<IceObject>);
 	};
+
+	class IceDictObject : public IceInstanceObject
+	{
+	private:
+		void genBuiltInMethods();
+
+	public:
+		/*
+			TODO: add members
+		*/
+	};
 }
 
 #endif // __ICE_OBJECT_H__

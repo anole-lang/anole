@@ -153,6 +153,7 @@ namespace Ice
 					state = State::Begin;
 					break;
 				default:
+					tokens.push_back(Token(Token::TOKEN::TNOT));
 					state = State::Begin;
 					reading--;
 					break;
@@ -217,11 +218,6 @@ namespace Ice
 					state = State::InDouble;
 					break;
 				default:
-					if (('a' <= *reading && *reading <= 'z') || ('A' <= *reading && *reading <= 'Z') || *reading == '_')
-					{
-						std::cout << "syntax error!" << std::endl;
-						exit(0);
-					}
 					tokens.push_back(Token(Token::TOKEN::TINTEGER, value));
 					state = State::Begin;
 					value = "";
@@ -246,11 +242,6 @@ namespace Ice
 					value += *reading;
 					break;
 				default:
-					if (('a' <= *reading && *reading <= 'z') || ('A' <= *reading && *reading <= 'Z') || *reading == '_')
-					{
-						std::cout << "syntax error!" << std::endl;
-						exit(0);
-					}
 					tokens.push_back(Token(Token::TOKEN::TDOUBLE, value));
 					state = State::Begin;
 					value = "";

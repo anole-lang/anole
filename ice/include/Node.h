@@ -183,7 +183,7 @@ namespace Ice
 	{
 	public:
 		ExpressionList expressions;
-		ListExpr(ExpressionList expressions) :expressions(expressions) {}
+		ListExpr(ExpressionList expressions) : expressions(expressions) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top = nullptr);
 	};
 
@@ -193,6 +193,15 @@ namespace Ice
 		std::shared_ptr<Expr> expression;
 		std::shared_ptr<Expr> index;
 		IndexExpr(std::shared_ptr<Expr> expression, std::shared_ptr<Expr> index) : expression(expression), index(index) {}
+		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top = nullptr);
+	};
+
+	class DictExpr : public Expr
+	{
+	public:
+		ExpressionList keys;
+		ExpressionList values;
+		DictExpr(ExpressionList keys, ExpressionList values) : keys(keys), values(values) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top = nullptr);
 	};
 
@@ -282,7 +291,7 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top = nullptr);
 	};
 
-	class WhileStmt : public Stmt 
+	class WhileStmt : public Stmt
 	{
 	public:
 		std::shared_ptr<Expr> cond;
