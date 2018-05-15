@@ -51,6 +51,8 @@ namespace Ice
 
 	IceStringObject::IceStringObject(std::string value) : value(value)
 	{
+		genBuiltInMethods();
+
 		type = TYPE::STRING;
 
 		raw_value = "";

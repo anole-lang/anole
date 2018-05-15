@@ -120,8 +120,31 @@ string
 	;
 
 expr
-	: cmp cmp_rest
+	: logic_or logic_or_rest
 	| TLBRACE enum_expr
+	;
+
+logic_or
+	: logic_and logic_and_rest
+	;
+
+logic_or_rest
+	: 
+	| TOR logic_or logic_or_rest
+	;
+
+logic_and
+	: logic_not
+	;
+
+logic_and_rest
+	: 
+	| TAND logic_or
+	;
+
+logic_not
+	: cmp cmp_rest
+	| TNOT cmp cmp_rest
 	;
 
 cmp
@@ -246,7 +269,7 @@ match_expr
 	;
 
 matches
-	: expr TRET expr matches_rest
+	: expr call_args_tail TRET expr matches_rest
 	;
 
 matches_rest

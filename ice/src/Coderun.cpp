@@ -105,7 +105,9 @@ namespace Ice
 
 	std::shared_ptr<IceObject> StringExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
 	{
-		return std::make_shared<IceStringObject>(value);
+		std::shared_ptr<IceStringObject> obj = std::make_shared<IceStringObject>(value);
+		obj->top->put("self", obj);
+		return obj;
 	}
 
 	std::shared_ptr<IceObject> IdentifierExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
@@ -125,7 +127,7 @@ namespace Ice
 		}
 		else if (_obj->type != IceObject::TYPE::FUNCTION)
 		{
-			std::cout << "method need function type" << std::endl;
+			std::cout << "call need function type" << std::endl;
 			exit(0);
 		}
 
@@ -388,7 +390,7 @@ namespace Ice
 		}
 
 		std::shared_ptr<IceObject> _obj = left->runCode(top, normal_top);
-		if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST)
+		if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING)
 		{
 			std::cout << "it doesn't support for '.'" << std::endl;
 			exit(0);
