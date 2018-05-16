@@ -359,6 +359,14 @@ namespace Ice
 				break;
 			}
 			break;
+		case TYPE::BOOLEAN:
+			switch (op)
+			{
+			case Token::TOKEN::TCEQ:
+				return std::make_shared<IceBooleanObject>(value == std::dynamic_pointer_cast<IceBooleanObject>(obj)->value);
+			default:
+				break;
+			}
 		default:
 			break;
 		}

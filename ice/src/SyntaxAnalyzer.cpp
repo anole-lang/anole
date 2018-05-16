@@ -753,14 +753,27 @@ namespace Ice
 			iToken++;
 			while (iToken->token_id != Token::TOKEN::TRBRACE)
 			{
+				int counter = 1;
 				mat_expressions.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+
+				while (iToken->token_id == Token::TOKEN::TCOMMA)
+				{
+					iToken++;
+					mat_expressions.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+					counter++;
+				}
+
 				if (iToken->token_id != Token::TOKEN::TRET)
 				{
 					std::cout << "missing symbol '=>'" << std::endl;
 					exit(0);
 				}
 				iToken++;
-				ret_expressions.push_back(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
+
+				std::shared_ptr<Expr> ret_expression = std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]());
+				while (counter--)	
+					ret_expressions.push_back(ret_expression);
+
 				if (iToken->token_id == Token::TOKEN::TCOMMA)
 				{
 					iToken++;
