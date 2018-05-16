@@ -366,8 +366,7 @@ namespace Ice
 		std::shared_ptr<IceInstanceObject> ins_obj = std::make_shared<IceInstanceObject>(top);
 
 		class_obj->block->runCode(ins_obj->top);
-		std::string self("self");
-		ins_obj->top->put(self, ins_obj);
+		ins_obj->top->put("self", ins_obj);
 		std::shared_ptr<MethodCallExpr> call = std::make_shared<MethodCallExpr>(std::make_shared<IdentifierExpr>(id->name), arguments);
 		call->runCode(ins_obj->top);
 		return ins_obj;
@@ -427,6 +426,8 @@ namespace Ice
 		long i = 0;
 		for (auto &enumerator : enumerators)
 			obj->top->put(enumerator->name, std::make_shared<IceIntegerObject>(i++));
+
+		obj->top->put("self", obj);
 
 		return obj;
 	}

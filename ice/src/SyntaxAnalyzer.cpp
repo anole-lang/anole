@@ -19,7 +19,7 @@ namespace Ice
 			{
 			case Token::TOKEN::TAT:
 				if ((iToken + 1)->token_id == Token::TOKEN::TLPAREN)
-					node = genNode[Symbol::expr]();
+					node = std::make_shared<ExprStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 				else
 					node = genNode[Symbol::decl_or_assign]();
 				break;
@@ -300,7 +300,7 @@ namespace Ice
 			};
 
 			std::shared_ptr<Node> node = nullptr;
-			if (iToken->token_id == Token::TOKEN::TLBRACKET)
+			if (iToken->token_id == Token::TOKEN::TLBRACE)
 			{
 				node = genNode[Symbol::enum_expr]();
 				return node;

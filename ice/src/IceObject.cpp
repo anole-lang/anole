@@ -453,7 +453,9 @@ namespace Ice
 		}
 		std::string str;
 		str += value[index->value];
-		return std::make_shared<IceStringObject>(str);
+		std::shared_ptr<IceStringObject> obj = std::make_shared<IceStringObject>(str);
+		obj->top->put("self", obj);
+		return obj;
 	}
 
 	void IceStringObject::genBuiltInMethods()
