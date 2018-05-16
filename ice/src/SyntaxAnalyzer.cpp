@@ -64,6 +64,7 @@ namespace Ice
 			case Token::TOKEN::TNEW:
 			case Token::TOKEN::TMATCH:
 			case Token::TOKEN::TLBRACKET:
+			case Token::TOKEN::TNOT:
 				node = std::make_shared<ExprStmt>(std::dynamic_pointer_cast<Expr>(genNode[Symbol::expr]()));
 				break;
 			default:
@@ -251,70 +252,95 @@ namespace Ice
 		};
 
 		genNode[Symbol::ident] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TIDENTIFIER:
-				node = std::make_shared<IdentifierExpr>(iToken->value);
-				iToken++;
-				break;
-			default:
-				break;
-			}
+			std::shared_ptr<Node> node = std::make_shared<IdentifierExpr>(iToken->value);
+			iToken++;
 			return node;
 		};
 
 		genNode[Symbol::numeric] = [&]() {
 			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TINTEGER:
+			if (iToken->token_id == Token::TOKEN::TINTEGER)
 				node = std::make_shared<IntegerExpr>(std::stoi(iToken->value));
-				iToken++;
-				break;
-			case Token::TOKEN::TDOUBLE:
+			else
 				node = std::make_shared<DoubleExpr>(std::stod(iToken->value));
-				iToken++;
-				break;
-			default:
-				break;
-			}
+			iToken++;
 			return node;
 		};
 
 		genNode[Symbol::boolean] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TTRUE:
-				node = std::make_shared<BooleanExpr>(true);
-				iToken++;
-				break;
-			case Token::TOKEN::TFALSE:
-				node = std::make_shared<BooleanExpr>(false);
-				iToken++;
-				break;
-			default:
-				break;
-			}
+			std::shared_ptr<Node> node = std::make_shared<BooleanExpr>(((iToken->token_id == Token::TOKEN::TTRUE) ? true : false));
+			iToken++;
 			return node;
 		};
 
 		genNode[Symbol::string] = [&]() {
-			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
-			{
-			case Token::TOKEN::TSTRING:
-				node = std::make_shared<StringExpr>(iToken->value);
-				iToken++;
-				break;
-			default:
-				break;
-			}
+			std::shared_ptr<Node> node = std::make_shared<StringExpr>(iToken->value);
+			iToken++;
 			return node;
 		};
 
 		genNode[Symbol::expr] = [&]() {
+			std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genLogicOrRest;
+			genLogicOrRest = [&](std::shared_ptr<Expr> lhs) {
+				std::shared_ptr<Node> node = lhs;
+				Token::TOKEN op;
+				switch (iToken->token_id)
+				{
+				case Token::TOKEN::TOR:
+					op = iToken->token_id;
+					iToken++;
+					break;
+				default:
+					return node;
+				}
+				std::shared_ptr<Expr> rhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::logic_or]());
+				std::shared_ptr<Expr> _lhs = std::make_shared<BinaryOperatorExpr>(lhs, op, rhs);
+				node = genLogicOrRest(_lhs);
+				return node;
+			};
+
+			std::shared_ptr<Node> node = nullptr;
+			if (iToken->token_id == Token::TOKEN::TLBRACKET)
+			{
+				node = genNode[Symbol::enum_expr]();
+				return node;
+			}
+
+			node = genNode[Symbol::logic_or]();
+			node = genLogicOrRest(std::dynamic_pointer_cast<Expr>(node));
+			return node;
+		};
+
+		genNode[Symbol::logic_or] = [&](){
+			std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genLogicAndRest;
+			genLogicAndRest = [&](std::shared_ptr<Expr> lhs) {
+				std::shared_ptr<Node> node = lhs;
+				Token::TOKEN op;
+				switch (iToken->token_id)
+				{
+				case Token::TOKEN::TAND:
+					op = iToken->token_id;
+					iToken++;
+					break;
+				default:
+					return node;
+				}
+				std::shared_ptr<Expr> rhs = std::dynamic_pointer_cast<Expr>(genNode[Symbol::logic_and]());
+				std::shared_ptr<Expr> _lhs = std::make_shared<BinaryOperatorExpr>(lhs, op, rhs);
+				node = genLogicAndRest(_lhs);
+				return node;
+			};
+
+			std::shared_ptr<Node> node = genNode[Symbol::logic_and]();
+			node = genLogicAndRest(std::dynamic_pointer_cast<Expr>(node));
+			return node;
+		};
+
+		genNode[Symbol::logic_and] = [&](){
+			return genNode[Symbol::logic_not]();
+		};
+
+		genNode[Symbol::logic_not] = [&]() {
 			std::function<std::shared_ptr<Node>(std::shared_ptr<Expr>)> genCmpRest;
 			genCmpRest = [&](std::shared_ptr<Expr> lhs) {
 				std::shared_ptr<Node> node = lhs;
@@ -340,13 +366,14 @@ namespace Ice
 			};
 
 			std::shared_ptr<Node> node = nullptr;
-			switch (iToken->token_id)
+			if (iToken->token_id == Token::TOKEN::TNOT)
 			{
-			case Token::TOKEN::TLBRACE:
-				return genNode[Symbol::enum_expr]();
-			default:
-				break;
-			};
+				iToken++;
+				node = genNode[Symbol::cmp]();
+				node = genCmpRest(std::dynamic_pointer_cast<Expr>(node));
+				node = std::make_shared<UnaryOperatorExpr>(Token::TOKEN::TNOT, std::dynamic_pointer_cast<Expr>(node));
+				return node;
+			}
 			node = genNode[Symbol::cmp]();
 			node = genCmpRest(std::dynamic_pointer_cast<Expr>(node));
 			return node;

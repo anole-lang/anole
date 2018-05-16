@@ -287,8 +287,10 @@ namespace Ice
 	{
 		switch (op)
 		{
-		case Ice::Token::TOKEN::TSUB:
+		case Token::TOKEN::TSUB:
 			return std::make_shared<IceIntegerObject>(-value);
+		case Token::TOKEN::TNOT:
+			return std::make_shared<IceBooleanObject>(!value);
 		default:
 			break;
 		}
@@ -364,6 +366,10 @@ namespace Ice
 			{
 			case Token::TOKEN::TCEQ:
 				return std::make_shared<IceBooleanObject>(value == std::dynamic_pointer_cast<IceBooleanObject>(obj)->value);
+			case Token::TOKEN::TAND:
+				return std::make_shared<IceBooleanObject>(value && std::dynamic_pointer_cast<IceBooleanObject>(obj)->value);
+			case Token::TOKEN::TOR:
+				return std::make_shared<IceBooleanObject>(value || std::dynamic_pointer_cast<IceBooleanObject>(obj)->value);
 			default:
 				break;
 			}
