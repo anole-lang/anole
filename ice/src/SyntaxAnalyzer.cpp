@@ -668,6 +668,7 @@ namespace Ice
 		genNode[Symbol::class_decl] = [&]() {
 			std::function<IdentifierList()> genBases;
 			genBases = [&]() {
+				iToken++;
 				IdentifierList bases;
 				while (iToken->token_id == Token::TOKEN::TIDENTIFIER)
 				{
@@ -675,6 +676,12 @@ namespace Ice
 					if (iToken->token_id == Token::TOKEN::TCOMMA) iToken++;
 					else break;
 				}
+				if (iToken->token_id != Token::TOKEN::TRPAREN)
+				{
+					std::cout << "missing symbol ')'" << std::endl;
+					exit(0);
+				}
+				iToken++;
 				return bases;
 			};
 
@@ -686,14 +693,7 @@ namespace Ice
 				std::cout << "missing symbol '('" << std::endl;
 				exit(0);
 			}
-			iToken++;
 			IdentifierList bases = genBases();
-			if (iToken->token_id != Token::TOKEN::TRPAREN)
-			{
-				std::cout << "missing symbol ')'" << std::endl;
-				exit(0);
-			}
-			iToken++;
 			std::shared_ptr<BlockExpr> block = std::dynamic_pointer_cast<BlockExpr>(genNode[Symbol::block]());
 			node = std::make_shared<ClassDeclarationStmt>(id, bases, block);
 			return node;

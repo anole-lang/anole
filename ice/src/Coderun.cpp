@@ -365,10 +365,24 @@ namespace Ice
 		std::shared_ptr<IceClassObject> class_obj = std::dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
 		std::shared_ptr<IceInstanceObject> ins_obj = std::make_shared<IceInstanceObject>(top);
 
+		for (auto &base : class_obj->bases)
+		{
+			std::dynamic_pointer_cast<IceClassObject>(top->getObject(base->name))->block->runCode(ins_obj->top);
+			if (ins_obj->top->getObject(base->name)->type == IceObject::TYPE::FUNCTION)
+			{
+				std::shared_ptr<MethodCallExpr> call = std::make_shared<MethodCallExpr>(std::make_shared<IdentifierExpr>(base->name), arguments);
+				call->runCode(ins_obj->top);
+			}
+		}
+
 		class_obj->block->runCode(ins_obj->top);
 		ins_obj->top->put("self", ins_obj);
-		std::shared_ptr<MethodCallExpr> call = std::make_shared<MethodCallExpr>(std::make_shared<IdentifierExpr>(id->name), arguments);
-		call->runCode(ins_obj->top);
+
+		if (ins_obj->top->getObject(id->name)->type == IceObject::TYPE::FUNCTION)
+		{
+			std::shared_ptr<MethodCallExpr> call = std::make_shared<MethodCallExpr>(std::make_shared<IdentifierExpr>(id->name), arguments);
+			call->runCode(ins_obj->top);
+		}
 		return ins_obj;
 	}
 
