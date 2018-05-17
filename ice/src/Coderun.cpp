@@ -26,8 +26,23 @@ namespace Ice
 		node->runCode(top);
 	}
 
+	void Env::garbageCollect(std::string name)
+	{
+		if (IceObject::isInstance(objects[name]->type))
+		{
+			if (objects[name].use_count() == 2)
+			{
+				std::dynamic_pointer_cast<IceInstanceObject>(objects[name])->top->objects["self"] = nullptr;
+			}
+		}
+	}
+
 	void Env::put(std::string name, std::shared_ptr<IceObject> obj)
 	{
+		if (objects.find(name) != objects.end())
+		{
+			garbageCollect(name);
+		}
 		objects[name] = obj;
 	}
 
@@ -38,14 +53,15 @@ namespace Ice
 		{
 			if (tmp->objects.find(name) != tmp->objects.end())
 			{
+				tmp->garbageCollect(name);
 				tmp->objects[name] = obj;
 				return;
 			}
 			else
 				tmp = tmp->prev;
 		}
-		std::cout << "cannot find " << name << std::endl;
-		exit(0);
+		objects[name] = obj;
+		return;
 	}
 
 	std::shared_ptr<IceObject> Env::getObject(std::string name)
@@ -63,24 +79,37 @@ namespace Ice
 		return nullptr;
 	}
 
+	void Env::garbageCollection()
+	{
+		for (auto iter = objects.begin(); iter != objects.end(); iter++)
+		{
+			if (IceObject::isInstance(iter->second->type))
+			{
+				if (iter->second.use_count() == 2)
+					std::dynamic_pointer_cast<IceInstanceObject>(iter->second)->top->objects["self"] = nullptr;
+			}
+		}
+	}
+
 	std::shared_ptr<IceObject> BlockExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
 	{
 		std::shared_ptr<IceObject> returnValue = top->getReturnValue();
 		for (auto stmt : statements)
 		{
 			stmt->runCode(top);
-			if (top->getBreakStatus() || top->getContinueStatus())
+			if (top->getBreakStatus() || top->getContinueStatus() || returnValue != nullptr)
 			{
-				return returnValue;
+				break;
 			}
 			if (returnValue != top->getReturnValue())
 			{
 				returnValue = top->getReturnValue();
 				top->setReturnValue(nullptr);
-				return returnValue;
+				break;
 			}
 		}
-		return nullptr;
+		top->garbageCollection();
+		return returnValue;
 	}
 
 	std::shared_ptr<IceObject> NoneExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
@@ -224,8 +253,32 @@ namespace Ice
 	{
 		std::shared_ptr<IceObject> cond = this->cond->runCode(top);
 		std::shared_ptr<IceObject> returnValue = nullptr;
-		if (cond->isTrue()) returnValue = blockTrue->runCode(top);
-		else returnValue = blockFalse->runCode(top);
+		if (cond->isTrue())
+		{
+			std::shared_ptr<Env> _top = std::make_shared<Env>(top);
+			returnValue = blockTrue->runCode(_top);
+			if (_top->getBreakStatus())
+			{
+				top->setBreakStatus(true);
+			}
+			if (_top->getContinueStatus())
+			{
+				top->setContinueStatus(true);
+			}
+		}
+		else
+		{
+			std::shared_ptr<Env> _top = std::make_shared<Env>(top);
+			returnValue = blockFalse->runCode(_top);
+			if (_top->getBreakStatus())
+			{
+				top->setBreakStatus(true);
+			}
+			if (_top->getContinueStatus())
+			{
+				top->setContinueStatus(true);
+			}
+		}
 		if (returnValue != nullptr) top->setReturnValue(returnValue);
 		return returnValue;
 	}
@@ -234,17 +287,18 @@ namespace Ice
 	{
 		std::shared_ptr<IceObject> cond = this->cond->runCode(top);
 		std::shared_ptr<IceObject> returnValue = nullptr;
+		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
+
 		while (cond->isTrue())
 		{
-			returnValue = block->runCode(top);
-			if (top->getBreakStatus())
+			returnValue = block->runCode(_top);
+			if (_top->getBreakStatus())
 			{
-				top->setBreakStatus(false);
 				return returnValue;
 			}
-			if (top->getContinueStatus())
+			if (_top->getContinueStatus())
 			{
-				top->setContinueStatus(false);
+				_top->setContinueStatus(false);
 				cond = this->cond->runCode(top);
 				continue;
 			}
@@ -262,14 +316,17 @@ namespace Ice
 	{
 		std::shared_ptr<IceObject> cond = this->cond->runCode(top);
 		std::shared_ptr<IceObject> returnValue = nullptr;
+		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
 
-		returnValue = block->runCode(top);
-		if (top->getBreakStatus())
+		returnValue = block->runCode(_top);
+		if (_top->getBreakStatus())
 		{
-			top->setBreakStatus(false);
 			return returnValue;
 		}
-		if (top->getContinueStatus()) top->setContinueStatus(false);
+		if (_top->getContinueStatus()) 
+		{
+			_top->setContinueStatus(false);
+		}
 		if (returnValue != nullptr)
 		{
 			top->setReturnValue(returnValue);
@@ -278,15 +335,14 @@ namespace Ice
 
 		while (cond->isTrue())
 		{
-			returnValue = block->runCode(top);
-			if (top->getBreakStatus())
+			returnValue = block->runCode(_top);
+			if (_top->getBreakStatus())
 			{
-				top->setBreakStatus(false);
 				return returnValue;
 			}
-			if (top->getContinueStatus())
+			if (_top->getContinueStatus())
 			{
-				top->setContinueStatus(false);
+				_top->setContinueStatus(false);
 				cond = this->cond->runCode(top);
 				continue;
 			}
@@ -305,17 +361,19 @@ namespace Ice
 		std::shared_ptr<IceObject> begin = this->begin->runCode(top);
 		std::shared_ptr<IceObject> end = this->end->runCode(top);
 		std::shared_ptr<IceObject> returnValue = nullptr;
+
+		std::shared_ptr<Env> _top = std::make_shared<Env>(top);
+
 		while (begin->binaryOperate(end, Token::TOKEN::TCLT)->isTrue())
 		{
-			returnValue = block->runCode(top);
-			if (top->getBreakStatus())
+			returnValue = block->runCode(_top);
+			if (_top->getBreakStatus())
 			{
-				top->setBreakStatus(false);
 				return returnValue;
 			}
-			if (top->getContinueStatus())
+			if (_top->getContinueStatus())
 			{
-				top->setContinueStatus(false);
+				_top->setContinueStatus(false);
 				begin = begin->binaryOperate(std::make_shared<IceIntegerObject>(1), Token::TOKEN::TADD);
 				continue;
 			}
@@ -391,7 +449,7 @@ namespace Ice
 		if (normal_top == nullptr)
 		{
 			std::shared_ptr<IceObject> _obj = left->runCode(top, top);
-			if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING)
+			if (!IceObject::isInstance(_obj->type))
 			{
 				std::cout << "it doesn't support for '.'" << std::endl;
 				exit(0);
@@ -403,7 +461,7 @@ namespace Ice
 		}
 
 		std::shared_ptr<IceObject> _obj = left->runCode(top, normal_top);
-		if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING)
+		if (!IceObject::isInstance(_obj->type)) 
 		{
 			std::cout << "it doesn't support for '.'" << std::endl;
 			exit(0);
@@ -420,7 +478,7 @@ namespace Ice
 		for (auto &expression : expressions)
 		{
 			std::shared_ptr<IceObject> _obj = expression->runCode(_top);
-			if (_obj->type != IceObject::TYPE::INSTANCE && _obj->type != IceObject::TYPE::LIST)
+			if (!IceObject::isInstance(_obj->type))
 			{
 				std::cout << "it doesn't '.' operator" << std::endl;
 				exit(0);

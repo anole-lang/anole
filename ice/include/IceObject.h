@@ -46,6 +46,8 @@ namespace Ice
 		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN) { return nullptr; }
 		virtual bool isTrue() = 0;
 		virtual std::string toStr() = 0;
+
+		static bool isInstance(TYPE type);
 	};
 
 	class IceFunctionObject : public IceObject

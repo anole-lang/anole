@@ -20,6 +20,8 @@ namespace Ice
 		bool breakStatus;
 		bool continueStatus;
 
+		void garbageCollect(std::string name);
+
 	public:
 		std::shared_ptr<Env> prev;
 		Env(std::shared_ptr<Env> prev) : prev(prev) { returnValue = nullptr; breakStatus = false; continueStatus = false; }
@@ -38,6 +40,8 @@ namespace Ice
 		void put(std::string, std::shared_ptr<IceObject>);
 		void replace(std::string, std::shared_ptr<IceObject>);
 		std::shared_ptr<IceObject> getObject(std::string);
+
+		void garbageCollection();
 	};
 }
 
