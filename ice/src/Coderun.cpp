@@ -565,6 +565,11 @@ namespace Ice
 		return nullptr;
 	}
 
+	std::shared_ptr<IceObject> DictExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
+	{
+
+	}
+
 	// Built_in functions implement
 
 	void Env::genBuildInFunctions()

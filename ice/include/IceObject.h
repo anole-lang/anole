@@ -37,7 +37,8 @@ namespace Ice
 			CLASS,
 			INSTANCE,
 			NONE,
-			LIST
+			LIST,
+			DICT
 		} type;
 		virtual ~IceObject() {}
 

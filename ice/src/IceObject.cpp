@@ -4,7 +4,7 @@ namespace Ice
 {
 	bool IceObject::isInstance(TYPE type)
 	{
-		return type == TYPE::INSTANCE || type == TYPE::LIST || type == TYPE::STRING;
+		return type == TYPE::INSTANCE || type == TYPE::LIST || type == TYPE::STRING || type == TYPE::DICT;
 	}
 
 	IceFunctionObject::IceFunctionObject(const VariableList &argDecls, std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block)
