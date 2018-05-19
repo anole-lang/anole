@@ -201,6 +201,7 @@ namespace Ice
 	public:
 		ExpressionList keys;
 		ExpressionList values;
+		DictExpr() {}
 		DictExpr(ExpressionList keys, ExpressionList values) : keys(keys), values(values) {}
 		virtual std::shared_ptr<IceObject> runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top = nullptr);
 	};

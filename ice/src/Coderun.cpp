@@ -531,7 +531,7 @@ namespace Ice
 	std::shared_ptr<IceObject> IndexExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
 	{
 		std::shared_ptr<IceObject> _obj = expression->runCode(top);
-		if (_obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING)
+		if (_obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING && _obj->type != IceObject::TYPE::DICT)
 		{
 			std::cout << "it doesn't support for []" << std::endl;
 			exit(0);
@@ -542,9 +542,14 @@ namespace Ice
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
 			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
 		}
-		else
+		else if (_obj->type == IceObject::TYPE::STRING)
 		{
 			std::shared_ptr<IceStringObject> obj = std::dynamic_pointer_cast<IceStringObject>(_obj);
+			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+		}
+		else
+		{
+			std::shared_ptr<IceDictObject> obj = std::dynamic_pointer_cast<IceDictObject>(_obj);
 			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
 		}
 	}
@@ -552,22 +557,43 @@ namespace Ice
 	std::shared_ptr<IceObject> IndexStmt::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
 	{
 		std::shared_ptr<IceObject> _obj = expression->runCode(top);
-		if (_obj->type != IceObject::TYPE::LIST)
+		if (_obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::DICT)
 		{
 			std::cout << "it doesn't support for []" << std::endl;
 			exit(0);
 		}
 
-		std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
-		std::shared_ptr<IceObject> index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
-		std::shared_ptr<IceObject> assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
-		obj->setByIndex(index, assignment);
+		if (_obj->type == IceObject::TYPE::LIST)
+		{
+			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(_obj);
+			std::shared_ptr<IceObject> index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			std::shared_ptr<IceObject> assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			obj->setByIndex(index, assignment);
+		}
+		else
+		{
+			std::shared_ptr<IceDictObject> obj = std::dynamic_pointer_cast<IceDictObject>(_obj);
+			std::shared_ptr<IceObject> index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			std::shared_ptr<IceObject> assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			obj->setByIndex(index, assignment);
+		}
 		return nullptr;
 	}
 
 	std::shared_ptr<IceObject> DictExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
 	{
-
+		if (keys.size() != values.size())
+		{
+			std::cout << "one key, one value" << std::endl;
+			exit(0);
+		}
+		std::shared_ptr<IceDictObject> obj = std::make_shared<IceDictObject>();
+		for (size_t i = 0; i < keys.size(); i++)
+		{
+			obj->setByIndex(keys[i]->runCode(top), values[i]->runCode(top));
+		}
+		obj->top->put("self", obj);
+		return obj;
 	}
 
 	// Built_in functions implement

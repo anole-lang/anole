@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <memory>
 #include <cctype>
 #include <functional>
@@ -202,15 +203,50 @@ namespace Ice
 		void setByIndex(std::shared_ptr<IceObject>, std::shared_ptr<IceObject>);
 	};
 
+	class KeyObject
+	{
+	public:
+		std::shared_ptr<IceObject> obj;
+		KeyObject(std::shared_ptr<IceObject> obj) : obj(obj) {}
+
+		size_t hashValue() const;
+	};
+
+	class KeyHash
+	{
+	public:
+		size_t operator()(const KeyObject &key) const
+		{
+			return key.hashValue();
+		}
+	};
+
+	class KeyEqual
+	{
+	public:
+		bool operator()(const KeyObject &key1, const KeyObject &key2) const
+		{
+			return std::dynamic_pointer_cast<IceBooleanObject>(key1.obj->binaryOperate(key2.obj, Token::TOKEN::TCEQ))->value;
+		}
+	};
+
 	class IceDictObject : public IceInstanceObject
 	{
 	private:
 		void genBuiltInMethods();
 
 	public:
-		/*
-			TODO: add members
-		*/
+		std::unordered_map<KeyObject, std::shared_ptr<IceObject>, KeyHash, KeyEqual> objects_map;
+
+		IceDictObject();
+		virtual ~IceDictObject() {}
+		
+		virtual void show();
+		virtual bool isTrue() { return objects_map.size() != 0; }
+		virtual std::string toStr() { return "dict"; }
+
+		std::shared_ptr<IceObject> getByIndex(std::shared_ptr<IceObject>);
+		void setByIndex(std::shared_ptr<IceObject>, std::shared_ptr<IceObject>);
 	};
 }
 

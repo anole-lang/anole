@@ -15,6 +15,7 @@ Please add feature request here.
 <hr>
 
 ### DONE
++ [X] Dict type & built-in methods
 + [X] Simple garbage collection (reference counting)
 + [X] Fixed bug with scope when using '.' operator
 + [X] List type & built-in methods
@@ -149,4 +150,10 @@ TOKEN.TBEGIN
 ```ice
 @list: [1, 2, 3]
 @list[0]: [1, 2, 3]
+```
+
+###### Dict Type
+```ice
+@dict: {1: 2, "cyy": "TianCaiChengXuYuan"}
+@dict["cyy"]
 ```

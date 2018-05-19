@@ -121,7 +121,7 @@ string
 
 expr
 	: logic_or logic_or_rest
-	| TLBRACE enum_expr
+	| TLBRACE expr enum_or_dict
 	;
 
 logic_or
@@ -250,6 +250,11 @@ new_expr
 	: TNEW ident TLPAREN call_args TRPAREN
 	;
 
+enum_or_dict
+	: TCOMMA enum_expr
+	| TASSIGN expr TCOMMA dict_expr
+	;
+
 enum_expr
 	: enumerators TRBRACE
 	| TRBRACE
@@ -262,6 +267,20 @@ enumerators
 enumerators_rest
 	: 
 	| TCOMMA enumerators
+	;
+
+dict_expr
+	: dictionary TRBRACE
+	| TRBRACE
+	;
+
+dictionary
+	: expr TASSIGN expr dictionary_rest
+	;
+
+dictionary_rest
+	: 
+	| TCOMMA dictionary
 	;
 	
 match_expr
@@ -327,7 +346,7 @@ namespace Ice
 			lambda_expr,
 			class_decl,
 			new_expr,
-			enum_expr,
+			enum_or_dict,
 			match_expr,
 			list_expr
 		};

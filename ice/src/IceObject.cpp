@@ -113,6 +113,12 @@ namespace Ice
 		genBuiltInMethods();
 	}
 
+	IceDictObject::IceDictObject()
+	{
+		type = TYPE::DICT;
+		genBuiltInMethods();
+	}
+
 	std::shared_ptr<IceObject> IceIntegerObject::unaryOperate(Token::TOKEN op)
 	{
 		switch (op)
@@ -639,6 +645,73 @@ namespace Ice
 			std::shared_ptr<IceListObject> obj = std::dynamic_pointer_cast<IceListObject>(top->getObject("self"));
 			obj->objects.clear();
 			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
+	}
+
+	size_t KeyObject::hashValue() const
+	{
+		switch (obj->type)
+		{
+		case IceObject::TYPE::INT:
+			return std::hash<long>{}(std::dynamic_pointer_cast<IceIntegerObject>(obj)->value);
+		case IceObject::TYPE::DOUBLE:
+			return std::hash<double>{}(std::dynamic_pointer_cast<IceDoubleObject>(obj)->value);
+		case IceObject::TYPE::BOOLEAN:
+			return std::hash<bool>{}(std::dynamic_pointer_cast<IceBooleanObject>(obj)->value);
+		case IceObject::TYPE::STRING:
+			return std::hash<std::string>{}(std::dynamic_pointer_cast<IceStringObject>(obj)->value);
+		default:
+			break;
+		}
+		std::cout << "key for dict should be int, double, boolean or string" << std::endl;
+		exit(0);
+		return 0;
+	}
+
+	void IceDictObject::show()
+	{
+		std::cout << "{";
+		for (auto iter = objects_map.begin(); iter != objects_map.end(); iter++)
+		{
+			if (iter != objects_map.begin()) std::cout << ", ";
+			iter->first.obj->show();
+			std::cout << ": ";
+			iter->second->show();
+		}
+		std::cout << "}";
+	}
+
+	std::shared_ptr<IceObject> IceDictObject::getByIndex(std::shared_ptr<IceObject> _key)
+	{
+		KeyObject key(_key);
+		if (objects_map.find(key) != objects_map.end())
+		{
+			return objects_map[key];
+		}
+		else
+		{
+			std::cout << "cannot find the key in the dict" << std::endl;
+			exit(0);
+			return nullptr;
+		}
+	}
+
+	void IceDictObject::setByIndex(std::shared_ptr<IceObject> key, std::shared_ptr<IceObject> value)
+	{
+		objects_map[KeyObject(key)] = value;
+	}
+
+	void IceDictObject::genBuiltInMethods()
+	{
+		top->put("size", std::make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
+			if (objects.size())
+			{
+				std::cout << "method size() need no arguments" << std::endl;
+				exit(0);
+			}
+
+			std::shared_ptr<IceDictObject> obj = std::dynamic_pointer_cast<IceDictObject>(top->getObject("self"));
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(obj->objects_map.size()));
 		}));
 	}
 }
