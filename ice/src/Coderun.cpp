@@ -671,5 +671,33 @@ namespace Ice
 				return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(std::dynamic_pointer_cast<IceListObject>(objects[0])->objects.size()));
 			}
 		}));
+
+		put("int", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+			if (objects.size() != 1)
+			{
+				std::cout << "int() need 1 arguments but get others" << std::endl;
+				exit(0);
+			}
+			else if (objects[0]->type != IceObject::TYPE::STRING)
+			{
+				std::cout << "int() need string object" << std::endl;
+				exit(0);
+			}
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(std::atoi(std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
+		}));
+
+		put("float", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+			if (objects.size() != 1)
+			{
+				std::cout << "float() need 1 arguments but get others" << std::endl;
+				exit(0);
+			}
+			else if (objects[0]->type != IceObject::TYPE::STRING)
+			{
+				std::cout << "float() need string object" << std::endl;
+				exit(0);
+			}
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceDoubleObject>(std::atof(std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
+		}));
 	}
 }
