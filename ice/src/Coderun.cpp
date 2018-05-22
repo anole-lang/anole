@@ -108,7 +108,6 @@ namespace Ice
 				break;
 			}
 		}
-		top->garbageCollection();
 		return returnValue;
 	}
 
@@ -175,6 +174,7 @@ namespace Ice
 			_top->put(argDecl->id->name, argDecl->assignment->runCode((normal_top == nullptr) ? (_top) : (normal_top)));
 
 		std::shared_ptr<IceObject> returnValue = func->block->runCode(_top);
+		_top->garbageCollection();
 		return returnValue;
 	}
 
@@ -617,7 +617,7 @@ namespace Ice
 				std::cout << "print() need 1 argument but get others" << std::endl;
 				exit(0);
 			}
-			std::cout << objects[0]->toStr() << std::endl;
+			std::cout << objects[0]->toStr();
 			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
 		}));
 

@@ -14,7 +14,8 @@ Please add feature request here.
 
 <hr>
 
-### DONE
+### ChangeLog
++ [X] Fixed bug for objects built in class block when the class was instantiated
 + [X] Dict type & built-in methods
 + [X] Simple garbage collection (reference counting)
 + [X] Fixed bug with scope when using '.' operator
