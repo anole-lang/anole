@@ -621,6 +621,16 @@ namespace Ice
 			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
 		}));
 
+		put("println", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+			if (objects.size() != 1)
+			{
+				std::cout << "println() need 1 argument but get others" << std::endl;
+				exit(0);
+			}
+			std::cout << objects[0]->toStr() << std::endl;
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceNoneObject>());
+		}));
+
 		put("str", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
 			if (objects.size() != 1)
 			{

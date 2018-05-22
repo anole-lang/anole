@@ -481,6 +481,17 @@ namespace Ice
 			std::shared_ptr<IceStringObject> obj = std::dynamic_pointer_cast<IceStringObject>(top->getObject("self"));
 			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceBooleanObject>(obj->value.size() == 1 ? (isalpha(obj->value[0])) : false));
 		}));
+
+		top->put("size", std::make_shared<IceBuiltInFunctionObject>([&](Objects &&objects) {
+			if (objects.size())
+			{
+				std::cout << "method size() need no arguments" << std::endl;
+				exit(0);
+			}
+
+			std::shared_ptr<IceStringObject> obj = std::dynamic_pointer_cast<IceStringObject>(top->getObject("self"));
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(obj->value.size()));
+		}));
 	}
 
 	void IceListObject::show()
