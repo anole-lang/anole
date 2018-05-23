@@ -15,12 +15,17 @@ CFLAGS = -g -Wall -std=c++11 -I$(DIR_INC)
 
 CPPFLAGS = -std=c++11
 
-${BIN_TARGET}:${OBJ}
+${BIN_TARGET}: ${OBJ} | ${DIR_BIN}
 	${CC} ${OBJ} -o $@
 
-${DIR_OBJ}/%.o:${DIR_SRC}/%.cpp
+${DIR_OBJ}/%.o: ${DIR_SRC}/%.cpp | ${DIR_OBJ}
 	${CC} ${CFLAGS} -c $< -o $@
 
+${DIR_BIN}:
+	mkdir $@
+
+${DIR_OBJ}:
+	mkdir $@
 
 .PHONY: clean
 clean:
