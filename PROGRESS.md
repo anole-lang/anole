@@ -9,6 +9,7 @@ Please add feature request here.
 <hr>
 
 ### TODO
++ [ ] Support for method().member / method().member()
 + [ ] Fix Bugs 
 + [ ] Refactoring
 

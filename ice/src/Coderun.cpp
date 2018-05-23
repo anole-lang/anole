@@ -28,7 +28,7 @@ namespace Ice
 
 	void Env::garbageCollect(std::string name)
 	{
-		if (IceObject::isInstance(objects[name]->type))
+		if (objects[name]->type == IceObject::TYPE::INSTANCE)
 		{
 			if (objects[name].use_count() == 2)
 			{
@@ -83,7 +83,7 @@ namespace Ice
 	{
 		for (auto iter = objects.begin(); iter != objects.end(); iter++)
 		{
-			if (IceObject::isInstance(iter->second->type))
+			if (iter->second->type == IceObject::TYPE::INSTANCE)
 			{
 				if (iter->second.use_count() == 2)
 					std::dynamic_pointer_cast<IceInstanceObject>(iter->second)->top->objects["self"] = nullptr;
@@ -134,7 +134,6 @@ namespace Ice
 	std::shared_ptr<IceObject> StringExpr::runCode(std::shared_ptr<Env> &top, std::shared_ptr<Env> normal_top)
 	{
 		std::shared_ptr<IceStringObject> obj = std::make_shared<IceStringObject>(value);
-		obj->top->put("self", obj);
 		return obj;
 	}
 
@@ -499,8 +498,6 @@ namespace Ice
 		for (auto &enumerator : enumerators)
 			obj->top->put(enumerator->name, std::make_shared<IceIntegerObject>(i++));
 
-		obj->top->put("self", obj);
-
 		return obj;
 	}
 
@@ -524,7 +521,6 @@ namespace Ice
 		{
 			obj->objects.push_back(expression->runCode(top));
 		}
-		obj->top->put("self", obj);
 		return obj;
 	}
 
@@ -592,7 +588,6 @@ namespace Ice
 		{
 			obj->setByIndex(keys[i]->runCode(top), values[i]->runCode(top));
 		}
-		obj->top->put("self", obj);
 		return obj;
 	}
 
