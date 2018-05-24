@@ -34,6 +34,22 @@ namespace Ice
 		this->top = std::make_shared<Env>(top);
 	}
 
+	std::shared_ptr<IceObject> IceInstanceObject::binaryOperate(std::shared_ptr<IceObject> obj, Token::TOKEN op)
+	{
+		if (obj->type == TYPE::NONE && op == Token::TOKEN::TCNE)
+		{
+			return std::make_shared<IceBooleanObject>(true);
+		}
+		else if (obj->type == TYPE::NONE && op == Token::TOKEN::TCEQ)
+		{
+			return std::make_shared<IceBooleanObject>(false);
+		}
+		else
+		{
+			return std::make_shared<IceBooleanObject>(false);
+		}
+	}
+
 	IceNoneObject::IceNoneObject()
 	{
 		type = TYPE::NONE;
@@ -691,9 +707,7 @@ namespace Ice
 		}
 		else
 		{
-			std::cout << "cannot find the key in the dict" << std::endl;
-			exit(0);
-			return nullptr;
+			return std::make_shared<IceNoneObject>();
 		}
 	}
 

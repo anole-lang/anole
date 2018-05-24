@@ -99,6 +99,7 @@ namespace Ice
 		virtual ~IceInstanceObject() {}
 
 		virtual void show() { std::cout << "an instance"; }
+		virtual std::shared_ptr<IceObject> binaryOperate(std::shared_ptr<IceObject>, Token::TOKEN);
 		virtual bool isTrue() { return true; }
 		virtual std::string toStr() { return "Instance"; }
 	};
