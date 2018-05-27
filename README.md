@@ -19,8 +19,10 @@ The interpreter for the Ice programming language with many bugs.
 git clone https://github.com/MU001999/ice.git
 cd ice/ice
 make
+cd bin
+./ice
 ```
-Also you can use Visual Studio, just open ice/ice.sln by Visual Studio.
+Also you can use Visual Studio, just open ice/ice/ice.sln by Visual Studio.
 
 ### Document
 * [Progress](./PROGRESS.md)

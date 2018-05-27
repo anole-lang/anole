@@ -165,7 +165,7 @@
     <ClCompile Include="unittest1.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ice.vcxproj">
+    <ProjectReference Include="..\ice\ice.vcxproj">
       <Project>{32b881f1-f457-4a67-80f9-f5c7aad10dc5}</Project>
     </ProjectReference>
   </ItemGroup>

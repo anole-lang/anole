@@ -1,62 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{44c42c61-bcee-4af8-adc2-be94ca8e443a}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{f9f1887e-a4c5-491d-8fc8-fb9213991641}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ice\src\Coderun.cpp">
+    <ClCompile Include="src\Coderun.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ice\src\IceObject.cpp">
+    <ClCompile Include="src\IceObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ice\src\Interpreter.cpp">
+    <ClCompile Include="src\Interpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ice\src\LexicalAnalyzer.cpp">
+    <ClCompile Include="src\LexicalAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ice\src\main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ice\src\SyntaxAnalyzer.cpp">
+    <ClCompile Include="src\SyntaxAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ice\src\Token.cpp">
+    <ClCompile Include="src\Token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ice\include\Coderun.h">
+    <ClInclude Include="include\Coderun.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ice\include\IceObject.h">
+    <ClInclude Include="include\IceObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ice\include\Interpreter.h">
+    <ClInclude Include="include\Interpreter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ice\include\LexicalAnalyzer.h">
+    <ClInclude Include="include\LexicalAnalyzer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ice\include\Node.h">
+    <ClInclude Include="include\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ice\include\SyntaxAnalyzer.h">
+    <ClInclude Include="include\SyntaxAnalyzer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ice\include\Token.h">
+    <ClInclude Include="include\Token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -72,7 +72,7 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)ice\include;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)include;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -106,22 +106,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ice\src\Coderun.cpp" />
-    <ClCompile Include="ice\src\IceObject.cpp" />
-    <ClCompile Include="ice\src\Interpreter.cpp" />
-    <ClCompile Include="ice\src\LexicalAnalyzer.cpp" />
-    <ClCompile Include="ice\src\main.cpp" />
-    <ClCompile Include="ice\src\SyntaxAnalyzer.cpp" />
-    <ClCompile Include="ice\src\Token.cpp" />
+    <ClCompile Include="src\Coderun.cpp" />
+    <ClCompile Include="src\IceObject.cpp" />
+    <ClCompile Include="src\Interpreter.cpp" />
+    <ClCompile Include="src\LexicalAnalyzer.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SyntaxAnalyzer.cpp" />
+    <ClCompile Include="src\Token.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ice\include\Coderun.h" />
-    <ClInclude Include="ice\include\IceObject.h" />
-    <ClInclude Include="ice\include\Interpreter.h" />
-    <ClInclude Include="ice\include\LexicalAnalyzer.h" />
-    <ClInclude Include="ice\include\Node.h" />
-    <ClInclude Include="ice\include\SyntaxAnalyzer.h" />
-    <ClInclude Include="ice\include\Token.h" />
+    <ClInclude Include="include\Coderun.h" />
+    <ClInclude Include="include\IceObject.h" />
+    <ClInclude Include="include\Interpreter.h" />
+    <ClInclude Include="include\LexicalAnalyzer.h" />
+    <ClInclude Include="include\Node.h" />
+    <ClInclude Include="include\SyntaxAnalyzer.h" />
+    <ClInclude Include="include\Token.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
