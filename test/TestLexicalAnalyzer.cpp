@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
-#include "../ice/include/LexicalAnalyzer.h"
+#include "LexicalAnalyzer.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -12,7 +12,29 @@ public:
 		
 	TEST_METHOD(TestLexerIdentifier)
 	{
-		std::string code = R"coldice()coldice";
+		std::string code = "abc";
+		LexicalAnalyzer lexicalAnalyzer;
+		auto tokens = lexicalAnalyzer.getTokens(code);
+	}
+
+	TEST_METHOD(TestLexerNumber)
+	{
+
+	}
+
+	TEST_METHOD(TestLexerOperators)
+	{
+
+	}
+
+	TEST_METHOD(TestLexerKeywords)
+	{
+
+	}
+
+	TEST_METHOD(TestLexerString)
+	{
+
 	}
 
 };
