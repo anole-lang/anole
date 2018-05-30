@@ -15,7 +15,8 @@ public:
 
 	TEST_METHOD(TestLexerIdentifier)
 	{
-		std::string code = R"coldice(
+		std::string code =
+R"coldice(
 @text: "hello world"
 print(text)
 )coldice";
@@ -25,7 +26,8 @@ print(text)
 
 	TEST_METHOD(TestLexerNumber)
 	{
-		std::string code = R"coldice(
+		std::string code = 
+R"coldice(
 123 123. 123.123
 )coldice";
 		auto tokens = lexer.getTokens(code);
@@ -34,7 +36,8 @@ print(text)
 
 	TEST_METHOD(TestLexerOperators)
 	{
-		std::string code = R"coldice(
+		std::string code = 
+R"coldice(
 +-*/%&|^~>< >> << = != <= >= and or else
 )coldice";
 		auto tokens = lexer.getTokens(code);
@@ -43,7 +46,10 @@ print(text)
 
 	TEST_METHOD(TestLexerKeywords)
 	{
-
+		std::string code = 
+R"coldice(
+using if else while do for to break continue return match new none true false and or not
+)coldice";
 	}
 
 	TEST_METHOD(TestLexerString)
