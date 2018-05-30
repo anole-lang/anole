@@ -887,7 +887,6 @@ namespace Ice
 	{
 		std::string line;
 		std::getline(std::cin, line);
-		line += "$";
 		auto &tokens = lexicalAnalyzer.getTokens(line);
 		iToken = tokens.begin();
 		return (iToken == tokens.end()) ? nullptr : genNode[Symbol::stmt]();

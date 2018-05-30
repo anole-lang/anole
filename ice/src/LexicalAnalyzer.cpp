@@ -346,7 +346,7 @@ namespace Ice
 	std::vector<Token> &LexicalAnalyzer::getTokens(std::string line)
 	{
 		tokens.clear();
-		analy(line);
+		analy(line + "$");
 		return tokens;
 	}
 
