@@ -2,6 +2,7 @@
 #include "Node.h"
 #include "SyntaxAnalyzer.h"
 #include "IceObject.h"
+#include "ctime"
 
 namespace Ice
 {
@@ -703,6 +704,15 @@ namespace Ice
 				exit(0);
 			}
 			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceDoubleObject>(std::atof(std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
+		}));
+
+		put("time", std::make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+			if (objects.size())
+			{
+				std::cout << "time() need no arguments" << std::endl;
+				exit(0);
+			}
+			return std::dynamic_pointer_cast<IceObject>(std::make_shared<IceIntegerObject>(time(nullptr)));
 		}));
 	}
 }

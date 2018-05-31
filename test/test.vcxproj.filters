@@ -18,5 +18,8 @@
     <ClCompile Include="TestLexicalAnalyzer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TestDeclarationAnalyzer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
