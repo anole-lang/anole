@@ -8,7 +8,7 @@ using TOKEN = Token::TOKEN;
 #define ASSERT_COUNT(COUNT)						Assert::AreEqual<size_t>(COUNT, tokens.size()); auto iToken = tokens.begin()
 #define ASSERT_TOKEN(TYPE)						Assert::AreEqual((int)TYPE, (int)iToken->token_id); iToken++
 #define ASSERT_TOKEN_WITH_VALUE(TYPE, VALUE)	Assert::AreEqual((int)TYPE, (int)iToken->token_id); Assert::AreEqual(VALUE, iToken->value.c_str()); iToken++
-#define TEST_OVER								Assert::AreEqual((int)TOKEN::TEND, (int)iToken->token_id); iToken++; Assert::AreEqual(true, iToken == tokens.end())
+#define ASSERT_OVER								Assert::AreEqual((int)TOKEN::TEND, (int)iToken->token_id); iToken++; Assert::AreEqual(true, iToken == tokens.end())
 
 TEST_CLASS(TestLexicalAnalyzer)
 {
@@ -37,7 +37,7 @@ print(text)
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "text");
 		ASSERT_TOKEN(TOKEN::TRPAREN);
 
-		TEST_OVER;
+		ASSERT_OVER;
 	}
 
 	TEST_METHOD(TestLexerNumber)
@@ -53,7 +53,7 @@ print(text)
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TDOUBLE, "123.");
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TDOUBLE, "123.123");
 
-		TEST_OVER;
+		ASSERT_OVER;
 	}
 
 	TEST_METHOD(TestLexerOperators)
@@ -87,7 +87,7 @@ print(text)
 		ASSERT_TOKEN(TOKEN::TOR);
 		ASSERT_TOKEN(TOKEN::TELSE);
 
-		TEST_OVER;
+		ASSERT_OVER;
 	}
 
 	TEST_METHOD(TestLexerKeywords)
@@ -119,7 +119,7 @@ return match new none true false and or not
 		ASSERT_TOKEN(TOKEN::TOR);
 		ASSERT_TOKEN(TOKEN::TNOT);
 
-		TEST_OVER;
+		ASSERT_OVER;
 	}
 
 	TEST_METHOD(TestLexerString)
@@ -136,7 +136,7 @@ return match new none true false and or not
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TSTRING, "\"");
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TSTRING, "\n\\\"\a\b\0\t\r\f");
 
-		TEST_OVER;
+		ASSERT_OVER;
 	}
 
 };
