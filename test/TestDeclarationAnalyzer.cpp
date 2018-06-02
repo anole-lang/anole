@@ -50,4 +50,34 @@ public:
 
 		ASSERT_OVER;
 	}
+
+	TEST_METHOD(TestCommonFunctionDeclaration)
+	{
+		std::string code = R"coldice(
+@add(a, b): a + b
+@pow(n): n * n
+@quadratic_sum(a, b): add(pow(a), pow(b))
+@fib(n) {
+	if n = 0 or n = 1 { return 1 }
+	else { return fib(n-1) + fib(n-2) }
+}
+)coldice";
+		auto node = parser.getNode(code);
+
+		ASSERT_COUNT(4);
+
+		ASSERT_STMT_BEGIN(FunctionDeclarationStmt);
+		ASSERT_STMT_END;
+
+		ASSERT_STMT_BEGIN(FunctionDeclarationStmt);
+		ASSERT_STMT_END;
+
+		ASSERT_STMT_BEGIN(FunctionDeclarationStmt);
+		ASSERT_STMT_END;
+
+		ASSERT_STMT_BEGIN(FunctionDeclarationStmt);
+		ASSERT_STMT_END;
+
+		ASSERT_OVER;
+	}
 };
