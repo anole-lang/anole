@@ -3,7 +3,7 @@
 namespace Ice
 {
 	SyntaxAnalyzer::SyntaxAnalyzer()
-	{
+	{ // init genNode[symbol]
 		genNode[Symbol::stmts] = [&]() {
 			std::shared_ptr<BlockExpr> node = std::make_shared<BlockExpr>();
 			while (iToken->token_id != Token::TOKEN::TEND)
@@ -229,7 +229,8 @@ namespace Ice
 			while (iToken->token_id != Token::TOKEN::TRBRACE)
 			{
 				if (iToken->token_id == Token::TOKEN::TEND) updateiToken();
-				node->statements.push_back(std::dynamic_pointer_cast<Stmt>(genNode[Symbol::stmt]()));
+				auto stmt = genNode[Symbol::stmt]();
+				if (stmt != nullptr) node->statements.push_back(std::dynamic_pointer_cast<Stmt>(stmt));
 			}
 			iToken++;
 			return node;
@@ -879,12 +880,13 @@ namespace Ice
 	}
 
 	void SyntaxAnalyzer::updateiToken()
-	{
+	{ // update iToken when cannot find the next token
 		if (iToken->token_id == Token::TOKEN::TEND) iToken = lexicalAnalyzer.cont();
 	}
 
 	std::shared_ptr<Node> SyntaxAnalyzer::getNode()
-	{
+	{ // use when interacting
+	  // return stmt node
 		std::string line;
 		std::getline(std::cin, line);
 		auto &tokens = lexicalAnalyzer.getTokens(line);
@@ -893,7 +895,8 @@ namespace Ice
 	}
 
 	std::shared_ptr<Node> SyntaxAnalyzer::getNode(std::string code)
-	{
+	{ // use when in interpreting file
+	  // return stmts node
 		auto &tokens = lexicalAnalyzer.getTokens(code);
 		iToken = tokens.begin();
 		return (iToken == tokens.end()) ? nullptr : genNode[Symbol::stmts]();

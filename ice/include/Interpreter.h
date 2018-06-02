@@ -15,7 +15,7 @@
 
 namespace Ice
 {
-	class BlockExpr;
+	class BlockExpr; // save statements
 
 	class Interpreter
 	{
