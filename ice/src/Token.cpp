@@ -2,7 +2,7 @@
 
 namespace Ice
 {
-	Token::Token(std::string value) : value(value)
+	Token::Token(string value) : value(value)
 	{
 		if (value == "using")
 			token_id = TOKEN::TUSING;

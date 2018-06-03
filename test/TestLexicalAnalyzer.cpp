@@ -3,6 +3,7 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Ice;
+
 using TOKEN = Token::TOKEN;
 
 #define ASSERT_COUNT(COUNT)						Assert::AreEqual<size_t>(COUNT, tokens.size()); \

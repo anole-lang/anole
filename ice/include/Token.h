@@ -6,11 +6,14 @@
 #include <cstring>
 #include <cstdio>
 
+using std::string;
+
 namespace Ice
 {
 	class Token
 	{
 	public:
+
 		enum class TOKEN
 		{
 			TEND, // #
@@ -78,10 +81,10 @@ namespace Ice
 
 			TRET, // =>
 		} token_id;
-		std::string value;
-		Token(TOKEN token_id, std::string value) : token_id(token_id), value(value) {}
+		string value;
+		Token(TOKEN token_id, string value) : token_id(token_id), value(value) {}
 		Token(TOKEN token_id) : token_id(token_id) {}
-		Token(std::string value);
+		Token(string value);
 	};
 }
 

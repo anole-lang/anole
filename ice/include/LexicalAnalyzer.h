@@ -8,6 +8,9 @@
 #include <vector>
 #include "Token.h"
 
+using std::string;
+using std::vector;
+
 namespace Ice
 {
 	class LexicalAnalyzer
@@ -31,12 +34,12 @@ namespace Ice
 			InString,
 			InStringEscaping
 		};
-		void analy(std::string);
+		void analy(string);
 
 	public:
 		LexicalAnalyzer() {}
-		std::vector<Token> &getTokens(std::string);
-		std::vector<Token>::iterator cont();
+		vector<Token> &getTokens(string);
+		vector<Token>::iterator cont();
 	};
 }
 

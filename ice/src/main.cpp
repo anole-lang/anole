@@ -4,12 +4,7 @@
 #include <cstdio>
 #include "Interpreter.h"
 
-using namespace Ice;
-
-namespace Ice
-{
-	Interpreter interpreter;
-}
+Ice::Interpreter interpreter;
 
 int main(int argc, char *argv[])
 {

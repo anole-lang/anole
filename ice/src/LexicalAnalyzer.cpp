@@ -1,11 +1,18 @@
 #include "LexicalAnalyzer.h"
 
+using std::cin;
+using std::cout;
+using std::endl;
+using std::getline;
+
+using TOKEN = Ice::Token::TOKEN;
+
 namespace Ice
 {
-	void LexicalAnalyzer::analy(std::string line)
+	void LexicalAnalyzer::analy(string line)
 	{
 		State state = State::Begin;
-		std::string value;
+		string value;
 		const char *reading = line.c_str();
 		while (*reading)
 		{
@@ -15,7 +22,7 @@ namespace Ice
 				switch (*reading)
 				{
 				case '$':
-					tokens.push_back(Token(Token::TOKEN::TEND));
+					tokens.push_back(Token(TOKEN::TEND));
 					break;
 				case '#':
 					state = State::InComment;
@@ -27,58 +34,58 @@ namespace Ice
 					state = State::InString;
 					break;
 				case ':':
-					tokens.push_back(Token(Token::TOKEN::TASSIGN));
+					tokens.push_back(Token(TOKEN::TASSIGN));
 					break;
 				case ',':
-					tokens.push_back(Token(Token::TOKEN::TCOMMA));
+					tokens.push_back(Token(TOKEN::TCOMMA));
 					break;
 				case '.':
-					tokens.push_back(Token(Token::TOKEN::TDOT));
+					tokens.push_back(Token(TOKEN::TDOT));
 					break;
 				case '(':
-					tokens.push_back(Token(Token::TOKEN::TLPAREN));
+					tokens.push_back(Token(TOKEN::TLPAREN));
 					break;
 				case ')':
-					tokens.push_back(Token(Token::TOKEN::TRPAREN));
+					tokens.push_back(Token(TOKEN::TRPAREN));
 					break;
 				case '[':
-					tokens.push_back(Token(Token::TOKEN::TLBRACKET));
+					tokens.push_back(Token(TOKEN::TLBRACKET));
 					break;
 				case ']':
-					tokens.push_back(Token(Token::TOKEN::TRBRACKET));
+					tokens.push_back(Token(TOKEN::TRBRACKET));
 					break;
 				case '{':
-					tokens.push_back(Token(Token::TOKEN::TLBRACE));
+					tokens.push_back(Token(TOKEN::TLBRACE));
 					break;
 				case '}':
-					tokens.push_back(Token(Token::TOKEN::TRBRACE));
+					tokens.push_back(Token(TOKEN::TRBRACE));
 					break;
 				case '+':
-					tokens.push_back(Token(Token::TOKEN::TADD));
+					tokens.push_back(Token(TOKEN::TADD));
 					break;
 				case '-':
-					tokens.push_back(Token(Token::TOKEN::TSUB));
+					tokens.push_back(Token(TOKEN::TSUB));
 					break;
 				case '*':
-					tokens.push_back(Token(Token::TOKEN::TMUL));
+					tokens.push_back(Token(TOKEN::TMUL));
 					break;
 				case '/':
-					tokens.push_back(Token(Token::TOKEN::TDIV));
+					tokens.push_back(Token(TOKEN::TDIV));
 					break;
 				case '%':
-					tokens.push_back(Token(Token::TOKEN::TMOD));
+					tokens.push_back(Token(TOKEN::TMOD));
 					break;
 				case '&':
-					tokens.push_back(Token(Token::TOKEN::TBAND));
+					tokens.push_back(Token(TOKEN::TBAND));
 					break;
 				case '|':
-					tokens.push_back(Token(Token::TOKEN::TBOR));
+					tokens.push_back(Token(TOKEN::TBOR));
 					break;
 				case '^':
-					tokens.push_back(Token(Token::TOKEN::TBXOR));
+					tokens.push_back(Token(TOKEN::TBXOR));
 					break;
 				case '~':
-					tokens.push_back(Token(Token::TOKEN::TBNEG));
+					tokens.push_back(Token(TOKEN::TBNEG));
 					break;
 				case '=':
 					state = State::InRET;
@@ -119,11 +126,11 @@ namespace Ice
 				switch (*reading)
 				{
 				case '@':
-					tokens.push_back(Token(Token::TOKEN::TATAT));
+					tokens.push_back(Token(TOKEN::TATAT));
 					state = State::Begin;
 					break;
 				default:
-					tokens.push_back(Token(Token::TOKEN::TAT));
+					tokens.push_back(Token(TOKEN::TAT));
 					state = State::Begin;
 					reading--;
 					break;
@@ -134,11 +141,11 @@ namespace Ice
 				switch (*reading)
 				{
 				case '>':
-					tokens.push_back(Token(Token::TOKEN::TRET));
+					tokens.push_back(Token(TOKEN::TRET));
 					state = State::Begin;
 					break;
 				default:
-					tokens.push_back(Token(Token::TOKEN::TCEQ));
+					tokens.push_back(Token(TOKEN::TCEQ));
 					state = State::Begin;
 					reading--;
 					break;
@@ -149,11 +156,11 @@ namespace Ice
 				switch (*reading)
 				{
 				case '=':
-					tokens.push_back(Token(Token::TOKEN::TCNE));
+					tokens.push_back(Token(TOKEN::TCNE));
 					state = State::Begin;
 					break;
 				default:
-					tokens.push_back(Token(Token::TOKEN::TNOT));
+					tokens.push_back(Token(TOKEN::TNOT));
 					state = State::Begin;
 					reading--;
 					break;
@@ -164,15 +171,15 @@ namespace Ice
 				switch (*reading)
 				{
 				case '=':
-					tokens.push_back(Token(Token::TOKEN::TCLE));
+					tokens.push_back(Token(TOKEN::TCLE));
 					state = State::Begin;
 					break;
 				case '<':
-					tokens.push_back(Token(Token::TOKEN::TBLS));
+					tokens.push_back(Token(TOKEN::TBLS));
 					state = State::Begin;
 					break;
 				default:
-					tokens.push_back(Token(Token::TOKEN::TCLT));
+					tokens.push_back(Token(TOKEN::TCLT));
 					state = State::Begin;
 					reading--;
 					break;
@@ -183,15 +190,15 @@ namespace Ice
 				switch (*reading)
 				{
 				case '=':
-					tokens.push_back(Token(Token::TOKEN::TCGE));
+					tokens.push_back(Token(TOKEN::TCGE));
 					state = State::Begin;
 					break;
 				case '>':
-					tokens.push_back(Token(Token::TOKEN::TBRS));
+					tokens.push_back(Token(TOKEN::TBRS));
 					state = State::Begin;
 					break;
 				default:
-					tokens.push_back(Token(Token::TOKEN::TCGT));
+					tokens.push_back(Token(TOKEN::TCGT));
 					state = State::Begin;
 					reading--;
 					break;
@@ -218,7 +225,7 @@ namespace Ice
 					state = State::InDouble;
 					break;
 				default:
-					tokens.push_back(Token(Token::TOKEN::TINTEGER, value));
+					tokens.push_back(Token(TOKEN::TINTEGER, value));
 					state = State::Begin;
 					value = "";
 					reading--;
@@ -242,7 +249,7 @@ namespace Ice
 					value += *reading;
 					break;
 				default:
-					tokens.push_back(Token(Token::TOKEN::TDOUBLE, value));
+					tokens.push_back(Token(TOKEN::TDOUBLE, value));
 					state = State::Begin;
 					value = "";
 					reading--;
@@ -268,13 +275,13 @@ namespace Ice
 				switch (*reading)
 				{
 				case '\n':
-					std::cout << "syntax error!" << std::endl;
+					cout << "syntax error!" << endl;
 					exit(0);
 				case '\\':
 					state = State::InStringEscaping;
 					break;
 				case '"':
-					tokens.push_back(Token(Token::TOKEN::TSTRING, value));
+					tokens.push_back(Token(TOKEN::TSTRING, value));
 					state = State::Begin;
 					value = "";
 					break;
@@ -288,7 +295,7 @@ namespace Ice
 				switch (*reading)
 				{
 				case '\n':
-					std::cout << "syntax error!" << std::endl;
+					cout << "syntax error!" << endl;
 					exit(0);
 				case 'n':
 					value += '\n';
@@ -343,21 +350,21 @@ namespace Ice
 		}
 	}
 
-	std::vector<Token> &LexicalAnalyzer::getTokens(std::string line)
+	vector<Token> &LexicalAnalyzer::getTokens(string line)
 	{
 		tokens.clear();
 		analy(line + "$");
 		return tokens;
 	}
 
-	std::vector<Token>::iterator LexicalAnalyzer::cont()
+	vector<Token>::iterator LexicalAnalyzer::cont()
 	{
 		int offset = tokens.size() - 1;
-		std::cout << ".. ";
+		cout << ".. ";
 		tokens.pop_back();
 
-		std::string line;
-		std::getline(std::cin, line);
+		string line;
+		getline(cin, line);
 		line += "$";
 
 		analy(line);

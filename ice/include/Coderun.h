@@ -7,27 +7,37 @@
 #include <memory>
 #include <cstring>
 
+using std::string;
+using std::map;
+using std::shared_ptr;
+using std::enable_shared_from_this;
+
 namespace Ice
 {
 	class IceObject;
 
-	class Env : public std::enable_shared_from_this<Env>
+	class Env : public enable_shared_from_this<Env>
 	{
 	private:
-		std::map<std::string, std::shared_ptr<IceObject>> objects;
+		map<string, shared_ptr<IceObject>> objects;
 
-		std::shared_ptr<IceObject> returnValue;
+		shared_ptr<IceObject> returnValue;
 		bool breakStatus;
 		bool continueStatus;
 
 		void garbageCollect(std::string name);
 
 	public:
-		std::shared_ptr<Env> prev;
-		Env(std::shared_ptr<Env> prev) : prev(prev) { returnValue = nullptr; breakStatus = false; continueStatus = false; }
+		shared_ptr<Env> prev;
+		Env(shared_ptr<Env> prev) : prev(prev) 
+		{ 
+			returnValue = nullptr; 
+			breakStatus = false; 
+			continueStatus = false; 
+		}
 
-		void setReturnValue(std::shared_ptr<IceObject> returnValue) { this->returnValue = returnValue; }
-		std::shared_ptr<IceObject> getReturnValue() { return returnValue; }
+		void setReturnValue(shared_ptr<IceObject> returnValue) { this->returnValue = returnValue; }
+		shared_ptr<IceObject> getReturnValue() { return returnValue; }
 
 		void setBreakStatus(bool status) { breakStatus = status; }
 		bool getBreakStatus() { return breakStatus; }
@@ -37,9 +47,9 @@ namespace Ice
 
 		void genBuildInFunctions();
 
-		void put(std::string, std::shared_ptr<IceObject>);
-		void replace(std::string, std::shared_ptr<IceObject>);
-		std::shared_ptr<IceObject> getObject(std::string);
+		void put(string, shared_ptr<IceObject>);
+		void replace(std::string, shared_ptr<IceObject>);
+		shared_ptr<IceObject> getObject(string);
 
 		void garbageCollection();
 	};

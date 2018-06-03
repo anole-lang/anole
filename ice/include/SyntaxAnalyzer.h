@@ -301,63 +301,63 @@ list_expr
 	;
 */
 
+using std::shared_ptr;
+using std::make_shared;
+using std::vector;
+
+typedef shared_ptr<Ice::BlockExpr> BLOCK_EXPR;
+typedef shared_ptr<Ice::Stmt> STMT;
+typedef shared_ptr<Ice::Expr> EXPR;
+
 namespace Ice
 {
 	class SyntaxAnalyzer
 	{
 	private:
-		LexicalAnalyzer lexicalAnalyzer;
-		std::vector<Token>::iterator iToken;
-		enum class Symbol
-		{
-			stmts,
-			stmt,
-			decl_or_assign,
-			var_assign,
-			if_else,
-			while_stmt,
-			do_while_stmt,
-			for_stmt,
-			return_stmt,
-			using_stmt,
-			block,
-			block_tail,
-			var_decl_tail,
-			func_decl_tail,
-			func_decl_rest,
-			func_decl_args,
-			func_decl_args_tail,
-			ident,
-			numeric,
-			boolean,
-			string,
-			expr,
-			logic_or,
-			logic_and,
-			logic_not,
-			cmp,
-			factor,
-			term,
-			ident_or_other,
-			call_args,
-			call_args_tail,
-			comparison,
-			if_else_tail,
-			lambda_expr,
-			class_decl,
-			new_expr,
-			enum_or_dict,
-			match_expr,
-			list_expr
-		};
-		std::map<Symbol, std::function<std::shared_ptr<Node>()>> genNode;
 
+		LexicalAnalyzer lexicalAnalyzer;
+		vector<Token>::iterator iToken;
 		void updateiToken();
 
+		BLOCK_EXPR genStmts();
+		BLOCK_EXPR genBlock();
+		BLOCK_EXPR genIfElseTail();
+		BLOCK_EXPR genFuncDeclRest();
+
+		STMT genStmt();
+		STMT genDeclOrAssign();
+		STMT genVarAssign();
+		STMT genClassDecl();
+		STMT genUsingStmt();
+		STMT genIfElse();
+		STMT genWhileStmt();
+		STMT genDoWhileStmt();
+		STMT genForStmt();
+		STMT genReturnStmt();
+
+		EXPR genExpr();
+		EXPR genLogicOr();
+		EXPR genLogicAnd();
+		EXPR genLogicNot();
+		EXPR genCmp();
+		EXPR genFactor();
+		EXPR genTerm();
+		EXPR genIdentOrOther();
+		EXPR genIdent();
+		EXPR genNumeric();
+		EXPR genBoolean();
+		EXPR genString();
+		EXPR genEnumOrDict();
+		EXPR genLambdaExpr();
+		EXPR genNewExpr();
+		EXPR genMatchExpr();
+		EXPR genListExpr();
+
 	public:
-		SyntaxAnalyzer();
-		std::shared_ptr<Node> getNode();
-		std::shared_ptr<Node> getNode(std::string);
+
+		SyntaxAnalyzer() {}
+		shared_ptr<Node> getNode();
+		shared_ptr<Node> getNode(std::string);
 	};
 }
 
