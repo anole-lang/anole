@@ -9,12 +9,13 @@ Please add feature request here.
 <hr>
 
 ### TODO
++ [ ] Add Comments
 + [ ] Fix Bugs 
-+ [ ] Refactoring
 
 <hr>
 
 ### ChangeLog
++ [X] Refactored class SyntaxAnalyzer & make it easy to read
 + [X] Fixed bug for objects built in class block when the class was instantiated
 + [X] Dict type & built-in methods
 + [X] Simple garbage collection (reference counting)
