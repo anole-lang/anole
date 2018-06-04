@@ -1,53 +1,44 @@
 #include "Token.h"
 
-#define elif else if
+#define elif		else if
+#define VALUE		(value
+#define equals		==
+#define assign		)token_id = 
+#define to			
+#define TOKEN_ID	
 
 namespace Ice
 {
 	Token::Token(string value) : value(value)
-	{
-		if (value == "using")
-			token_id = TOKEN::TUSING;
-		elif (value == "if")
-			token_id = TOKEN::TIF;
-		elif (value == "else")
-			token_id = TOKEN::TELSE;
-		elif (value == "while")
-			token_id = TOKEN::TWHILE;
-		elif (value == "do")
-			token_id = TOKEN::TDO;
-		elif (value == "for")
-			token_id = TOKEN::TFOR;
-		elif (value == "to")
-			token_id = TOKEN::TTO;
-		elif (value == "break")
-			token_id = TOKEN::TBREAK;
-		elif (value == "continue")
-			token_id = TOKEN::TCONTINUE;
-		elif (value == "return")
-			token_id = TOKEN::TRETURN;
-		elif (value == "match")
-			token_id = TOKEN::TMATCH;
+	{ // just for fun
+		if   VALUE equals "using"		assign TOKEN::TUSING	to TOKEN_ID;
+		elif VALUE equals "if"			assign TOKEN::TIF		to TOKEN_ID;
+		elif VALUE equals "else"		assign TOKEN::TELSE		to TOKEN_ID;
+		elif VALUE equals "while"		assign TOKEN::TWHILE	to TOKEN_ID;
+		elif VALUE equals "do"			assign TOKEN::TDO		to TOKEN_ID;
+		elif VALUE equals "for"			assign TOKEN::TFOR		to TOKEN_ID;
+		elif VALUE equals "to"			assign TOKEN::TTO		to TOKEN_ID;
+		elif VALUE equals "break"		assign TOKEN::TBREAK	to TOKEN_ID;
+		elif VALUE equals "continue"	assign TOKEN::TCONTINUE to TOKEN_ID;
+		elif VALUE equals "return"		assign TOKEN::TRETURN	to TOKEN_ID;
+		elif VALUE equals "match"		assign TOKEN::TMATCH	to TOKEN_ID;
 
-		elif (value == "new")
-			token_id = TOKEN::TNEW;
+		elif VALUE equals "new"			assign TOKEN::TNEW		to TOKEN_ID;
 
-		elif (value == "none")
-			token_id = TOKEN::TNONE;
-		elif (value == "true")
-			token_id = TOKEN::TTRUE;
-		elif (value == "false")
-			token_id = TOKEN::TFALSE;
+		elif VALUE equals "none"		assign TOKEN::TNONE		to TOKEN_ID;
+		elif VALUE equals "true"		assign TOKEN::TTRUE		to TOKEN_ID;
+		elif VALUE equals "false"		assign TOKEN::TFALSE	to TOKEN_ID;
 
-		elif (value == "and")
-			token_id = TOKEN::TAND;
-		elif (value == "or")
-			token_id = TOKEN::TOR;
-		elif (value == "not")
-			token_id = TOKEN::TNOT;
-		else
-			token_id = TOKEN::TIDENTIFIER;
+		elif VALUE equals "and"			assign TOKEN::TAND		to TOKEN_ID;
+		elif VALUE equals "or"			assign TOKEN::TOR		to TOKEN_ID;
+		elif VALUE equals "not"			assign TOKEN::TNOT		to TOKEN_ID;
+		else							token_id = TOKEN::TIDENTIFIER;
 	}
 }
 
 #undef elif
+#undef VALUE
+#undef equals
+#undef assign
+#undef to
+#undef TOKEN_ID
