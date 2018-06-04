@@ -1,49 +1,53 @@
 #include "Token.h"
 
+#define elif else if
+
 namespace Ice
 {
 	Token::Token(string value) : value(value)
 	{
 		if (value == "using")
 			token_id = TOKEN::TUSING;
-		else if (value == "if")
+		elif (value == "if")
 			token_id = TOKEN::TIF;
-		else if (value == "else")
+		elif (value == "else")
 			token_id = TOKEN::TELSE;
-		else if (value == "while")
+		elif (value == "while")
 			token_id = TOKEN::TWHILE;
-		else if (value == "do")
+		elif (value == "do")
 			token_id = TOKEN::TDO;
-		else if (value == "for")
+		elif (value == "for")
 			token_id = TOKEN::TFOR;
-		else if (value == "to")
+		elif (value == "to")
 			token_id = TOKEN::TTO;
-		else if (value == "break")
+		elif (value == "break")
 			token_id = TOKEN::TBREAK;
-		else if (value == "continue")
+		elif (value == "continue")
 			token_id = TOKEN::TCONTINUE;
-		else if (value == "return")
+		elif (value == "return")
 			token_id = TOKEN::TRETURN;
-		else if (value == "match")
+		elif (value == "match")
 			token_id = TOKEN::TMATCH;
 
-		else if (value == "new")
+		elif (value == "new")
 			token_id = TOKEN::TNEW;
 
-		else if (value == "none")
+		elif (value == "none")
 			token_id = TOKEN::TNONE;
-		else if (value == "true")
+		elif (value == "true")
 			token_id = TOKEN::TTRUE;
-		else if (value == "false")
+		elif (value == "false")
 			token_id = TOKEN::TFALSE;
 
-		else if (value == "and")
+		elif (value == "and")
 			token_id = TOKEN::TAND;
-		else if (value == "or")
+		elif (value == "or")
 			token_id = TOKEN::TOR;
-		else if (value == "not")
+		elif (value == "not")
 			token_id = TOKEN::TNOT;
 		else
 			token_id = TOKEN::TIDENTIFIER;
 	}
 }
+
+#undef elif
