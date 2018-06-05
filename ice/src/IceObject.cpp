@@ -552,7 +552,7 @@ namespace Ice
 		switch (op)
 		{
 		case TOKEN::TADD:
-			for (auto &object : obj->objects)
+			for (auto &object : obj->objects) 
 				res_obj->objects.push_back(object);
 			break;
 		default:

@@ -10,12 +10,12 @@ using TOKEN = Ice::Token::TOKEN;
 namespace Ice
 {
 	void LexicalAnalyzer::analy(string line)
-	{
+	{ // analyze the line & generate tokens
 		State state = State::Begin;
 		string value;
 		const char *reading = line.c_str();
 		while (*reading)
-		{
+		{ // until *reading == '\0'
 			switch (state)
 			{
 			case State::Begin:

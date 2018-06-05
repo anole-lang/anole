@@ -9,8 +9,8 @@ Please add feature request here.
 <hr>
 
 ### TODO
-+ [ ] Add Comments
-+ [ ] Fix Bugs 
++ [ ] Not exit while finding errors when interacting
++ [ ] Fix bugs 
 
 <hr>
 

@@ -22,11 +22,10 @@ namespace Ice
 	void Interpreter::run()
 	{
 		cout << "    _____________________\n"
-					 "   /_  ___/ _____/ _____/\n"
-					 "    / /  / /    / /____      Version 0.0.1 \n"
-					 " __/ /__/ /____/ /____       http://www.jusot.com/ice\n"
-					 "/______/______/______/\n"
-	   			  << endl;
+				"   /_  ___/ _____/ _____/\n"
+				"    / /  / /    / /____      Version 0.0.1 \n"
+				" __/ /__/ /____/ /____       http://www.jusot.com/ice\n"
+				"/______/______/______/\n"    << endl;
 		while (!cin.eof())
 		{
 			cout << ">> ";
@@ -37,6 +36,7 @@ namespace Ice
 				obj->show();
 				cout << endl;
 			}
+			else if (obj == nullptr) continue;
 			block->statements.push_back(dynamic_pointer_cast<Stmt>(node));
 		}
 	}
