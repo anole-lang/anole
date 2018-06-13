@@ -39,25 +39,21 @@ namespace Ice
 		virtual shared_ptr<IceObject> runCode(shared_ptr<Env>&, shared_ptr<Env> normal_top = nullptr) = 0;
 	};
 
-	class Stmt : public Node
-	{
-	};
-	class Expr : public Node
-	{
-	};
+	class Stmt : public Node {};
+	class Expr : public Node {};
 
 	class BlockExpr : public Expr
 	{
 	public:
 		StatementList statements;
-		BlockExpr() {}
+		BlockExpr() = default;
 		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
 	};
 
 	class NoneExpr : public Expr
 	{
 	public:
-		NoneExpr() {}
+		NoneExpr() = default;
 		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
 	};
 

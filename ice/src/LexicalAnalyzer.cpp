@@ -132,7 +132,7 @@ namespace Ice
 				default:
 					tokens.push_back(Token(TOKEN::TAT));
 					state = State::Begin;
-					reading--;
+					--reading;
 					break;
 				}
 				break;
@@ -147,7 +147,7 @@ namespace Ice
 				default:
 					tokens.push_back(Token(TOKEN::TCEQ));
 					state = State::Begin;
-					reading--;
+					--reading;
 					break;
 				}
 				break;
@@ -162,7 +162,7 @@ namespace Ice
 				default:
 					tokens.push_back(Token(TOKEN::TNOT));
 					state = State::Begin;
-					reading--;
+					--reading;
 					break;
 				}
 				break;
@@ -181,7 +181,7 @@ namespace Ice
 				default:
 					tokens.push_back(Token(TOKEN::TCLT));
 					state = State::Begin;
-					reading--;
+					--reading;
 					break;
 				}
 				break;
@@ -200,7 +200,7 @@ namespace Ice
 				default:
 					tokens.push_back(Token(TOKEN::TCGT));
 					state = State::Begin;
-					reading--;
+					--reading;
 					break;
 				}
 				break;
@@ -228,7 +228,7 @@ namespace Ice
 					tokens.push_back(Token(TOKEN::TINTEGER, value));
 					state = State::Begin;
 					value = "";
-					reading--;
+					--reading;
 					break;
 				}
 				break;
@@ -252,7 +252,7 @@ namespace Ice
 					tokens.push_back(Token(TOKEN::TDOUBLE, value));
 					state = State::Begin;
 					value = "";
-					reading--;
+					--reading;
 					break;
 				}
 				break;
@@ -267,7 +267,7 @@ namespace Ice
 					tokens.push_back(Token(value));
 					state = State::Begin;
 					value = "";
-					reading--;
+					--reading;
 				}
 				break;
 
@@ -346,7 +346,7 @@ namespace Ice
 			default:
 				break;
 			}
-			reading++;
+			++reading;
 		}
 	}
 

@@ -38,7 +38,7 @@ namespace Ice
 		auto block = make_shared<BlockExpr>();
 		updateiToken();
 		CHECK_AND_THROW(TOKEN::TLBRACE, "missing symbol '{'");
-		iToken++; // skip '{'
+		++iToken; // skip '{'
 		while (iToken->token_id != TOKEN::TRBRACE)
 		{ // '}' means the end of a block
 			updateiToken();
@@ -48,7 +48,7 @@ namespace Ice
 				block->statements.push_back(stmt);
 			}
 		}
-		iToken++; // skip '}'
+		++iToken; // skip '}'
 		return block;
 	}
 
@@ -57,7 +57,7 @@ namespace Ice
 		updateiToken();
 		if (iToken->token_id == TOKEN::TELSE)
 		{ // check 'else' after if {}
-			iToken++;
+			++iToken;
 			return genBlock();
 		}
 		else
@@ -70,7 +70,7 @@ namespace Ice
 	{ // generate function block (: expr | {}) after @foo()
 		if (iToken->token_id == TOKEN::TASSIGN)
 		{ // @foo(): expr
-			iToken++;
+			++iToken;
 			auto block = make_shared<BlockExpr>();
 			block->statements.push_back(make_shared<ReturnStmt>(genExpr()));
 			return block;
@@ -105,10 +105,10 @@ namespace Ice
 		case TOKEN::TFOR:
 			return genForStmt();
 		case TOKEN::TBREAK:
-			iToken++;
+			++iToken;
 			return make_shared<BreakStmt>();
 		case TOKEN::TCONTINUE:
-			iToken++;
+			++iToken;
 			return make_shared<ContinueStmt>();
 		case TOKEN::TRETURN:
 			return genReturnStmt();
@@ -139,30 +139,30 @@ namespace Ice
 
 		genArguments = [&]() { // generate arguments defined as (a, b:1)
 			VariableList args;
-			iToken++; // skip '('
+			++iToken; // skip '('
 			while (iToken->token_id == TOKEN::TIDENTIFIER)
 			{
 				auto id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
 				shared_ptr<Expr> expression = make_shared<NoneExpr>();
 				if (iToken->token_id == TOKEN::TASSIGN)
 				{
-					iToken++;
+					++iToken;
 					expression = genExpr();
 				}
 				args.push_back(make_shared<VariableDeclarationStmt>(id, expression));
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 				else break;
 			}
-			iToken++; // skip ')'
+			++iToken; // skip ')'
 			return args;
 		};
 
 		genDeclWithDot = [&](ExpressionList &expressions) {
-			iToken++;
+			++iToken;
 			shared_ptr<Node> node = genIdent();
 			if (iToken->token_id == TOKEN::TASSIGN)
 			{
-				iToken++;
+				++iToken;
 				node = make_shared<VariableDeclarationStmt>(
 					dynamic_pointer_cast<IdentifierExpr>(node),
 					genExpr()
@@ -183,7 +183,7 @@ namespace Ice
 					node = genIndexExpr(dynamic_pointer_cast<Expr>(node));
 				if (iToken->token_id == TOKEN::TASSIGN)
 				{
-					iToken++;
+					++iToken;
 					node = make_shared<IndexStmt>(
 						dynamic_pointer_cast<IndexExpr>(node),
 						genExpr());
@@ -206,15 +206,15 @@ namespace Ice
 		};
 
 		genIndexExpr = [&](shared_ptr<Expr> expression) {
-			iToken++;
+			++iToken;
 			auto node = genExpr();
 			CHECK_AND_THROW(TOKEN::TRBRACKET, "missing symbol ']'");
-			iToken++;
+			++iToken;
 			return make_shared<IndexExpr>(expression, node);
 		};
 
 		shared_ptr<Node> node = nullptr;
-		iToken++;
+		++iToken;
 		if (iToken->token_id == TOKEN::TDOT)
 		{
 			return genVarAssign();
@@ -223,7 +223,7 @@ namespace Ice
 		node = genIdent();
 		if (iToken->token_id == TOKEN::TASSIGN)
 		{
-			iToken++;
+			++iToken;
 			node = make_shared<VariableDeclarationStmt>(dynamic_pointer_cast<IdentifierExpr>(node), genExpr());
 		}
 		else if (iToken->token_id == TOKEN::TLPAREN)
@@ -237,7 +237,7 @@ namespace Ice
 				node = genIndexExpr(dynamic_pointer_cast<Expr>(node));
 			if (iToken->token_id == TOKEN::TASSIGN)
 			{
-				iToken++;
+				++iToken;
 				node = make_shared<IndexStmt>(dynamic_pointer_cast<IndexExpr>(node), genExpr());
 			}
 			else if (iToken->token_id == TOKEN::TDOT)
@@ -260,10 +260,10 @@ namespace Ice
 
 	STMT SyntaxAnalyzer::genVarAssign()
 	{
-		iToken++;
+		++iToken;
 		shared_ptr<IdentifierExpr> id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
 		CHECK_AND_THROW(TOKEN::TASSIGN, "missing symbol ':'");
-		iToken++;
+		++iToken;
 		auto assignment = genExpr();
 		return make_shared<VariableAssignStmt>(id, assignment);
 	}
@@ -272,21 +272,21 @@ namespace Ice
 	{
 		function<IdentifierList()> genBases;
 		genBases = [&]() {
-			iToken++;
+			++iToken;
 			IdentifierList bases;
 			while (iToken->token_id == TOKEN::TIDENTIFIER)
 			{
 				bases.push_back(dynamic_pointer_cast<IdentifierExpr>(genIdent()));
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 				else break;
 			}
 			CHECK_AND_THROW(TOKEN::TRPAREN, "missing symbol ')'");
-			iToken++;
+			++iToken;
 			return bases;
 		};
 
 		shared_ptr<Node> node = nullptr;
-		iToken++;
+		++iToken;
 		auto id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
 		CHECK_AND_THROW(TOKEN::TLPAREN, "missing symbol '('");
 		auto bases = genBases();
@@ -296,14 +296,14 @@ namespace Ice
 
 	STMT SyntaxAnalyzer::genUsingStmt()
 	{
-		iToken++;
+		++iToken;
 		CHECK_AND_THROW(TOKEN::TIDENTIFIER, "missing an identifier after 'using'");
 		return make_shared<UsingStmt>((iToken++)->value);
 	}
 
 	STMT SyntaxAnalyzer::genIfElse()
 	{
-		iToken++;
+		++iToken;
 		auto cond = genExpr();
 		auto blockTrue = genBlock();
 		auto blockFalse = genIfElseTail();
@@ -312,7 +312,7 @@ namespace Ice
 
 	STMT SyntaxAnalyzer::genWhileStmt()
 	{
-		iToken++;
+		++iToken;
 		auto cond = genExpr();
 		auto block = genBlock();
 		return make_shared<WhileStmt>(cond, block);
@@ -320,20 +320,20 @@ namespace Ice
 
 	STMT SyntaxAnalyzer::genDoWhileStmt()
 	{
-		iToken++;
+		++iToken;
 		auto block = genBlock();
 		CHECK_AND_THROW(TOKEN::TWHILE, "missing keyword 'while' after 'do'");
-		iToken++;
+		++iToken;
 		auto cond = genExpr();
 		return make_shared<DoWhileStmt>(cond, block);
 	}
 
 	STMT SyntaxAnalyzer::genForStmt()
 	{
-		iToken++;
+		++iToken;
 		auto begin = genExpr();
 		CHECK_AND_THROW(TOKEN::TTO, "missing keyword 'to' in for");
-		iToken++;
+		++iToken;
 		auto end = genExpr();
 		auto block = genBlock();
 		return make_shared<ForStmt>(begin, end, block);
@@ -341,7 +341,7 @@ namespace Ice
 
 	STMT SyntaxAnalyzer::genReturnStmt()
 	{
-		iToken++;
+		++iToken;
 		return make_shared<ReturnStmt>(genExpr());
 	}
 
@@ -355,7 +355,7 @@ namespace Ice
 			{
 			case TOKEN::TOR:
 				op = iToken->token_id;
-				iToken++;
+				++iToken;
 				break;
 			default:
 				return node;
@@ -386,7 +386,7 @@ namespace Ice
 			{
 			case TOKEN::TAND:
 				op = iToken->token_id;
-				iToken++;
+				++iToken;
 				break;
 			default:
 				return node;
@@ -421,7 +421,7 @@ namespace Ice
 			case TOKEN::TCGT:
 			case TOKEN::TCGE:
 				op = iToken->token_id;
-				iToken++;
+				++iToken;
 				break;
 			default:
 				return node;
@@ -435,7 +435,7 @@ namespace Ice
 		shared_ptr<Expr> node = nullptr;
 		if (iToken->token_id == TOKEN::TNOT)
 		{
-			iToken++;
+			++iToken;
 			node = genCmp();
 			node = genCmpRest(node);
 			return make_shared<UnaryOperatorExpr>(TOKEN::TNOT, node);
@@ -455,7 +455,7 @@ namespace Ice
 			case TOKEN::TADD:
 			case TOKEN::TSUB:
 				op = iToken->token_id;
-				iToken++;
+				++iToken;
 				break;
 			default:
 				return node;
@@ -482,7 +482,7 @@ namespace Ice
 			case TOKEN::TDIV:
 			case TOKEN::TMOD:
 				op = iToken->token_id;
-				iToken++;
+				++iToken;
 				break;
 			default:
 				return node;
@@ -508,7 +508,7 @@ namespace Ice
 		case TOKEN::TDOUBLE:
 			return genNumeric();
 		case TOKEN::TNONE:
-			iToken++;
+			++iToken;
 			return make_shared<NoneExpr>();
 		case TOKEN::TTRUE:
 		case TOKEN::TFALSE:
@@ -516,13 +516,13 @@ namespace Ice
 		case TOKEN::TSTRING:
 			return genString();
 		case TOKEN::TLPAREN:
-			iToken++;
+			++iToken;
 			node = genExpr();
 			CHECK_AND_THROW(TOKEN::TRPAREN, "missing symbol '(' .");
-			iToken++;
+			++iToken;
 			return node;
 		case TOKEN::TSUB:
-			iToken++;
+			++iToken;
 			return make_shared<UnaryOperatorExpr>(TOKEN::TSUB, genTerm());
 		case TOKEN::TAT:
 			return genLambdaExpr();
@@ -546,18 +546,18 @@ namespace Ice
 
 		genArgs = [&]() {
 			ExpressionList args;
-			iToken++;
+			++iToken;
 			while (iToken->token_id != TOKEN::TRPAREN)
 			{
 				args.push_back(genExpr());
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 			}
-			iToken++;
+			++iToken;
 			return args;
 		};
 
 		genDotExpr = [&](shared_ptr<Expr> left) {
-			iToken++;
+			++iToken;
 			shared_ptr<Expr> node = genIdent();
 			if (iToken->token_id == TOKEN::TLPAREN)
 				node = make_shared<MethodCallExpr>(node, genArgs());
@@ -569,10 +569,10 @@ namespace Ice
 		};
 
 		genIndexExpr = [&](shared_ptr<Expr> expression) {
-			iToken++;
+			++iToken;
 			shared_ptr<Expr> node = genExpr();
 			CHECK_AND_THROW(TOKEN::TRBRACKET, "missing symbol ']'");
-			iToken++;
+			++iToken;
 			return make_shared<IndexExpr>(expression, node);
 		};
 
@@ -593,7 +593,7 @@ namespace Ice
 	EXPR SyntaxAnalyzer::genIdent()
 	{
 		auto node = make_shared<IdentifierExpr>(iToken->value);
-		iToken++;
+		++iToken;
 		return node;
 	}
 
@@ -604,21 +604,21 @@ namespace Ice
 			node = make_shared<IntegerExpr>(stoi(iToken->value));
 		else
 			node = make_shared<DoubleExpr>(stod(iToken->value));
-		iToken++;
+		++iToken;
 		return node;
 	}
 
 	EXPR SyntaxAnalyzer::genBoolean()
 	{
 		auto node = make_shared<BooleanExpr>(((iToken->token_id == TOKEN::TTRUE) ? true : false));
-		iToken++;
+		++iToken;
 		return node;
 	}
 
 	EXPR SyntaxAnalyzer::genString()
 	{
 		auto node = make_shared<StringExpr>(iToken->value);
-		iToken++;
+		++iToken;
 		return node;
 	}
 
@@ -628,17 +628,17 @@ namespace Ice
 		function<shared_ptr<Expr>(shared_ptr<Expr>)> genDictExpr;
 
 		genEnumExpr = [&](shared_ptr<IdentifierExpr> first) {
-			iToken++;
+			++iToken;
 			IdentifierList enumerators;
 			enumerators.push_back(first);
 			while (iToken->token_id == TOKEN::TIDENTIFIER)
 			{
 				enumerators.push_back(dynamic_pointer_cast<IdentifierExpr>(genIdent()));
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 				else break;
 			}
 			CHECK_AND_THROW(TOKEN::TRBRACE, "missing symbol '}'");
-			iToken++;
+			++iToken;
 			return make_shared<EnumExpr>(enumerators);
 		};
 
@@ -647,26 +647,26 @@ namespace Ice
 			ExpressionList keys, values;
 			keys.push_back(first);
 
-			iToken++;
+			++iToken;
 			values.push_back(genExpr());
-			if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+			if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 			while (iToken->token_id != TOKEN::TRBRACE)
 			{
 				keys.push_back(genExpr());
 				CHECK_AND_THROW(TOKEN::TASSIGN, "missing symbol ':'");
-				iToken++;
+				++iToken;
 				values.push_back(genExpr());
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 				else break;
 			}
-			iToken++;
+			++iToken;
 			return make_shared<DictExpr>(keys, values);
 		};
 
-		iToken++;
+		++iToken;
 		if (iToken->token_id == TOKEN::TRBRACE)
 		{
-			iToken++;
+			++iToken;
 			return make_shared<DictExpr>();
 		}
 		auto node = genExpr();
@@ -691,35 +691,35 @@ namespace Ice
 				shared_ptr<Expr> expression = make_shared<NoneExpr>();
 				if (iToken->token_id == TOKEN::TASSIGN)
 				{
-					iToken++;
+					++iToken;
 					expression = genExpr();
 				}
 				args.push_back(make_shared<VariableDeclarationStmt>(id, expression));
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 				else break;
 			}
 			return args;
 		};
 
 		shared_ptr<Expr> node = nullptr;
-		iToken++;
+		++iToken;
 		CHECK_AND_THROW(TOKEN::TLPAREN, "missing symbol '('");
-		iToken++;
+		++iToken;
 		VariableList args = genArguments();
 		CHECK_AND_THROW(TOKEN::TRPAREN, "missing symbol ')'");
-		iToken++;
+		++iToken;
 		auto block = genBlock();
 		if (iToken->token_id == TOKEN::TLPAREN)
 		{
 			ExpressionList exprs;
-			iToken++;
+			++iToken;
 			while (iToken->token_id != TOKEN::TRPAREN)
 			{
 				exprs.push_back(genExpr());
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 				else break;
 			}
-			iToken++;
+			++iToken;
 			node = make_shared<LambdaCallExpr>(args, block, exprs);
 		}
 		else node = make_shared<LambdaExpr>(args, block);
@@ -731,19 +731,19 @@ namespace Ice
 		function<ExpressionList()> genArgs;
 		genArgs = [&]() {
 			ExpressionList args;
-			iToken++;
+			++iToken;
 			while (iToken->token_id != TOKEN::TRPAREN)
 			{
 				args.push_back(genExpr());
-				if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 				else break;
 			}
 			CHECK_AND_THROW(TOKEN::TRPAREN, "missing symbol ')'");
-			iToken++;
+			++iToken;
 			return args;
 		};
 
-		iToken++;
+		++iToken;
 		auto id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
 		CHECK_AND_THROW(TOKEN::TLPAREN, "missing symbol '('");
 		ExpressionList args = genArgs();
@@ -758,13 +758,13 @@ namespace Ice
 				5 => "five"
 			} else "bigger than five"
 		*/
-		iToken++;
+		++iToken;
 		auto expression = genExpr();
 		ExpressionList mat_expressions;
 		ExpressionList ret_expressions;
 		shared_ptr<Expr> else_expression = make_shared<NoneExpr>();
 		CHECK_AND_THROW(TOKEN::TLBRACE, "missing symbol '{'");
-		iToken++; // skip '{'
+		++iToken; // skip '{'
 		while (iToken->token_id != TOKEN::TRBRACE)
 		{
 			int counter = 1;
@@ -772,26 +772,26 @@ namespace Ice
 
 			while (iToken->token_id == TOKEN::TCOMMA)
 			{
-				iToken++;
+				++iToken;
 				mat_expressions.push_back(genExpr());
 				counter++;
 			}
 
 			CHECK_AND_THROW(TOKEN::TRET, "missing symbol '=>'");
-			iToken++;
+			++iToken;
 
 			auto ret_expression = genExpr();
 			while (counter--) ret_expressions.push_back(ret_expression);
 
 			if (iToken->token_id == TOKEN::TCOMMA)
 			{
-				iToken++;
+				++iToken;
 			}
 		}
-		iToken++; // skip '}'
+		++iToken; // skip '}'
 		if (iToken->token_id == TOKEN::TELSE)
 		{ // check 'else' after 'match {}'
-			iToken++;
+			++iToken;
 			else_expression = genExpr();
 		}
 		return make_shared<MatchExpr>(
@@ -804,14 +804,14 @@ namespace Ice
 
 	EXPR SyntaxAnalyzer::genListExpr()
 	{ // generate list as [expr1, expr2, ..., exprN]
-		iToken++; // skip '['
+		++iToken; // skip '['
 		ExpressionList expressions;
 		while (iToken->token_id != TOKEN::TRBRACKET)
 		{
 			expressions.push_back(genExpr());
-			if (iToken->token_id == TOKEN::TCOMMA) iToken++;
+			if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
 		}
-		iToken++; // skip(']')
+		++iToken; // skip(']')
 		return make_shared<ListExpr>(expressions);
 	}
 
