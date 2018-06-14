@@ -313,6 +313,7 @@ namespace Ice
 {
 	class SyntaxAnalyzer
 	{
+
 	private:
 
 		LexicalAnalyzer lexicalAnalyzer;

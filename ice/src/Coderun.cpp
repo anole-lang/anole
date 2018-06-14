@@ -72,7 +72,9 @@ namespace Ice
 				return;
 			}
 			else
+			{
 				tmp = tmp->prev;
+			}
 		}
 		objects[name] = obj;
 		return;
@@ -84,9 +86,13 @@ namespace Ice
 		while (tmp != nullptr)
 		{
 			if (tmp->objects.find(name) != tmp->objects.end())
+			{
 				return tmp->objects[name];
+			}
 			else
+			{
 				tmp = tmp->prev;
+			}
 		}
 		cout << "cannot find " << name << endl;
 		exit(0);
@@ -100,7 +106,9 @@ namespace Ice
 			if (iter->second->type == IceObject::TYPE::INSTANCE)
 			{
 				if (iter->second.use_count() == 2)
+				{
 					dynamic_pointer_cast<IceInstanceObject>(iter->second)->top->objects["self"] = nullptr;
+				}
 			}
 		}
 	}
@@ -163,7 +171,9 @@ namespace Ice
 		{
 			Objects objects;
 			for (auto &argument : arguments)
+			{
 				objects.push_back(argument->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+			}
 			return dynamic_pointer_cast<IceBuiltInFunctionObject>(_obj)->func(objects);
 		}
 		else if (_obj->type != IceObject::TYPE::FUNCTION)
@@ -180,11 +190,15 @@ namespace Ice
 			exit(0);
 		}
 
-		for (size_t i = 0; i < arguments.size(); i++) 
+		for (size_t i = 0; i < arguments.size(); i++)
+		{
 			func->argDecls[i]->assignment = arguments[i];
+		}
 
 		for (auto &argDecl : func->argDecls)
+		{
 			_top->put(argDecl->id->name, argDecl->assignment->runCode((normal_top == nullptr) ? (_top) : (normal_top)));
+		}
 
 		shared_ptr<IceObject> returnValue = func->block->runCode(_top);
 		_top->garbageCollection();
@@ -292,7 +306,10 @@ namespace Ice
 				top->setContinueStatus(true);
 			}
 		}
-		if (returnValue != nullptr) top->setReturnValue(returnValue);
+		if (returnValue != nullptr)
+		{
+			top->setReturnValue(returnValue);
+		}
 		return returnValue;
 	}
 
@@ -510,7 +527,9 @@ namespace Ice
 
 		long i = 0;
 		for (auto &enumerator : enumerators)
+		{
 			obj->top->put(enumerator->name, make_shared<IceIntegerObject>(i++));
+		}
 
 		return obj;
 	}
@@ -609,7 +628,8 @@ namespace Ice
 
 	void Env::genBuildInFunctions()
 	{
-		put("input", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("input", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size())
 			{
 				cout << "input() need no arguments" << endl;
@@ -620,7 +640,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceStringObject>(input));
 		}));
 
-		put("print", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("print", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size() != 1)
 			{
 				cout << "print() need 1 argument but get others" << endl;
@@ -630,7 +651,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
 
-		put("println", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("println", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size() != 1)
 			{
 				cout << "println() need 1 argument but get others" << endl;
@@ -640,7 +662,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
 
-		put("str", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("str", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size() != 1)
 			{
 				cout << "str() need 1 argument but get others" << endl;
@@ -649,7 +672,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceStringObject>(objects[0]->toStr()));
 		}));
 
-		put("exit", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("exit", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size())
 			{
 				if (objects.size() == 1)
@@ -670,7 +694,8 @@ namespace Ice
 		}));
 
 
-		put("len", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("len", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size() != 1)
 			{
 				cout << "len() need 1 argument but get others" << endl;
@@ -691,7 +716,8 @@ namespace Ice
 			}
 		}));
 
-		put("int", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("int", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size() != 1)
 			{
 				cout << "int() need 1 arguments but get others" << endl;
@@ -705,7 +731,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(atoi(dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
 		}));
 
-		put("float", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("float", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size() != 1)
 			{
 				cout << "float() need 1 arguments but get others" << endl;
@@ -719,7 +746,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceDoubleObject>(atof(dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
 		}));
 
-		put("time", make_shared<IceBuiltInFunctionObject>([](Objects objects) {
+		put("time", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		{
 			if (objects.size())
 			{
 				cout << "time() need no arguments" << endl;

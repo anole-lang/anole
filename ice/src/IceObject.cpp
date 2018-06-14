@@ -119,7 +119,7 @@ namespace Ice
 				raw_value += *p;
 				break;
 			}
-			p++;
+			++p;
 		}
 	}
 
@@ -493,7 +493,8 @@ namespace Ice
 
 	void IceStringObject::genBuiltInMethods()
 	{
-		top->put("isalpha", make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
+		top->put("isalpha", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		{
 			if (objects.size())
 			{
 				cout << "method isalpha() need no arguments" << endl;
@@ -502,7 +503,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceBooleanObject>(value.size() == 1 ? (isalpha(value[0])) : false));
 		}));
 
-		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
+		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		{
 			if (objects.size())
 			{
 				cout << "method size() need no arguments" << endl;
@@ -532,7 +534,9 @@ namespace Ice
 		case TOKEN::TSUB:
 			obj = make_shared<IceListObject>();
 			for (int i = (int)objects.size() - 1; i >= 0; i--)
+			{
 				obj->objects.push_back(objects[i]);
+			}
 			break;
 		default:
 			break;
@@ -552,8 +556,10 @@ namespace Ice
 		switch (op)
 		{
 		case TOKEN::TADD:
-			for (auto &object : obj->objects) 
+			for (auto &object : obj->objects)
+			{
 				res_obj->objects.push_back(object);
+			}
 			break;
 		default:
 			break;
@@ -597,7 +603,8 @@ namespace Ice
 
 	void IceListObject::genBuiltInMethods()
 	{
-		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) {
+		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		{
 			if (_objects.size())
 			{
 				cout << "method size() need no arguments" << endl;
@@ -607,7 +614,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(objects.size()));
 		}));
 
-		top->put("empty", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) {
+		top->put("empty", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		{
 			if (_objects.size())
 			{
 				cout << "method empty() need no arguments" << endl;
@@ -617,7 +625,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceBooleanObject>(objects.empty()));
 		}));
 
-		top->put("push_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) {
+		top->put("push_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		{
 			if (_objects.size() != 1)
 			{
 				cout << "method push_back() need 1 argument but get others" << endl;
@@ -628,7 +637,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
 
-		top->put("pop_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) {
+		top->put("pop_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		{
 			if (_objects.size())
 			{
 				cout << "method pop_back() need no arguments" << endl;
@@ -639,7 +649,8 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
 
-		top->put("front", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) {
+		top->put("front", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		{
 			if (_objects.size())
 			{
 				cout << "method front() need no arguments" << endl;
@@ -649,7 +660,8 @@ namespace Ice
 			return objects.front();
 		}));
 
-		top->put("back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) {
+		top->put("back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		{
 			if (_objects.size())
 			{
 				cout << "method back() need no arguments" << endl;
@@ -659,7 +671,8 @@ namespace Ice
 			return objects.back();
 		}));
 
-		top->put("clear", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) {
+		top->put("clear", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		{
 			if (_objects.size())
 			{
 				cout << "method clear() need no arguments" << endl;
@@ -696,7 +709,10 @@ namespace Ice
 		cout << "{";
 		for (auto iter = objects_map.begin(); iter != objects_map.end(); iter++)
 		{
-			if (iter != objects_map.begin()) cout << ", ";
+			if (iter != objects_map.begin())
+			{
+				cout << ", ";
+			}
 			iter->first.obj->show();
 			cout << ": ";
 			iter->second->show();
@@ -724,7 +740,8 @@ namespace Ice
 
 	void IceDictObject::genBuiltInMethods()
 	{
-		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects) {
+		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		{
 			if (objects.size())
 			{
 				cout << "method size() need no arguments" << endl;

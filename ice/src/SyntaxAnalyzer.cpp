@@ -18,13 +18,15 @@ using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
+	// update iToken when cannot find the next token
 	void SyntaxAnalyzer::updateiToken()
-	{ // update iToken when cannot find the next token
+	{ 
 		if (iToken->token_id == TOKEN::TEND) iToken = lexicalAnalyzer.cont();
 	}
 
+	// usually use when interacting
 	BLOCK_EXPR SyntaxAnalyzer::genStmts()
-	{ // usually use when interacting
+	{ 
 		auto stmts = make_shared<BlockExpr>();
 		while (iToken->token_id != TOKEN::TEND)
 		{
@@ -33,14 +35,17 @@ namespace Ice
 		return stmts;
 	}
 
+	// gen normal block as {...}
 	BLOCK_EXPR SyntaxAnalyzer::genBlock()
-	{ // gen normal block as {...}
+	{ 
 		auto block = make_shared<BlockExpr>();
 		updateiToken();
 		CHECK_AND_THROW(TOKEN::TLBRACE, "missing symbol '{'");
 		++iToken; // skip '{'
+
+		// '}' means the end of a block
 		while (iToken->token_id != TOKEN::TRBRACE)
-		{ // '}' means the end of a block
+		{
 			updateiToken();
 			auto stmt = genStmt();
 			if (stmt != nullptr)
@@ -52,38 +57,41 @@ namespace Ice
 		return block;
 	}
 
+	// generate else block after if {}
 	BLOCK_EXPR SyntaxAnalyzer::genIfElseTail()
-	{ // generate else block after if {}
+	{ 
 		updateiToken();
 		if (iToken->token_id == TOKEN::TELSE)
-		{ // check 'else' after if {}
+		{
 			++iToken;
 			return genBlock();
 		}
 		else
-		{ // only if {}
+		{
 			return make_shared<BlockExpr>();
 		}
 	}
 
+	// generate function block (: expr | {}) after @foo()
 	BLOCK_EXPR SyntaxAnalyzer::genFuncDeclRest()
-	{ // generate function block (: expr | {}) after @foo()
+	{ 
 		if (iToken->token_id == TOKEN::TASSIGN)
-		{ // @foo(): expr
+		{
 			++iToken;
 			auto block = make_shared<BlockExpr>();
 			block->statements.push_back(make_shared<ReturnStmt>(genExpr()));
 			return block;
 		}
 		else if (iToken->token_id == TOKEN::TLBRACE)
-		{ // @foo() {}
+		{
 			return genBlock();
 		}
 		else THROW("missing symbol ':' or '{' after @func()");
 	}
 
+	// generate normal statement
 	STMT SyntaxAnalyzer::genStmt()
-	{ // generate normal statement
+	{ 
 		switch (iToken->token_id)
 		{
 		case TOKEN::TAT:
@@ -131,13 +139,16 @@ namespace Ice
 		}
 	}
 
+	// generate declaration or assignment (@.var:)
 	STMT SyntaxAnalyzer::genDeclOrAssign()
-	{ // generate declaration or assignment (@.var:)
+	{ 
+		// generate arguments defined as (a, b:1)
 		function<VariableList()> genArguments;
 		function<shared_ptr<Node>(ExpressionList &)> genDeclWithDot;
 		function<shared_ptr<IndexExpr>(shared_ptr<Expr>)> genIndexExpr;
-
-		genArguments = [&]() { // generate arguments defined as (a, b:1)
+		
+		genArguments = [&]() 
+		{ 
 			VariableList args;
 			++iToken; // skip '('
 			while (iToken->token_id == TOKEN::TIDENTIFIER)
@@ -157,36 +168,30 @@ namespace Ice
 			return args;
 		};
 
-		genDeclWithDot = [&](ExpressionList &expressions) {
+		genDeclWithDot = [&](ExpressionList &expressions) 
+		{
 			++iToken;
 			shared_ptr<Node> node = genIdent();
 			if (iToken->token_id == TOKEN::TASSIGN)
 			{
 				++iToken;
-				node = make_shared<VariableDeclarationStmt>(
-					dynamic_pointer_cast<IdentifierExpr>(node),
-					genExpr()
-					);
+				node = make_shared<VariableDeclarationStmt>(dynamic_pointer_cast<IdentifierExpr>(node), genExpr());
 			}
 			else if (iToken->token_id == TOKEN::TLPAREN)
 			{
 				VariableList args = genArguments();
-				node = make_shared<FunctionDeclarationStmt>(
-					dynamic_pointer_cast<IdentifierExpr>(node),
-					args,
-					genFuncDeclRest()
-					);
+				node = make_shared<FunctionDeclarationStmt>(dynamic_pointer_cast<IdentifierExpr>(node), args, genFuncDeclRest());
 			}
 			else if (iToken->token_id == TOKEN::TLBRACKET)
 			{
 				while (iToken->token_id == TOKEN::TLBRACKET)
+				{
 					node = genIndexExpr(dynamic_pointer_cast<Expr>(node));
+				}
 				if (iToken->token_id == TOKEN::TASSIGN)
 				{
 					++iToken;
-					node = make_shared<IndexStmt>(
-						dynamic_pointer_cast<IndexExpr>(node),
-						genExpr());
+					node = make_shared<IndexStmt>(dynamic_pointer_cast<IndexExpr>(node), genExpr());
 				}
 				else if (iToken->token_id == TOKEN::TDOT)
 				{
@@ -205,7 +210,8 @@ namespace Ice
 			return make_shared<DotStmt>(expressions, dynamic_pointer_cast<Stmt>(node));
 		};
 
-		genIndexExpr = [&](shared_ptr<Expr> expression) {
+		genIndexExpr = [&](shared_ptr<Expr> expression) 
+		{
 			++iToken;
 			auto node = genExpr();
 			CHECK_AND_THROW(TOKEN::TRBRACKET, "missing symbol ']'");
@@ -234,7 +240,9 @@ namespace Ice
 		else if (iToken->token_id == TOKEN::TLBRACKET)
 		{
 			while (iToken->token_id == TOKEN::TLBRACKET)
+			{
 				node = genIndexExpr(dynamic_pointer_cast<Expr>(node));
+			}
 			if (iToken->token_id == TOKEN::TASSIGN)
 			{
 				++iToken;
@@ -261,7 +269,7 @@ namespace Ice
 	STMT SyntaxAnalyzer::genVarAssign()
 	{
 		++iToken;
-		shared_ptr<IdentifierExpr> id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
+		auto id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
 		CHECK_AND_THROW(TOKEN::TASSIGN, "missing symbol ':'");
 		++iToken;
 		auto assignment = genExpr();
@@ -270,8 +278,8 @@ namespace Ice
 
 	STMT SyntaxAnalyzer::genClassDecl()
 	{
-		function<IdentifierList()> genBases;
-		genBases = [&]() {
+		auto genBases = [&]() 
+		{
 			++iToken;
 			IdentifierList bases;
 			while (iToken->token_id == TOKEN::TIDENTIFIER)
@@ -347,9 +355,9 @@ namespace Ice
 
 	EXPR SyntaxAnalyzer::genExpr()
 	{
-		function<shared_ptr<Expr>(shared_ptr<Expr>)> genLogicOrRest;
-		genLogicOrRest = [&](shared_ptr<Expr> lhs) {
-			shared_ptr<Expr> node = lhs;
+		function<shared_ptr<Expr>(shared_ptr<Expr>)> genLogicOrRest = [&](shared_ptr<Expr> lhs) 
+		{
+			auto node = lhs;
 			TOKEN op;
 			switch (iToken->token_id)
 			{
@@ -378,8 +386,8 @@ namespace Ice
 
 	EXPR SyntaxAnalyzer::genLogicOr()
 	{
-		function<shared_ptr<Expr>(shared_ptr<Expr>)> genLogicAndRest;
-		genLogicAndRest = [&](shared_ptr<Expr> lhs) {
+		function<shared_ptr<Expr>(shared_ptr<Expr>)> genLogicAndRest = [&](shared_ptr<Expr> lhs) 
+		{
 			shared_ptr<Expr> node = lhs;
 			TOKEN op;
 			switch (iToken->token_id)
@@ -408,8 +416,8 @@ namespace Ice
 
 	EXPR SyntaxAnalyzer::genLogicNot()
 	{
-		function<shared_ptr<Expr>(shared_ptr<Expr>)> genCmpRest;
-		genCmpRest = [&](shared_ptr<Expr> lhs) {
+		function<shared_ptr<Expr>(shared_ptr<Expr>)> genCmpRest = [&](shared_ptr<Expr> lhs)
+		{
 			shared_ptr<Expr> node = lhs;
 			TOKEN op;
 			switch (iToken->token_id)
@@ -446,8 +454,8 @@ namespace Ice
 
 	EXPR SyntaxAnalyzer::genCmp()
 	{
-		function<shared_ptr<Expr>(shared_ptr<Expr>)> genFactorRest;
-		genFactorRest = [&](shared_ptr<Expr> lhs) {
+		function<shared_ptr<Expr>(shared_ptr<Expr>)> genFactorRest = [&](shared_ptr<Expr> lhs)
+		{
 			shared_ptr<Expr> node = lhs;
 			TOKEN op;
 			switch (iToken->token_id)
@@ -472,8 +480,8 @@ namespace Ice
 
 	EXPR SyntaxAnalyzer::genFactor()
 	{
-		function<shared_ptr<Expr>(shared_ptr<Expr>)> genTermRest;
-		genTermRest = [&](shared_ptr<Expr> lhs) {
+		function<shared_ptr<Expr>(shared_ptr<Expr>)> genTermRest = [&](shared_ptr<Expr> lhs)
+		{
 			shared_ptr<Expr> node = lhs;
 			TOKEN op;
 			switch (iToken->token_id)
@@ -544,7 +552,8 @@ namespace Ice
 		function<shared_ptr<Expr>(shared_ptr<Expr>)> genDotExpr;
 		function<shared_ptr<IndexExpr>(shared_ptr<Expr>)> genIndexExpr;
 
-		genArgs = [&]() {
+		genArgs = [&]() 
+		{
 			ExpressionList args;
 			++iToken;
 			while (iToken->token_id != TOKEN::TRPAREN)
@@ -556,7 +565,8 @@ namespace Ice
 			return args;
 		};
 
-		genDotExpr = [&](shared_ptr<Expr> left) {
+		genDotExpr = [&](shared_ptr<Expr> left) 
+		{
 			++iToken;
 			shared_ptr<Expr> node = genIdent();
 			if (iToken->token_id == TOKEN::TLPAREN)
@@ -568,7 +578,8 @@ namespace Ice
 			return make_shared<DotExpr>(left, node);
 		};
 
-		genIndexExpr = [&](shared_ptr<Expr> expression) {
+		genIndexExpr = [&](shared_ptr<Expr> expression) 
+		{
 			++iToken;
 			shared_ptr<Expr> node = genExpr();
 			CHECK_AND_THROW(TOKEN::TRBRACKET, "missing symbol ']'");
@@ -622,12 +633,14 @@ namespace Ice
 		return node;
 	}
 
+	// generate enum as {NAME1, NAME2, ..., NAMEN} or dict as {KEY1: VAL1, KEY2: VAL2, ..., KEYN: VALN}
 	EXPR SyntaxAnalyzer::genEnumOrDict()
-	{ // generate enum as {NAME1, NAME2, ..., NAMEN} or dict as {KEY1: VAL1, KEY2: VAL2, ..., KEYN: VALN}
+	{ 
 		function<shared_ptr<Expr>(shared_ptr<IdentifierExpr>)> genEnumExpr;
 		function<shared_ptr<Expr>(shared_ptr<Expr>)> genDictExpr;
 
-		genEnumExpr = [&](shared_ptr<IdentifierExpr> first) {
+		genEnumExpr = [&](shared_ptr<IdentifierExpr> first) 
+		{
 			++iToken;
 			IdentifierList enumerators;
 			enumerators.push_back(first);
@@ -642,7 +655,8 @@ namespace Ice
 			return make_shared<EnumExpr>(enumerators);
 		};
 
-		genDictExpr = [&](shared_ptr<Expr> first) {
+		genDictExpr = [&](shared_ptr<Expr> first) 
+		{
 			CHECK_AND_THROW(TOKEN::TASSIGN, "missing symbol ':'");
 			ExpressionList keys, values;
 			keys.push_back(first);
@@ -680,10 +694,11 @@ namespace Ice
 		}
 	}
 
+	// generate lambda expr as @(){} and also @(){}()
 	EXPR SyntaxAnalyzer::genLambdaExpr()
-	{ // generate lambda expr as @(){} and also @(){}()
-		function<VariableList()> genArguments;
-		genArguments = [&]() {
+	{ 
+		auto genArguments = [&]() 
+		{
 			VariableList args;
 			while (iToken->token_id == TOKEN::TIDENTIFIER)
 			{
@@ -726,10 +741,11 @@ namespace Ice
 		return node;
 	}
 
+	// generate new expr as @instance: new Class()
 	EXPR SyntaxAnalyzer::genNewExpr()
-	{ // generate new expr as @instance: new Class()
-		function<ExpressionList()> genArgs;
-		genArgs = [&]() {
+	{ 
+		auto genArgs = [&]() 
+		{
 			ExpressionList args;
 			++iToken;
 			while (iToken->token_id != TOKEN::TRPAREN)
@@ -750,14 +766,15 @@ namespace Ice
 		return make_shared<NewExpr>(id, args);
 	}
 
+	/* EXPR SyntaxAnalyzer::genMatchExpr()
+	generate match expr as follow:
+		match value {
+			1, 2, 3, 4 => "smaller than five",
+			5 => "five"
+		} else "bigger than five"
+	*/
 	EXPR SyntaxAnalyzer::genMatchExpr()
-	{ // generate match expr as follow:
-		/*
-			match value {
-				1, 2, 3, 4 => "smaller than five",
-				5 => "five"
-			} else "bigger than five"
-		*/
+	{ 
 		++iToken;
 		auto expression = genExpr();
 		ExpressionList mat_expressions;
@@ -781,7 +798,10 @@ namespace Ice
 			++iToken;
 
 			auto ret_expression = genExpr();
-			while (counter--) ret_expressions.push_back(ret_expression);
+			while (counter--)
+			{
+				ret_expressions.push_back(ret_expression);
+			}
 
 			if (iToken->token_id == TOKEN::TCOMMA)
 			{
@@ -789,21 +809,19 @@ namespace Ice
 			}
 		}
 		++iToken; // skip '}'
+
+		// check 'else' after 'match {}'
 		if (iToken->token_id == TOKEN::TELSE)
-		{ // check 'else' after 'match {}'
+		{ 
 			++iToken;
 			else_expression = genExpr();
 		}
-		return make_shared<MatchExpr>(
-			expression, 
-			mat_expressions, 
-			ret_expressions, 
-			else_expression
-			);
+		return make_shared<MatchExpr>(expression, mat_expressions, ret_expressions, else_expression);
 	}
 
+	// generate list as [expr1, expr2, ..., exprN]
 	EXPR SyntaxAnalyzer::genListExpr()
-	{ // generate list as [expr1, expr2, ..., exprN]
+	{ 
 		++iToken; // skip '['
 		ExpressionList expressions;
 		while (iToken->token_id != TOKEN::TRBRACKET)
@@ -815,9 +833,9 @@ namespace Ice
 		return make_shared<ListExpr>(expressions);
 	}
 
+	// use when interacting & return stmt node
 	shared_ptr<Node> SyntaxAnalyzer::getNode()
-	{ // use when interacting
-	  // return stmt node
+	{ 
 		string line;
 		getline(cin, line);
 		auto &tokens = lexicalAnalyzer.getTokens(line);
@@ -825,9 +843,9 @@ namespace Ice
 		return (iToken == tokens.end()) ? nullptr : genStmt();
 	}
 
+	// use when in interpreting file & return stmts node
 	shared_ptr<Node> SyntaxAnalyzer::getNode(string code)
-	{ // use when in interpreting file
-	  // return stmts node
+	{ 
 		auto &tokens = lexicalAnalyzer.getTokens(code);
 		iToken = tokens.begin();
 		return (iToken == tokens.end()) ? nullptr : genStmts();

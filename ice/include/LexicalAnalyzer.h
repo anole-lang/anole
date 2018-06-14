@@ -16,6 +16,7 @@ namespace Ice
 	class LexicalAnalyzer
 	{
 	private:
+
 		std::vector<Token> tokens;
 		enum class State
 		{
@@ -37,6 +38,7 @@ namespace Ice
 		void analy(string);
 
 	public:
+
 		LexicalAnalyzer() {}
 		vector<Token> &getTokens(string);
 		vector<Token>::iterator cont();

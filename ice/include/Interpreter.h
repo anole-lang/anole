@@ -21,6 +21,7 @@ namespace Ice
 
 	class Interpreter
 	{
+
 	private:
 
 		shared_ptr<Env> top;

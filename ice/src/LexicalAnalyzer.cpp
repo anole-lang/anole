@@ -9,13 +9,16 @@ using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
+	// analyze the line & generate tokens
 	void LexicalAnalyzer::analy(string line)
-	{ // analyze the line & generate tokens
+	{ 
 		State state = State::Begin;
 		string value;
 		const char *reading = line.c_str();
-		while (*reading)
-		{ // until *reading == '\0'
+
+		// until *reading == '\0'
+		while (*reading) 
+		{ 
 			switch (state)
 			{
 			case State::Begin:

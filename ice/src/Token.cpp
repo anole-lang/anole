@@ -29,7 +29,7 @@ namespace Ice
 		elif VALUE == "and"			TOKEN_ID = TOKEN::TAND;
 		elif VALUE == "or"			TOKEN_ID = TOKEN::TOR;
 		elif VALUE == "not"			TOKEN_ID = TOKEN::TNOT;
-		else							token_id = TOKEN::TIDENTIFIER;
+		else						token_id = TOKEN::TIDENTIFIER;
 	}
 }
 
