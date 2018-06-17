@@ -6,7 +6,7 @@ using namespace Ice;
 
 using TOKEN = Token::TOKEN;
 
-#define ASSERT_COUNT(COUNT)						Assert::AreEqual<size_t>(COUNT, tokens.size()); \
+#define ASSERT_COUNT(COUNT)						Assert::AreEqual<size_t>((COUNT)+1, tokens.size()); \
 												auto iToken = tokens.begin()
 #define ASSERT_TOKEN(TYPE)						Assert::AreEqual((int)TYPE, (int)iToken->token_id); iToken++
 #define ASSERT_TOKEN_WITH_VALUE(TYPE, VALUE)	Assert::AreEqual((int)TYPE, (int)iToken->token_id); \
@@ -25,21 +25,30 @@ public:
 	TEST_METHOD(TestLexerIdentifier)
 	{
 		std::string code = R"coldice(
-@text: "hello world"
-print(text)
+test identifier
+_
+___
+_id
+id_
+__id
+id__
+_id_
+__id__
 )coldice";
 		auto &tokens = lexer.getTokens(code);
 
-		ASSERT_COUNT(9);
+		ASSERT_COUNT(10);
 
-		ASSERT_TOKEN(TOKEN::TAT);
-		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "text");
-		ASSERT_TOKEN(TOKEN::TASSIGN);
-		ASSERT_TOKEN_WITH_VALUE(TOKEN::TSTRING, "hello world");
-		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "print");
-		ASSERT_TOKEN(TOKEN::TLPAREN);
-		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "text");
-		ASSERT_TOKEN(TOKEN::TRPAREN);
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "test");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "identifier");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "_");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "___");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "_id");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "id_");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "__id");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "id__");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "_id_");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "__id__");
 
 		ASSERT_OVER;
 	}
@@ -47,11 +56,13 @@ print(text)
 	TEST_METHOD(TestLexerNumber)
 	{
 		std::string code = R"coldice(
-123 123. 123.123
+123 
+123. 
+123.123
 )coldice";
 		auto tokens = lexer.getTokens(code);
 		
-		ASSERT_COUNT(4);
+		ASSERT_COUNT(3);
 
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TINTEGER, "123");
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TDOUBLE, "123.");
@@ -67,7 +78,7 @@ print(text)
 )coldice";
 		auto tokens = lexer.getTokens(code);
 		
-		ASSERT_COUNT(22);
+		ASSERT_COUNT(21);
 
 		ASSERT_TOKEN(TOKEN::TADD);
 		ASSERT_TOKEN(TOKEN::TSUB);
@@ -102,7 +113,7 @@ return match new none true false and or not
 )coldice";
 		auto tokens = lexer.getTokens(code);
 		
-		ASSERT_COUNT(19);
+		ASSERT_COUNT(18);
 
 		ASSERT_TOKEN(TOKEN::TUSING);
 		ASSERT_TOKEN(TOKEN::TIF);
@@ -129,11 +140,14 @@ return match new none true false and or not
 	TEST_METHOD(TestLexerString)
 	{
 		std::string code = R"coldice(
-"abcdefg" "abcdefg\"" "\"" "\n\\\"\a\b\0\t\r\f"
+"abcdefg" 
+"abcdefg\"" 
+"\"" 
+"\n\\\"\a\b\0\t\r\f"
 )coldice";
 		auto tokens = lexer.getTokens(code);
 		
-		ASSERT_COUNT(5);
+		ASSERT_COUNT(4);
 
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TSTRING, "abcdefg");
 		ASSERT_TOKEN_WITH_VALUE(TOKEN::TSTRING, "abcdefg\"");
@@ -143,5 +157,20 @@ return match new none true false and or not
 		ASSERT_OVER;
 	}
 
-};
+	TEST_METHOD(TestLexerComment)
+	{
+		std::string code = R"(
+# test comments
+after line # comment
+)";
+		auto tokens = lexer.getTokens(code);
 
+		ASSERT_COUNT(2);
+
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "after");
+		ASSERT_TOKEN_WITH_VALUE(TOKEN::TIDENTIFIER, "line");
+
+		ASSERT_OVER;
+	}
+
+};
