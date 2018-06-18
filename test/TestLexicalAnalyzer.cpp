@@ -1,18 +1,24 @@
 #include "CppUnitTest.h"
 #include "LexicalAnalyzer.h"
 
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Ice;
+
 
 using TOKEN = Token::TOKEN;
 
 #define ASSERT_COUNT(COUNT)						Assert::AreEqual<size_t>((COUNT)+1, tokens.size()); \
 												auto iToken = tokens.begin()
+
 #define ASSERT_TOKEN(TYPE)						Assert::AreEqual((int)TYPE, (int)iToken->token_id); iToken++
+
 #define ASSERT_TOKEN_WITH_VALUE(TYPE, VALUE)	Assert::AreEqual((int)TYPE, (int)iToken->token_id); \
 												Assert::AreEqual(VALUE, iToken->value.c_str()); iToken++
+
 #define ASSERT_OVER								Assert::AreEqual((int)TOKEN::TEND, (int)iToken->token_id); iToken++; \
 												Assert::AreEqual(true, iToken == tokens.end())
+
 
 TEST_CLASS(TestLexicalAnalyzer)
 {

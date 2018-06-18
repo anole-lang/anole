@@ -13,6 +13,7 @@
 #include "Coderun.h"
 #include "IceObject.h"
 
+using std::string;
 using std::shared_ptr;
 
 namespace Ice
@@ -33,7 +34,8 @@ namespace Ice
 
 		Interpreter();
 		void run();
-		void run(std::string);
+		void run(string);
+
 	};
 }
 

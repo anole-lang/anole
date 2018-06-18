@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TestCodeRuntime.cpp" />
     <ClCompile Include="TestDeclarationAnalyzer.cpp" />
     <ClCompile Include="TestLexicalAnalyzer.cpp" />
   </ItemGroup>
