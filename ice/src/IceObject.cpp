@@ -740,7 +740,29 @@ namespace Ice
 
 	void IceDictObject::genBuiltInMethods()
 	{
-		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		top->put("at", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		{
+			if (objects.size() != 1)
+			{
+				cout << "method at() need one argument" << endl;
+				exit(0);
+			}
+
+			return getByIndex(objects[0]);
+		}));
+
+		top->put("empty", make_shared<IceBuiltInFunctionObject>([&](Objects objects)
+		{
+			if (objects.size())
+			{
+				cout << "method empty() need no arguments" << endl;
+				exit(0);
+			}
+
+			return dynamic_pointer_cast<IceObject>(make_shared<IceBooleanObject>(objects_map.empty()));
+		}));
+
+		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects)
 		{
 			if (objects.size())
 			{
@@ -749,6 +771,42 @@ namespace Ice
 			}
 
 			return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(objects_map.size()));
+		}));
+
+		top->put("clear", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		{
+			if (objects.size())
+			{
+				cout << "method clear() need no arguments" << endl;
+				exit(0);
+			}
+
+			objects_map.clear();
+			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
+		}));
+
+		top->put("insert", make_shared<IceBuiltInFunctionObject>([&](Objects objects)
+		{
+			if (objects.size() != 2)
+			{
+				cout << "method insert() need 2 arguments" << endl;
+				exit(0);
+			}
+
+			setByIndex(objects[0], objects[1]);
+			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
+		}));
+
+		top->put("erase", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		{
+			if (objects.size() != 1)
+			{
+				cout << "method erase() need 1 argument" << endl;
+				exit(0);
+			}
+
+			objects_map.erase(KeyObject(objects[0]));
+			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
 	}
 }

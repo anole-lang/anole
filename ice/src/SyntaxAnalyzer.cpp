@@ -266,6 +266,7 @@ namespace Ice
 		return dynamic_pointer_cast<Stmt>(node);
 	}
 
+	// generate assignment as @.ident: expr
 	STMT SyntaxAnalyzer::genVarAssign()
 	{
 		++iToken;
