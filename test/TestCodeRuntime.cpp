@@ -25,7 +25,7 @@ using TYPE = IceObject::TYPE;
 															++iObject;
 
 
-TEST_CLASS(TestCodeRuntime)
+TEST_CLASS(TestBaseRuntime)
 {
 private:
 
@@ -40,12 +40,45 @@ public:
 @b: 1.1
 @c: "1.1"
 
-[a, b, c]
+a b c
 
 )coldice";
 
-		ASSERT_COUNT(4);
+		auto node = dynamic_pointer_cast<BlockExpr>(parser.getNode(code));
+		Assert::AreEqual(true, node->statements.size() == 6); 
+
+		auto top = make_shared<Env>(nullptr); 
+		for (int i = 0; i < 3; ++i)
+		{
+			node->statements[i]->runCode(top);
+		}
+
+		auto obj = node->statements[3]->runCode(top); 
+		Assert::AreEqual(true, obj->type == TYPE::INT);
+		Assert::AreEqual(true, dynamic_pointer_cast<IceIntegerObject>(obj)->value == 1);
 		
+		obj = node->statements[4]->runCode(top);
+		Assert::AreEqual(true, obj->type == TYPE::DOUBLE);
+		Assert::AreEqual(true, dynamic_pointer_cast<IceDoubleObject>(obj)->value == 1.1);
+
+		obj = node->statements[5]->runCode(top);
+		Assert::AreEqual(true, obj->type == TYPE::STRING);
+		Assert::AreEqual(true, dynamic_pointer_cast<IceStringObject>(obj)->value == "1.1");
+	}
+
+	TEST_METHOD(TestListRuntime)
+	{
+		std::string code = R"coldice(
+@a: 1
+@b: 1.1
+@c: "1.1"
+
+[a, b, c]
+
+)coldice";
+		
+		ASSERT_COUNT(4);
+
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::DOUBLE, IceDoubleObject, 1.1);
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "1.1");
@@ -122,14 +155,44 @@ public:
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::BOOLEAN, IceBooleanObject, false);
 	}
 
-	TEST_METHOD(TestListRuntime)
-	{
-
-	}
-
 	TEST_METHOD(TestDictRuntime)
 	{
+		std::string code = R"coldice(
+@a: 1
+@b: 1.2
+@c: "1.23"
+@d: {a: 1, b: 1.2, c: "1.23", 4: [a, b, c]}
 
+[d[a], d[b], d[c]] + d[4]
+
+)coldice";
+
+		ASSERT_COUNT(5);
+
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::DOUBLE, IceDoubleObject, 1.2);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "1.23");
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::DOUBLE, IceDoubleObject, 1.2);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "1.23");
 	}
 
+};
+
+
+TEST_CLASS(TestControlFlowRuntime)
+{
+	TEST_METHOD(TestIfElseRuntime)
+	{
+
+	}
+};
+
+
+TEST_CLASS(TestFunctionalRuntime)
+{
+	TEST_METHOD(TestLambdaRuntime)
+	{
+
+	}
 };
