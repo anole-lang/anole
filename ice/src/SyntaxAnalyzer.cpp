@@ -695,7 +695,7 @@ namespace Ice
 		}
 	}
 
-	// generate lambda expr as @(){} and also @(){}()
+	// generate lambda expr as @(){} and also @(){}()..
 	EXPR SyntaxAnalyzer::genLambdaExpr()
 	{ 
 		auto genArguments = [&]() 
@@ -717,6 +717,19 @@ namespace Ice
 			return args;
 		};
 
+		auto genArgsAfterDecl = [&]()
+		{
+			ExpressionList args;
+			++iToken;
+			while (iToken->token_id != TOKEN::TRPAREN)
+			{
+				args.push_back(genExpr());
+				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
+			}
+			++iToken;
+			return args;
+		};
+
 		shared_ptr<Expr> node = nullptr;
 		++iToken;
 		CHECK_AND_THROW(TOKEN::TLPAREN, "missing symbol '('");
@@ -725,20 +738,13 @@ namespace Ice
 		CHECK_AND_THROW(TOKEN::TRPAREN, "missing symbol ')'");
 		++iToken;
 		auto block = genBlock();
-		if (iToken->token_id == TOKEN::TLPAREN)
+		node = make_shared<LambdaExpr>(args, block);
+
+		while (iToken->token_id == TOKEN::TLPAREN)
 		{
-			ExpressionList exprs;
-			++iToken;
-			while (iToken->token_id != TOKEN::TRPAREN)
-			{
-				exprs.push_back(genExpr());
-				if (iToken->token_id == TOKEN::TCOMMA) ++iToken;
-				else break;
-			}
-			++iToken;
-			node = make_shared<LambdaCallExpr>(args, block, exprs);
+			node = make_shared<MethodCallExpr>(node, genArgsAfterDecl());
 		}
-		else node = make_shared<LambdaExpr>(args, block);
+
 		return node;
 	}
 

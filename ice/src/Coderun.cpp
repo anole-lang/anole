@@ -422,32 +422,6 @@ namespace Ice
 		return make_shared<IceFunctionObject>(argDecls, block);
 	}
 
-	shared_ptr<IceObject> LambdaCallExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
-	{
-
-		shared_ptr<Env> _top = make_shared<Env>(top);
-
-		if (expressions.size() > argDecls.size())
-		{
-			cout << "The number of arguments does not match" << endl;
-			exit(0);
-		}
-
-		vector<shared_ptr<IceObject>> argValues;
-
-		for (size_t i = 0; i < expressions.size(); i++)
-		{
-			argDecls[i]->assignment = expressions[i];
-		}
-		for (auto &argDecl : argDecls)
-		{
-			_top->put(argDecl->id->name, argDecl->assignment->runCode(_top));
-		}
-
-		shared_ptr<IceObject> returnValue = block->runCode(_top);
-		return returnValue;
-	}
-
 	shared_ptr<IceObject> NewExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
 		shared_ptr<IceClassObject> class_obj = dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));

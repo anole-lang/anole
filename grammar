@@ -231,7 +231,7 @@ for_stmt
 	;
 
 lambda_expr
-	: TAT TLPAREN func_decl_args TRPAREN block method_call_tail
+	: TAT TLPAREN func_decl_args TRPAREN block other_tail
 	;
 
 class_decl

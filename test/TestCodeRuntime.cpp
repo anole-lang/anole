@@ -296,7 +296,21 @@ public:
 	}
 }
 
-[add(3, 4), addFunction()(5, 6), addFuncFunction()()(7, 8), addFuncFuncFunction()()()(9, 10)]
+[	
+	add(3, 4), 
+	addFunction()(5, 6), 
+	addFuncFunction()()(7, 8), 
+	addFuncFuncFunction()()()(9, 10),
+	@() {
+		return @() {
+			return @() {
+				return @(a, b) {
+					return a + b
+				}
+			}
+		}
+	}()()()(11, 12)
+]
 
 )coldice";
 
@@ -305,5 +319,6 @@ public:
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 11);
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 15);
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 19);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 23);
 	}
 };

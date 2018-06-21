@@ -160,18 +160,6 @@ namespace Ice
 	};
 
 
-	class LambdaCallExpr : public Expr
-	{
-	public:
-
-		VariableList argDecls;
-		shared_ptr<BlockExpr> block;
-		ExpressionList expressions;
-		LambdaCallExpr(VariableList argDecls, shared_ptr<BlockExpr> block, ExpressionList expressions) : argDecls(argDecls), block(block), expressions(expressions) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
-	};
-
-
 	class NewExpr : public Expr
 	{
 	public:
