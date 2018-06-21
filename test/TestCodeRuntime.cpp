@@ -88,7 +88,9 @@ a b c
 	{
 		std::string code = R"coldice(
 @add(a, b): a + b
-@mul(a, b): (a * b)
+@mul(a, b) {
+	return a * b
+}
 
 [add(1, 2), mul(2, 3)]
 
@@ -182,7 +184,79 @@ a b c
 
 TEST_CLASS(TestControlFlowRuntime)
 {
+private:
+
+	SyntaxAnalyzer parser;
+
+public:
+
 	TEST_METHOD(TestIfElseRuntime)
+	{
+		std::string code = R"coldice(
+@pow(num, n: 2) {
+	if n > 0 {
+		return num * pow(num, n-1)
+	} else {
+		return 1
+	}
+}
+
+@fib(n) {
+	if n = 1 or n = 2 {
+		return 1
+	} else {
+		return fib(n-1) + fib(n-2)
+	}
+}
+
+[pow(3), pow(4, 5), fib(6)]
+
+)coldice";
+
+		ASSERT_COUNT(3);
+
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 9);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1024);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 8);
+	}
+
+	TEST_METHOD(TestWhileRuntime)
+	{
+		std::string code = R"coldice(
+@pow(num, n:2) {
+	@res: 1
+	while n > 0 {
+		@.res: res * num
+		@.n: n - 1
+	}
+	return res
+}
+
+[pow(3), pow(4, 5)]
+
+)coldice";
+
+		ASSERT_COUNT(2);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 9);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1024);
+	}
+
+	TEST_METHOD(TestDoWhileRuntime)
+	{
+
+	}
+
+	TEST_METHOD(TestForRuntime)
+	{
+
+	}
+
+	TEST_METHOD(TestContinueRuntime)
+	{
+
+	}
+
+	TEST_METHOD(TestBreakRuntime)
 	{
 
 	}
@@ -191,8 +265,45 @@ TEST_CLASS(TestControlFlowRuntime)
 
 TEST_CLASS(TestFunctionalRuntime)
 {
+private:
+
+	SyntaxAnalyzer parser;
+
+public:
+
 	TEST_METHOD(TestLambdaRuntime)
 	{
+		std::string code = R"coldice(
+@add: @(a, b) {
+	return a + b
+}
 
+@addFunction(): @(a, b) {
+	return a + b
+}
+
+@addFuncFunction(): @() {
+	return @(a, b) {
+		return a + b
+	}
+}
+
+@addFuncFuncFunction(): @() {
+	return @() {
+		return @(a, b) {
+			return a + b
+		}
+	}
+}
+
+[add(3, 4), addFunction()(5, 6), addFuncFunction()()(7, 8), addFuncFuncFunction()()()(9, 10)]
+
+)coldice";
+
+		ASSERT_COUNT(5);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 7);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 11);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 15);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 19);
 	}
 };
