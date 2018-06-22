@@ -344,8 +344,14 @@ namespace Ice
 		CHECK_AND_THROW(TOKEN::TTO, "missing keyword 'to' in for");
 		++iToken;
 		auto end = genExpr();
+		shared_ptr<IdentifierExpr> id = nullptr;
+		if (iToken->token_id == TOKEN::TAS)
+		{
+			++iToken;
+			id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
+		}
 		auto block = genBlock();
-		return make_shared<ForStmt>(begin, end, block);
+		return make_shared<ForStmt>(begin, end, id, block);
 	}
 
 	STMT SyntaxAnalyzer::genReturnStmt()

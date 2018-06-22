@@ -69,11 +69,11 @@ a b c
 	TEST_METHOD(TestListRuntime)
 	{
 		std::string code = R"coldice(
-@a: 1
-@b: 1.1
-@c: "1.1"
+@res: [1, 1.1, "1.1"]
+res.pop_back()
+res.push_back("1.1.1")
 
-[a, b, c]
+res
 
 )coldice";
 		
@@ -81,7 +81,7 @@ a b c
 
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::DOUBLE, IceDoubleObject, 1.1);
-		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "1.1");
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "1.1.1");
 	}
 
 	TEST_METHOD(TestCommonFunctionRuntime)
@@ -243,12 +243,42 @@ public:
 
 	TEST_METHOD(TestDoWhileRuntime)
 	{
+		std::string code = R"coldice(
+@test(n) {
+	@test: 0
+	do {
+		@.test: test + 1
+	} while test < n
+	return test
+}
 
+[test(0), test(1), test(2)]
+
+)coldice";
+
+		ASSERT_COUNT(2);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 2);
 	}
 
 	TEST_METHOD(TestForRuntime)
 	{
+		std::string code = R"coldice(
+@res: []
+for 1 to 5 as i {
+	res.push_back(i)
+}
 
+res
+
+)coldice";
+
+		ASSERT_COUNT(3);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 2);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 3);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 4);
 	}
 
 	TEST_METHOD(TestContinueRuntime)

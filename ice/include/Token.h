@@ -28,6 +28,7 @@ namespace Ice
 			TDO,	// do
 			TFOR,	// for
 			TTO,	// to
+			TAS,	// as
 			TBREAK,	// break
 			TCONTINUE,	// continue
 			TRETURN, // return

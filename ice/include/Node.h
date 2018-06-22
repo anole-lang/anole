@@ -372,8 +372,9 @@ namespace Ice
 
 		shared_ptr<Expr> begin;
 		shared_ptr<Expr> end;
+		shared_ptr<IdentifierExpr> id;
 		shared_ptr<BlockExpr> block;
-		ForStmt(shared_ptr<Expr> begin, shared_ptr<Expr> end, shared_ptr<BlockExpr> block) : begin(begin), end(end), block(block) {}
+		ForStmt(shared_ptr<Expr> begin, shared_ptr<Expr> end, shared_ptr<IdentifierExpr> id, shared_ptr<BlockExpr> block) : begin(begin), end(end), id(id), block(block) {}
 		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
 	};
 

@@ -344,7 +344,6 @@ namespace Ice
 
 	shared_ptr<IceObject> DoWhileStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> cond = this->cond->runCode(top);
 		shared_ptr<IceObject> returnValue = nullptr;
 		shared_ptr<Env> _top = make_shared<Env>(top);
 
@@ -363,6 +362,7 @@ namespace Ice
 			return returnValue;
 		}
 
+		shared_ptr<IceObject> cond = this->cond->runCode(top);
 		while (cond->isTrue())
 		{
 			returnValue = block->runCode(_top);
@@ -393,6 +393,7 @@ namespace Ice
 		shared_ptr<IceObject> returnValue = nullptr;
 
 		shared_ptr<Env> _top = make_shared<Env>(top);
+		if (id != nullptr) _top->put(id->name, begin);
 
 		while (begin->binaryOperate(end, TOKEN::TCLT)->isTrue())
 		{
@@ -413,6 +414,7 @@ namespace Ice
 				return returnValue;
 			}
 			begin = begin->binaryOperate(make_shared<IceIntegerObject>(1), TOKEN::TADD);
+			if (id != nullptr) _top->put(id->name, begin);
 		}
 		return returnValue;
 	}

@@ -227,7 +227,8 @@ do_while_stmt
 	;
 
 for_stmt
-	: TFOR expr TTO expr block
+	: TFOR expr TTO expr TAS identifier block
+	| TFOR expr TTO expr block
 	;
 
 lambda_expr
