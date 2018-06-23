@@ -283,12 +283,44 @@ res
 
 	TEST_METHOD(TestContinueRuntime)
 	{
+		std::string code = R"coldice(
+@res: []
+for 1 to 5 as i {
+	if i = 3 {
+		continue
+	} else {
+		res.push_back(i)
+	}
+}
 
+res
+
+)coldice";
+
+		ASSERT_COUNT(3);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 2);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 4);
 	}
 
 	TEST_METHOD(TestBreakRuntime)
 	{
+		std::string code = R"coldice(
+@res: []
+for 1 to 5 as i {
+	if i = 3 {
+		break
+	} 
+	res.push_back(i)
+}
 
+res
+
+)coldice";
+
+		ASSERT_COUNT(3);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 2);
 	}
 };
 

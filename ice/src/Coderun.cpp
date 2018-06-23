@@ -406,6 +406,7 @@ namespace Ice
 			{
 				_top->setContinueStatus(false);
 				begin = begin->binaryOperate(make_shared<IceIntegerObject>(1), TOKEN::TADD);
+				if (id != nullptr) _top->put(id->name, begin);
 				continue;
 			}
 			if (returnValue != nullptr)
