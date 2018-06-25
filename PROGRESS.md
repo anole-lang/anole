@@ -9,6 +9,7 @@ Please add feature request here.
 <hr>
 
 ### TODO
++ [ ] Add elif statement
 + [ ] Not exit while finding errors when interacting
 + [ ] Fix bugs 
 
@@ -43,11 +44,14 @@ Please add feature request here.
 
 ###### Control Flow
 ```ice
-# support if_else while do_while for break continue
+# support if_else while do_while for for_as break continue
 
 @fib(n) {
-    if (n = 0) + (n = 1) { return 1 }
-    else { return fib(n-1) + fib(n-2) }
+    if n = 0 or n = 1 { 
+        return 1 
+    } else { 
+        return fib(n-1) + fib(n-2) 
+    }
 }
 
 fib(10) # 89
@@ -55,20 +59,23 @@ fib(10) # 89
 @a: 3
 while a {
     print(a)
-    @a: a - 1
+    @.a: a - 1
 }
 
 @a: 0
 do {
-    @a: a + 1
-    if a = 3 { break }
+    @.a: a + 1
+    if a = 3 {
+         break 
+    }
     print(a)
 } while a < 5
 
-for 1 to 5 {
-    @a: a + 1
-    if a = 3 { continue }
-    print(a)
+for 1 to 5 as i {
+    if i = 3 { 
+        continue 
+    }
+    print(i)
 }
 ```
 
@@ -78,11 +85,17 @@ for 1 to 5 {
 @mul: @(a, b) {
     return a * b
 }
-@(a, b) { return a / b }(9, 3)
+@(a, b) { 
+    return a / b 
+}(9, 3)
 
 @quadraticSum: @(a, b) {
-    @sqrt: @(n) { return n * n }
-    return @(a, b) { return a + b }(sqrt(a), sqrt(b))
+    @sqrt: @(n) { 
+        return n * n 
+    }
+    return @(a, b) { 
+        return a + b 
+    }(sqrt(a), sqrt(b))
 }
 ```
 
@@ -98,8 +111,12 @@ for 1 to 5 {
     }
 
     @quadraticSum: @(a, b) {
-        @sqrt: @(n) { return n * n }
-        return @(a, b) { return a + b }(sqrt(a), sqrt(b))
+        @sqrt: @(n) { 
+            return n * n 
+        }
+        return @(a, b) { 
+            return a + b 
+        }(sqrt(a), sqrt(b))
     }
 
     @Math(base) {
