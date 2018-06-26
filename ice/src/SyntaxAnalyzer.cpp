@@ -57,21 +57,6 @@ namespace Ice
 		return block;
 	}
 
-	// generate else block after if {}
-	BLOCK_EXPR SyntaxAnalyzer::genIfElseTail()
-	{ 
-		updateiToken();
-		if (iToken->token_id == TOKEN::TELSE)
-		{
-			++iToken;
-			return genBlock();
-		}
-		else
-		{
-			return make_shared<BlockExpr>();
-		}
-	}
-
 	// generate function block (: expr | {}) after @foo()
 	BLOCK_EXPR SyntaxAnalyzer::genFuncDeclRest()
 	{ 
@@ -315,8 +300,24 @@ namespace Ice
 		++iToken;
 		auto cond = genExpr();
 		auto blockTrue = genBlock();
-		auto blockFalse = genIfElseTail();
-		return make_shared<IfElseStmt>(cond, blockTrue, blockFalse);
+		auto elseStmt = dynamic_pointer_cast<IfElseStmt>(genIfElseTail());
+		return make_shared<IfElseStmt>(cond, blockTrue, elseStmt);
+	}
+
+	STMT SyntaxAnalyzer::genIfElseTail()
+	{
+		updateiToken();
+		if (iToken->token_id == TOKEN::TELIF)
+		{
+			return genIfElse();
+		}
+		else if (iToken->token_id == TOKEN::TELSE)
+		{
+			++iToken;
+			auto block = genBlock();
+			return make_shared<IfElseStmt>(make_shared<BooleanExpr>(true), block, nullptr);
+		}
+		else return nullptr;
 	}
 
 	STMT SyntaxAnalyzer::genWhileStmt()

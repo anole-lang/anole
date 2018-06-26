@@ -23,6 +23,7 @@ namespace Ice
 
 			TUSING, // using
 			TIF,     // if
+			TELIF,   // elif
 			TELSE,   // else
 			TWHILE,  // while
 			TDO,	// do

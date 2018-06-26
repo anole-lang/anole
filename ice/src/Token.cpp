@@ -10,6 +10,7 @@ namespace Ice
 	{ // just for fun
 		if   VALUE == "using"		TOKEN_ID = TOKEN::TUSING;
 		elif VALUE == "if"			TOKEN_ID = TOKEN::TIF;
+		elif VALUE == "elif"		TOKEN_ID = TOKEN::TELIF;
 		elif VALUE == "else"		TOKEN_ID = TOKEN::TELSE;
 		elif VALUE == "while"		TOKEN_ID = TOKEN::TWHILE;
 		elif VALUE == "do"			TOKEN_ID = TOKEN::TDO;

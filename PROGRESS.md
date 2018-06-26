@@ -16,6 +16,7 @@ Please add feature request here.
 <hr>
 
 ### ChangeLog
++ [X] Support for 'if elif else' statement
 + [X] For stmt now will have a var to save the current for_index
 + [X] Refactored class SyntaxAnalyzer & make it easy to read
 + [X] Fixed bug for objects built in class block when the class was instantiated

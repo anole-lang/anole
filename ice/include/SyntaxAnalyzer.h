@@ -36,7 +36,6 @@ namespace Ice
 
 		BLOCK_EXPR genStmts();
 		BLOCK_EXPR genBlock();
-		BLOCK_EXPR genIfElseTail();
 		BLOCK_EXPR genFuncDeclRest();
 
 		STMT genStmt();
@@ -45,6 +44,7 @@ namespace Ice
 		STMT genClassDecl();
 		STMT genUsingStmt();
 		STMT genIfElse();
+		STMT genIfElseTail();
 		STMT genWhileStmt();
 		STMT genDoWhileStmt();
 		STMT genForStmt();

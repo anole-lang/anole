@@ -209,15 +209,28 @@ public:
 	}
 }
 
-[pow(3), pow(4, 5), fib(6)]
+@checkSexIsMaleOrFemale(name) {
+	if name = "male" {
+		return "isMale"
+	} elif name = "female" {
+		return "isFemale"
+	} else {
+		return "uncertain"
+	}
+}
+
+[pow(3), pow(4, 5), fib(6), checkSexIsMaleOrFemale("male"), checkSexIsMaleOrFemale("female"), checkSexIsMaleOrFemale("cyy")]
 
 )coldice";
 
-		ASSERT_COUNT(3);
+		ASSERT_COUNT(4);
 
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 9);
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1024);
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 8);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "isMale");
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "isFemale");
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "uncertain");
 	}
 
 	TEST_METHOD(TestWhileRuntime)

@@ -215,6 +215,7 @@ if_else
 
 if_else_tail
 	:
+	| TELIF block if_else_tail
 	| TELSE block
 	;
 

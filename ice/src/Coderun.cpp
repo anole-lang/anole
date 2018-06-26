@@ -293,18 +293,9 @@ namespace Ice
 				top->setContinueStatus(true);
 			}
 		}
-		else
+		else if (elseStmt != nullptr)
 		{
-			shared_ptr<Env> _top = make_shared<Env>(top);
-			returnValue = blockFalse->runCode(_top);
-			if (_top->getBreakStatus())
-			{
-				top->setBreakStatus(true);
-			}
-			if (_top->getContinueStatus())
-			{
-				top->setContinueStatus(true);
-			}
+			returnValue = elseStmt->runCode(top);
 		}
 		if (returnValue != nullptr)
 		{

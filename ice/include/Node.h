@@ -338,8 +338,8 @@ namespace Ice
 
 		shared_ptr<Expr> cond;
 		shared_ptr<BlockExpr> blockTrue;
-		shared_ptr<BlockExpr> blockFalse;
-		IfElseStmt(shared_ptr<Expr> cond, shared_ptr<BlockExpr> blockTrue, shared_ptr<BlockExpr> blockFalse) : cond(cond), blockTrue(blockTrue), blockFalse(blockFalse) {}
+		shared_ptr<IfElseStmt> elseStmt;
+		IfElseStmt(shared_ptr<Expr> cond, shared_ptr<BlockExpr> blockTrue, shared_ptr<IfElseStmt> elseStmt) : cond(cond), blockTrue(blockTrue), elseStmt(elseStmt) {}
 		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
 	};
 
