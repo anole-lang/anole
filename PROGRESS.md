@@ -9,7 +9,6 @@ Please add feature request here.
 <hr>
 
 ### TODO
-+ [ ] Add elif statement
 + [ ] Not exit while finding errors when interacting
 + [ ] Fix bugs 
 
