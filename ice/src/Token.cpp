@@ -16,6 +16,7 @@ namespace Ice
 		elif VALUE == "do"			TOKEN_ID = TOKEN::TDO;
 		elif VALUE == "for"			TOKEN_ID = TOKEN::TFOR;
 		elif VALUE == "to"			TOKEN_ID = TOKEN::TTO;
+		elif VALUE == "foreach"		TOKEN_ID = TOKEN::TFOREACH;
 		elif VALUE == "as"			TOKEN_ID = TOKEN::TAS;
 		elif VALUE == "break"		TOKEN_ID = TOKEN::TBREAK;
 		elif VALUE == "continue"	TOKEN_ID = TOKEN::TCONTINUE;

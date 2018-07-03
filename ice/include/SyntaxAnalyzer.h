@@ -48,6 +48,7 @@ namespace Ice
 		STMT genWhileStmt();
 		STMT genDoWhileStmt();
 		STMT genForStmt();
+		STMT genForeachStmt();
 		STMT genReturnStmt();
 
 		EXPR genExpr();

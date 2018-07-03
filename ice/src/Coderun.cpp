@@ -82,7 +82,7 @@ namespace Ice
 
 	shared_ptr<IceObject> Env::getObject(string name)
 	{
-		shared_ptr<Env> tmp = shared_from_this();
+		auto tmp = shared_from_this();
 		while (tmp != nullptr)
 		{
 			if (tmp->objects.find(name) != tmp->objects.end())
@@ -155,8 +155,7 @@ namespace Ice
 
 	shared_ptr<IceObject> StringExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceStringObject> obj = make_shared<IceStringObject>(value);
-		return obj;
+		return make_shared<IceStringObject>(value);
 	}
 
 	shared_ptr<IceObject> IdentifierExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
@@ -166,7 +165,7 @@ namespace Ice
 
 	shared_ptr<IceObject> MethodCallExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> _obj = expression->runCode(top);
+		auto _obj = expression->runCode(top);
 		if (_obj->type == IceObject::TYPE::BUILT_IN_FUNCTION)
 		{
 			Objects objects;
@@ -182,8 +181,8 @@ namespace Ice
 			exit(0);
 		}
 
-		shared_ptr<IceFunctionObject> func = dynamic_pointer_cast<IceFunctionObject>(_obj);
-		shared_ptr<Env> _top = make_shared<Env>(top);
+		auto func = dynamic_pointer_cast<IceFunctionObject>(_obj);
+		auto _top = make_shared<Env>(top);
 		if (arguments.size() > func->argDecls.size())
 		{
 			cout << "The number of arguments does not match" << endl;
@@ -200,21 +199,21 @@ namespace Ice
 			_top->put(argDecl->id->name, argDecl->assignment->runCode((normal_top == nullptr) ? (_top) : (normal_top)));
 		}
 
-		shared_ptr<IceObject> returnValue = func->block->runCode(_top);
+		auto returnValue = func->block->runCode(_top);
 		_top->garbageCollection();
 		return returnValue;
 	}
 
 	shared_ptr<IceObject> UnaryOperatorExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> obj = expression->runCode(top);
+		auto obj = expression->runCode(top);
 		return obj->unaryOperate(op);
 	}
 
 	shared_ptr<IceObject> BinaryOperatorExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> lobj = lhs->runCode(top);
-		shared_ptr<IceObject> robj = rhs->runCode(top);
+		auto lobj = lhs->runCode(top);
+		auto robj = rhs->runCode(top);
 		return lobj->binaryOperate(robj, op);
 	}
 
@@ -225,28 +224,28 @@ namespace Ice
 
 	shared_ptr<IceObject> VariableDeclarationStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> obj = assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+		auto obj = assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
 		top->put(id->name, obj);
 		return nullptr;
 	}
 
 	shared_ptr<IceObject> VariableAssignStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> obj = assignment->runCode(top);
+		auto obj = assignment->runCode(top);
 		top->replace(id->name, obj);
 		return nullptr;
 	}
 
 	shared_ptr<IceObject> FunctionDeclarationStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> obj = make_shared<IceFunctionObject>(argDecls, block);
+		auto obj = make_shared<IceFunctionObject>(argDecls, block);
 		top->put(id->name, obj);
 		return nullptr;
 	}
 
 	shared_ptr<IceObject> ClassDeclarationStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> obj = make_shared<IceClassObject>(bases, block);
+		auto obj = make_shared<IceClassObject>(bases, block);
 		top->put(id->name, obj);
 		return nullptr;
 	}
@@ -265,7 +264,7 @@ namespace Ice
 
 	shared_ptr<IceObject> ReturnStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> returnValue = assignment->runCode(top);
+		auto returnValue = assignment->runCode(top);
 		top->setReturnValue(returnValue);
 		return nullptr;
 	}
@@ -278,11 +277,11 @@ namespace Ice
 
 	shared_ptr<IceObject> IfElseStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> cond = this->cond->runCode(top);
+		auto cond = this->cond->runCode(top);
 		shared_ptr<IceObject> returnValue = nullptr;
 		if (cond->isTrue())
 		{
-			shared_ptr<Env> _top = make_shared<Env>(top);
+			auto _top = make_shared<Env>(top);
 			returnValue = blockTrue->runCode(_top);
 			if (_top->getBreakStatus())
 			{
@@ -306,9 +305,9 @@ namespace Ice
 
 	shared_ptr<IceObject> WhileStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> cond = this->cond->runCode(top);
+		auto cond = this->cond->runCode(top);
 		shared_ptr<IceObject> returnValue = nullptr;
-		shared_ptr<Env> _top = make_shared<Env>(top);
+		auto _top = make_shared<Env>(top);
 
 		while (cond->isTrue())
 		{
@@ -336,7 +335,7 @@ namespace Ice
 	shared_ptr<IceObject> DoWhileStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
 		shared_ptr<IceObject> returnValue = nullptr;
-		shared_ptr<Env> _top = make_shared<Env>(top);
+		auto _top = make_shared<Env>(top);
 
 		returnValue = block->runCode(_top);
 		if (_top->getBreakStatus())
@@ -353,7 +352,7 @@ namespace Ice
 			return returnValue;
 		}
 
-		shared_ptr<IceObject> cond = this->cond->runCode(top);
+		auto cond = this->cond->runCode(top);
 		while (cond->isTrue())
 		{
 			returnValue = block->runCode(_top);
@@ -379,11 +378,11 @@ namespace Ice
 
 	shared_ptr<IceObject> ForStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> begin = this->begin->runCode(top);
-		shared_ptr<IceObject> end = this->end->runCode(top);
+		auto begin = this->begin->runCode(top);
+		auto end = this->end->runCode(top);
 		shared_ptr<IceObject> returnValue = nullptr;
 
-		shared_ptr<Env> _top = make_shared<Env>(top);
+		auto _top = make_shared<Env>(top);
 		if (id != nullptr) _top->put(id->name, begin);
 
 		while (begin->binaryOperate(end, TOKEN::TCLT)->isTrue())
@@ -411,6 +410,67 @@ namespace Ice
 		return returnValue;
 	}
 
+	shared_ptr<IceObject> ForeachStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	{
+		auto _obj = expression->runCode(top, normal_top);
+		if (!_obj->isTraversable() || _obj->type == IceObject::TYPE::DICT)
+		{
+			cout << "it isn't traversable" << endl;
+			exit(0);
+		}
+
+		shared_ptr<IceObject> returnValue = nullptr;
+		auto _top = make_shared<Env>(top);
+
+		if (_obj->type == IceObject::TYPE::LIST)
+		{
+			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
+			for (auto &object : obj->objects)
+			{
+				_top->put(id->name, object);
+				returnValue = block->runCode(_top);
+				if (_top->getBreakStatus())
+				{
+					return returnValue;
+				}
+				if (_top->getContinueStatus())
+				{
+					_top->setContinueStatus(false);
+					continue;
+				}
+				if (returnValue != nullptr)
+				{
+					top->setReturnValue(returnValue);
+					return returnValue;
+				}
+			}
+		}
+		else
+		{
+			auto obj = dynamic_pointer_cast<IceStringObject>(_obj);
+			for (auto &chr : obj->value)
+			{
+				_top->put(id->name, make_shared<IceStringObject>("" + chr));
+				returnValue = block->runCode(_top);
+				if (_top->getBreakStatus())
+				{
+					return returnValue;
+				}
+				if (_top->getContinueStatus())
+				{
+					_top->setContinueStatus(false);
+					continue;
+				}
+				if (returnValue != nullptr)
+				{
+					top->setReturnValue(returnValue);
+					return returnValue;
+				}
+			}
+		}
+		return returnValue;
+	}
+
 	shared_ptr<IceObject> LambdaExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
 		return make_shared<IceFunctionObject>(argDecls, block);
@@ -418,15 +478,15 @@ namespace Ice
 
 	shared_ptr<IceObject> NewExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceClassObject> class_obj = dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
-		shared_ptr<IceInstanceObject> ins_obj = make_shared<IceInstanceObject>(top);
+		auto class_obj = dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
+		auto ins_obj = make_shared<IceInstanceObject>(top);
 
 		for (auto &base : class_obj->bases)
 		{
 			dynamic_pointer_cast<IceClassObject>(top->getObject(base->name))->block->runCode(ins_obj->top);
 			if (ins_obj->top->getObject(base->name)->type == IceObject::TYPE::FUNCTION)
 			{
-				shared_ptr<MethodCallExpr> call = make_shared<MethodCallExpr>(make_shared<IdentifierExpr>(base->name), arguments);
+				auto call = make_shared<MethodCallExpr>(make_shared<IdentifierExpr>(base->name), arguments);
 				call->runCode(ins_obj->top);
 			}
 		}
@@ -436,7 +496,7 @@ namespace Ice
 
 		if (ins_obj->top->getObject(id->name)->type == IceObject::TYPE::FUNCTION)
 		{
-			shared_ptr<MethodCallExpr> call = make_shared<MethodCallExpr>(make_shared<IdentifierExpr>(id->name), arguments);
+			auto call = make_shared<MethodCallExpr>(make_shared<IdentifierExpr>(id->name), arguments);
 			call->runCode(ins_obj->top);
 		}
 		return ins_obj;
@@ -446,43 +506,43 @@ namespace Ice
 	{
 		if (normal_top == nullptr)
 		{
-			shared_ptr<IceObject> _obj = left->runCode(top, top);
-			if (!IceObject::isInstance(_obj->type))
+			auto _obj = left->runCode(top, top);
+			if (!_obj->isInstance())
 			{
 				cout << "it doesn't support for '.'" << endl;
 				exit(0);
 			}
 
-			shared_ptr<IceInstanceObject> obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
-			shared_ptr<IceObject> res = right->runCode(obj->top, top);
+			auto obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
+			auto res = right->runCode(obj->top, top);
 			return res;
 		}
 
-		shared_ptr<IceObject> _obj = left->runCode(top, normal_top);
-		if (!IceObject::isInstance(_obj->type)) 
+		auto _obj = left->runCode(top, normal_top);
+		if (!_obj->isInstance()) 
 		{
 			cout << "it doesn't support for '.'" << endl;
 			exit(0);
 		}
 
-		shared_ptr<IceInstanceObject> obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
-		shared_ptr<IceObject> res = right->runCode(obj->top, normal_top);
+		auto obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
+		auto res = right->runCode(obj->top, normal_top);
 		return res;
 	}
 
 	shared_ptr<IceObject> DotStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<Env> _top = top;
+		auto _top = top;
 		for (auto &expression : expressions)
 		{
-			shared_ptr<IceObject> _obj = expression->runCode(_top);
-			if (!IceObject::isInstance(_obj->type))
+			auto _obj = expression->runCode(_top);
+			if (!_obj->isInstance())
 			{
 				cout << "it doesn't '.' operator" << endl;
 				exit(0);
 			}
 			
-			shared_ptr<IceInstanceObject> obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
+			auto obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
 			_top = obj->top;
 		}
 		to_run->runCode(_top, top);
@@ -491,7 +551,7 @@ namespace Ice
 
 	shared_ptr<IceObject> EnumExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceInstanceObject> obj = make_shared<IceInstanceObject>(top);;
+		auto obj = make_shared<IceInstanceObject>(top);;
 
 		long i = 0;
 		for (auto &enumerator : enumerators)
@@ -504,7 +564,7 @@ namespace Ice
 
 	shared_ptr<IceObject> MatchExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> obj = expression->runCode(top);
+		auto obj = expression->runCode(top);
 		for (size_t i = 0; i < mat_expressions.size(); i++)
 		{
 			if (mat_expressions[i]->runCode(top)->binaryOperate(obj, TOKEN::TCEQ)->isTrue())
@@ -517,7 +577,7 @@ namespace Ice
 
 	shared_ptr<IceObject> ListExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceListObject> obj = make_shared<IceListObject>();
+		auto obj = make_shared<IceListObject>();
 		for (auto &expression : expressions)
 		{
 			obj->objects.push_back(expression->runCode(top));
@@ -527,8 +587,8 @@ namespace Ice
 
 	shared_ptr<IceObject> IndexExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> _obj = expression->runCode(top);
-		if (_obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::STRING && _obj->type != IceObject::TYPE::DICT)
+		auto _obj = expression->runCode(top);
+		if (!_obj->isTraversable())
 		{
 			cout << "it doesn't support for []" << endl;
 			exit(0);
@@ -536,25 +596,25 @@ namespace Ice
 
 		if (_obj->type == IceObject::TYPE::LIST) 
 		{
-			shared_ptr<IceListObject> obj = dynamic_pointer_cast<IceListObject>(_obj);
+			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
 			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
 		}
 		else if (_obj->type == IceObject::TYPE::STRING)
 		{
-			shared_ptr<IceStringObject> obj = dynamic_pointer_cast<IceStringObject>(_obj);
+			auto obj = dynamic_pointer_cast<IceStringObject>(_obj);
 			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
 		}
 		else
 		{
-			shared_ptr<IceDictObject> obj = dynamic_pointer_cast<IceDictObject>(_obj);
+			auto obj = dynamic_pointer_cast<IceDictObject>(_obj);
 			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
 		}
 	}
 
 	shared_ptr<IceObject> IndexStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> _obj = expression->runCode(top);
-		if (_obj->type != IceObject::TYPE::LIST && _obj->type != IceObject::TYPE::DICT)
+		auto _obj = expression->runCode(top);
+		if (!_obj->isTraversable() || _obj->type == IceObject::TYPE::STRING)
 		{
 			cout << "it doesn't support for []" << endl;
 			exit(0);
@@ -562,16 +622,16 @@ namespace Ice
 
 		if (_obj->type == IceObject::TYPE::LIST)
 		{
-			shared_ptr<IceListObject> obj = dynamic_pointer_cast<IceListObject>(_obj);
-			shared_ptr<IceObject> index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
-			shared_ptr<IceObject> assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
+			auto index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			auto assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
 			obj->setByIndex(index, assignment);
 		}
 		else
 		{
-			shared_ptr<IceDictObject> obj = dynamic_pointer_cast<IceDictObject>(_obj);
-			shared_ptr<IceObject> index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
-			shared_ptr<IceObject> assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			auto obj = dynamic_pointer_cast<IceDictObject>(_obj);
+			auto index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			auto assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
 			obj->setByIndex(index, assignment);
 		}
 		return nullptr;
@@ -584,7 +644,7 @@ namespace Ice
 			cout << "one key, one value" << endl;
 			exit(0);
 		}
-		shared_ptr<IceDictObject> obj = make_shared<IceDictObject>();
+		auto obj = make_shared<IceDictObject>();
 		for (size_t i = 0; i < keys.size(); i++)
 		{
 			obj->setByIndex(keys[i]->runCode(top), values[i]->runCode(top));

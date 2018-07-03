@@ -29,6 +29,7 @@ namespace Ice
 			TDO,	// do
 			TFOR,	// for
 			TTO,	// to
+			TFOREACH, // foreach
 			TAS,	// as
 			TBREAK,	// break
 			TCONTINUE,	// continue

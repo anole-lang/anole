@@ -8,9 +8,14 @@ using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
-	bool IceObject::isInstance(TYPE type)
+	bool IceObject::isInstance()
 	{
 		return type == TYPE::INSTANCE || type == TYPE::LIST || type == TYPE::STRING || type == TYPE::DICT;
+	}
+
+	bool IceObject::isTraversable()
+	{
+		return type == TYPE::LIST || type == TYPE::STRING || type == TYPE::DICT;
 	}
 
 	IceFunctionObject::IceFunctionObject(const VariableList &argDecls, shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block)

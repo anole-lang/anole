@@ -68,7 +68,8 @@ namespace Ice
 		virtual bool isTrue() = 0;
 		virtual string toStr() = 0;
 
-		static bool isInstance(TYPE type);
+		bool isInstance();
+		bool isTraversable();
 	};
 
 	class IceFunctionObject : public IceObject

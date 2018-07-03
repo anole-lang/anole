@@ -97,6 +97,8 @@ namespace Ice
 			return genDoWhileStmt();
 		case TOKEN::TFOR:
 			return genForStmt();
+		case TOKEN::TFOREACH:
+			return genForeachStmt();
 		case TOKEN::TBREAK:
 			++iToken;
 			return make_shared<BreakStmt>();
@@ -353,6 +355,17 @@ namespace Ice
 		}
 		auto block = genBlock();
 		return make_shared<ForStmt>(begin, end, id, block);
+	}
+
+	STMT SyntaxAnalyzer::genForeachStmt()
+	{
+		++iToken;
+		auto expression = genExpr();
+		CHECK_AND_THROW(TOKEN::TAS, "missing keyword 'as' in foreach");
+		++iToken;
+		auto id = dynamic_pointer_cast<IdentifierExpr>(genIdent());
+		auto block = genBlock();
+		return make_shared<ForeachStmt>(expression, id, block);
 	}
 
 	STMT SyntaxAnalyzer::genReturnStmt()

@@ -379,6 +379,18 @@ namespace Ice
 	};
 
 
+	class ForeachStmt : public Stmt
+	{
+	public:
+
+		shared_ptr<Expr> expression;
+		shared_ptr<IdentifierExpr> id;
+		shared_ptr<BlockExpr> block;
+		ForeachStmt(shared_ptr<Expr> expression, shared_ptr<IdentifierExpr> id, shared_ptr<BlockExpr> block) : expression(expression), id(id), block(block) {}
+		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+	};
+
+
 	class DotStmt : public Stmt
 	{
 	public:

@@ -15,6 +15,8 @@ Please add feature request here.
 <hr>
 
 ### ChangeLog
++ [X] Add test for 'foreach'
++ [X] Support for 'foreach' keyword
 + [X] Support for 'if elif else' statement
 + [X] For stmt now will have a var to save the current for_index
 + [X] Refactored class SyntaxAnalyzer & make it easy to read
@@ -44,7 +46,7 @@ Please add feature request here.
 
 ###### Control Flow
 ```ice
-# support if_else while do_while for for_as break continue
+# support if_else while do_while for for_as foreach break continue
 
 @fib(n) {
     if n = 0 or n = 1 { 

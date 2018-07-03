@@ -21,6 +21,7 @@ stmt
 	| while_stmt
 	| do_while_stmt
 	| for_stmt
+	| foreach_stmt
 	| expr
 	| break_stmt
 	| continue_stmt
@@ -230,6 +231,10 @@ do_while_stmt
 for_stmt
 	: TFOR expr TTO expr TAS identifier block
 	| TFOR expr TTO expr block
+	;
+
+foreach_stmt
+	: TFOREACH expr TAS identifier block
 	;
 
 lambda_expr
