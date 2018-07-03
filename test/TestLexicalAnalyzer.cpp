@@ -113,12 +113,12 @@ __id__
 	TEST_METHOD(TestLexerKeywords)
 	{
 		std::string code = R"coldice(
-using if else while do for to break continue 
+using if else while do for to foreach as break continue 
 return match new none true false and or not
 )coldice";
 		auto tokens = lexer.getTokens(code);
 		
-		ASSERT_COUNT(18);
+		ASSERT_COUNT(20);
 
 		ASSERT_TOKEN(TOKEN::TUSING);
 		ASSERT_TOKEN(TOKEN::TIF);
@@ -127,6 +127,8 @@ return match new none true false and or not
 		ASSERT_TOKEN(TOKEN::TDO);
 		ASSERT_TOKEN(TOKEN::TFOR);
 		ASSERT_TOKEN(TOKEN::TTO);
+		ASSERT_TOKEN(TOKEN::TFOREACH);
+		ASSERT_TOKEN(TOKEN::TAS);
 		ASSERT_TOKEN(TOKEN::TBREAK);
 		ASSERT_TOKEN(TOKEN::TCONTINUE);
 		ASSERT_TOKEN(TOKEN::TRETURN);

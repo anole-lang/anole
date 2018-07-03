@@ -294,6 +294,23 @@ res
 		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 4);
 	}
 
+	TEST_METHOD(TestForeachRuntime)
+	{
+		std::string code = R"coldice(
+@list: [1, "2", 3.4]
+@res: []
+foreach list as value {
+	res.push_back(value)
+}
+res
+)coldice";
+
+		ASSERT_COUNT(4);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::INT, IceIntegerObject, 1);
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::STRING, IceStringObject, "2");
+		ASSERT_TYPE_PTRTYPE_VALUE(TYPE::DOUBLE, IceDoubleObject, 3.4);
+	}
+
 	TEST_METHOD(TestContinueRuntime)
 	{
 		std::string code = R"coldice(
