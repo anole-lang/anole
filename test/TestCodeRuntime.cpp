@@ -7,6 +7,8 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Ice;
+
+using std::string;
 using TYPE = IceObject::TYPE;
 
 
@@ -35,7 +37,7 @@ public:
 
 	TEST_METHOD(TestCommonVariableRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @a: 1
 @b: 1.1
 @c: "1.1"
@@ -68,7 +70,7 @@ a b c
 
 	TEST_METHOD(TestListRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @res: [1, 1.1, "1.1"]
 res.pop_back()
 res.push_back("1.1.1")
@@ -86,7 +88,7 @@ res
 
 	TEST_METHOD(TestCommonFunctionRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @add(a, b): a + b
 @mul(a, b) {
 	return a * b
@@ -111,7 +113,7 @@ res
 
 	TEST_METHOD(TestNumericRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @a: 1 + 2 - 3 + 4 - 5 + 6 - 7
 @b: 2 * 3 * 4 / 4
 @c: 1.1 + 1.2 + 1.3 + 1.4 - 1.5
@@ -133,7 +135,7 @@ res
 
 	TEST_METHOD(TestStringRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @a: "test common string"
 @b: "test string with escaping \""
 @c: -a
@@ -159,7 +161,7 @@ res
 
 	TEST_METHOD(TestDictRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @a: 1
 @b: 1.2
 @c: "1.23"
@@ -192,7 +194,7 @@ public:
 
 	TEST_METHOD(TestIfElseRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @pow(num, n: 2) {
 	if n > 0 {
 		return num * pow(num, n-1)
@@ -235,7 +237,7 @@ public:
 
 	TEST_METHOD(TestWhileRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @pow(num, n:2) {
 	@res: 1
 	while n > 0 {
@@ -256,7 +258,7 @@ public:
 
 	TEST_METHOD(TestDoWhileRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @test(n) {
 	@test: 0
 	do {
@@ -277,7 +279,7 @@ public:
 
 	TEST_METHOD(TestForRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @res: []
 for 1 to 5 as i {
 	res.push_back(i)
@@ -296,7 +298,7 @@ res
 
 	TEST_METHOD(TestForeachRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @list: [1, "2", 3.4]
 @res: []
 foreach list as value {
@@ -313,7 +315,7 @@ res
 
 	TEST_METHOD(TestContinueRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @res: []
 for 1 to 5 as i {
 	if i = 3 {
@@ -335,7 +337,7 @@ res
 
 	TEST_METHOD(TestBreakRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @res: []
 for 1 to 5 as i {
 	if i = 3 {
@@ -365,7 +367,7 @@ public:
 
 	TEST_METHOD(TestLambdaRuntime)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @add: @(a, b) {
 	return a + b
 }

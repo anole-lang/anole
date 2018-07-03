@@ -26,7 +26,7 @@ namespace Ice
 		bool breakStatus;
 		bool continueStatus;
 
-		void garbageCollect(std::string name);
+		void garbageCollect(string name);
 
 	public:
 

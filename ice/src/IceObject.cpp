@@ -8,6 +8,7 @@ using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
+	// General method definitions
 	bool IceObject::isInstance()
 	{
 		return type == TYPE::INSTANCE || type == TYPE::LIST || type == TYPE::STRING || type == TYPE::DICT;
@@ -18,21 +19,29 @@ namespace Ice
 		return type == TYPE::LIST || type == TYPE::STRING || type == TYPE::DICT;
 	}
 
+
+	// Definitions for IceFunctionObject
 	IceFunctionObject::IceFunctionObject(const VariableList &argDecls, shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block)
 	{
 		type = TYPE::FUNCTION;
 	}
+	
 
+	// Definitions for IceBuiltInFunctionObject
 	IceBuiltInFunctionObject::IceBuiltInFunctionObject(function<shared_ptr<IceObject>(Objects)> func) : func(func)
 	{
 		type = TYPE::BUILT_IN_FUNCTION;
 	}
 
+
+	// Definitions for IceClassObject
 	IceClassObject::IceClassObject(const IdentifierList &bases, shared_ptr<BlockExpr> block) : bases(bases), block(block)
 	{
 		type = TYPE::CLASS;
 	}
 
+
+	// Definitions for IceInstancesObject
 	IceInstanceObject::IceInstanceObject()
 	{
 		type = TYPE::INSTANCE;
@@ -61,89 +70,18 @@ namespace Ice
 		}
 	}
 
+
+	// Definitions for IceNoneObject
 	IceNoneObject::IceNoneObject()
 	{
 		type = TYPE::NONE;
 	}
 
+
+	// Definitions for IceIntegerObejct
 	IceIntegerObject::IceIntegerObject(long value) : value(value)
 	{
 		type = TYPE::INT;
-	}
-
-	IceDoubleObject::IceDoubleObject(double value) : value(value)
-	{
-		type = TYPE::DOUBLE;
-	}
-
-	IceBooleanObject::IceBooleanObject(bool value) : value(value)
-	{
-		type = TYPE::BOOLEAN;
-	}
-
-	IceStringObject::IceStringObject(string value) : value(value)
-	{
-		genBuiltInMethods();
-
-		type = TYPE::STRING;
-
-		raw_value = "";
-		const char *p = value.c_str();
-		while (*p)
-		{
-			switch (*p)
-			{
-			case '\n':
-				raw_value += "\\n";
-				break;
-			case '\\':
-				raw_value += "\\\\";
-				break;
-			case '\"':
-				raw_value += "\\\"";
-				break;
-			case '\a':
-				raw_value += "\\a";
-				break;
-			case '\b':
-				raw_value += "\\b";
-				break;
-			case '\0':
-				raw_value += "\\0";
-				break;
-			case '\t':
-				raw_value += "\\t";
-				break;
-			case '\r':
-				raw_value += "\\r";
-				break;
-			case '\f':
-				raw_value += "\\f";
-				break;
-			default:
-				raw_value += *p;
-				break;
-			}
-			++p;
-		}
-	}
-
-	IceListObject::IceListObject()
-	{
-		type = TYPE::LIST;
-		genBuiltInMethods();
-	}
-
-	IceListObject::IceListObject(Objects objects) : objects(objects)
-	{
-		type = TYPE::LIST;
-		genBuiltInMethods();
-	}
-
-	IceDictObject::IceDictObject()
-	{
-		type = TYPE::DICT;
-		genBuiltInMethods();
 	}
 
 	shared_ptr<IceObject> IceIntegerObject::unaryOperate(TOKEN op)
@@ -230,6 +168,13 @@ namespace Ice
 		return nullptr;
 	}
 
+
+	// Definitions for IceDoubleObject
+	IceDoubleObject::IceDoubleObject(double value) : value(value)
+	{
+		type = TYPE::DOUBLE;
+	}
+
 	shared_ptr<IceObject> IceDoubleObject::unaryOperate(TOKEN op)
 	{
 		switch (op)
@@ -313,6 +258,13 @@ namespace Ice
 		cout << "doesn't support this operator" << endl;
 		exit(0);
 		return nullptr;
+	}
+
+
+	// Definitions for IceBooleanObject
+	IceBooleanObject::IceBooleanObject(bool value) : value(value)
+	{
+		type = TYPE::BOOLEAN;
 	}
 
 	void IceBooleanObject::show()
@@ -419,6 +371,55 @@ namespace Ice
 		return nullptr;
 	}
 
+
+	// Definitions for IceStringObject
+	IceStringObject::IceStringObject(string value) : value(value)
+	{
+		genBuiltInMethods();
+
+		type = TYPE::STRING;
+
+		raw_value = "";
+		const char *p = value.c_str();
+		while (*p)
+		{
+			switch (*p)
+			{
+			case '\n':
+				raw_value += "\\n";
+				break;
+			case '\\':
+				raw_value += "\\\\";
+				break;
+			case '\"':
+				raw_value += "\\\"";
+				break;
+			case '\a':
+				raw_value += "\\a";
+				break;
+			case '\b':
+				raw_value += "\\b";
+				break;
+			case '\0':
+				raw_value += "\\0";
+				break;
+			case '\t':
+				raw_value += "\\t";
+				break;
+			case '\r':
+				raw_value += "\\r";
+				break;
+			case '\f':
+				raw_value += "\\f";
+				break;
+			default:
+				raw_value += *p;
+				break;
+			}
+			++p;
+		}
+	}
+
 	shared_ptr<IceObject> IceStringObject::unaryOperate(TOKEN op)
 	{
 		string dup = value;
@@ -498,7 +499,7 @@ namespace Ice
 
 	void IceStringObject::genBuiltInMethods()
 	{
-		top->put("isalpha", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		top->put("isalpha", make_shared<IceBuiltInFunctionObject>([&](Objects objects)
 		{
 			if (objects.size())
 			{
@@ -508,7 +509,7 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceBooleanObject>(value.size() == 1 ? (isalpha(value[0])) : false));
 		}));
 
-		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects) 
+		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects objects)
 		{
 			if (objects.size())
 			{
@@ -518,6 +519,20 @@ namespace Ice
 
 			return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(value.size()));
 		}));
+	}
+
+
+	// Definitions for IceListObject
+	IceListObject::IceListObject()
+	{
+		type = TYPE::LIST;
+		genBuiltInMethods();
+	}
+
+	IceListObject::IceListObject(Objects objects) : objects(objects)
+	{
+		type = TYPE::LIST;
+		genBuiltInMethods();
 	}
 
 	void IceListObject::show()
@@ -608,7 +623,7 @@ namespace Ice
 
 	void IceListObject::genBuiltInMethods()
 	{
-		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		top->put("size", make_shared<IceBuiltInFunctionObject>([&](Objects _objects)
 		{
 			if (_objects.size())
 			{
@@ -619,7 +634,7 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(objects.size()));
 		}));
 
-		top->put("empty", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		top->put("empty", make_shared<IceBuiltInFunctionObject>([&](Objects _objects)
 		{
 			if (_objects.size())
 			{
@@ -630,7 +645,7 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceBooleanObject>(objects.empty()));
 		}));
 
-		top->put("push_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		top->put("push_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects)
 		{
 			if (_objects.size() != 1)
 			{
@@ -642,7 +657,7 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
 
-		top->put("pop_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		top->put("pop_back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects)
 		{
 			if (_objects.size())
 			{
@@ -654,7 +669,7 @@ namespace Ice
 			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
 
-		top->put("front", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		top->put("front", make_shared<IceBuiltInFunctionObject>([&](Objects _objects)
 		{
 			if (_objects.size())
 			{
@@ -665,7 +680,7 @@ namespace Ice
 			return objects.front();
 		}));
 
-		top->put("back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		top->put("back", make_shared<IceBuiltInFunctionObject>([&](Objects _objects)
 		{
 			if (_objects.size())
 			{
@@ -676,7 +691,7 @@ namespace Ice
 			return objects.back();
 		}));
 
-		top->put("clear", make_shared<IceBuiltInFunctionObject>([&](Objects _objects) 
+		top->put("clear", make_shared<IceBuiltInFunctionObject>([&](Objects _objects)
 		{
 			if (_objects.size())
 			{
@@ -687,6 +702,14 @@ namespace Ice
 			objects.clear();
 			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
 		}));
+	}
+
+
+	// Definitions for IceDictObject
+	IceDictObject::IceDictObject()
+	{
+		type = TYPE::DICT;
+		genBuiltInMethods();
 	}
 
 	size_t KeyObject::hashValue() const

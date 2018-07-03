@@ -4,6 +4,8 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Ice;
+
+using std::string;
 using TOKEN = Token::TOKEN;
 
 
@@ -29,7 +31,7 @@ public:
 
 	TEST_METHOD(TestLexerIdentifier)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 test identifier
 _
 ___
@@ -60,7 +62,7 @@ __id__
 
 	TEST_METHOD(TestLexerNumber)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 123 
 123. 
 123.123
@@ -78,7 +80,7 @@ __id__
 
 	TEST_METHOD(TestLexerOperators)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 +-*/%&|^~>< << >> = != <= >= => and or else
 )coldice";
 		auto tokens = lexer.getTokens(code);
@@ -112,7 +114,7 @@ __id__
 
 	TEST_METHOD(TestLexerKeywords)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 using if else while do for to foreach as break continue 
 return match new none true false and or not
 )coldice";
@@ -146,7 +148,7 @@ return match new none true false and or not
 
 	TEST_METHOD(TestLexerString)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 "abcdefg" 
 "abcdefg\"" 
 "\"" 
@@ -166,7 +168,7 @@ return match new none true false and or not
 
 	TEST_METHOD(TestLexerComment)
 	{
-		std::string code = R"(
+		string code = R"(
 # test comments
 after line # comment
 )";

@@ -166,7 +166,7 @@ namespace Ice
 			}
 			else if (iToken->token_id == TOKEN::TLPAREN)
 			{
-				VariableList args = genArguments();
+				auto args = genArguments();
 				node = make_shared<FunctionDeclarationStmt>(dynamic_pointer_cast<IdentifierExpr>(node), args, genFuncDeclRest());
 			}
 			else if (iToken->token_id == TOKEN::TLBRACKET)
@@ -221,7 +221,7 @@ namespace Ice
 		}
 		else if (iToken->token_id == TOKEN::TLPAREN)
 		{
-			VariableList args = genArguments();
+			auto args = genArguments();
 			node = make_shared<FunctionDeclarationStmt>(dynamic_pointer_cast<IdentifierExpr>(node), args, genFuncDeclRest());
 		}
 		else if (iToken->token_id == TOKEN::TLBRACKET)

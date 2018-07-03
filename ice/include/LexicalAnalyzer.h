@@ -17,7 +17,7 @@ namespace Ice
 	{
 	private:
 
-		std::vector<Token> tokens;
+		vector<Token> tokens;
 		enum class State
 		{
 			Begin,

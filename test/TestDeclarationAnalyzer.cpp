@@ -6,6 +6,8 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace Ice;
 
+using std::string;
+
 
 #define ASSERT_COUNT(COUNT)		Assert::AreEqual(true, std::dynamic_pointer_cast<BlockExpr>(node) != nullptr); \
 								Assert::AreEqual<size_t>(COUNT, std::dynamic_pointer_cast<BlockExpr>(node)->statements.size()); \
@@ -31,7 +33,7 @@ public:
 
 	TEST_METHOD(TestCommonVariableDeclaration)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @_one: 1
 @_one_dot_one: 1.1
 @_str: "string"
@@ -60,7 +62,7 @@ public:
 
 	TEST_METHOD(TestCommonFunctionDeclaration)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @add(a, b): a + b
 @pow(n): n * n
 @quadratic_sum(a, b): add(pow(a), pow(b))
@@ -93,7 +95,7 @@ public:
 
 	TEST_METHOD(TestCommonClassDeclaration)
 	{
-		std::string code = R"coldice(
+		string code = R"coldice(
 @@TestClass() {
 	
 	@name: "origin"	

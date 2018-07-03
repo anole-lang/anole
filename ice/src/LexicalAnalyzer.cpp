@@ -12,9 +12,9 @@ namespace Ice
 	// analyze the line & generate tokens
 	void LexicalAnalyzer::analy(string line)
 	{ 
-		State state = State::Begin;
+		auto state = State::Begin;
+		auto reading = line.c_str();
 		string value;
-		const char *reading = line.c_str();
 
 		// until *reading == '\0'
 		while (*reading) 
@@ -362,7 +362,7 @@ namespace Ice
 
 	vector<Token>::iterator LexicalAnalyzer::cont()
 	{
-		int offset = tokens.size() - 1;
+		auto offset = tokens.size() - 1;
 		cout << ".. ";
 		tokens.pop_back();
 
