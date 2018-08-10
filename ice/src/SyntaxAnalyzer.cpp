@@ -48,7 +48,7 @@ namespace Ice
 		{
 			updateiToken();
 			auto stmt = genStmt();
-			if (stmt != nullptr)
+			if (stmt)
 			{
 				block->statements.push_back(stmt);
 			}

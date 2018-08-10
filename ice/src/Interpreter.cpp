@@ -30,13 +30,13 @@ namespace Ice
 		{
 			cout << ">> ";
 			auto node = syntaxAnalyzer.getNode();
-			auto obj = (node == nullptr) ? nullptr : node->runCode(top);
-			if (obj != nullptr && obj->type != IceObject::TYPE::NONE)
+			auto obj = node ? node->runCode(top) : nullptr;
+			if (obj && obj->type != IceObject::TYPE::NONE)
 			{
 				obj->show();
 				cout << endl;
 			}
-			else if (obj == nullptr) continue;
+			else if (!obj) continue;
 			block->statements.push_back(dynamic_pointer_cast<Stmt>(node));
 		}
 	}
