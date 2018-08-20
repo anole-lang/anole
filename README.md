@@ -10,7 +10,7 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)](https://forthebadge.com)
 
 ## Just an exercise for *Compilers*.
-> actually just an interpreter
+> actually just an interpreter, and supports REPL.
 
 The interpreter for the Ice programming language with many bugs.
 
