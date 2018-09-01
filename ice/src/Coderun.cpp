@@ -63,7 +63,7 @@ namespace Ice
 	void Env::replace(string name, shared_ptr<IceObject> obj)
 	{
 		shared_ptr<Env> tmp = shared_from_this();
-		while (tmp != nullptr)
+		while (tmp)
 		{
 			if (tmp->objects.find(name) != tmp->objects.end())
 			{
@@ -83,7 +83,7 @@ namespace Ice
 	shared_ptr<IceObject> Env::getObject(string name)
 	{
 		auto tmp = shared_from_this();
-		while (tmp != nullptr)
+		while (tmp)
 		{
 			if (tmp->objects.find(name) != tmp->objects.end())
 			{
@@ -119,7 +119,7 @@ namespace Ice
 		for (auto stmt : statements)
 		{
 			stmt->runCode(top);
-			if (top->getBreakStatus() || top->getContinueStatus() || returnValue != nullptr)
+			if (top->getBreakStatus() || top->getContinueStatus() || returnValue)
 			{
 				break;
 			}
@@ -171,7 +171,7 @@ namespace Ice
 			Objects objects;
 			for (auto &argument : arguments)
 			{
-				objects.push_back(argument->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+				objects.push_back(argument->runCode(normal_top ? normal_top : top));
 			}
 			return dynamic_pointer_cast<IceBuiltInFunctionObject>(_obj)->func(objects);
 		}
@@ -196,7 +196,7 @@ namespace Ice
 
 		for (auto &argDecl : func->argDecls)
 		{
-			_top->put(argDecl->id->name, argDecl->assignment->runCode((normal_top == nullptr) ? (_top) : (normal_top)));
+			_top->put(argDecl->id->name, argDecl->assignment->runCode(normal_top ? normal_top : _top));
 		}
 
 		auto returnValue = func->block->runCode(_top);
@@ -224,7 +224,7 @@ namespace Ice
 
 	shared_ptr<IceObject> VariableDeclarationStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		auto obj = assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+		auto obj = assignment->runCode(normal_top ? normal_top : top);
 		top->put(id->name, obj);
 		return nullptr;
 	}
@@ -292,11 +292,11 @@ namespace Ice
 				top->setContinueStatus(true);
 			}
 		}
-		else if (elseStmt != nullptr)
+		else if (elseStmt)
 		{
 			returnValue = elseStmt->runCode(top);
 		}
-		if (returnValue != nullptr)
+		if (returnValue)
 		{
 			top->setReturnValue(returnValue);
 		}
@@ -322,7 +322,7 @@ namespace Ice
 				cond = this->cond->runCode(top);
 				continue;
 			}
-			if (returnValue != nullptr)
+			if (returnValue)
 			{
 				top->setReturnValue(returnValue);
 				return returnValue;
@@ -346,7 +346,7 @@ namespace Ice
 		{
 			_top->setContinueStatus(false);
 		}
-		if (returnValue != nullptr)
+		if (returnValue)
 		{
 			top->setReturnValue(returnValue);
 			return returnValue;
@@ -366,7 +366,7 @@ namespace Ice
 				cond = this->cond->runCode(top);
 				continue;
 			}
-			if (returnValue != nullptr)
+			if (returnValue)
 			{
 				top->setReturnValue(returnValue);
 				return returnValue;
@@ -383,7 +383,7 @@ namespace Ice
 		shared_ptr<IceObject> returnValue = nullptr;
 
 		auto _top = make_shared<Env>(top);
-		if (id != nullptr) _top->put(id->name, begin);
+		if (id) _top->put(id->name, begin);
 
 		while (begin->binaryOperate(end, TOKEN::TCLT)->isTrue())
 		{
@@ -396,16 +396,16 @@ namespace Ice
 			{
 				_top->setContinueStatus(false);
 				begin = begin->binaryOperate(make_shared<IceIntegerObject>(1), TOKEN::TADD);
-				if (id != nullptr) _top->put(id->name, begin);
+				if (id) _top->put(id->name, begin);
 				continue;
 			}
-			if (returnValue != nullptr)
+			if (returnValue)
 			{
 				top->setReturnValue(returnValue);
 				return returnValue;
 			}
 			begin = begin->binaryOperate(make_shared<IceIntegerObject>(1), TOKEN::TADD);
-			if (id != nullptr) _top->put(id->name, begin);
+			if (id) _top->put(id->name, begin);
 		}
 		return returnValue;
 	}
@@ -438,7 +438,7 @@ namespace Ice
 					_top->setContinueStatus(false);
 					continue;
 				}
-				if (returnValue != nullptr)
+				if (returnValue)
 				{
 					top->setReturnValue(returnValue);
 					return returnValue;
@@ -461,7 +461,7 @@ namespace Ice
 					_top->setContinueStatus(false);
 					continue;
 				}
-				if (returnValue != nullptr)
+				if (returnValue)
 				{
 					top->setReturnValue(returnValue);
 					return returnValue;
@@ -504,7 +504,7 @@ namespace Ice
 
 	shared_ptr<IceObject> DotExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
 	{
-		if (normal_top == nullptr)
+		if (!normal_top)
 		{
 			auto _obj = left->runCode(top, top);
 			if (!_obj->isInstance())
@@ -597,17 +597,17 @@ namespace Ice
 		if (_obj->type == IceObject::TYPE::LIST) 
 		{
 			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
-			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+			return obj->getByIndex(index->runCode(normal_top ? normal_top : top));
 		}
 		else if (_obj->type == IceObject::TYPE::STRING)
 		{
 			auto obj = dynamic_pointer_cast<IceStringObject>(_obj);
-			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+			return obj->getByIndex(index->runCode(normal_top ? normal_top : top));
 		}
 		else
 		{
 			auto obj = dynamic_pointer_cast<IceDictObject>(_obj);
-			return obj->getByIndex(index->runCode((normal_top == nullptr) ? (top) : (normal_top)));
+			return obj->getByIndex(index->runCode(normal_top ? normal_top : top));
 		}
 	}
 
@@ -623,15 +623,15 @@ namespace Ice
 		if (_obj->type == IceObject::TYPE::LIST)
 		{
 			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
-			auto index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
-			auto assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			auto index = this->index->runCode(normal_top ? normal_top : top);
+			auto assignment = this->assignment->runCode(normal_top ? normal_top : top);
 			obj->setByIndex(index, assignment);
 		}
 		else
 		{
 			auto obj = dynamic_pointer_cast<IceDictObject>(_obj);
-			auto index = this->index->runCode((normal_top == nullptr) ? (top) : (normal_top));
-			auto assignment = this->assignment->runCode((normal_top == nullptr) ? (top) : (normal_top));
+			auto index = this->index->runCode(normal_top ? normal_top : top);
+			auto assignment = this->assignment->runCode(normal_top ? normal_top : top);
 			obj->setByIndex(index, assignment);
 		}
 		return nullptr;
