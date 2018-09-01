@@ -1,6 +1,7 @@
 #ifndef __SYNTAX_ANALYZER_H__
 #define __SYNTAX_ANALYZER_H__
 
+
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -13,25 +14,20 @@
 #include "LexicalAnalyzer.h"
 
 
-using ::std::shared_ptr;
-using ::std::make_shared;
-using ::std::vector;
-
-
-using BLOCK_EXPR = shared_ptr<Ice::BlockExpr>;
-using STMT = shared_ptr<Ice::Stmt>;
-using EXPR = shared_ptr<Ice::Expr>;
-
-
 namespace Ice
 {
+    using BLOCK_EXPR = ::std::shared_ptr<BlockExpr>;
+    using STMT = ::std::shared_ptr<Stmt>;
+    using EXPR = ::std::shared_ptr<Expr>;
+
+
 	class SyntaxAnalyzer
 	{
 
 	private:
 
 		LexicalAnalyzer lexicalAnalyzer;
-		vector<Token>::iterator iToken;
+		::std::vector<Token>::iterator iToken;
 		void updateiToken();
 
 		BLOCK_EXPR genStmts();
@@ -72,8 +68,8 @@ namespace Ice
 	public:
 
 		SyntaxAnalyzer() {}
-		shared_ptr<Node> getNode();
-		shared_ptr<Node> getNode(::std::string);
+		::std::shared_ptr<Node> getNode();
+		::std::shared_ptr<Node> getNode(::std::string);
 	};
 }
 

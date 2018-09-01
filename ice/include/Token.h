@@ -1,12 +1,12 @@
 #ifndef __TOKEN_H__
 #define __TOKEN_H__
 
+
 #include <iostream>
 #include <string>
 #include <cstring>
 #include <cstdio>
 
-using ::std::string;
 
 namespace Ice
 {
@@ -82,13 +82,17 @@ namespace Ice
 			TCGT,       // >
 			TCGE,       // >=
 
-			TRET,       // =>
+			TRET        // =>
 		} token_id;
-		string value;
-		Token(TOKEN token_id, string value) : token_id(token_id), value(value) {}
+
+		::std::string value;
+
+		Token(TOKEN token_id, ::std::string value) : token_id(token_id), value(value) {}
 		Token(TOKEN token_id) : token_id(token_id) {}
-		Token(string value);
+		Token(::std::string value);
 	};
+
+    using TOKEN = Token::TOKEN;
 }
 
 #endif //__TOKEN_H__

@@ -1,6 +1,7 @@
 #ifndef __LEXICAL_ANALYZER_H__
 #define __LEXICAL_ANALYZER_H__
 
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -8,8 +9,6 @@
 #include <vector>
 #include "Token.h"
 
-using ::std::string;
-using ::std::vector;
 
 namespace Ice
 {
@@ -17,7 +16,7 @@ namespace Ice
 	{
 	private:
 
-		vector<Token> tokens;
+		::std::vector<Token> tokens;
 		enum class State
 		{
 			Begin,
@@ -35,13 +34,13 @@ namespace Ice
 			InString,
 			InStringEscaping
 		};
-		void analy(string);
+		void analy(::std::string);
 
 	public:
 
 		LexicalAnalyzer() {}
-		vector<Token> &getTokens(string);
-		vector<Token>::iterator cont();
+		::std::vector<Token> &getTokens(::std::string);
+		::std::vector<Token>::iterator cont();
 	};
 }
 

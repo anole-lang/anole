@@ -1,20 +1,14 @@
 #include "LexicalAnalyzer.h"
 
-using ::std::cin;
-using ::std::cout;
-using ::std::endl;
-using ::std::getline;
-
-using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
 	// analyze the line & generate tokens
-	void LexicalAnalyzer::analy(string line)
+	void LexicalAnalyzer::analy(::std::string line)
 	{ 
 		auto state = State::Begin;
 		auto reading = line.c_str();
-		string value;
+		::std::string value;
 
 		// until *reading == '\0'
 		while (*reading) 
@@ -278,7 +272,7 @@ namespace Ice
 				switch (*reading)
 				{
 				case '\n':
-					cout << "syntax error!" << endl;
+					::std::cout << "syntax error!" << ::std::endl;
 					exit(0);
 				case '\\':
 					state = State::InStringEscaping;
@@ -298,7 +292,7 @@ namespace Ice
 				switch (*reading)
 				{
 				case '\n':
-					cout << "syntax error!" << endl;
+					::std::cout << "syntax error!" << ::std::endl;
 					exit(0);
 				case 'n':
 					value += '\n';
@@ -353,21 +347,21 @@ namespace Ice
 		}
 	}
 
-	vector<Token> &LexicalAnalyzer::getTokens(string line)
+	::std::vector<Token> &LexicalAnalyzer::getTokens(::std::string line)
 	{
 		tokens.clear();
 		analy(line + "$");
 		return tokens;
 	}
 
-	vector<Token>::iterator LexicalAnalyzer::cont()
+	::std::vector<Token>::iterator LexicalAnalyzer::cont()
 	{
 		auto offset = tokens.size() - 1;
-		cout << ".. ";
+		::std::cout << ".. ";
 		tokens.pop_back();
 
-		string line;
-		getline(cin, line);
+		::std::string line;
+		::std::getline(::std::cin, line);
 		line += "$";
 
 		analy(line);

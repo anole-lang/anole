@@ -1,6 +1,7 @@
 #ifndef __NODE_H__
 #define __NODE_H__
 
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -9,23 +10,17 @@
 #include <cstring>
 #include "Token.h"
 
-using ::std::string;
-using ::std::vector;
-using ::std::shared_ptr;
-
-using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
-
-	using StatementList = vector<shared_ptr<class Stmt>>;
-	using ExpressionList = vector<shared_ptr<class Expr>>;
-	using VariableList = vector<shared_ptr<class VariableDeclarationStmt>>;
-	using IdentifierList = vector<shared_ptr<class IdentifierExpr>>;
+	using StatementList = ::std::vector<::std::shared_ptr<class Stmt>>;
+	using ExpressionList = ::std::vector<::std::shared_ptr<class Expr>>;
+	using VariableList = ::std::vector<::std::shared_ptr<class VariableDeclarationStmt>>;
+	using IdentifierList = ::std::vector<::std::shared_ptr<class IdentifierExpr>>;
 
     class IceObject;
 
-    extern void runUsingStmt(string &, shared_ptr<class Env> &);
+    extern void runUsingStmt(::std::string &, ::std::shared_ptr<class Env> &);
 
 
 	class Node
@@ -33,7 +28,7 @@ namespace Ice
 	public:
 
 		virtual ~Node() {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env>&, shared_ptr<Env> normal_top = nullptr) = 0;
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env>&, ::std::shared_ptr<Env> normal_top = nullptr) = 0;
 	};
 
 
@@ -47,7 +42,7 @@ namespace Ice
 
 		StatementList statements;
 		BlockExpr() = default;
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -56,7 +51,7 @@ namespace Ice
 	public:
 
 		NoneExpr() = default;
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -66,7 +61,7 @@ namespace Ice
 
 		long value;
 		IntegerExpr(long value) : value(value) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -76,7 +71,7 @@ namespace Ice
 
 		double value;
 		DoubleExpr(double value) : value(value) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -86,7 +81,7 @@ namespace Ice
 
 		bool value;
 		BooleanExpr(bool value) : value(value) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -94,9 +89,9 @@ namespace Ice
 	{
 	public:
 
-		string value;
-		StringExpr(string value) : value(value) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::string value;
+		StringExpr(::std::string value) : value(value) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -104,9 +99,9 @@ namespace Ice
 	{
 	public:
 
-		string name;
-		IdentifierExpr(string &name) : name(name) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::string name;
+		IdentifierExpr(::std::string &name) : name(name) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -114,10 +109,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> expression;
+		::std::shared_ptr<Expr> expression;
 		ExpressionList arguments;
-		MethodCallExpr(shared_ptr<Expr> expression, ExpressionList arguments) : expression(expression), arguments(arguments) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		MethodCallExpr(::std::shared_ptr<Expr> expression, ExpressionList arguments) : expression(expression), arguments(arguments) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -126,9 +121,9 @@ namespace Ice
 	public:
 
 		TOKEN op;
-		shared_ptr<Expr> expression;
-		UnaryOperatorExpr(TOKEN op, shared_ptr<Expr> expression) : op(op), expression(expression) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> expression;
+		UnaryOperatorExpr(TOKEN op, ::std::shared_ptr<Expr> expression) : op(op), expression(expression) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -136,11 +131,11 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> lhs;
+		::std::shared_ptr<Expr> lhs;
 		TOKEN op;
-		shared_ptr<Expr> rhs;
-		BinaryOperatorExpr(shared_ptr<Expr> lhs, TOKEN op, shared_ptr<Expr> rhs) : lhs(lhs), op(op), rhs(rhs) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> rhs;
+		BinaryOperatorExpr(::std::shared_ptr<Expr> lhs, TOKEN op, ::std::shared_ptr<Expr> rhs) : lhs(lhs), op(op), rhs(rhs) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -149,9 +144,9 @@ namespace Ice
 	public:
 
 		VariableList argDecls;
-		shared_ptr<BlockExpr> block;
-		LambdaExpr(VariableList argDecls, shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<BlockExpr> block;
+		LambdaExpr(VariableList argDecls, ::std::shared_ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -159,10 +154,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<IdentifierExpr> id;
+		::std::shared_ptr<IdentifierExpr> id;
 		ExpressionList arguments;
-		NewExpr(shared_ptr<IdentifierExpr> id, ExpressionList arguments) : id(id), arguments(arguments) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		NewExpr(::std::shared_ptr<IdentifierExpr> id, ExpressionList arguments) : id(id), arguments(arguments) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -170,10 +165,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> left;
-		shared_ptr<Expr> right;
-		DotExpr(shared_ptr<Expr> left, shared_ptr<Expr> right) : left(left), right(right) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> left;
+		::std::shared_ptr<Expr> right;
+		DotExpr(::std::shared_ptr<Expr> left, ::std::shared_ptr<Expr> right) : left(left), right(right) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -183,7 +178,7 @@ namespace Ice
 
 		IdentifierList	enumerators;
 		EnumExpr(IdentifierList enumerators) : enumerators(enumerators) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -191,12 +186,12 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> expression;
+		::std::shared_ptr<Expr> expression;
 		ExpressionList mat_expressions;
 		ExpressionList ret_expressions;
-		shared_ptr<Expr> else_expression;
-		MatchExpr(shared_ptr<Expr> expression, ExpressionList mat_expressions, ExpressionList ret_expressions, shared_ptr<Expr> else_expression) : expression(expression), mat_expressions(mat_expressions), ret_expressions(ret_expressions), else_expression(else_expression) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> else_expression;
+		MatchExpr(::std::shared_ptr<Expr> expression, ExpressionList mat_expressions, ExpressionList ret_expressions, ::std::shared_ptr<Expr> else_expression) : expression(expression), mat_expressions(mat_expressions), ret_expressions(ret_expressions), else_expression(else_expression) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -206,7 +201,7 @@ namespace Ice
 
 		ExpressionList expressions;
 		ListExpr(ExpressionList expressions) : expressions(expressions) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -214,10 +209,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> expression;
-		shared_ptr<Expr> index;
-		IndexExpr(shared_ptr<Expr> expression, shared_ptr<Expr> index) : expression(expression), index(index) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> expression;
+		::std::shared_ptr<Expr> index;
+		IndexExpr(::std::shared_ptr<Expr> expression, ::std::shared_ptr<Expr> index) : expression(expression), index(index) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -229,7 +224,7 @@ namespace Ice
 		ExpressionList values;
 		DictExpr() {}
 		DictExpr(ExpressionList keys, ExpressionList values) : keys(keys), values(values) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -237,9 +232,9 @@ namespace Ice
 	{
 	public:
 
-		string name;
-		UsingStmt(string name) : name(name) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::string name;
+		UsingStmt(::std::string name) : name(name) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -247,9 +242,9 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> assignment;
-		ExprStmt(shared_ptr<Expr> assignment) : assignment(assignment) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> assignment;
+		ExprStmt(::std::shared_ptr<Expr> assignment) : assignment(assignment) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -257,10 +252,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<IdentifierExpr> id;
-		shared_ptr<Expr> assignment;
-		VariableDeclarationStmt(shared_ptr<IdentifierExpr> id, shared_ptr<Expr>assignment) : id(id), assignment(assignment) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<IdentifierExpr> id;
+		::std::shared_ptr<Expr> assignment;
+		VariableDeclarationStmt(::std::shared_ptr<IdentifierExpr> id, ::std::shared_ptr<Expr>assignment) : id(id), assignment(assignment) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -268,10 +263,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<IdentifierExpr> id;
-		shared_ptr<Expr> assignment;
-		VariableAssignStmt(shared_ptr<IdentifierExpr> id, shared_ptr<Expr>assignment) : id(id), assignment(assignment) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<IdentifierExpr> id;
+		::std::shared_ptr<Expr> assignment;
+		VariableAssignStmt(::std::shared_ptr<IdentifierExpr> id, ::std::shared_ptr<Expr>assignment) : id(id), assignment(assignment) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -279,11 +274,11 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<IdentifierExpr> id;
+		::std::shared_ptr<IdentifierExpr> id;
 		VariableList argDecls;
-		shared_ptr<BlockExpr> block;
-		FunctionDeclarationStmt(shared_ptr<IdentifierExpr> id, VariableList argDecls, shared_ptr<BlockExpr> block) : id(id), argDecls(argDecls), block(block) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<BlockExpr> block;
+		FunctionDeclarationStmt(::std::shared_ptr<IdentifierExpr> id, VariableList argDecls, ::std::shared_ptr<BlockExpr> block) : id(id), argDecls(argDecls), block(block) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -291,11 +286,11 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<IdentifierExpr> id;
+		::std::shared_ptr<IdentifierExpr> id;
 		IdentifierList bases;
-		shared_ptr<BlockExpr> block;
-		ClassDeclarationStmt(shared_ptr<IdentifierExpr> id, IdentifierList bases, shared_ptr<BlockExpr> block) : id(id), bases(bases), block(block) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<BlockExpr> block;
+		ClassDeclarationStmt(::std::shared_ptr<IdentifierExpr> id, IdentifierList bases, ::std::shared_ptr<BlockExpr> block) : id(id), bases(bases), block(block) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -304,7 +299,7 @@ namespace Ice
 	public:
 
 		BreakStmt() {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -313,7 +308,7 @@ namespace Ice
 	public:
 
 		ContinueStmt() {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -321,9 +316,9 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> assignment;
-		ReturnStmt(shared_ptr<Expr> assignment) :assignment(assignment) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> assignment;
+		ReturnStmt(::std::shared_ptr<Expr> assignment) :assignment(assignment) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -331,11 +326,11 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> cond;
-		shared_ptr<BlockExpr> blockTrue;
-		shared_ptr<IfElseStmt> elseStmt;
-		IfElseStmt(shared_ptr<Expr> cond, shared_ptr<BlockExpr> blockTrue, shared_ptr<IfElseStmt> elseStmt) : cond(cond), blockTrue(blockTrue), elseStmt(elseStmt) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> cond;
+		::std::shared_ptr<BlockExpr> blockTrue;
+		::std::shared_ptr<IfElseStmt> elseStmt;
+		IfElseStmt(::std::shared_ptr<Expr> cond, ::std::shared_ptr<BlockExpr> blockTrue, ::std::shared_ptr<IfElseStmt> elseStmt) : cond(cond), blockTrue(blockTrue), elseStmt(elseStmt) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -343,10 +338,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> cond;
-		shared_ptr<BlockExpr> block;
-		WhileStmt(shared_ptr<Expr> cond, shared_ptr<BlockExpr> block) : cond(cond), block(block) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> cond;
+		::std::shared_ptr<BlockExpr> block;
+		WhileStmt(::std::shared_ptr<Expr> cond, ::std::shared_ptr<BlockExpr> block) : cond(cond), block(block) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -354,10 +349,10 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> cond;
-		shared_ptr<BlockExpr> block;
-		DoWhileStmt(shared_ptr<Expr> cond, shared_ptr<BlockExpr> block) : cond(cond), block(block) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> cond;
+		::std::shared_ptr<BlockExpr> block;
+		DoWhileStmt(::std::shared_ptr<Expr> cond, ::std::shared_ptr<BlockExpr> block) : cond(cond), block(block) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -365,12 +360,12 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> begin;
-		shared_ptr<Expr> end;
-		shared_ptr<IdentifierExpr> id;
-		shared_ptr<BlockExpr> block;
-		ForStmt(shared_ptr<Expr> begin, shared_ptr<Expr> end, shared_ptr<IdentifierExpr> id, shared_ptr<BlockExpr> block) : begin(begin), end(end), id(id), block(block) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> begin;
+		::std::shared_ptr<Expr> end;
+		::std::shared_ptr<IdentifierExpr> id;
+		::std::shared_ptr<BlockExpr> block;
+		ForStmt(::std::shared_ptr<Expr> begin, ::std::shared_ptr<Expr> end, ::std::shared_ptr<IdentifierExpr> id, ::std::shared_ptr<BlockExpr> block) : begin(begin), end(end), id(id), block(block) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -378,11 +373,11 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> expression;
-		shared_ptr<IdentifierExpr> id;
-		shared_ptr<BlockExpr> block;
-		ForeachStmt(shared_ptr<Expr> expression, shared_ptr<IdentifierExpr> id, shared_ptr<BlockExpr> block) : expression(expression), id(id), block(block) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> expression;
+		::std::shared_ptr<IdentifierExpr> id;
+		::std::shared_ptr<BlockExpr> block;
+		ForeachStmt(::std::shared_ptr<Expr> expression, ::std::shared_ptr<IdentifierExpr> id, ::std::shared_ptr<BlockExpr> block) : expression(expression), id(id), block(block) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -391,9 +386,9 @@ namespace Ice
 	public:
 
 		ExpressionList expressions;
-		shared_ptr<Stmt> to_run;
-		DotStmt(ExpressionList expressions, shared_ptr<Stmt> to_run) : expressions(expressions), to_run(to_run) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Stmt> to_run;
+		DotStmt(ExpressionList expressions, ::std::shared_ptr<Stmt> to_run) : expressions(expressions), to_run(to_run) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 
 
@@ -401,11 +396,11 @@ namespace Ice
 	{
 	public:
 
-		shared_ptr<Expr> expression;
-		shared_ptr<Expr> index;
-		shared_ptr<Expr> assignment;
-		IndexStmt(shared_ptr<IndexExpr> index_expr, shared_ptr<Expr>assignment) : expression(index_expr->expression), index(index_expr->index), assignment(assignment) {}
-		virtual shared_ptr<IceObject> runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top = nullptr);
+		::std::shared_ptr<Expr> expression;
+		::std::shared_ptr<Expr> index;
+		::std::shared_ptr<Expr> assignment;
+		IndexStmt(::std::shared_ptr<IndexExpr> index_expr, ::std::shared_ptr<Expr>assignment) : expression(index_expr->expression), index(index_expr->index), assignment(assignment) {}
+		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top = nullptr);
 	};
 }
 

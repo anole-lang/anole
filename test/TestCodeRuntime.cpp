@@ -6,9 +6,9 @@
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace std;
 using namespace Ice;
 
-using std::string;
 using TYPE = IceObject::TYPE;
 
 

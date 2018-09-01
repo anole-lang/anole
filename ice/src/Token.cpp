@@ -4,9 +4,10 @@
 #define VALUE		( value
 #define TOKEN_ID	) token_id
 
+
 namespace Ice
 {
-	Token::Token(string value) : value(value)
+	Token::Token(::std::string value) : value(value)
 	{ // just for fun
 		if   VALUE == "using"		TOKEN_ID = TOKEN::TUSING;
 		elif VALUE == "if"			TOKEN_ID = TOKEN::TIF;

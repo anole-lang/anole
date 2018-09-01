@@ -1,48 +1,45 @@
 #ifndef __CODERUN_H__
 #define __CODERUN_H__
 
+
 #include <iostream>
 #include <map>
 #include <string>
 #include <memory>
 #include <cstring>
 
-using ::std::string;
-using ::std::map;
-using ::std::shared_ptr;
-using ::std::enable_shared_from_this;
 
 namespace Ice
 {
 	class IceObject;
 
-	class Env : public enable_shared_from_this<Env>
+	class Env : public ::std::enable_shared_from_this<Env>
 	{
 	private:
 
-		map<string, shared_ptr<IceObject>> objects;
+		::std::map<::std::string, ::std::shared_ptr<IceObject>> objects;
 
-		shared_ptr<IceObject> returnValue;
+		::std::shared_ptr<IceObject> returnValue;
 		bool breakStatus;
 		bool continueStatus;
 
-		void garbageCollect(string name);
+		void garbageCollect(::std::string name);
 
 	public:
 
-		shared_ptr<Env> prev;
-		Env(shared_ptr<Env> prev) : prev(prev) 
+		::std::shared_ptr<Env> prev;
+		Env(::std::shared_ptr<Env> prev) : prev(prev) 
 		{ 
 			returnValue = nullptr; 
 			breakStatus = false; 
 			continueStatus = false; 
 		}
 
-		void setReturnValue(shared_ptr<IceObject> returnValue) 
+		void setReturnValue(::std::shared_ptr<IceObject> returnValue) 
 		{ 
 			this->returnValue = returnValue; 
 		}
-		shared_ptr<IceObject> getReturnValue() 
+		::std::shared_ptr<IceObject> getReturnValue() 
 		{ 
 			return returnValue; 
 		}
@@ -67,9 +64,9 @@ namespace Ice
 
 		void genBuildInFunctions();
 
-		void put(string, shared_ptr<IceObject>);
-		void replace(string, shared_ptr<IceObject>);
-		shared_ptr<IceObject> getObject(string);
+		void put(::std::string, ::std::shared_ptr<IceObject>);
+		void replace(::std::string, ::std::shared_ptr<IceObject>);
+		::std::shared_ptr<IceObject> getObject(::std::string);
 
 		void garbageCollection();
 	};

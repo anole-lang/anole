@@ -1,37 +1,25 @@
+#include "ctime"
 #include "Coderun.h"
 #include "Node.h"
 #include "SyntaxAnalyzer.h"
 #include "IceObject.h"
-#include "ctime"
 
-using ::std::cin;
-using ::std::cout;
-using ::std::endl;
-using ::std::atoi;
-using ::std::atof;
-using ::std::getline;
-using ::std::ifstream;
-using ::std::vector;
-using ::std::make_shared;
-using ::std::dynamic_pointer_cast;
-
-using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
-	void runUsingStmt(string &name, shared_ptr<Env> &top)
+	void runUsingStmt(::std::string &name, ::std::shared_ptr<Env> &top)
 	{
-		ifstream fin(name + ".ice");
+		::std::ifstream fin(name + ".ice");
 		SyntaxAnalyzer syntaxAnalyzer;
 		if (fin.bad())
 		{
-			cout << "cannot open module " << name << endl;
+			::std::cout << "cannot open module " << name << ::std::endl;
 			exit(0);
 		}
-		string code, new_line;
+		::std::string code, new_line;
 		while (!fin.eof())
 		{
-			getline(fin, new_line);
+			::std::getline(fin, new_line);
 			code += new_line + "\n";
 		}
 		code += "$";
@@ -40,18 +28,18 @@ namespace Ice
 		node->runCode(top);
 	}
 
-	void Env::garbageCollect(string name)
+	void Env::garbageCollect(::std::string name)
 	{
 		if (objects[name]->type == IceObject::TYPE::INSTANCE)
 		{
 			if (objects[name].use_count() == 2)
 			{
-				dynamic_pointer_cast<IceInstanceObject>(objects[name])->top->objects["self"] = nullptr;
+				::std::dynamic_pointer_cast<IceInstanceObject>(objects[name])->top->objects["self"] = nullptr;
 			}
 		}
 	}
 
-	void Env::put(string name, shared_ptr<IceObject> obj)
+	void Env::put(::std::string name, ::std::shared_ptr<IceObject> obj)
 	{
 		if (objects.find(name) != objects.end())
 		{
@@ -60,9 +48,9 @@ namespace Ice
 		objects[name] = obj;
 	}
 
-	void Env::replace(string name, shared_ptr<IceObject> obj)
+	void Env::replace(::std::string name, ::std::shared_ptr<IceObject> obj)
 	{
-		shared_ptr<Env> tmp = shared_from_this();
+		::std::shared_ptr<Env> tmp = shared_from_this();
 		while (tmp)
 		{
 			if (tmp->objects.find(name) != tmp->objects.end())
@@ -80,7 +68,7 @@ namespace Ice
 		return;
 	}
 
-	shared_ptr<IceObject> Env::getObject(string name)
+	::std::shared_ptr<IceObject> Env::getObject(::std::string name)
 	{
 		auto tmp = shared_from_this();
 		while (tmp)
@@ -94,7 +82,7 @@ namespace Ice
 				tmp = tmp->prev;
 			}
 		}
-		cout << "cannot find " << name << endl;
+		::std::cout << "cannot find " << name << ::std::endl;
 		exit(0);
 		return nullptr;
 	}
@@ -107,15 +95,15 @@ namespace Ice
 			{
 				if (iter->second.use_count() == 2)
 				{
-					dynamic_pointer_cast<IceInstanceObject>(iter->second)->top->objects["self"] = nullptr;
+					::std::dynamic_pointer_cast<IceInstanceObject>(iter->second)->top->objects["self"] = nullptr;
 				}
 			}
 		}
 	}
 
-	shared_ptr<IceObject> BlockExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> BlockExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> returnValue = top->getReturnValue();
+		::std::shared_ptr<IceObject> returnValue = top->getReturnValue();
 		for (auto stmt : statements)
 		{
 			stmt->runCode(top);
@@ -133,37 +121,37 @@ namespace Ice
 		return returnValue;
 	}
 
-	shared_ptr<IceObject> NoneExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> NoneExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		return make_shared<IceNoneObject>();
+		return ::std::make_shared<IceNoneObject>();
 	}
 
-	shared_ptr<IceObject> IntegerExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> IntegerExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		return make_shared<IceIntegerObject>(value);
+		return ::std::make_shared<IceIntegerObject>(value);
 	}
 
-	shared_ptr<IceObject> DoubleExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> DoubleExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		return make_shared<IceDoubleObject>(value);
+		return ::std::make_shared<IceDoubleObject>(value);
 	}
 
-	shared_ptr<IceObject> BooleanExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> BooleanExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		return make_shared<IceBooleanObject>(value);
+		return ::std::make_shared<IceBooleanObject>(value);
 	}
 
-	shared_ptr<IceObject> StringExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> StringExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		return make_shared<IceStringObject>(value);
+		return ::std::make_shared<IceStringObject>(value);
 	}
 
-	shared_ptr<IceObject> IdentifierExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> IdentifierExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		return top->getObject(name);
 	}
 
-	shared_ptr<IceObject> MethodCallExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> MethodCallExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto _obj = expression->runCode(top);
 		if (_obj->type == IceObject::TYPE::BUILT_IN_FUNCTION)
@@ -173,19 +161,19 @@ namespace Ice
 			{
 				objects.push_back(argument->runCode(normal_top ? normal_top : top));
 			}
-			return dynamic_pointer_cast<IceBuiltInFunctionObject>(_obj)->func(objects);
+			return ::std::dynamic_pointer_cast<IceBuiltInFunctionObject>(_obj)->func(objects);
 		}
 		else if (_obj->type != IceObject::TYPE::FUNCTION)
 		{
-			cout << "call need function type" << endl;
+			::std::cout << "call need ::std::function type" << ::std::endl;
 			exit(0);
 		}
 
-		auto func = dynamic_pointer_cast<IceFunctionObject>(_obj);
-		auto _top = make_shared<Env>(top);
+		auto func = ::std::dynamic_pointer_cast<IceFunctionObject>(_obj);
+		auto _top = ::std::make_shared<Env>(top);
 		if (arguments.size() > func->argDecls.size())
 		{
-			cout << "The number of arguments does not match" << endl;
+			::std::cout << "The number of arguments does not match" << ::std::endl;
 			exit(0);
 		}
 
@@ -204,84 +192,84 @@ namespace Ice
 		return returnValue;
 	}
 
-	shared_ptr<IceObject> UnaryOperatorExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> UnaryOperatorExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto obj = expression->runCode(top);
 		return obj->unaryOperate(op);
 	}
 
-	shared_ptr<IceObject> BinaryOperatorExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> BinaryOperatorExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto lobj = lhs->runCode(top);
 		auto robj = rhs->runCode(top);
 		return lobj->binaryOperate(robj, op);
 	}
 
-	shared_ptr<IceObject> ExprStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> ExprStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		return assignment->runCode(top);
 	}
 
-	shared_ptr<IceObject> VariableDeclarationStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> VariableDeclarationStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto obj = assignment->runCode(normal_top ? normal_top : top);
 		top->put(id->name, obj);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> VariableAssignStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> VariableAssignStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto obj = assignment->runCode(top);
 		top->replace(id->name, obj);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> FunctionDeclarationStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> FunctionDeclarationStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		auto obj = make_shared<IceFunctionObject>(argDecls, block);
+		auto obj = ::std::make_shared<IceFunctionObject>(argDecls, block);
 		top->put(id->name, obj);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> ClassDeclarationStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> ClassDeclarationStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		auto obj = make_shared<IceClassObject>(bases, block);
+		auto obj = ::std::make_shared<IceClassObject>(bases, block);
 		top->put(id->name, obj);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> BreakStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> BreakStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		top->setBreakStatus(true);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> ContinueStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> ContinueStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		top->setContinueStatus(true);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> ReturnStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> ReturnStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto returnValue = assignment->runCode(top);
 		top->setReturnValue(returnValue);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> UsingStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> UsingStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		runUsingStmt(name, top);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> IfElseStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> IfElseStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto cond = this->cond->runCode(top);
-		shared_ptr<IceObject> returnValue = nullptr;
+		::std::shared_ptr<IceObject> returnValue = nullptr;
 		if (cond->isTrue())
 		{
-			auto _top = make_shared<Env>(top);
+			auto _top = ::std::make_shared<Env>(top);
 			returnValue = blockTrue->runCode(_top);
 			if (_top->getBreakStatus())
 			{
@@ -303,11 +291,11 @@ namespace Ice
 		return returnValue;
 	}
 
-	shared_ptr<IceObject> WhileStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> WhileStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto cond = this->cond->runCode(top);
-		shared_ptr<IceObject> returnValue = nullptr;
-		auto _top = make_shared<Env>(top);
+		::std::shared_ptr<IceObject> returnValue = nullptr;
+		auto _top = ::std::make_shared<Env>(top);
 
 		while (cond->isTrue())
 		{
@@ -332,10 +320,10 @@ namespace Ice
 		return returnValue;
 	}
 
-	shared_ptr<IceObject> DoWhileStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> DoWhileStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		shared_ptr<IceObject> returnValue = nullptr;
-		auto _top = make_shared<Env>(top);
+		::std::shared_ptr<IceObject> returnValue = nullptr;
+		auto _top = ::std::make_shared<Env>(top);
 
 		returnValue = block->runCode(_top);
 		if (_top->getBreakStatus())
@@ -376,13 +364,13 @@ namespace Ice
 		return returnValue;
 	}
 
-	shared_ptr<IceObject> ForStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> ForStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto begin = this->begin->runCode(top);
 		auto end = this->end->runCode(top);
-		shared_ptr<IceObject> returnValue = nullptr;
+		::std::shared_ptr<IceObject> returnValue = nullptr;
 
-		auto _top = make_shared<Env>(top);
+		auto _top = ::std::make_shared<Env>(top);
 		if (id) _top->put(id->name, begin);
 
 		while (begin->binaryOperate(end, TOKEN::TCLT)->isTrue())
@@ -395,7 +383,7 @@ namespace Ice
 			if (_top->getContinueStatus())
 			{
 				_top->setContinueStatus(false);
-				begin = begin->binaryOperate(make_shared<IceIntegerObject>(1), TOKEN::TADD);
+				begin = begin->binaryOperate(::std::make_shared<IceIntegerObject>(1), TOKEN::TADD);
 				if (id) _top->put(id->name, begin);
 				continue;
 			}
@@ -404,27 +392,27 @@ namespace Ice
 				top->setReturnValue(returnValue);
 				return returnValue;
 			}
-			begin = begin->binaryOperate(make_shared<IceIntegerObject>(1), TOKEN::TADD);
+			begin = begin->binaryOperate(::std::make_shared<IceIntegerObject>(1), TOKEN::TADD);
 			if (id) _top->put(id->name, begin);
 		}
 		return returnValue;
 	}
 
-	shared_ptr<IceObject> ForeachStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> ForeachStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto _obj = expression->runCode(top, normal_top);
 		if (!_obj->isTraversable() || _obj->type == IceObject::TYPE::DICT)
 		{
-			cout << "it isn't traversable" << endl;
+			::std::cout << "it isn't traversable" << ::std::endl;
 			exit(0);
 		}
 
-		shared_ptr<IceObject> returnValue = nullptr;
-		auto _top = make_shared<Env>(top);
+		::std::shared_ptr<IceObject> returnValue = nullptr;
+		auto _top = ::std::make_shared<Env>(top);
 
 		if (_obj->type == IceObject::TYPE::LIST)
 		{
-			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceListObject>(_obj);
 			for (auto &object : obj->objects)
 			{
 				_top->put(id->name, object);
@@ -447,10 +435,10 @@ namespace Ice
 		}
 		else
 		{
-			auto obj = dynamic_pointer_cast<IceStringObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceStringObject>(_obj);
 			for (auto &chr : obj->value)
 			{
-				_top->put(id->name, make_shared<IceStringObject>("" + chr));
+				_top->put(id->name, ::std::make_shared<IceStringObject>("" + chr));
 				returnValue = block->runCode(_top);
 				if (_top->getBreakStatus())
 				{
@@ -471,22 +459,22 @@ namespace Ice
 		return returnValue;
 	}
 
-	shared_ptr<IceObject> LambdaExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> LambdaExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		return make_shared<IceFunctionObject>(argDecls, block);
+		return ::std::make_shared<IceFunctionObject>(argDecls, block);
 	}
 
-	shared_ptr<IceObject> NewExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> NewExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		auto class_obj = dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
-		auto ins_obj = make_shared<IceInstanceObject>(top);
+		auto class_obj = ::std::dynamic_pointer_cast<IceClassObject>(top->getObject(id->name));
+		auto ins_obj = ::std::make_shared<IceInstanceObject>(top);
 
 		for (auto &base : class_obj->bases)
 		{
-			dynamic_pointer_cast<IceClassObject>(top->getObject(base->name))->block->runCode(ins_obj->top);
+			::std::dynamic_pointer_cast<IceClassObject>(top->getObject(base->name))->block->runCode(ins_obj->top);
 			if (ins_obj->top->getObject(base->name)->type == IceObject::TYPE::FUNCTION)
 			{
-				auto call = make_shared<MethodCallExpr>(make_shared<IdentifierExpr>(base->name), arguments);
+				auto call = ::std::make_shared<MethodCallExpr>(::std::make_shared<IdentifierExpr>(base->name), arguments);
 				call->runCode(ins_obj->top);
 			}
 		}
@@ -496,24 +484,24 @@ namespace Ice
 
 		if (ins_obj->top->getObject(id->name)->type == IceObject::TYPE::FUNCTION)
 		{
-			auto call = make_shared<MethodCallExpr>(make_shared<IdentifierExpr>(id->name), arguments);
+			auto call = ::std::make_shared<MethodCallExpr>(::std::make_shared<IdentifierExpr>(id->name), arguments);
 			call->runCode(ins_obj->top);
 		}
 		return ins_obj;
 	}
 
-	shared_ptr<IceObject> DotExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> DotExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		if (!normal_top)
 		{
 			auto _obj = left->runCode(top, top);
 			if (!_obj->isInstance())
 			{
-				cout << "it doesn't support for '.'" << endl;
+				::std::cout << "it doesn't support for '.'" << ::std::endl;
 				exit(0);
 			}
 
-			auto obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceInstanceObject>(_obj);
 			auto res = right->runCode(obj->top, top);
 			return res;
 		}
@@ -521,16 +509,16 @@ namespace Ice
 		auto _obj = left->runCode(top, normal_top);
 		if (!_obj->isInstance()) 
 		{
-			cout << "it doesn't support for '.'" << endl;
+			::std::cout << "it doesn't support for '.'" << ::std::endl;
 			exit(0);
 		}
 
-		auto obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
+		auto obj = ::std::dynamic_pointer_cast<IceInstanceObject>(_obj);
 		auto res = right->runCode(obj->top, normal_top);
 		return res;
 	}
 
-	shared_ptr<IceObject> DotStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> DotStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto _top = top;
 		for (auto &expression : expressions)
@@ -538,31 +526,31 @@ namespace Ice
 			auto _obj = expression->runCode(_top);
 			if (!_obj->isInstance())
 			{
-				cout << "it doesn't '.' operator" << endl;
+				::std::cout << "it doesn't '.' operator" << ::std::endl;
 				exit(0);
 			}
 			
-			auto obj = dynamic_pointer_cast<IceInstanceObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceInstanceObject>(_obj);
 			_top = obj->top;
 		}
 		to_run->runCode(_top, top);
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> EnumExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> EnumExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		auto obj = make_shared<IceInstanceObject>(top);;
+		auto obj = ::std::make_shared<IceInstanceObject>(top);;
 
 		long i = 0;
 		for (auto &enumerator : enumerators)
 		{
-			obj->top->put(enumerator->name, make_shared<IceIntegerObject>(i++));
+			obj->top->put(enumerator->name, ::std::make_shared<IceIntegerObject>(i++));
 		}
 
 		return obj;
 	}
 
-	shared_ptr<IceObject> MatchExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> MatchExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto obj = expression->runCode(top);
 		for (size_t i = 0; i < mat_expressions.size(); i++)
@@ -575,9 +563,9 @@ namespace Ice
 		return else_expression->runCode(top);
 	}
 
-	shared_ptr<IceObject> ListExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> ListExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
-		auto obj = make_shared<IceListObject>();
+		auto obj = ::std::make_shared<IceListObject>();
 		for (auto &expression : expressions)
 		{
 			obj->objects.push_back(expression->runCode(top));
@@ -585,51 +573,51 @@ namespace Ice
 		return obj;
 	}
 
-	shared_ptr<IceObject> IndexExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> IndexExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto _obj = expression->runCode(top);
 		if (!_obj->isTraversable())
 		{
-			cout << "it doesn't support for []" << endl;
+			::std::cout << "it doesn't support for []" << ::std::endl;
 			exit(0);
 		}
 
 		if (_obj->type == IceObject::TYPE::LIST) 
 		{
-			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceListObject>(_obj);
 			return obj->getByIndex(index->runCode(normal_top ? normal_top : top));
 		}
 		else if (_obj->type == IceObject::TYPE::STRING)
 		{
-			auto obj = dynamic_pointer_cast<IceStringObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceStringObject>(_obj);
 			return obj->getByIndex(index->runCode(normal_top ? normal_top : top));
 		}
 		else
 		{
-			auto obj = dynamic_pointer_cast<IceDictObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceDictObject>(_obj);
 			return obj->getByIndex(index->runCode(normal_top ? normal_top : top));
 		}
 	}
 
-	shared_ptr<IceObject> IndexStmt::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> IndexStmt::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		auto _obj = expression->runCode(top);
 		if (!_obj->isTraversable() || _obj->type == IceObject::TYPE::STRING)
 		{
-			cout << "it doesn't support for []" << endl;
+			::std::cout << "it doesn't support for []" << ::std::endl;
 			exit(0);
 		}
 
 		if (_obj->type == IceObject::TYPE::LIST)
 		{
-			auto obj = dynamic_pointer_cast<IceListObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceListObject>(_obj);
 			auto index = this->index->runCode(normal_top ? normal_top : top);
 			auto assignment = this->assignment->runCode(normal_top ? normal_top : top);
 			obj->setByIndex(index, assignment);
 		}
 		else
 		{
-			auto obj = dynamic_pointer_cast<IceDictObject>(_obj);
+			auto obj = ::std::dynamic_pointer_cast<IceDictObject>(_obj);
 			auto index = this->index->runCode(normal_top ? normal_top : top);
 			auto assignment = this->assignment->runCode(normal_top ? normal_top : top);
 			obj->setByIndex(index, assignment);
@@ -637,14 +625,14 @@ namespace Ice
 		return nullptr;
 	}
 
-	shared_ptr<IceObject> DictExpr::runCode(shared_ptr<Env> &top, shared_ptr<Env> normal_top)
+	::std::shared_ptr<IceObject> DictExpr::runCode(::std::shared_ptr<Env> &top, ::std::shared_ptr<Env> normal_top)
 	{
 		if (keys.size() != values.size())
 		{
-			cout << "one key, one value" << endl;
+			::std::cout << "one key, one value" << ::std::endl;
 			exit(0);
 		}
-		auto obj = make_shared<IceDictObject>();
+		auto obj = ::std::make_shared<IceDictObject>();
 		for (size_t i = 0; i < keys.size(); i++)
 		{
 			obj->setByIndex(keys[i]->runCode(top), values[i]->runCode(top));
@@ -656,51 +644,51 @@ namespace Ice
 
 	void Env::genBuildInFunctions()
 	{
-		put("input", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("input", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size())
 			{
-				cout << "input() need no arguments" << endl;
+				::std::cout << "input() need no arguments" << ::std::endl;
 				exit(0);
 			}
-			string input;
-			getline(cin, input);
-			return dynamic_pointer_cast<IceObject>(make_shared<IceStringObject>(input));
+			::std::string input;
+			::std::getline(::std::cin, input);
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceStringObject>(input));
 		}));
 
-		put("print", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("print", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size() != 1)
 			{
-				cout << "print() need 1 argument but get others" << endl;
+				::std::cout << "print() need 1 argument but get others" << ::std::endl;
 				exit(0);
 			}
-			cout << objects[0]->toStr();
-			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
+			::std::cout << objects[0]->toStr();
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceNoneObject>());
 		}));
 
-		put("println", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("println", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size() != 1)
 			{
-				cout << "println() need 1 argument but get others" << endl;
+				::std::cout << "println() need 1 argument but get others" << ::std::endl;
 				exit(0);
 			}
-			cout << objects[0]->toStr() << endl;
-			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
+			::std::cout << objects[0]->toStr() << ::std::endl;
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceNoneObject>());
 		}));
 
-		put("str", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("str", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size() != 1)
 			{
-				cout << "str() need 1 argument but get others" << endl;
+				::std::cout << "str() need 1 argument but get others" << ::std::endl;
 				exit(0);
 			}
-			return dynamic_pointer_cast<IceObject>(make_shared<IceStringObject>(objects[0]->toStr()));
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceStringObject>(objects[0]->toStr()));
 		}));
 
-		put("exit", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("exit", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size())
 			{
@@ -708,80 +696,80 @@ namespace Ice
 				{
 					if (objects[0]->type == IceObject::TYPE::INT)
 					{
-						exit(dynamic_pointer_cast<IceIntegerObject>(objects[0])->value);
+						exit(::std::dynamic_pointer_cast<IceIntegerObject>(objects[0])->value);
 					}
 				}
 				else
 				{
-					cout << "exit() need no arguments" << endl;
+					::std::cout << "exit() need no arguments" << ::std::endl;
 					exit(0);
 				}
 			}
 			exit(0);
-			return dynamic_pointer_cast<IceObject>(make_shared<IceNoneObject>());
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceNoneObject>());
 		}));
 
 
-		put("len", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("len", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size() != 1)
 			{
-				cout << "len() need 1 argument but get others" << endl;
+				::std::cout << "len() need 1 argument but get others" << ::std::endl;
 				exit(0);
 			}
 			else if (objects[0]->type != IceObject::TYPE::STRING && objects[0]->type != IceObject::TYPE::LIST)
 			{
-				cout << "len() need string object or list object but get other types" << endl;
+				::std::cout << "len() need ::std::string object or list object but get other types" << ::std::endl;
 				exit(0);
 			}
 			if (objects[0]->type == IceObject::TYPE::STRING)
 			{
-				return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(dynamic_pointer_cast<IceStringObject>(objects[0])->value.length()));
+				return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceIntegerObject>(::std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.length()));
 			}
 			else
 			{
-				return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(dynamic_pointer_cast<IceListObject>(objects[0])->objects.size()));
+				return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceIntegerObject>(::std::dynamic_pointer_cast<IceListObject>(objects[0])->objects.size()));
 			}
 		}));
 
-		put("int", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("int", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size() != 1)
 			{
-				cout << "int() need 1 arguments but get others" << endl;
+				::std::cout << "int() need 1 arguments but get others" << ::std::endl;
 				exit(0);
 			}
 			else if (objects[0]->type != IceObject::TYPE::STRING)
 			{
-				cout << "int() need string object" << endl;
+				::std::cout << "int() need ::std::string object" << ::std::endl;
 				exit(0);
 			}
-			return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(atoi(dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceIntegerObject>(::std::atoi(::std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
 		}));
 
-		put("float", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("float", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size() != 1)
 			{
-				cout << "float() need 1 arguments but get others" << endl;
+				::std::cout << "float() need 1 arguments but get others" << ::std::endl;
 				exit(0);
 			}
 			else if (objects[0]->type != IceObject::TYPE::STRING)
 			{
-				cout << "float() need string object" << endl;
+				::std::cout << "float() need ::std::string object" << ::std::endl;
 				exit(0);
 			}
-			return dynamic_pointer_cast<IceObject>(make_shared<IceDoubleObject>(atof(dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceDoubleObject>(::std::atof(::std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
 		}));
 
-		put("time", make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("time", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
 		{
 			if (objects.size())
 			{
-				cout << "time() need no arguments" << endl;
+				::std::cout << "time() need no arguments" << ::std::endl;
 				exit(0);
 			}
-			return dynamic_pointer_cast<IceObject>(make_shared<IceIntegerObject>(time(nullptr)));
+			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceIntegerObject>(time(nullptr)));
 		}));
 	}
 }

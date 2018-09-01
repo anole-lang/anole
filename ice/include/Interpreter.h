@@ -1,6 +1,7 @@
 #ifndef __INTERPRETER_H__
 #define __INTERPRETER_H__
 
+
 #include <iostream>
 #include <string>
 #include <memory>
@@ -13,8 +14,6 @@
 #include "Coderun.h"
 #include "IceObject.h"
 
-using ::std::string;
-using ::std::shared_ptr;
 
 namespace Ice
 {
@@ -23,8 +22,8 @@ namespace Ice
 
 	private:
 
-		shared_ptr<Env> top;
-		shared_ptr<class BlockExpr> block;
+		::std::shared_ptr<Env> top;
+		::std::shared_ptr<class BlockExpr> block;
 
 		SyntaxAnalyzer syntaxAnalyzer;
 
@@ -32,7 +31,7 @@ namespace Ice
 
 		Interpreter();
 		void run();
-		void run(string);
+		void run(::std::string);
 
 	};
 }
