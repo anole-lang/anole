@@ -7,10 +7,10 @@
 #include <memory>
 #include <cstring>
 
-using std::string;
-using std::map;
-using std::shared_ptr;
-using std::enable_shared_from_this;
+using ::std::string;
+using ::std::map;
+using ::std::shared_ptr;
+using ::std::enable_shared_from_this;
 
 namespace Ice
 {

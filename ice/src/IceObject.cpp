@@ -1,8 +1,8 @@
 #include "IceObject.h"
 
-using std::endl;
-using std::hash;
-using std::reverse;
+using ::std::endl;
+using ::std::hash;
+using ::std::reverse;
 
 using TOKEN = Ice::Token::TOKEN;
 

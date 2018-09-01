@@ -1,13 +1,13 @@
 #include "Interpreter.h"
 
 
-using std::cin;
-using std::cout;
-using std::endl;
-using std::ifstream;
-using std::getline;
-using std::make_shared;
-using std::dynamic_pointer_cast;
+using ::std::cin;
+using ::std::cout;
+using ::std::endl;
+using ::std::ifstream;
+using ::std::getline;
+using ::std::make_shared;
+using ::std::dynamic_pointer_cast;
 
 
 namespace Ice

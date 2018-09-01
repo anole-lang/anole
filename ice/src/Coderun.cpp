@@ -4,16 +4,16 @@
 #include "IceObject.h"
 #include "ctime"
 
-using std::cin;
-using std::cout;
-using std::endl;
-using std::atoi;
-using std::atof;
-using std::getline;
-using std::ifstream;
-using std::vector;
-using std::make_shared;
-using std::dynamic_pointer_cast;
+using ::std::cin;
+using ::std::cout;
+using ::std::endl;
+using ::std::atoi;
+using ::std::atof;
+using ::std::getline;
+using ::std::ifstream;
+using ::std::vector;
+using ::std::make_shared;
+using ::std::dynamic_pointer_cast;
 
 using TOKEN = Ice::Token::TOKEN;
 

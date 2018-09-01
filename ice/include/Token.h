@@ -6,7 +6,7 @@
 #include <cstring>
 #include <cstdio>
 
-using std::string;
+using ::std::string;
 
 namespace Ice
 {
@@ -16,73 +16,73 @@ namespace Ice
 
 		enum class TOKEN
 		{
-			TEND, // #
+			TEND,       // #
 
-			TAT, // @
-			TATAT, // @@
+			TAT,        // @
+			TATAT,      // @@
 
-			TUSING, // using
-			TIF,     // if
-			TELIF,   // elif
-			TELSE,   // else
-			TWHILE,  // while
-			TDO,	// do
-			TFOR,	// for
-			TTO,	// to
-			TFOREACH, // foreach
-			TAS,	// as
-			TBREAK,	// break
+			TUSING,     // using
+			TIF,        // if
+			TELIF,      // elif
+			TELSE,      // else
+			TWHILE,     // while
+			TDO,	    // do
+			TFOR,	    // for
+			TTO,	    // to
+			TFOREACH,   // foreach
+			TAS,	    // as
+			TBREAK,	    // break
 			TCONTINUE,	// continue
-			TRETURN, // return
-			TMATCH, // match
+			TRETURN,    // return
+			TMATCH,     // match
 
-			TNEW, // new
+			TNEW,       // new
 
-			TNONE, // none
-			TTRUE, // true
-			TFALSE, // false
+			TNONE,      // none
+			TTRUE,      // true
+			TFALSE,     // false
 
 			TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
 			TINTEGER,    // [0-9]+
 			TDOUBLE,     // [0-9]+\.[0-9]*
 			TSTRING,     // "[^"\n]"
 
-			TASSIGN, // :
-			TCOMMA,  // ,
-			TDOT, // .
+			TASSIGN,    // :
+			TCOMMA,     // ,
+			TDOT,       // .
 
-			TLPAREN, // (
-			TRPAREN, // )
-			TLBRACKET, // [
-			TRBRACKET, // ]
-			TLBRACE, // {
-			TRBRACE, // }
+			TLPAREN,    // (
+			TRPAREN,    // )
+			TLBRACKET,  // [
+			TRBRACKET,  // ]
+			TLBRACE,    // {
+			TRBRACE,    // }
 
-			TADD, // +
-			TSUB, // -
-			TMUL, // *
-			TDIV, // /
-			TMOD, // %
+			TADD,       // +
+			TSUB,       // -
+			TMUL,       // *
+			TDIV,       // /
+			TMOD,       // %
 
-			TBAND, // &
-			TBOR,  // |
-			TBXOR, // ^
-			TBNEG, // ~
-			TBLS,  // <<
-			TBRS,  // >>
+			TBAND,      // &
+			TBOR,       // |
+			TBXOR,      // ^
+			TBNEG,      // ~
+			TBLS,       // <<
+			TBRS,       // >>
 
-			TAND, // and
-			TOR,  // or
-			TNOT, // not !
+			TAND,       // and
+			TOR,        // or
+			TNOT,       // not !
 
-			TCEQ, // =
-			TCNE, // !=
-			TCLT, // <
-			TCLE, // <=
-			TCGT, // >
-			TCGE, // >=
+			TCEQ,       // =
+			TCNE,       // !=
+			TCLT,       // <
+			TCLE,       // <=
+			TCGT,       // >
+			TCGE,       // >=
 
-			TRET, // =>
+			TRET,       // =>
 		} token_id;
 		string value;
 		Token(TOKEN token_id, string value) : token_id(token_id), value(value) {}

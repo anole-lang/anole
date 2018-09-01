@@ -13,28 +13,27 @@
 #include "Token.h"
 #include "Coderun.h"
 
-using std::cout;
-using std::string;
-using std::vector;
-using std::function;
-using std::shared_ptr;
-using std::make_shared;
-using std::to_string;
-using std::dynamic_pointer_cast;
-using std::unordered_map;
+using ::std::cout;
+using ::std::string;
+using ::std::vector;
+using ::std::function;
+using ::std::shared_ptr;
+using ::std::make_shared;
+using ::std::to_string;
+using ::std::dynamic_pointer_cast;
+using ::std::unordered_map;
 
 using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
-	class BlockExpr;
-	class VariableDeclarationStmt;
-	typedef vector<shared_ptr<VariableDeclarationStmt>> VariableList;
-	class IdentifierExpr;
-	typedef vector<shared_ptr<IdentifierExpr>> IdentifierList;
 
-	class IceObject;
-	typedef vector<shared_ptr<IceObject>> Objects;
+	using VariableList = vector<shared_ptr<class VariableDeclarationStmt>>;
+	using IdentifierList = vector<shared_ptr<class IdentifierExpr>> ;
+	using Objects = vector<shared_ptr<class IceObject>>;
+
+    class BlockExpr;
+
 
 	class IceObject
 	{

@@ -13,14 +13,14 @@
 #include "LexicalAnalyzer.h"
 
 
-using std::shared_ptr;
-using std::make_shared;
-using std::vector;
+using ::std::shared_ptr;
+using ::std::make_shared;
+using ::std::vector;
 
 
-typedef shared_ptr<Ice::BlockExpr> BLOCK_EXPR;
-typedef shared_ptr<Ice::Stmt> STMT;
-typedef shared_ptr<Ice::Expr> EXPR;
+using BLOCK_EXPR = shared_ptr<Ice::BlockExpr>;
+using STMT = shared_ptr<Ice::Stmt>;
+using EXPR = shared_ptr<Ice::Expr>;
 
 
 namespace Ice
@@ -73,7 +73,7 @@ namespace Ice
 
 		SyntaxAnalyzer() {}
 		shared_ptr<Node> getNode();
-		shared_ptr<Node> getNode(std::string);
+		shared_ptr<Node> getNode(::std::string);
 	};
 }
 

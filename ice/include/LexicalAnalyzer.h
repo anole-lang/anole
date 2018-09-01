@@ -8,8 +8,8 @@
 #include <vector>
 #include "Token.h"
 
-using std::string;
-using std::vector;
+using ::std::string;
+using ::std::vector;
 
 namespace Ice
 {

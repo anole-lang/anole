@@ -13,20 +13,18 @@
 #include "Coderun.h"
 #include "IceObject.h"
 
-using std::string;
-using std::shared_ptr;
+using ::std::string;
+using ::std::shared_ptr;
 
 namespace Ice
 {
-	class BlockExpr; // save statements
-
 	class Interpreter
 	{
 
 	private:
 
 		shared_ptr<Env> top;
-		shared_ptr<BlockExpr> block;
+		shared_ptr<class BlockExpr> block;
 
 		SyntaxAnalyzer syntaxAnalyzer;
 

@@ -1,14 +1,14 @@
 #include "SyntaxAnalyzer.h"
 
-using std::cin;
-using std::cout;
-using std::endl;
-using std::atoi;
-using std::atof;
-using std::getline;
-using std::string;
-using std::function;
-using std::dynamic_pointer_cast;
+using ::std::cin;
+using ::std::cout;
+using ::std::endl;
+using ::std::atoi;
+using ::std::atof;
+using ::std::getline;
+using ::std::string;
+using ::std::function;
+using ::std::dynamic_pointer_cast;
 
 using TOKEN = Ice::Token::TOKEN;
 

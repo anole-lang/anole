@@ -9,28 +9,23 @@
 #include <cstring>
 #include "Token.h"
 
-using std::string;
-using std::vector;
-using std::shared_ptr;
+using ::std::string;
+using ::std::vector;
+using ::std::shared_ptr;
 
 using TOKEN = Ice::Token::TOKEN;
 
 namespace Ice
 {
-	class Env;
-	class IceObject;
 
-	extern void runUsingStmt(string &, shared_ptr<Env> &);
+	using StatementList = vector<shared_ptr<class Stmt>>;
+	using ExpressionList = vector<shared_ptr<class Expr>>;
+	using VariableList = vector<shared_ptr<class VariableDeclarationStmt>>;
+	using IdentifierList = vector<shared_ptr<class IdentifierExpr>>;
 
-	class Stmt;
-	class Expr;
-	class VariableDeclarationStmt;
-	class IdentifierExpr;
+    class IceObject;
 
-	typedef vector<shared_ptr<Stmt>> StatementList;
-	typedef vector<shared_ptr<Expr>> ExpressionList;
-	typedef vector<shared_ptr<VariableDeclarationStmt>> VariableList;
-	typedef vector<shared_ptr<IdentifierExpr>> IdentifierList;
+    extern void runUsingStmt(string &, shared_ptr<class Env> &);
 
 
 	class Node

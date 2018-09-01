@@ -1,9 +1,9 @@
 #include "LexicalAnalyzer.h"
 
-using std::cin;
-using std::cout;
-using std::endl;
-using std::getline;
+using ::std::cin;
+using ::std::cout;
+using ::std::endl;
+using ::std::getline;
 
 using TOKEN = Ice::Token::TOKEN;
 
