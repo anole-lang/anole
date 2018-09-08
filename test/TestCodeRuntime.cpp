@@ -1,8 +1,5 @@
 #include "CppUnitTest.h"
-#include "Node.h"
-#include "SyntaxAnalyzer.h"
-#include "Coderun.h"
-#include "IceObject.h"
+#include "Ice.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

@@ -1,4 +1,4 @@
-#include "IceObject.h"
+#include "Ice.h"
 
 
 namespace Ice

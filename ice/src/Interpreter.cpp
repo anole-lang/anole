@@ -1,4 +1,4 @@
-#include "Interpreter.h"
+#include "Ice.h"
 
 
 namespace Ice
@@ -13,10 +13,10 @@ namespace Ice
 	void Interpreter::run()
 	{
 		::std::cout << "    _____________________\n"
-				"   /_  ___/ _____/ _____/\n"
-				"    / /  / /    / /____      Version 0.0.1 \n"
-				" __/ /__/ /____/ /____       http://www.jusot.com/ice\n"
-				"/______/______/______/   \n"    << ::std::endl;
+				       "   /_  ___/ _____/ _____/\n"
+				       "    / /  / /    / /____      Version 0.0.1 \n"
+				       " __/ /__/ /____/ /____       http://www.jusot.com/ice\n"
+				       "/______/______/______/   \n"    << ::std::endl;
 		while (!::std::cin.eof())
 		{
 			::std::cout << ">> ";

@@ -1,6 +1,5 @@
 #include "CppUnitTest.h"
-#include "Node.h"
-#include "SyntaxAnalyzer.h"
+#include "Ice.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

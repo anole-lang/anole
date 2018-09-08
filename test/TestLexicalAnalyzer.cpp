@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "LexicalAnalyzer.h"
+#include "Ice.h"
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

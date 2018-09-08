@@ -1,4 +1,4 @@
-#include "SyntaxAnalyzer.h"
+#include "Ice.h"
 
 #define THROW(MESSAGE)						{ ::std::cout << MESSAGE << ::std::endl; exit(0); }
 #define CHECK_AND_THROW(TOKEN_ID, MESSAGE)	if (iToken->token_id != TOKEN_ID) \

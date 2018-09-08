@@ -2,27 +2,12 @@
 #define __ICE_OBJECT_H__
 
 
-#include <iostream>
-#include <algorithm>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <memory>
-#include <cctype>
-#include <functional>
-#include <cstring>
-#include "Token.h"
-#include "Coderun.h"
-
-
 namespace Ice
 {
 
 	using VariableList = ::std::vector<::std::shared_ptr<class VariableDeclarationStmt>>;
 	using IdentifierList = ::std::vector<::std::shared_ptr<class IdentifierExpr>> ;
 	using Objects = ::std::vector<::std::shared_ptr<class IceObject>>;
-
-    class BlockExpr;
 
 
 	class IceObject
@@ -66,7 +51,7 @@ namespace Ice
 	public:
 
 		VariableList argDecls;
-		::std::shared_ptr<BlockExpr> block;
+		::std::shared_ptr<class BlockExpr> block;
 
 		IceFunctionObject(const VariableList &, ::std::shared_ptr<BlockExpr>);
 		virtual ~IceFunctionObject() {}

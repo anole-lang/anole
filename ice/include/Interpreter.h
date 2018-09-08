@@ -2,19 +2,6 @@
 #define __INTERPRETER_H__
 
 
-#include <iostream>
-#include <string>
-#include <memory>
-#include <fstream>
-#include <cstring>
-#include <cstdio>
-#include "Token.h"
-#include "Node.h"
-#include "SyntaxAnalyzer.h"
-#include "Coderun.h"
-#include "IceObject.h"
-
-
 namespace Ice
 {
 	class Interpreter

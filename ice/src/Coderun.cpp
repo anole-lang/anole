@@ -1,8 +1,4 @@
-#include "ctime"
-#include "Coderun.h"
-#include "Node.h"
-#include "SyntaxAnalyzer.h"
-#include "IceObject.h"
+#include "Ice.h"
 
 
 namespace Ice

@@ -1,8 +1,4 @@
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <cstdio>
-#include "Interpreter.h"
+#include "Ice.h"
 
 
 Ice::Interpreter interpreter;

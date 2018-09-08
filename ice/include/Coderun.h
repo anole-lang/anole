@@ -2,22 +2,13 @@
 #define __CODERUN_H__
 
 
-#include <iostream>
-#include <map>
-#include <string>
-#include <memory>
-#include <cstring>
-
-
 namespace Ice
 {
-	class IceObject;
-
 	class Env : public ::std::enable_shared_from_this<Env>
 	{
 	private:
 
-		::std::map<::std::string, ::std::shared_ptr<IceObject>> objects;
+		::std::map<::std::string, ::std::shared_ptr<class IceObject>> objects;
 
 		::std::shared_ptr<IceObject> returnValue;
 		bool breakStatus;

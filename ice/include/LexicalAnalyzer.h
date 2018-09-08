@@ -2,14 +2,6 @@
 #define __LEXICAL_ANALYZER_H__
 
 
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <cstdio>
-#include <vector>
-#include "Token.h"
-
-
 namespace Ice
 {
 	class LexicalAnalyzer

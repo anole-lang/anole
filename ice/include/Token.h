@@ -2,12 +2,6 @@
 #define __TOKEN_H__
 
 
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <cstdio>
-
-
 namespace Ice
 {
 	class Token

@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Coderun.h" />
+    <ClInclude Include="include\Ice.h" />
     <ClInclude Include="include\IceObject.h" />
     <ClInclude Include="include\Interpreter.h" />
     <ClInclude Include="include\LexicalAnalyzer.h" />

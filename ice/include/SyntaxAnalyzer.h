@@ -2,18 +2,6 @@
 #define __SYNTAX_ANALYZER_H__
 
 
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <stack>
-#include <iterator>
-#include <functional>
-#include <map>
-#include "Token.h"
-#include "Node.h"
-#include "LexicalAnalyzer.h"
-
-
 namespace Ice
 {
     using BLOCK_EXPR = ::std::shared_ptr<BlockExpr>;

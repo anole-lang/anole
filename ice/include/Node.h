@@ -2,23 +2,12 @@
 #define __NODE_H__
 
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <memory>
-#include <string>
-#include <cstring>
-#include "Token.h"
-
-
 namespace Ice
 {
 	using StatementList = ::std::vector<::std::shared_ptr<class Stmt>>;
 	using ExpressionList = ::std::vector<::std::shared_ptr<class Expr>>;
 	using VariableList = ::std::vector<::std::shared_ptr<class VariableDeclarationStmt>>;
 	using IdentifierList = ::std::vector<::std::shared_ptr<class IdentifierExpr>>;
-
-    class IceObject;
 
     extern void runUsingStmt(::std::string &, ::std::shared_ptr<class Env> &);
 
@@ -28,7 +17,7 @@ namespace Ice
 	public:
 
 		virtual ~Node() {}
-		virtual ::std::shared_ptr<IceObject> runCode(::std::shared_ptr<Env>&, ::std::shared_ptr<Env> normal_top = nullptr) = 0;
+		virtual ::std::shared_ptr<class IceObject> runCode(::std::shared_ptr<Env>&, ::std::shared_ptr<Env> normal_top = nullptr) = 0;
 	};
 
 

@@ -59,5 +59,8 @@
     <ClInclude Include="include\Token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Ice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
