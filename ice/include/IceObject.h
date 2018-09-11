@@ -46,6 +46,7 @@ namespace Ice
 		bool isTraversable();
 	};
 
+
 	class IceFunctionObject : public IceObject
 	{
 	public:
@@ -66,6 +67,7 @@ namespace Ice
 		}
 	};
 
+
 	class IceBuiltInFunctionObject : public IceObject
 	{
 	public:
@@ -83,6 +85,7 @@ namespace Ice
 			return "built-in ::std::function";
 		}
 	};
+
 
 	class IceClassObject : public IceObject
 	{
@@ -103,6 +106,7 @@ namespace Ice
 			return "Class"; 
 		}
 	};
+
 
 	class IceInstanceObject : public IceObject
 	{
@@ -129,6 +133,7 @@ namespace Ice
 		}
 	};
 
+
 	class IceNoneObject : public IceObject
 	{
 	public:
@@ -154,6 +159,7 @@ namespace Ice
 		}
 	};
 
+
 	class IceIntegerObject : public IceObject
 	{
 	public:
@@ -175,6 +181,7 @@ namespace Ice
 			return ::std::to_string(value); 
 		}
 	};
+
 
 	class IceDoubleObject : public IceObject
 	{
@@ -201,6 +208,7 @@ namespace Ice
 		}
 	};
 
+
 	class IceBooleanObject : public IceObject
 	{
 	public:
@@ -222,6 +230,7 @@ namespace Ice
 			return ::std::to_string(value);
 		}
 	};
+
 
 	class IceStringObject : public IceInstanceObject
 	{
@@ -255,6 +264,7 @@ namespace Ice
 		::std::shared_ptr<IceObject> getByIndex(::std::shared_ptr<IceObject>);
 	};
 
+
 	class IceListObject : public IceInstanceObject
 	{
 	private:
@@ -285,31 +295,32 @@ namespace Ice
 		void setByIndex(::std::shared_ptr<IceObject>, ::std::shared_ptr<IceObject>);
 	};
 
-	class KeyObject
+
+	class _KeyObject
 	{
 	public:
 
 		::std::shared_ptr<IceObject> obj;
-		KeyObject(::std::shared_ptr<IceObject> obj) : obj(obj) {}
+		_KeyObject(::std::shared_ptr<IceObject> obj) : obj(obj) {}
 
 		size_t hashValue() const;
 	};
 
-	class KeyHash
+	class _KeyHash
 	{
 	public:
 
-		size_t operator()(const KeyObject &key) const
+		size_t operator()(const _KeyObject &key) const
 		{
 			return key.hashValue();
 		}
 	};
 
-	class KeyEqual
+	class _KeyEqual
 	{
 	public:
 
-		bool operator()(const KeyObject &key1, const KeyObject &key2) const
+		bool operator()(const _KeyObject &key1, const _KeyObject &key2) const
 		{
 			return ::std::dynamic_pointer_cast<IceBooleanObject>(key1.obj->binaryOperate(key2.obj, TOKEN::TCEQ))->value;
 		}
@@ -323,7 +334,7 @@ namespace Ice
 
 	public:
 
-		::std::unordered_map<KeyObject, ::std::shared_ptr<IceObject>, KeyHash, KeyEqual> objects_map;
+		::std::unordered_map<_KeyObject, ::std::shared_ptr<IceObject>, _KeyHash, _KeyEqual> objects_map;
 
 		IceDictObject();
 		virtual ~IceDictObject() {}

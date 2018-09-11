@@ -707,7 +707,7 @@ namespace Ice
 		genBuiltInMethods();
 	}
 
-	size_t KeyObject::hashValue() const
+	size_t _KeyObject::hashValue() const
 	{
 		switch (obj->type)
 		{
@@ -745,7 +745,7 @@ namespace Ice
 
 	::std::shared_ptr<IceObject> IceDictObject::getByIndex(::std::shared_ptr<IceObject> _key)
 	{
-		KeyObject key(_key);
+        _KeyObject key(_key);
 		if (objects_map.find(key) != objects_map.end())
 		{
 			return objects_map[key];
@@ -758,7 +758,7 @@ namespace Ice
 
 	void IceDictObject::setByIndex(::std::shared_ptr<IceObject> key, ::std::shared_ptr<IceObject> value)
 	{
-		objects_map[KeyObject(key)] = value;
+		objects_map[_KeyObject(key)] = value;
 	}
 
 	void IceDictObject::genBuiltInMethods()
@@ -828,7 +828,7 @@ namespace Ice
 				exit(0);
 			}
 
-			objects_map.erase(KeyObject(objects[0]));
+			objects_map.erase(_KeyObject(objects[0]));
 			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceNoneObject>());
 		}));
 	}
