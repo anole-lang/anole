@@ -167,6 +167,8 @@ namespace Ice
 
 		auto func = ::std::dynamic_pointer_cast<IceFunctionObject>(_obj);
 		auto _top = ::std::make_shared<Env>(top);
+		_top->objects = func->pres;
+
 		if (arguments.size() > func->argDecls.size())
 		{
 			::std::cout << "The number of arguments does not match" << ::std::endl;
@@ -184,6 +186,12 @@ namespace Ice
 		}
 
 		auto returnValue = func->block->runCode(_top);
+
+		if (returnValue->type == IceObject::TYPE::FUNCTION)
+		{
+			::std::dynamic_pointer_cast<IceFunctionObject>(returnValue)->pres = _top->objects;
+		}
+
 		_top->garbageCollection();
 		return returnValue;
 	}

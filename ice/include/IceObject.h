@@ -51,6 +51,8 @@ namespace Ice
 	{
 	public:
 
+		::std::map<::std::string, ::std::shared_ptr<class IceObject>> pres;
+
 		VariableList argDecls;
 		::std::shared_ptr<class BlockExpr> block;
 

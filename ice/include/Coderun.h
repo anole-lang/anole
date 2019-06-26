@@ -6,7 +6,7 @@ namespace Ice
 {
 	class Env : public ::std::enable_shared_from_this<Env>
 	{
-	private:
+	public:
 
 		::std::map<::std::string, ::std::shared_ptr<class IceObject>> objects;
 
