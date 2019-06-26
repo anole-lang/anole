@@ -15,6 +15,7 @@ Please add feature request here.
 <hr>
 
 ### ChangeLog
++ [X] Support for closure
 + [X] Add test for 'foreach'
 + [X] Support for 'foreach' keyword
 + [X] Support for 'if elif else' statement
@@ -40,12 +41,12 @@ Please add feature request here.
 ### Examples
 
 ###### Comments
-```ice
+```
 # hello world
 ```
 
 ###### Control Flow
-```ice
+```
 # support if_else while do_while for for_as foreach break continue
 
 @fib(n) {
@@ -82,7 +83,7 @@ for 1 to 5 as i {
 ```
 
 ###### Anonymous Function
-```ice
+```
 @add(a, b): a + b
 @mul: @(a, b) {
     return a * b
@@ -101,8 +102,14 @@ for 1 to 5 as i {
 }
 ```
 
+###### Closure
+```
+@add(x): @(y) { return x + y }
+add(1)(2)
+```
+
 ###### Using Module & Simple OOP
-```ice
+```
 # demo.ice
 @@Math() {
 
@@ -127,7 +134,7 @@ for 1 to 5 as i {
 }
 ```
 
-```ice
+```
 # run.ice
 using demo
 
@@ -148,13 +155,13 @@ math.pow(5, 3)
 ```
 
 ###### Enum Expression
-```ice
+```
 @TOKEN: { TBEGIN, TEND }
 TOKEN.TBEGIN
 ```
 
 ###### Match Expression
-```ice
+```
 @numeber: 1 # or 2, 3, 4, ...
 @name: match numeber {
         1 => "one",
@@ -164,13 +171,13 @@ TOKEN.TBEGIN
 ```
 
 ###### List Type
-```ice
+```
 @list: [1, 2, 3]
 @list[0]: [1, 2, 3]
 ```
 
 ###### Dict Type
-```ice
+```
 @dict: {1: 2, "cyy": "TianCaiChengXuYuan"}
 @dict["cyy"]
 ```
