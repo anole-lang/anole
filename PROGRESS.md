@@ -10,7 +10,7 @@ Please add feature request here.
 
 ### TODO
 + [ ] Not exit while finding errors when interacting
-+ [ ] Fix bugs 
++ [ ] Fix bugs
 
 <hr>
 
@@ -50,14 +50,25 @@ Please add feature request here.
 # support if_else while do_while for for_as foreach break continue
 
 @fib(n) {
-    if n = 0 or n = 1 { 
-        return 1 
-    } else { 
-        return fib(n-1) + fib(n-2) 
+    if n = 0 or n = 1 {
+        return 1
+    } else {
+        return fib(n-1) + fib(n-2)
     }
 }
 
 fib(10) # 89
+
+@metafact(mf): @(n) {
+    if n = 0 {
+        return 1
+    }
+    else {
+        return n * mf(mf)(n-1)
+    }
+}
+@fact: metafact(metafact)
+fact(5) # 120
 
 @a: 3
 while a {
@@ -69,14 +80,14 @@ while a {
 do {
     @.a: a + 1
     if a = 3 {
-         break 
+         break
     }
     print(a)
 } while a < 5
 
 for 1 to 5 as i {
-    if i = 3 { 
-        continue 
+    if i = 3 {
+        continue
     }
     print(i)
 }
@@ -88,16 +99,16 @@ for 1 to 5 as i {
 @mul: @(a, b) {
     return a * b
 }
-@(a, b) { 
-    return a / b 
+@(a, b) {
+    return a / b
 }(9, 3)
 
 @quadraticSum: @(a, b) {
-    @sqrt: @(n) { 
-        return n * n 
+    @sqrt: @(n) {
+        return n * n
     }
-    return @(a, b) { 
-        return a + b 
+    return @(a, b) {
+        return a + b
     }(sqrt(a), sqrt(b))
 }
 ```
@@ -120,11 +131,11 @@ add(1)(2)
     }
 
     @quadraticSum: @(a, b) {
-        @sqrt: @(n) { 
-            return n * n 
+        @sqrt: @(n) {
+            return n * n
         }
-        return @(a, b) { 
-            return a + b 
+        return @(a, b) {
+            return a + b
         }(sqrt(a), sqrt(b))
     }
 
