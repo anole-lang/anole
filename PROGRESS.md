@@ -115,17 +115,6 @@ add(1)(2)
 }
 @fact: metafact(metafact)
 fact(5) # 120
-
-@metafact(mf): @(n) {
-    if n = 0 {
-        return 1
-    } else {
-        return n * mf(n-1)
-    }
-}
-@Y(y): @(x) { return y(x) } ( @(x) { return y(x) } )
-@fact: metafact(Y(metafact))
-fact(5) # 120
 ```
 
 ###### Using Module & Simple OOP
