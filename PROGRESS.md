@@ -56,19 +56,7 @@ Please add feature request here.
         return fib(n-1) + fib(n-2)
     }
 }
-
 fib(10) # 89
-
-@metafact(mf): @(n) {
-    if n = 0 {
-        return 1
-    }
-    else {
-        return n * mf(mf)(n-1)
-    }
-}
-@fact: metafact(metafact)
-fact(5) # 120
 
 @a: 3
 while a {
@@ -117,6 +105,27 @@ for 1 to 5 as i {
 ```
 @add(x): @(y) { return x + y }
 add(1)(2)
+
+@metafact(mf): @(n) {
+    if n = 0 {
+        return 1
+    } else {
+        return n * mf(mf)(n-1)
+    }
+}
+@fact: metafact(metafact)
+fact(5) # 120
+
+@metafact(mf): @(n) {
+    if n = 0 {
+        return 1
+    } else {
+        return n * mf(n-1)
+    }
+}
+@Y(y): @(x) { return y(x) } ( @(x) { return y(x) } )
+@fact: metafact(Y(metafact))
+fact(5) # 120
 ```
 
 ###### Using Module & Simple OOP
