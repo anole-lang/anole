@@ -5,296 +5,208 @@
 #       stmt is a single interactive statemnet;
 #       stmts is a module or sequence of commands read from an input file;
 
+%start program;
+
 program
-	: stmts
-	;
+    : stmts
+    ;
 
 stmts
-	:
-	| stmt stmts
-	;
+    : %empty
+    | stmt stmts
+    ;
 
 stmt
-	: decl_or_assign
-	| class_decl
-	| if_else
-	| while_stmt
-	| do_while_stmt
-	| for_stmt
-	| foreach_stmt
-	| expr
-	| break_stmt
-	| continue_stmt
-	| return_stmt
-	| using_stmt
-	;
+    : decl_or_assign
+    | class_decl
+    | if_else
+    | while_stmt
+    | do_while_stmt
+    | for_stmt
+    | foreach_stmt
+    | expr
+    | RETURN expr
+    | USING ident
+    | CONTINUE
+    | BREAK
+    ;
 
 decl_or_assign
-	: TAT ident other_tail var_decl_or_func_decl_tail
-	| var_assign
-	;
+    : AT ident decl_tail ':' expr
+    | AT ident decl_tail '(' ')' ':' expr
+    | AT ident decl_tail '(' ')' block
+    | AT ident decl_tail '(' func_decl_args ')' ':' expr
+    | AT ident decl_tail '(' func_decl_args ')' block
+    | AT '.' ident decl_tail ':' expr
+    ;
 
-var_assign
-	: TDOT ident TASSIGN expr
-	;
-
-other_tail
-	: dot_tail
-	| TLBRACKET expr TRBRACKET dot_tail
-	;
-
-dot_tail
-	|
-	| TLPAREN func_decl_args TRPAREN
-	| TDOT ident other_tail
-	;
-
-var_decl_or_func_decl_tail
-	: var_decl_tail
-	| TLPAREN func_decl_tail
-	;
-
-return_stmt
-	: TRETURN expr
-	;
-
-using_stmt
-	: TUSING TIDENTIFIER
-	;
+decl_tail
+    : %empty
+    | '.' ident decl_tail
+    | '[' expr ']' decl_tail
+    ;
 
 block
-	: TLBRACE block_tail
-	;
-
-block_tail
-	: stmts TRBRACE
-	| TRBRACE
-	;
-
-var_decl_tail
-	: TASSIGN expr
-	;
-
-func_decl_tail
-	: func_decl_args TRPAREN func_decl_rest
-	| TRPAREN func_decl_rest
-	;
-
-func_decl_rest
-	: TASSIGN expr
-	| block
-	;
+    : '{' stmts '}'
+    ;
 
 func_decl_args
-	| ident func_decl_args_tail
-	;
-
-func_decl_args_tail
-	:
-	| TASSIGN expr TCOMMA func_decl_args
-	| TCOMMA func_decl_args
+    : ident
+    | ident ',' func_decl_args
+    | ident ':' expr
+    | ident ':' expr ',' func_decl_args
+    ;
 
 ident
-	: TIDENTIFIER
-	;
+    : IDENTIFIER
+    ;
 
 numeric
-	: TINTEGER
-	| TDOUBLE
-	;
+    : INTEGER
+    | DOUBLE
+    ;
 
 boolean
-	: TTRUE
-	| TFALSE
-	;
+    : TRUE
+    | FALSE
+    ;
 
 string
-	: TSTRING
-	;
+    : STRING
+    ;
 
 expr
-	: logic_or logic_or_rest
-	| TLBRACE expr enum_or_dict
-	;
+    : expr OR expr
+    | expr AND expr
+    | expr CEQ expr
+    | expr CNE expr
+    | expr CLT expr
+    | expr CLE expr
+    | expr CGT expr
+    | expr CGE expr
+    | expr BLS expr
+    | expr BRS expr
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | expr '%' expr
+    | term
+    | '{' enumerators '}'
+    | '{' dictionary '}'
+    ;
 
-logic_or
-	: logic_and logic_and_rest
-	;
-
-logic_or_rest
-	: 
-	| TOR logic_or logic_or_rest
-	;
-
-logic_and
-	: logic_not
-	;
-
-logic_and_rest
-	: 
-	| TAND logic_or
-	;
-
-logic_not
-	: cmp cmp_rest
-	| TNOT cmp cmp_rest
-	;
-
-cmp
-	: factor fatcor_rest
-	;
-
-cmp_rest
-	:
-	| TCEQ cmp cmp_rest
-	| TCNE cmp cmp_rest
-	| TCLT cmp cmp_rest
-	| TCLE cmp cmp_rest
-	| TCGT cmp cmp_rest
-	| TCGE cmp cmp_rest
-	;
-
-factor
-	: term term_rest
-	;
-
-factor_rest
-	:
-	| TADD factor factor_rest
-	| TSUB factor factor_rest
-	| comparison factor
-	;
 
 term
-	: ident_or_other
-	| numeric
-	| boolean
-	| string
-	| TLPAREN expr TRPAREN
-	| TSUB term
-	| lambda_expr
-	| new_expr
-	| match_expr
-	| list_expr
-	;
-
-term_rest
-	:
-	| TMUL term term_rest
-	| TDIV term term_rest
-	| TMOD term term_rest
-	;
+    : ident_or_other
+    | numeric
+    | boolean
+    | string
+    | NOT term
+    | '-' term
+    | '(' expr ')'
+    | lambda_expr
+    | new_expr
+    | match_expr
+    | list_expr
+    | NONE
+    ;
 
 ident_or_other
-	: ident other_tail
-	;
+    : ident another_tail
+    ;
 
-other_tail
-	:
-	| TLPAREN call_args TRPAREN other_tail
-	| TDOT ident other_tail
-	| TLBRACKET expr TRBRACKET other_tail
-	;
+another_tail
+    : %empty
+    | '.' ident another_tail
+    | '(' call_args ')' another_tail
+    | '[' expr ']' another_tail
+    ;
 
 call_args
-	:
-	| expr call_args_tail
-	;
+    : %empty
+    | expr call_args_tail
+    ;
 
 call_args_tail
-	:
-	| TCOMMA expr call_args_tail
-	;
-
-comparison
-	: TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
-	;
+    : %empty
+    | ',' expr call_args_tail
+    ;
 
 if_else
-	: TIF expr block if_else_tail
-	;
+    : IF expr block if_else_tail
+    ;
 
 if_else_tail
-	:
-	| TELIF block if_else_tail
-	| TELSE block
-	;
+    : %empty
+    | ELIF block if_else_tail
+    | ELSE block
+    ;
 
 while_stmt
-	: TWHILE expr block
-	;
+    : WHILE expr block
+    ;
 
 do_while_stmt
-	: TDO block TWHILE expr
-	;
+    : DO block WHILE expr
+    ;
 
 for_stmt
-	: TFOR expr TTO expr TAS identifier block
-	| TFOR expr TTO expr block
-	;
+    : FOR expr TO expr AS ident block
+    | FOR expr TO expr block
+    ;
 
 foreach_stmt
-	: TFOREACH expr TAS identifier block
-	;
+    : FOREACH expr AS ident block
+    ;
 
 lambda_expr
-	: TAT TLPAREN func_decl_args TRPAREN block other_tail
-	;
+    : AT '(' ')' block decl_tail
+    | AT '(' func_decl_args ')' block decl_tail
+    ;
 
 class_decl
-	: TATAT ident TLPAREN func_decl_args TRPAREN block
-	;
+    : ATAT ident '(' ')' block
+    | ATAT ident '(' func_decl_args ')' block
+    ;
 
 new_expr
-	: TNEW ident TLPAREN call_args TRPAREN
-	;
-
-enum_or_dict
-	: TCOMMA enum_expr
-	| TASSIGN expr TCOMMA dict_expr
-	;
-
-enum_expr
-	: enumerators TRBRACE
-	| TRBRACE
-	;
+    : NEW ident '(' call_args ')'
+    ;
 
 enumerators
-	| ident enumerators_rest
-	;
+    : %empty
+    | ident enumerators_rest
+    ;
 
 enumerators_rest
-	: 
-	| TCOMMA enumerators
-	;
-
-dict_expr
-	: dictionary TRBRACE
-	| TRBRACE
-	;
+    : %empty
+    | ',' enumerators
+    ;
 
 dictionary
-	: expr TASSIGN expr dictionary_rest
-	;
+    : expr ':' expr dictionary_rest
+    ;
 
 dictionary_rest
-	: 
-	| TCOMMA dictionary
-	;
-	
+    : %empty
+    | ',' dictionary
+    ;
+
 match_expr
-	: TMATCH expr TLBRACE matches TRBRACE (TELSE expr)
-	;
+    : MATCH expr '{' matches '}'
+    | MATCH expr '{' matches '}' ELSE expr
+    ;
 
 matches
-	: expr call_args_tail TRET expr matches_rest
-	;
+    : expr call_args_tail RET expr matches_rest
+    ;
 
 matches_rest
-	:
-	| TCOMMA matches
-	;
+    : %empty
+    | ',' matches
+    ;
 
 list_expr
-	: TLBRACKET call_args TRBRACKET
-	;
+    : '[' call_args ']'
+    ;
