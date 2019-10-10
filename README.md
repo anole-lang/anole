@@ -1,4 +1,4 @@
-# Ice
+# Ice Language
 
 [![](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/MU001999/ice/issues/new)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/MU001999/ice/compare)
