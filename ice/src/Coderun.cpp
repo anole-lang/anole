@@ -334,7 +334,7 @@ namespace Ice
 		{
 			return returnValue;
 		}
-		if (_top->getContinueStatus()) 
+		if (_top->getContinueStatus())
 		{
 			_top->setContinueStatus(false);
 		}
@@ -511,7 +511,7 @@ namespace Ice
 		}
 
 		auto _obj = left->runCode(top, normal_top);
-		if (!_obj->isInstance()) 
+		if (!_obj->isInstance())
 		{
 			::std::cout << "it doesn't support for '.'" << ::std::endl;
 			exit(0);
@@ -533,7 +533,7 @@ namespace Ice
 				::std::cout << "it doesn't '.' operator" << ::std::endl;
 				exit(0);
 			}
-			
+
 			auto obj = ::std::dynamic_pointer_cast<IceInstanceObject>(_obj);
 			_top = obj->top;
 		}
@@ -586,7 +586,7 @@ namespace Ice
 			exit(0);
 		}
 
-		if (_obj->type == IceObject::TYPE::LIST) 
+		if (_obj->type == IceObject::TYPE::LIST)
 		{
 			auto obj = ::std::dynamic_pointer_cast<IceListObject>(_obj);
 			return obj->getByIndex(index->runCode(normal_top ? normal_top : top));
@@ -648,7 +648,7 @@ namespace Ice
 
 	void Env::genBuildInFunctions()
 	{
-		put("input", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("input", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size())
 			{
@@ -660,7 +660,7 @@ namespace Ice
 			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceStringObject>(input));
 		}));
 
-		put("print", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("print", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size() != 1)
 			{
@@ -671,7 +671,7 @@ namespace Ice
 			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceNoneObject>());
 		}));
 
-		put("println", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("println", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size() != 1)
 			{
@@ -682,7 +682,7 @@ namespace Ice
 			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceNoneObject>());
 		}));
 
-		put("str", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("str", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size() != 1)
 			{
@@ -692,7 +692,7 @@ namespace Ice
 			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceStringObject>(objects[0]->toStr()));
 		}));
 
-		put("exit", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("exit", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size())
 			{
@@ -714,7 +714,7 @@ namespace Ice
 		}));
 
 
-		put("len", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("len", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size() != 1)
 			{
@@ -736,7 +736,7 @@ namespace Ice
 			}
 		}));
 
-		put("int", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("int", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size() != 1)
 			{
@@ -751,7 +751,7 @@ namespace Ice
 			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceIntegerObject>(::std::atoi(::std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
 		}));
 
-		put("float", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("float", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size() != 1)
 			{
@@ -766,7 +766,7 @@ namespace Ice
 			return ::std::dynamic_pointer_cast<IceObject>(::std::make_shared<IceDoubleObject>(::std::atof(::std::dynamic_pointer_cast<IceStringObject>(objects[0])->value.c_str())));
 		}));
 
-		put("time", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects) 
+		put("time", ::std::make_shared<IceBuiltInFunctionObject>([](Objects objects)
 		{
 			if (objects.size())
 			{
