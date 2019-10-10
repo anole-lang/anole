@@ -5,10 +5,6 @@
 [![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/ice-lang)
 [![license](https://img.shields.io/github/license/MU001999/ice.svg)](https://github.com/MU001999/ice)
 
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/for-you.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)](https://forthebadge.com)
-
 ## Just an exercise for *Compilers*.
 > actually just an interpreter, and supports REPL.
 
