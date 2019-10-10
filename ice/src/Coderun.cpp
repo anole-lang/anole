@@ -187,7 +187,7 @@ namespace Ice
 
 		auto returnValue = func->block->runCode(_top);
 
-		if (returnValue->type == IceObject::TYPE::FUNCTION)
+		if (returnValue && returnValue->type == IceObject::TYPE::FUNCTION)
 		{
 			::std::dynamic_pointer_cast<IceFunctionObject>(returnValue)->pres = _top->objects;
 		}
