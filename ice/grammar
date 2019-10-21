@@ -5,17 +5,90 @@
 #       stmt is a single interactive statemnet;
 #       stmts is a module or sequence of commands read from an input file;
 
+# Grammar for Ice
+# http://www.jusot.com/ice/grammar/
+
+# Start symbols for the grammar:
+#       stmt is a single interactive statemnet;
+#       stmts is a module or sequence of commands read from an input file;
+
+%token AT;      // @
+%token ATAT;    // @@
+
+%token USING;   // using
+%token IF;      // if
+%token ELIF;    // elif
+%token ELSE;    // else
+%token WHILE;   // while
+%token DO;      // do
+%token FOR;     // for
+%token TO;      // to
+%token FOREACH; // foreach
+%token AS;      // as
+%token BREAK;   // break
+%token CONTINUE;// continue
+%token RETURN;  // return
+%token MATCH;   // match
+
+%token NEW;     // new
+
+%token NONE;    // none
+%token TRUE;    // true
+%token FALSE;   // false
+
+%token <std::string> IDENTIFIER; // [a-zA-Z_][a-zA-Z0-9_]*
+%token <int64_t>     INTEGER;    // [0-9]+
+%token <double>      DOUBLE;     // [0-9]+\.[0-9]*
+%token <std::string> STRING;     // "[^"\n]"
+
+%token BLS;       // <<
+%token BRS;       // >>
+%token AND;       // and
+%token OR;        // or
+%token NOT;       // not !
+%token CEQ;       // =
+%token CNE;       // !=
+%token CLT;       // <
+%token CLE;       // <=
+%token CGT;       // >
+%token CGE;       // >=
+%token RET;       // =>
+%token ADD;       // +
+%token SUB;       // -
+%token MUL;       // *
+%token DIV;       // /
+%token MOD;       // %
+%token ASSIGN;    // %
+%token DOT;       // .
+%token COMMA;     // ,
+%token LPAREN;    // (
+%token RPAREN;    // )
+%token LBRACKET;  // [
+%token RBRACKET;  // ]
+%token LBRACE;    // {
+%token RBRACE;    // }
+
+%left OR AND;
+%left CEQ CNE CLT CLE CGT CGE;
+%left BLS BRS;
+%left ADD SUB;
+%left MUL DIV MOD;
+
+%%
+
 %start program;
 
 program
     : stmts
     ;
 
+%type <Ptr<StmtList>> stmts;
 stmts
     : %empty
     | stmt stmts
     ;
 
+%type <Ptr<Stmt>> stmt;
 stmt
     : decl_or_assign
     | class_decl
@@ -31,50 +104,56 @@ stmt
     | BREAK
     ;
 
+%type <Ptr<Stmt>> decl_or_assign;
 decl_or_assign
-    : AT ident decl_tail ':' expr
-    | AT ident decl_tail '(' ')' ':' expr
-    | AT ident decl_tail '(' ')' block
-    | AT ident decl_tail '(' func_decl_args ')' ':' expr
-    | AT ident decl_tail '(' func_decl_args ')' block
-    | AT '.' ident decl_tail ':' expr
+    : AT ident decl_tail ASSIGN expr
+    | AT ident decl_tail LPAREN RPAREN ASSIGN expr
+    | AT ident decl_tail LPAREN RPAREN block
+    | AT ident decl_tail LPAREN func_decl_args RPAREN ASSIGN expr
+    | AT ident decl_tail LPAREN func_decl_args RPAREN block
+    | AT DOT ident decl_tail ASSIGN expr
     ;
 
 decl_tail
     : %empty
-    | '.' ident decl_tail
-    | '[' expr ']' decl_tail
+    | DOT ident decl_tail
+    | LBRACKET expr RBRACKET decl_tail
     ;
 
 block
-    : '{' stmts '}'
+    : LBRACE stmts RBRACE
     ;
 
 func_decl_args
     : ident
-    | ident ',' func_decl_args
-    | ident ':' expr
-    | ident ':' expr ',' func_decl_args
+    | ident COMMA func_decl_args
+    | ident ASSIGN expr
+    | ident ASSIGN expr COMMA func_decl_args
     ;
 
+%type <Ptr<IdentifierExpr>> ident;
 ident
     : IDENTIFIER
     ;
 
+%type <Ptr<Expr>> numeric;
 numeric
     : INTEGER
     | DOUBLE
     ;
 
+%type <Ptr<BoolExpr>> boolean;
 boolean
     : TRUE
     | FALSE
     ;
 
+%type <Ptr<StringExpr>> string;
 string
     : STRING
     ;
 
+%type <Ptr<Expr>> expr;
 expr
     : expr OR expr
     | expr AND expr
@@ -86,25 +165,25 @@ expr
     | expr CGE expr
     | expr BLS expr
     | expr BRS expr
-    | expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr '/' expr
-    | expr '%' expr
+    | expr ADD expr
+    | expr SUB expr
+    | expr MUL expr
+    | expr DIV expr
+    | expr MOD expr
     | term
-    | '{' enumerators '}'
-    | '{' dictionary '}'
+    | LBRACE enumerators RBRACE
+    | LBRACE dictionary RBRACE
     ;
 
-
+%type <Ptr<Expr>> term;
 term
     : ident_or_other
     | numeric
     | boolean
     | string
     | NOT term
-    | '-' term
-    | '(' expr ')'
+    | SUB term
+    | LPAREN expr RPAREN
     | lambda_expr
     | new_expr
     | match_expr
@@ -118,9 +197,9 @@ ident_or_other
 
 another_tail
     : %empty
-    | '.' ident another_tail
-    | '(' call_args ')' another_tail
-    | '[' expr ']' another_tail
+    | DOT ident another_tail
+    | LPAREN call_args RPAREN another_tail
+    | LBRACKET expr RBRACKET another_tail
     ;
 
 call_args
@@ -130,7 +209,7 @@ call_args
 
 call_args_tail
     : %empty
-    | ',' expr call_args_tail
+    | COMMA expr call_args_tail
     ;
 
 if_else
@@ -161,17 +240,17 @@ foreach_stmt
     ;
 
 lambda_expr
-    : AT '(' ')' block decl_tail
-    | AT '(' func_decl_args ')' block decl_tail
+    : AT LPAREN RPAREN block decl_tail
+    | AT LPAREN func_decl_args RPAREN block decl_tail
     ;
 
 class_decl
-    : ATAT ident '(' ')' block
-    | ATAT ident '(' func_decl_args ')' block
+    : ATAT ident LPAREN RPAREN block
+    | ATAT ident LPAREN func_decl_args RPAREN block
     ;
 
 new_expr
-    : NEW ident '(' call_args ')'
+    : NEW ident LPAREN call_args RPAREN
     ;
 
 enumerators
@@ -181,21 +260,21 @@ enumerators
 
 enumerators_rest
     : %empty
-    | ',' enumerators
+    | COMMA enumerators
     ;
 
 dictionary
-    : expr ':' expr dictionary_rest
+    : expr ASSIGN expr dictionary_rest
     ;
 
 dictionary_rest
     : %empty
-    | ',' dictionary
+    | COMMA dictionary
     ;
 
 match_expr
-    : MATCH expr '{' matches '}'
-    | MATCH expr '{' matches '}' ELSE expr
+    : MATCH expr LBRACE matches RBRACE
+    | MATCH expr LBRACE matches RBRACE ELSE expr
     ;
 
 matches
@@ -204,9 +283,9 @@ matches
 
 matches_rest
     : %empty
-    | ',' matches
+    | COMMA matches
     ;
 
 list_expr
-    : '[' call_args ']'
+    : LBRACKET call_args RBRACKET
     ;
