@@ -18,7 +18,12 @@ make
 cd bin
 ./ice
 ```
-Also you can use Visual Studio, just open ice/ice/ice.sln by Visual Studio 2017 or above.
 
 ### Document
 * [Progress](./PROGRESS.md)
+
+---
+
+### Newest
+
+Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine. I am planning to implement the front end firstly, then virtual machine and the codegen part finally.
