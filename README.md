@@ -18,8 +18,13 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ### Codegen
 
-+ [ ] Codegen to LLVM
-+ [ ] Codegen to IVM
+#### Codegen to LLVM
+
++ [ ] Implementation
+
+#### Codegen to IVM
+
++ [ ] Implementation
 
 ### IVM
 

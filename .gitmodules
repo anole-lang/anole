@@ -1,3 +1,0 @@
-[submodule "ivm"]
-	path = ivm
-	url = git@github.com:ice-lang/ivm.git
