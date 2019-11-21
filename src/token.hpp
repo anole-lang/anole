@@ -10,73 +10,73 @@ class Token
   public:
     enum class TokenId
     {
-        TEND,       // #
+        End,       // #
 
-        TAT,        // @
-        TATAT,      // @@
+        At,        // @
+        AtAt,      // @@
 
-        TUSING,     // using
-        TIF,        // if
-        TELIF,      // elif
-        TELSE,      // else
-        TWHILE,     // while
-        TDO,        // do
-        TFOR,       // for
-        TTO,        // to
-        TFOREACH,   // foreach
-        TAS,        // as
-        TBREAK,     // break
-        TCONTINUE,  // continue
-        TRETURN,    // return
-        TMATCH,     // match
+        Using,     // using
+        If,        // if
+        Elif,      // elif
+        Else,      // else
+        While,     // while
+        Do,        // do
+        For,       // for
+        To,        // to
+        Foreach,   // foreach
+        As,        // as
+        Break,     // break
+        Continue,  // continue
+        Return,    // return
+        Match,     // match
 
-        TNEW,       // new
+        New,       // new
 
-        TNONE,      // none
-        TTRUE,      // true
-        TFALSE,     // false
+        None,      // none
+        True,      // true
+        False,     // false
 
-        TIDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
-        TINTEGER,    // [0-9]+
-        TDOUBLE,     // [0-9]+\.[0-9]*
-        TSTRING,     // "[^"\n]"
+        Identifier, // [a-zA-Z_][a-zA-Z0-9_]*
+        Integer,    // [0-9]+
+        Double,     // [0-9]+\.[0-9]*
+        String,     // "[^"\n]"
 
-        TASSIGN,    // :
-        TCOMMA,     // ,
-        TDOT,       // .
+        Assign,    // :
+        Comma,     // ,
+        Dot,       // .
 
-        TLPAREN,    // (
-        TRPAREN,    // )
-        TLBRACKET,  // [
-        TRBRACKET,  // ]
-        TLBRACE,    // {
-        TRBRACE,    // }
+        LParen,    // (
+        RParen,    // )
+        LBracket,  // [
+        RBracket,  // ]
+        LBrace,    // {
+        RBrace,    // }
 
-        TADD,       // +
-        TSUB,       // -
-        TMUL,       // *
-        TDIV,       // /
-        TMOD,       // %
+        Add,       // +
+        Sub,       // -
+        Mul,       // *
+        Div,       // /
+        Mod,       // %
 
-        TBAND,      // &
-        TBOR,       // |
-        TBXOR,      // ^
-        TBNEG,      // ~
-        TBLS,       // <<
-        TBRS,       // >>
+        BAnd,      // &
+        BOr,       // |
+        BXor,      // ^
+        BNeg,      // ~
+        BLS,       // <<
+        BRS,       // >>
 
-        TAND,       // and
-        TOR,        // or
-        TNOT,       // not !
+        And,       // and
+        Or,        // or
+        Not,       // not !
 
-        TCEQ,       // =
-        TCNE,       // !=
-        TCLT,       // <
-        TCLE,       // <=
-        TCGT,       // >
-        TCGE,       // >=
+        CEQ,       // =
+        CNE,       // !=
+        CLT,       // <
+        CLE,       // <=
+        CGT,       // >
+        CGE,       // >=
 
-        TRET        // =>
+        Ret        // =>
     };
 
     Token() = default;

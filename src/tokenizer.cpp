@@ -46,7 +46,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '$':
-                token = new Token(TokenId::TEND);
+                token = new Token(TokenId::End);
                 break;
 
             case '#':
@@ -62,75 +62,75 @@ Token Tokenizer::next()
                 break;
 
             case ':':
-                token = new Token(TokenId::TASSIGN);
+                token = new Token(TokenId::Assign);
                 break;
 
             case ',':
-                token = new Token(TokenId::TCOMMA);
+                token = new Token(TokenId::Comma);
                 break;
 
             case '.':
-                token = new Token(TokenId::TDOT);
+                token = new Token(TokenId::Dot);
                 break;
 
             case '(':
-                token = new Token(TokenId::TLPAREN);
+                token = new Token(TokenId::LParen);
                 break;
 
             case ')':
-                token = new Token(TokenId::TRPAREN);
+                token = new Token(TokenId::RParen);
                 break;
 
             case '[':
-                token = new Token(TokenId::TLBRACKET);
+                token = new Token(TokenId::LBracket);
                 break;
 
             case ']':
-                token = new Token(TokenId::TRBRACKET);
+                token = new Token(TokenId::RBracket);
                 break;
 
             case '{':
-                token = new Token(TokenId::TLBRACE);
+                token = new Token(TokenId::LBrace);
                 break;
 
             case '}':
-                token = new Token(TokenId::TRBRACE);
+                token = new Token(TokenId::RBrace);
                 break;
 
             case '+':
-                token = new Token(TokenId::TADD);
+                token = new Token(TokenId::Add);
                 break;
 
             case '-':
-                token = new Token(TokenId::TSUB);
+                token = new Token(TokenId::Sub);
                 break;
 
             case '*':
-                token = new Token(TokenId::TMUL);
+                token = new Token(TokenId::Mul);
                 break;
 
             case '/':
-                token = new Token(TokenId::TDIV);
+                token = new Token(TokenId::Div);
                 break;
 
             case '%':
-                token = new Token(TokenId::TMOD);
+                token = new Token(TokenId::Mod);
                 break;
 
             case '&':
-                token = new Token(TokenId::TBAND);
+                token = new Token(TokenId::BAnd);
                 break;
 
             case '|':
-                token = new Token(TokenId::TBOR);
+                token = new Token(TokenId::BOr);
                 break;
 
             case '^':
-                token = new Token(TokenId::TBXOR);
+                token = new Token(TokenId::BXor);
                 break;
 
             case '~':
-                token = new Token(TokenId::TBNEG);
+                token = new Token(TokenId::BNeg);
                 break;
 
             case '=':
@@ -168,11 +168,11 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '@':
-                token = new Token(TokenId::TATAT);
+                token = new Token(TokenId::AtAt);
                 break;
 
             default:
-                return Token(TokenId::TAT);
+                return Token(TokenId::At);
             }
             break;
 
@@ -180,11 +180,11 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '>':
-                token = new Token(TokenId::TRET);
+                token = new Token(TokenId::Ret);
                 break;
 
             default:
-                return Token(TokenId::TCEQ);
+                return Token(TokenId::CEQ);
             }
             break;
 
@@ -192,11 +192,11 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '=':
-                token = new Token(TokenId::TCNE);
+                token = new Token(TokenId::CNE);
                 break;
 
             default:
-                return Token(TokenId::TNOT);
+                return Token(TokenId::Not);
             }
             break;
 
@@ -204,15 +204,15 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '=':
-                token = new Token(TokenId::TCLE);
+                token = new Token(TokenId::CLE);
                 break;
 
             case '<':
-                token = new Token(TokenId::TBLS);
+                token = new Token(TokenId::BLS);
                 break;
 
             default:
-                return Token(TokenId::TCLT);
+                return Token(TokenId::CLT);
             }
             break;
 
@@ -220,15 +220,15 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '=':
-                token = new Token(TokenId::TCGE);
+                token = new Token(TokenId::CGE);
                 break;
 
             case '>':
-                token = new Token(TokenId::TBRS);
+                token = new Token(TokenId::BRS);
                 break;
 
             default:
-                return Token(TokenId::TCGT);
+                return Token(TokenId::CGT);
             }
             break;
 
@@ -247,7 +247,7 @@ Token Tokenizer::next()
                 }
                 else
                 {
-                    return Token(TokenId::TINTEGER, value);
+                    return Token(TokenId::Integer, value);
                 }
                 break;
             }
@@ -260,7 +260,7 @@ Token Tokenizer::next()
             }
             else
             {
-                return Token(TokenId::TDOUBLE, value);
+                return Token(TokenId::Double, value);
             }
             break;
 
@@ -287,7 +287,7 @@ Token Tokenizer::next()
                 break;
 
             case '"':
-                token = new Token(TokenId::TSTRING, value);
+                token = new Token(TokenId::String, value);
                 break;
 
             default:
@@ -368,7 +368,7 @@ Token Tokenizer::next()
     }
     if (!token)
     {
-        token = new Token(TokenId::TEND);
+        token = new Token(TokenId::End);
     }
     return *token;
 }
