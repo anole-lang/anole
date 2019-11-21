@@ -1,7 +1,7 @@
 #include <set>
 #include <exception>
 #include <functional>
-#include "node.hpp"
+#include "ast.hpp"
 #include "parser.hpp"
 
 #define THROW(MESSAGE)                      throw runtime_error(MESSAGE)
@@ -19,7 +19,7 @@ Parser::Parser(istream &in)
 }
 
 // use when interacting & return stmt node
-shared_ptr<Node> Parser::gen_node()
+shared_ptr<AST> Parser::gen_node()
 {
     return gen_stmt();
 }

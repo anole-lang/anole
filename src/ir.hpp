@@ -2,8 +2,18 @@
 
 namespace ice_language
 {
-enum class Op
+class Instruction
 {
+  public:
+    Instruction() = default;
+};
+
+class Code
+{
+  public:
+    Code() = default;
+
+  private:
 
 };
 }

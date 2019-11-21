@@ -17,19 +17,19 @@ using ExprList    = std::vector<Ptr<struct Expr>>;
 using IdentList   = std::vector<Ptr<struct IdentifierExpr>>;
 using VarDeclList = std::vector<Ptr<struct VariableDeclarationStmt>>;
 
-struct Node
+struct AST
 {
-    virtual ~Node() = default;
+    virtual ~AST() = default;
     virtual void codegen(Code &) = 0;
 };
 
-struct Stmt : Node
+struct Stmt : AST
 {
     virtual ~Stmt() = default;
     virtual void codegen(Code &) = 0;
 };
 
-struct Expr : Node
+struct Expr : AST
 {
     virtual ~Expr() = default;
     virtual void codegen(Code &) = 0;

@@ -10,7 +10,7 @@ using namespace std;
 using namespace ice_language;
 
 template <typename R, typename ...T>
-shared_ptr<R> cast(shared_ptr<Node> node)
+shared_ptr<R> cast(shared_ptr<AST> node)
 {
     ASSERT(node);
     if constexpr (sizeof...(T) > 0)

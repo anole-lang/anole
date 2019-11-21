@@ -5,12 +5,12 @@
 #include <istream>
 #include <iostream>
 #include <iterator>
-#include "token.hpp"
+#include "ast.hpp"
 #include "tokenizer.hpp"
 
 namespace ice_language
 {
-using NodePtr       = std::shared_ptr<struct Node>;
+using ASTPtr       = std::shared_ptr<struct AST>;
 using ExprPtr       = std::shared_ptr<struct Expr>;
 using StmtPtr       = std::shared_ptr<struct Stmt>;
 using BlockExprPtr = std::shared_ptr<struct BlockExpr>;
@@ -19,7 +19,7 @@ class Parser
 {
   public:
     Parser(std::istream &in = std::cin);
-    std::shared_ptr<Node> gen_node();
+    std::shared_ptr<AST> gen_node();
 
   private:
     Token current_token_;
