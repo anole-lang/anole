@@ -18,10 +18,10 @@ id_
 _id_)");
         Token token;
         Tokenizer tokenizer{ss};
-        while ((token = tokenizer.next()).token_id() != TokenId::End)
+        while ((token = tokenizer.next()).token_id != TokenId::End)
         {
-            cout << "TokenID: " << (int)token.token_id();
-            cout << " Value: " << token.value() << endl;
+            cout << "TokenID: " << (int)token.token_id;
+            cout << " Value: " << token.value << endl;
         }
     TEST_END
 
@@ -29,10 +29,10 @@ _id_)");
         istringstream ss(R"(1 2.3)");
         Token token;
         Tokenizer tokenizer{ss};
-        while ((token = tokenizer.next()).token_id() != TokenId::End)
+        while ((token = tokenizer.next()).token_id != TokenId::End)
         {
-            cout << "TokenID: " << (int)token.token_id();
-            cout << " Value: " << token.value() << endl;
+            cout << "TokenID: " << (int)token.token_id;
+            cout << " Value: " << token.value << endl;
         }
     TEST_END
 TEST_END

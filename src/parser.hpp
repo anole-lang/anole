@@ -10,57 +10,57 @@
 
 namespace ice_language
 {
-using NODE       = std::shared_ptr<struct Node>;
-using EXPR       = std::shared_ptr<struct Expr>;
-using STMT       = std::shared_ptr<struct Stmt>;
-using BLOCK_EXPR = std::shared_ptr<struct BlockExpr>;
+using NodePtr       = std::shared_ptr<struct Node>;
+using ExprPtr       = std::shared_ptr<struct Expr>;
+using StmtPtr       = std::shared_ptr<struct Stmt>;
+using BlockExprPtr = std::shared_ptr<struct BlockExpr>;
 
 class Parser
 {
   public:
     Parser(std::istream &in = std::cin);
-    std::shared_ptr<Node> getNode();
+    std::shared_ptr<Node> gen_node();
 
   private:
-    Token currentToken;
-    Tokenizer tokenizer;
-    Token getNextToken();
+    Token current_token_;
+    Tokenizer tokenizer_;
+    Token get_next_token();
 
-    ExprList genArguments();
-    VarDeclList genDeclArguments();
+    ExprList gen_arguments();
+    VarDeclList gen_decl_arguments();
 
-    BLOCK_EXPR genStmts();
-    BLOCK_EXPR genBlock();
+    BlockExprPtr gen_stmts();
+    BlockExprPtr gen_block();
 
-    STMT genStmt();
-    STMT genDeclOrAssign();
-    STMT genVarAssign();
-    STMT genClassDecl();
-    STMT genUsingStmt();
-    STMT genIfElse();
-    STMT genIfElseTail();
-    STMT genWhileStmt();
-    STMT genDoWhileStmt();
-    STMT genForStmt();
-    STMT genForeachStmt();
-    STMT genReturnStmt();
+    StmtPtr gen_stmt();
+    StmtPtr gen_decl_or_assign();
+    StmtPtr gen_var_assign();
+    StmtPtr gen_class_decl();
+    StmtPtr gen_using_stmt();
+    StmtPtr gen_if_else();
+    StmtPtr gen_if_else_tail();
+    StmtPtr gen_while_stmt();
+    StmtPtr gen_do_while_stmt();
+    StmtPtr gen_for_stmt();
+    StmtPtr gen_foreach_stmt();
+    StmtPtr gen_return_stmt();
 
-    EXPR genExpr(int priority = 0);
-    EXPR genTerm();
-    EXPR genTermTail(EXPR expr);
-    EXPR genIdent();
-    EXPR genNumeric();
-    EXPR genNone();
-    EXPR genBoolean();
-    EXPR genString();
-    EXPR genDotExpr(EXPR left);
-    EXPR genIndexExpr(EXPR expr);
-    EXPR genEnumOrDict();
-    EXPR genEnumExpr(EXPR first);
-    EXPR genDictExpr(EXPR first);
-    EXPR genLambdaExpr();
-    EXPR genNewExpr();
-    EXPR genMatchExpr();
-    EXPR genListExpr();
+    ExprPtr gen_expr(int priority = 0);
+    ExprPtr gen_term();
+    ExprPtr gen_term_tail(ExprPtr expr);
+    ExprPtr gen_ident();
+    ExprPtr gen_numeric();
+    ExprPtr gen_none();
+    ExprPtr gen_boolean();
+    ExprPtr gen_string();
+    ExprPtr gen_dot_expr(ExprPtr left);
+    ExprPtr gen_index_expr(ExprPtr expr);
+    ExprPtr gen_enum_or_dict();
+    ExprPtr gen_enum_expr(ExprPtr first);
+    ExprPtr gen_dict_expr(ExprPtr first);
+    ExprPtr gen_lambda_expr();
+    ExprPtr gen_new_expr();
+    ExprPtr gen_match_expr();
+    ExprPtr gen_list_expr();
 };
 }

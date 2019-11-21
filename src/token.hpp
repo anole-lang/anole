@@ -5,7 +5,7 @@
 
 namespace ice_language
 {
-class Token
+struct Token
 {
   public:
     enum class TokenId
@@ -81,26 +81,21 @@ class Token
 
     Token() = default;
     Token(TokenId token_id, std::string value)
-      : token_id_(token_id), value_(std::move(value)) {}
-    Token(TokenId token_id) : token_id_(token_id) {}
+      : token_id(token_id), value(std::move(value)) {}
+    Token(TokenId token_id) : token_id(token_id) {}
     Token(std::string value);
     Token(Token &&token)
-      : token_id_(token.token_id_),
-        value_(std::move(token.value_)) {}
+      : token_id(token.token_id),
+        value(std::move(token.value)) {}
     Token(const Token &token)
-      : token_id_(token.token_id_),
-        value_(token.value_) {}
+      : token_id(token.token_id),
+        value(token.value) {}
     Token &operator=(const Token &token);
 
-    TokenId token_id() const;
-    void set_token_id(TokenId token_id);
-
-    const std::string &value() const;
-    void set_value(std::string value);
+    TokenId token_id;
+    std::string value;
 
   private:
-    TokenId token_id_;
-    std::string value_;
 };
 using TokenId = Token::TokenId;
 }

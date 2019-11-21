@@ -25,11 +25,13 @@ struct Node
 
 struct Stmt : Node
 {
+    virtual ~Stmt() = default;
     virtual void codegen(Code &) = 0;
 };
 
 struct Expr : Node
 {
+    virtual ~Expr() = default;
     virtual void codegen(Code &) = 0;
 };
 
@@ -89,25 +91,25 @@ struct ParenOperatorExpr : Expr
 
 struct UnaryOperatorExpr : Expr
 {
-    TOKEN op;
+    TokenId op;
     Ptr<Expr> expr;
-    UnaryOperatorExpr(TOKEN op, Ptr<Expr> expr) : op(op), expr(expr) {}
+    UnaryOperatorExpr(TokenId op, Ptr<Expr> expr) : op(op), expr(expr) {}
     void codegen(Code &) override;
 };
 
 struct BinaryOperatorExpr : Expr
 {
-    TOKEN op;
+    TokenId op;
     Ptr<Expr> lhs, rhs;
-    BinaryOperatorExpr(Ptr<Expr> lhs, TOKEN op, Ptr<Expr> rhs) : op(op), lhs(lhs), rhs(rhs) {}
+    BinaryOperatorExpr(Ptr<Expr> lhs, TokenId op, Ptr<Expr> rhs) : op(op), lhs(lhs), rhs(rhs) {}
     void codegen(Code &) override;
 };
 
 struct LambdaExpr : Expr
 {
-    VarDeclList argDecls;
+    VarDeclList arg_decls;
     Ptr<BlockExpr> block;
-    LambdaExpr(VarDeclList argDecls, Ptr<BlockExpr> block) : argDecls(argDecls), block(block) {}
+    LambdaExpr(VarDeclList arg_decls, Ptr<BlockExpr> block) : arg_decls(arg_decls), block(block) {}
     void codegen(Code &) override;
 };
 
@@ -198,10 +200,10 @@ struct VariableAssignStmt : Stmt
 struct FunctionDeclarationStmt : Stmt
 {
     Ptr<IdentifierExpr> id;
-    VarDeclList argDecls;
+    VarDeclList arg_decls;
     Ptr<BlockExpr> block;
-    FunctionDeclarationStmt(Ptr<IdentifierExpr> id, VarDeclList argDecls, Ptr<BlockExpr> block)
-      : id(id), argDecls(argDecls), block(block) {}
+    FunctionDeclarationStmt(Ptr<IdentifierExpr> id, VarDeclList arg_decls, Ptr<BlockExpr> block)
+      : id(id), arg_decls(arg_decls), block(block) {}
     void codegen(Code &) override;
 };
 
@@ -235,10 +237,10 @@ struct ReturnStmt : Stmt
 struct IfElseStmt : Stmt
 {
     Ptr<Expr> cond;
-    Ptr<BlockExpr> blockTrue;
-    Ptr<IfElseStmt> elseStmt;
-    IfElseStmt(Ptr<Expr> cond, Ptr<BlockExpr> blockTrue, Ptr<IfElseStmt> elseStmt)
-      : cond(cond), blockTrue(blockTrue), elseStmt(elseStmt) {}
+    Ptr<BlockExpr> block_true;
+    Ptr<IfElseStmt> else_stmt;
+    IfElseStmt(Ptr<Expr> cond, Ptr<BlockExpr> block_true, Ptr<IfElseStmt> else_stmt)
+      : cond(cond), block_true(block_true), else_stmt(else_stmt) {}
     void codegen(Code &) override;
 };
 
@@ -278,5 +280,3 @@ struct ForeachStmt : Stmt
     void codegen(Code &) override;
 };
 }
-
-#undef void codegen(Code &) override
