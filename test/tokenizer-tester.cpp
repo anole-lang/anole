@@ -1,8 +1,8 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include "../source/token.cpp"
-#include "../source/tokenizer.cpp"
+#include "../src/token.cpp"
+#include "../src/tokenizer.cpp"
 #include "tester.hpp"
 
 using namespace std;
