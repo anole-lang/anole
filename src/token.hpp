@@ -80,16 +80,10 @@ struct Token
   public:
 
     Token() = default;
-    Token(TokenId token_id, std::string value)
-      : token_id(token_id), value(std::move(value)) {}
-    Token(TokenId token_id) : token_id(token_id) {}
+    Token(TokenId token_id, std::string value = "");
     Token(std::string value);
-    Token(Token &&token)
-      : token_id(token.token_id),
-        value(std::move(token.value)) {}
-    Token(const Token &token)
-      : token_id(token.token_id),
-        value(token.value) {}
+    Token(Token &&token);
+    Token(const Token &token);
     Token &operator=(const Token &token);
 
     TokenId token_id;

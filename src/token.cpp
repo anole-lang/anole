@@ -21,6 +21,17 @@ namespace
 
 namespace ice_language
 {
+Token::Token(TokenId token_id, std::string value)
+    : token_id(token_id), value(std::move(value)) {}
+
+Token::Token(Token &&token)
+    : token_id(token.token_id),
+    value(std::move(token.value)) {}
+
+Token::Token(const Token &token)
+    : token_id(token.token_id),
+    value(token.value) {}
+
 Token &Token::operator=(const Token &token)
 {
     token_id = token.token_id;

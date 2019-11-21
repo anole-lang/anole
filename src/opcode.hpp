@@ -2,7 +2,7 @@
 
 namespace ice_language
 {
-enum class Operator
+enum class Opcode
 {
 
 };
