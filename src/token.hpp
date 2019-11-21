@@ -5,9 +5,10 @@
 
 namespace ice_language
 {
-struct Token
+class Token
 {
-    enum class TOKEN
+  public:
+    enum class TokenId
     {
         TEND,       // #
 
@@ -78,16 +79,28 @@ struct Token
         TRET        // =>
     };
 
-    TOKEN tokenId;
-    std::string value;
-
     Token() = default;
-    Token(const Token &token);
-    Token(TOKEN tokenId, std::string value)
-      : tokenId(tokenId), value(std::move(value)) {}
-    Token(TOKEN tokenId) : tokenId(tokenId) {}
+    Token(TokenId token_id, std::string value)
+      : token_id_(token_id), value_(std::move(value)) {}
+    Token(TokenId token_id) : token_id_(token_id) {}
     Token(std::string value);
-};
+    Token(Token &&token)
+      : token_id_(token.token_id_),
+        value_(std::move(token.value_)) {}
+    Token(const Token &token)
+      : token_id_(token.token_id_),
+        value_(token.value_) {}
+    Token &operator=(const Token &token);
 
-using TOKEN = Token::TOKEN;
+    TokenId token_id() const;
+    void set_token_id(TokenId token_id);
+
+    const std::string &value() const;
+    void set_value(std::string value);
+
+  private:
+    TokenId token_id_;
+    std::string value_;
+};
+using TokenId = Token::TokenId;
 }
