@@ -15,7 +15,7 @@ class Tokenizer
     Token next();
 
   private:
-    std::istream &inputStream;
-    char lastInput;
+    std::istream &input_stream_;
+    char last_input_;
 };
 }

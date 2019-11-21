@@ -6,7 +6,7 @@ using namespace std;
 namespace ice_language
 {
 Tokenizer::Tokenizer(istream &in)
-  : inputStream(in), lastInput(' ')
+  : input_stream_(in), last_input_(' ')
 {
     // ...
 };
@@ -31,9 +31,9 @@ Token Tokenizer::next()
         InStringEscaping
     };
     auto state = State::Begin;
-    while (isspace(lastInput))
+    while (isspace(last_input_))
     {
-        lastInput = inputStream.get();
+        last_input_ = input_stream_.get();
     }
 
     Token *token = nullptr;
@@ -43,10 +43,10 @@ Token Tokenizer::next()
         switch (state)
         {
         case State::Begin:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '$':
-                token = new Token(TOKEN::TEND);
+                token = new Token(TokenId::TEND);
                 break;
 
             case '#':
@@ -62,75 +62,75 @@ Token Tokenizer::next()
                 break;
 
             case ':':
-                token = new Token(TOKEN::TASSIGN);
+                token = new Token(TokenId::TASSIGN);
                 break;
 
             case ',':
-                token = new Token(TOKEN::TCOMMA);
+                token = new Token(TokenId::TCOMMA);
                 break;
 
             case '.':
-                token = new Token(TOKEN::TDOT);
+                token = new Token(TokenId::TDOT);
                 break;
 
             case '(':
-                token = new Token(TOKEN::TLPAREN);
+                token = new Token(TokenId::TLPAREN);
                 break;
 
             case ')':
-                token = new Token(TOKEN::TRPAREN);
+                token = new Token(TokenId::TRPAREN);
                 break;
 
             case '[':
-                token = new Token(TOKEN::TLBRACKET);
+                token = new Token(TokenId::TLBRACKET);
                 break;
 
             case ']':
-                token = new Token(TOKEN::TRBRACKET);
+                token = new Token(TokenId::TRBRACKET);
                 break;
 
             case '{':
-                token = new Token(TOKEN::TLBRACE);
+                token = new Token(TokenId::TLBRACE);
                 break;
 
             case '}':
-                token = new Token(TOKEN::TRBRACE);
+                token = new Token(TokenId::TRBRACE);
                 break;
 
             case '+':
-                token = new Token(TOKEN::TADD);
+                token = new Token(TokenId::TADD);
                 break;
 
             case '-':
-                token = new Token(TOKEN::TSUB);
+                token = new Token(TokenId::TSUB);
                 break;
 
             case '*':
-                token = new Token(TOKEN::TMUL);
+                token = new Token(TokenId::TMUL);
                 break;
 
             case '/':
-                token = new Token(TOKEN::TDIV);
+                token = new Token(TokenId::TDIV);
                 break;
 
             case '%':
-                token = new Token(TOKEN::TMOD);
+                token = new Token(TokenId::TMOD);
                 break;
 
             case '&':
-                token = new Token(TOKEN::TBAND);
+                token = new Token(TokenId::TBAND);
                 break;
 
             case '|':
-                token = new Token(TOKEN::TBOR);
+                token = new Token(TokenId::TBOR);
                 break;
 
             case '^':
-                token = new Token(TOKEN::TBXOR);
+                token = new Token(TokenId::TBXOR);
                 break;
 
             case '~':
-                token = new Token(TOKEN::TBNEG);
+                token = new Token(TokenId::TBNEG);
                 break;
 
             case '=':
@@ -150,90 +150,90 @@ Token Tokenizer::next()
                 break;
 
             default:
-                if (isdigit(lastInput))
+                if (isdigit(last_input_))
                 {
                     state = State::InInteger;
-                    value += lastInput;
+                    value += last_input_;
                 }
-                else if (lastInput == '_' || isalpha(lastInput))
+                else if (last_input_ == '_' || isalpha(last_input_))
                 {
                     state = State::InIdentifier;
-                    value += lastInput;
+                    value += last_input_;
                 }
                 break;
             }
             break;
 
         case State::InAT:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '@':
-                token = new Token(TOKEN::TATAT);
+                token = new Token(TokenId::TATAT);
                 break;
 
             default:
-                return Token(TOKEN::TAT);
+                return Token(TokenId::TAT);
             }
             break;
 
         case State::InRET:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '>':
-                token = new Token(TOKEN::TRET);
+                token = new Token(TokenId::TRET);
                 break;
 
             default:
-                return Token(TOKEN::TCEQ);
+                return Token(TokenId::TCEQ);
             }
             break;
 
         case State::InNot:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '=':
-                token = new Token(TOKEN::TCNE);
+                token = new Token(TokenId::TCNE);
                 break;
 
             default:
-                return Token(TOKEN::TNOT);
+                return Token(TokenId::TNOT);
             }
             break;
 
         case State::InCLT:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '=':
-                token = new Token(TOKEN::TCLE);
+                token = new Token(TokenId::TCLE);
                 break;
 
             case '<':
-                token = new Token(TOKEN::TBLS);
+                token = new Token(TokenId::TBLS);
                 break;
 
             default:
-                return Token(TOKEN::TCLT);
+                return Token(TokenId::TCLT);
             }
             break;
 
         case State::InCGT:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '=':
-                token = new Token(TOKEN::TCGE);
+                token = new Token(TokenId::TCGE);
                 break;
 
             case '>':
-                token = new Token(TOKEN::TBRS);
+                token = new Token(TokenId::TBRS);
                 break;
 
             default:
-                return Token(TOKEN::TCGT);
+                return Token(TokenId::TCGT);
             }
             break;
 
         case State::InInteger:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '.':
                 value += '.';
@@ -241,33 +241,33 @@ Token Tokenizer::next()
                 break;
 
             default:
-                if (isdigit(lastInput))
+                if (isdigit(last_input_))
                 {
-                    value += lastInput;
+                    value += last_input_;
                 }
                 else
                 {
-                    return Token(TOKEN::TINTEGER, value);
+                    return Token(TokenId::TINTEGER, value);
                 }
                 break;
             }
             break;
 
         case State::InDouble:
-            if (isdigit(lastInput))
+            if (isdigit(last_input_))
             {
-                value += lastInput;
+                value += last_input_;
             }
             else
             {
-                return Token(TOKEN::TDOUBLE, value);
+                return Token(TokenId::TDOUBLE, value);
             }
             break;
 
         case State::InIdentifier:
-            if (lastInput == '_' || isalnum(lastInput))
+            if (last_input_ == '_' || isalnum(last_input_))
             {
-                value += lastInput;
+                value += last_input_;
             }
             else
             {
@@ -276,7 +276,7 @@ Token Tokenizer::next()
             break;
 
         case State::InString:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '\n':
                 cout << "syntax error!" << endl;
@@ -287,17 +287,17 @@ Token Tokenizer::next()
                 break;
 
             case '"':
-                token = new Token(TOKEN::TSTRING, value);
+                token = new Token(TokenId::TSTRING, value);
                 break;
 
             default:
-                value += lastInput;
+                value += last_input_;
                 break;
             }
             break;
 
         case State::InStringEscaping:
-            switch (lastInput)
+            switch (last_input_)
             {
             case '\n':
                 cout << "syntax error!" << endl;
@@ -341,16 +341,16 @@ Token Tokenizer::next()
 
             default:
                 value += '\\';
-                value += lastInput;
+                value += last_input_;
                 break;
             }
             state = State::InString;
             break;
 
         case State::InComment:
-            while (inputStream >> lastInput)
+            while (input_stream_ >> last_input_)
             {
-                if (lastInput == '\n')
+                if (last_input_ == '\n')
                 {
                     break;
                 }
@@ -360,15 +360,15 @@ Token Tokenizer::next()
         default:
             break;
         }
-        if (lastInput == EOF)
+        if (last_input_ == EOF)
         {
             break;
         }
-        lastInput = inputStream.get();
+        last_input_ = input_stream_.get();
     }
     if (!token)
     {
-        token = new Token(TOKEN::TEND);
+        token = new Token(TokenId::TEND);
     }
     return *token;
 }
