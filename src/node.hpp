@@ -10,6 +10,8 @@
 
 namespace ice_language
 {
+class Code;
+
 template <typename T>
 using Ptr         = std::shared_ptr<T>;
 using StmtList    = std::vector<Ptr<struct Stmt>>;
@@ -20,7 +22,7 @@ using VarDeclList = std::vector<Ptr<struct VariableDeclarationStmt>>;
 struct Node
 {
     virtual ~Node() = default;
-    INTERPRET_DECL;
+    virtual void codegen(Code &) = 0;
 };
 
 struct Stmt : Node {};
