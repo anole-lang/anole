@@ -1,0 +1,12 @@
+[submodule "src/front"]
+	path = src/front
+	url = https://github.com/ice-lang/ice-front.git
+[submodule "grammar"]
+	path = grammar
+	url = https://github.com/ice-lang/ice-grammar.git
+[submodule "src/codegen"]
+	path = src/codegen
+	url = https://github.com/ice-lang/ice-codegen.git
+[submodule "src/vm"]
+	path = src/vm
+	url = https://github.com/ice-lang/ice-vm.git
