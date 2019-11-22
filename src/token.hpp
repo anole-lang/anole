@@ -88,7 +88,5 @@ struct Token
 
     TokenId token_id;
     std::string value;
-
-  private:
 };
 }

@@ -1,25 +1,17 @@
 #pragma once
 
 #include <list>
-#include <memory>
+#include "instruction.hpp"
 
 namespace ice_language
 {
-enum class Opcode;
-
-class Instruction
-{
-  public:
-    Instruction() = default;
-};
-
 class Code
 {
   public:
-    Code() = default;
-    void append(std::unique_ptr<Instruction> instruction);
+    void add_opcode(Opcode opcode);
+    void add_common_ins(Instruction &&ins);
 
   private:
-    std::list<std::unique_ptr<Instruction>> instructions_;
+    std::list<Instruction> instructions_;
 };
 }
