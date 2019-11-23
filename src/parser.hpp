@@ -10,10 +10,10 @@
 
 namespace ice_language
 {
-using ASTPtr       = std::shared_ptr<struct AST>;
-using ExprPtr       = std::shared_ptr<struct Expr>;
-using StmtPtr       = std::shared_ptr<struct Stmt>;
-using BlockExprPtr = std::shared_ptr<struct BlockExpr>;
+using ASTPtr       = Ptr<struct AST>;
+using ExprPtr      = Ptr<struct Expr>;
+using StmtPtr      = Ptr<struct Stmt>;
+using BlockExprPtr = Ptr<struct BlockExpr>;
 
 class Parser
 {
