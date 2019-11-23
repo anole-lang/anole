@@ -2,7 +2,7 @@
 
 namespace ice_language
 {
-void BlockExpr(Code &code)
+void BlockExpr::codegen(Code &code)
 {
 
 }
