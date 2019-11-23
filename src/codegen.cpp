@@ -1,4 +1,9 @@
+#include <tuple>
+#include <memory>
 #include "ast.hpp"
+#include "code.hpp"
+
+using namespace std;
 
 namespace ice_language
 {
@@ -14,7 +19,10 @@ void NoneExpr::codegen(Code &code)
 
 void IntegerExpr::codegen(Code &code)
 {
-
+    code.add_ins({
+        Opcode::PUSH,
+        make_unique<Oprands<long>>(value)
+    });
 }
 
 void FloatExpr::codegen(Code &code)
