@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <utility>
 #include "instruction.hpp"
 
 namespace ice_language
@@ -8,8 +9,10 @@ namespace ice_language
 class Code
 {
   public:
-    void add_opcode(Opcode opcode);
-    void add_common_ins(Instruction &&ins);
+    void add_ins(Instruction &&ins)
+    {
+        instructions_.emplace_back(std::move(ins));
+    }
 
   private:
     std::list<Instruction> instructions_;

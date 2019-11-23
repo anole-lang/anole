@@ -12,7 +12,7 @@ enum class Opcode
 class OprandsBase {};
 
 template <typename ...Types>
-class Oprands : public OprandBase
+class Oprands : public OprandsBase
 {
   public:
     Oprands(Types ...args) : values_(args...) {}
