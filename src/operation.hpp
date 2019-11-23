@@ -6,12 +6,12 @@ namespace ice_language
 {
 enum class Opcode
 {
-
+    PUSH
 };
 
 class OprandsBase {};
 
-template <Opcode opcode, typename ...Types>
+template <typename ...Types>
 class Oprands : public OprandBase
 {
   public:
