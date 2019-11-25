@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <utility>
+#include <vector>
 #include "operation.hpp"
 
 namespace ice_language
@@ -9,10 +9,10 @@ namespace ice_language
 struct Instruction
 {
     Instruction(Opcode opcode,
-        std::shared_ptr<OprandsBase> oprands)
+        std::vector<std::shared_ptr<void>> oprands = {})
       : opcode(opcode), oprands(oprands)
     {}
     Opcode opcode;
-    std::shared_ptr<OprandsBase> oprands;
+    std::vector<std::shared_ptr<void>> oprands;
 };
 }
