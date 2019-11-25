@@ -21,13 +21,16 @@ void IntegerExpr::codegen(Code &code)
 {
     code.add_ins({
         Opcode::Push,
-        make_shared<Oprands<long>>(value)
+        { make_shared<long>(value) }
     });
 }
 
 void FloatExpr::codegen(Code &code)
 {
-
+    code.add_ins({
+        Opcode::Push,
+        { make_shared<double>(value) }
+    });
 }
 
 void BoolExpr::codegen(Code &code)
@@ -61,8 +64,7 @@ void BinaryOperatorExpr::codegen(Code &code)
     {
     case TokenId::Add:
         code.add_ins({
-            Opcode::Add,
-            nullptr
+            Opcode::Add
         });
         break;
 
