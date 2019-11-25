@@ -1,4 +1,6 @@
+#include <string>
 #include <cassert>
+#include <sstream>
 #include <iostream>
 
 #define TEST_CLASS(NAME)            static int TEST_CLASS_##NAME = []{\
