@@ -1,7 +1,8 @@
 #pragma once
 
-#include "operation.hpp"
+#include <stack>
 #include <memory>
+#include "operation.hpp"
 
 namespace ice_language
 {
@@ -12,9 +13,12 @@ class VM
 {
   public:
     void execute_ins(Instruction &ins);
-    void ececute_code(Code &code);
+    void execute_code(Code &code);
 
   private:
     void push(Instruction &ins);
+    void add();
+
+    std::stack<std::shared_ptr<void>> stack_;
 };
 } // namespace ice_language
