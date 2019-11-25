@@ -6,7 +6,8 @@ namespace ice_language
 {
 enum class Opcode
 {
-    PUSH
+    Push,
+    Add
 };
 
 class OprandsBase {};
@@ -16,6 +17,10 @@ class Oprands : public OprandsBase
 {
   public:
     Oprands(Types ...args) : values_(args...) {}
+    std::tuple<Types> &get_values()
+    {
+        return values_;
+    }
 
   private:
     std::tuple<Types> values_;

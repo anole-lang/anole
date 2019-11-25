@@ -9,10 +9,10 @@ namespace ice_language
 struct Instruction
 {
     Instruction(Opcode opcode,
-        std::unique_ptr<OprandsBase> oprands)
-      : opcode(opcode), oprands(std::move(oprands))
+        std::shared_ptr<OprandsBase> oprands)
+      : opcode(opcode), oprands(oprands)
     {}
     Opcode opcode;
-    std::unique_ptr<OprandsBase> oprands;
+    std::shared_ptr<OprandsBase> oprands;
 };
 }
