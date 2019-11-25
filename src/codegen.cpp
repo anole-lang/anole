@@ -20,8 +20,8 @@ void NoneExpr::codegen(Code &code)
 void IntegerExpr::codegen(Code &code)
 {
     code.add_ins({
-        Opcode::PUSH,
-        make_unique<Oprands<long>>(value)
+        Opcode::Push,
+        make_shared<Oprands<long>>(value)
     });
 }
 
@@ -57,7 +57,18 @@ void UnaryOperatorExpr::codegen(Code &code)
 
 void BinaryOperatorExpr::codegen(Code &code)
 {
+    switch (op)
+    {
+    case TokenId::Add:
+        code.add_ins({
+            Opcode::Add,
+            nullptr
+        });
+        break;
 
+    default:
+        break;
+    }
 }
 
 void LambdaExpr::codegen(Code &code)
