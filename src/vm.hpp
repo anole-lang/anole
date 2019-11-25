@@ -19,6 +19,14 @@ class VM
     void push(Instruction &ins);
     void add();
 
+    template <typename R>
+    std::shared_ptr<R> pop()
+    {
+        auto res = reinterpret_pointer_cast<R>(stack_.top());
+        stack_.pop();
+        return res;
+    }
+
     std::stack<std::shared_ptr<void>> stack_;
 };
 } // namespace ice_language

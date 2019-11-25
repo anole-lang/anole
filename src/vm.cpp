@@ -32,16 +32,13 @@ void VM::execute_code(Code &code)
 
 void VM::push(Instruction &ins)
 {
-    auto values = reinterpret_pointer_cast<Oprands<long>>(ins.oprands)->get_values();
-    stack_.push(make_shared<long>(get<0>(values)));
+    stack_.push(ins.oprands[0]);
 }
 
 void VM::add()
 {
-    long a = *reinterpret_pointer_cast<long>(stack_.top());
-    stack_.pop();
-    long b = *reinterpret_pointer_cast<long>(stack_.top());
-    stack_.pop();
+    long a = *pop<long>();
+    long b = *pop<long>();
     stack_.push(make_shared<long>(a + b));
 }
 }
