@@ -19,7 +19,7 @@ Parser::Parser(istream &in)
 }
 
 // use when interacting & return stmt node
-shared_ptr<AST> Parser::gen_node()
+shared_ptr<AST> Parser::gen_ast()
 {
     return gen_stmt();
 }

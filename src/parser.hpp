@@ -19,7 +19,7 @@ class Parser
 {
   public:
     Parser(std::istream &in = std::cin);
-    std::shared_ptr<AST> gen_node();
+    std::shared_ptr<AST> gen_ast();
 
   private:
     Token current_token_;
