@@ -1,5 +1,5 @@
 CC = clang++
-FLAGS = -g -std=c++17
+FLAGS = -g -std=c++17 -stdlib=libstdc++
 
 test: tmp/tokenizer-tester\
 	  tmp/parser-tester
