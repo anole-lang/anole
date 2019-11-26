@@ -12,21 +12,27 @@ class Code;
 class VM
 {
   public:
-    void execute_ins(Instruction &ins);
-    void execute_code(Code &code);
-
-  private:
-    void push(Instruction &ins);
-    void add();
-    void sub();
-
+    void push(std::shared_ptr<void> value)
+    {
+        stack_.push(value);
+    }
+    template <typename R>
+    std::shared_ptr<R> top()
+    {
+        return reinterpret_pointer_cast<R>(stack_.top());
+    }
     template <typename R>
     std::shared_ptr<R> pop()
     {
-        auto res = reinterpret_pointer_cast<R>(stack_.top());
+        auto res = top<R>();
         stack_.pop();
         return res;
     }
+
+    void execute_op(Operation &ins);
+    void execute_code(Code &code);
+
+  private:
 
     std::stack<std::shared_ptr<void>> stack_;
 };

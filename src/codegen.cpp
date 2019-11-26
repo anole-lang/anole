@@ -14,42 +14,27 @@ void BlockExpr::codegen(Code &code)
 
 void NoneExpr::codegen(Code &code)
 {
-    code.add_ins({
-        Opcode::Push,
-        { nullptr }
-    });
+    code.add_op<Push>(nullptr);
 }
 
 void IntegerExpr::codegen(Code &code)
 {
-    code.add_ins({
-        Opcode::Push,
-        { make_shared<long>(value) }
-    });
+    code.add_op<Push>(value);
 }
 
 void FloatExpr::codegen(Code &code)
 {
-    code.add_ins({
-        Opcode::Push,
-        { make_shared<double>(value) }
-    });
+    code.add_op<Push>(value);
 }
 
 void BoolExpr::codegen(Code &code)
 {
-    code.add_ins({
-        Opcode::Push,
-        { make_shared<bool>(value) }
-    });
+    code.add_op<Push>(value);
 }
 
 void StringExpr::codegen(Code &code)
 {
-    code.add_ins({
-        Opcode::Push,
-        { make_shared<string>(value) }
-    });
+    code.add_op<Push>(value);
 }
 
 void IdentifierExpr::codegen(Code &code)
@@ -72,11 +57,11 @@ void BinaryOperatorExpr::codegen(Code &code)
     switch (op)
     {
     case TokenId::Add:
-        code.add_ins(Opcode::Add);
+        code.add_op<Add>();
         break;
 
     case TokenId::Sub:
-        code.add_ins(Opcode::Sub);
+        code.add_op<Sub>();
         break;
 
     default:
