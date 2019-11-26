@@ -2,7 +2,7 @@
 
 #include <stack>
 #include <memory>
-#include "operation.hpp"
+#include "code.hpp"
 
 namespace ice_language
 {
@@ -19,7 +19,7 @@ class VM
     template <typename R>
     std::shared_ptr<R> top()
     {
-        return reinterpret_pointer_cast<R>(stack_.top());
+        return std::reinterpret_pointer_cast<R>(stack_.top());
     }
     template <typename R>
     std::shared_ptr<R> pop()
@@ -29,11 +29,20 @@ class VM
         return res;
     }
 
-    void execute_op(Operation &ins);
-    void execute_code(Code &code);
+    void execute_op(Operation &op)
+    {
+        op.execute(*this);
+    }
+
+    void execute_code(Code &code)
+    {
+        for (auto op : code.get_operations())
+        {
+            op->execute(*this);
+        }
+    }
 
   private:
-
     std::stack<std::shared_ptr<void>> stack_;
 };
 } // namespace ice_language
