@@ -6,8 +6,6 @@
 
 namespace ice_language
 {
-class Code;
-
 class VM
 {
   public:
