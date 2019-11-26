@@ -18,6 +18,7 @@ class VM
   private:
     void push(Instruction &ins);
     void add();
+    void sub();
 
     template <typename R>
     std::shared_ptr<R> pop()

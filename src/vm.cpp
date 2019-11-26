@@ -41,4 +41,5 @@ void VM::add()
     long b = *pop<long>();
     stack_.push(make_shared<long>(a + b));
 }
+
 }
