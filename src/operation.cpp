@@ -20,7 +20,7 @@ void Add::execute(VM &vm)
     vm.push(make_shared<long>(lhs + rhs));
 }
 
-void Add::execute(VM &vm)
+void Sub::execute(VM &vm)
 {
     auto lhs = *vm.pop<long>();
     auto rhs = *vm.pop<long>();
