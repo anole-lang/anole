@@ -1,25 +1,49 @@
 #pragma once
 
 #include <list>
-#include <utility>
-#include "instruction.hpp"
+#include <memory>
+#include <type_traits>
+#include "operation.hpp"
 
 namespace ice_language
 {
 class Code
 {
   public:
-    void add_ins(Instruction &&ins)
+    template <typename Op, typename ...Args>
+    void add_op(Args ...args)
     {
-        instructions_.emplace_back(std::move(ins));
+        if constexpr (sizeof...(Args) == 0)
+        {
+            operations_.push_back(std::make_shared<Op>());
+        }
+        else
+        {
+            std::vector<std::shared_ptr<void>> oprands;
+            helper(oprands, args);
+        }
     }
 
-    std::list<Instruction> &get_instructions()
+    std::list<std::shared_ptr<Operation>> &get_operations()
     {
-        return instructions_;
+        return operations_;
     }
 
   private:
-    std::list<Instruction> instructions_;
+    template <typename T, typename ...Args>
+    void helper(std::vector<std::shared_ptr<void>> &oprands,
+        T value)
+    {
+        if (std::is_same<T, nullptr>::value)
+        {
+            oprands.push_back(nullptr);
+        }
+        else
+        {
+            oprands.push_back(make_shared<T>(value));
+        }
+    }
+
+    std::list<std::shared_ptr<Operation>> operations_;
 };
 }
