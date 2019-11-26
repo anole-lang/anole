@@ -19,7 +19,7 @@ Parser::Parser(istream &in)
 }
 
 // use when interacting & return stmt node
-shared_ptr<AST> Parser::gen_ast()
+ASTPtr Parser::gen_ast()
 {
     return gen_stmt();
 }
@@ -364,21 +364,25 @@ StmtPtr Parser::gen_return_stmt()
     return make_shared<ReturnStmt>(gen_expr());
 }
 
-static const vector<set<TokenId>> operators
+static const vector<set<TokenId>> &get_operators()
 {
-    { TokenId::Or },
-    { TokenId::And },
-    { TokenId::CEQ, TokenId::CNE, TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
-    { TokenId::Add, TokenId::Sub },
-    { TokenId::Mul, TokenId::Div, TokenId::Mod },
-    { TokenId::Not, TokenId::Sub }
-};
+    static const vector<set<TokenId>> operators
+    {
+        { TokenId::Or },
+        { TokenId::And },
+        { TokenId::CEQ, TokenId::CNE, TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
+        { TokenId::Add, TokenId::Sub },
+        { TokenId::Mul, TokenId::Div, TokenId::Mod },
+        { TokenId::Not, TokenId::Sub }
+    };
+    return operators;
+}
 
 ExprPtr Parser::gen_expr(int priority)
 {
-    if (priority == operators.size() - 1)
+    if (priority == get_operators().size() - 1)
     {
-        if (operators[priority].count(current_token_.token_id))
+        if (get_operators()[priority].count(current_token_.token_id))
         {
             auto op = current_token_.token_id;
             get_next_token();
@@ -394,7 +398,7 @@ ExprPtr Parser::gen_expr(int priority)
 
     auto lhs = gen_expr(priority + 1);
     auto op = current_token_.token_id;
-    while (operators[priority].count(op))
+    while (get_operators()[priority].count(op))
     {
         get_next_token();
         auto rhs = gen_expr(priority + 1);
