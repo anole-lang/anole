@@ -1,12 +1,28 @@
 CC = clang++
+FLAGS = -g -std=c++17
 
-test: tokenizer-tester.cpp parser-tester.cpp
-	$(CC) -std=c++17 tokenizer-tester.cpp -o test
-	./test
-	$(CC) -std=c++17 parser-tester.cpp -o test
-	./test
-	rm test
+test: tmp/tokenizer-tester\
+	  tmp/parser-tester
+	tmp/tokenizer-tester
+	tmp/parser-tester
+
+tmp/tokenizer-tester: tokenizer-tester.cpp \
+					  ../src/token.cpp \
+					  ../src/tokenizer.cpp \
+					  | tmp
+	${CC} ${FLAGS} $^ -o tmp/tokenizer-tester
+
+tmp/parser-tester: parser-tester.cpp \
+				   ../src/token.cpp \
+				   ../src/tokenizer.cpp \
+				   ../src/parser.cpp \
+				   ../src/codegen.cpp \
+				   ../src/operation.cpp
+	${CC} ${FLAGS} $^ -o tmp/parser-tester
+
+tmp:
+	mkdir tmp
 
 .PHONY: clean
 clean:
-	rm test
+	rm -r ./tmp
