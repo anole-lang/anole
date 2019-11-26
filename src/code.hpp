@@ -20,7 +20,7 @@ class Code
         else
         {
             std::vector<std::shared_ptr<void>> oprands;
-            helper(oprands, args);
+            helper(oprands, args...);
         }
     }
 
@@ -32,15 +32,20 @@ class Code
   private:
     template <typename T, typename ...Args>
     void helper(std::vector<std::shared_ptr<void>> &oprands,
-        T value)
+        T value, Args ...args)
     {
-        if (std::is_same<T, nullptr>::value)
+        if (std::is_same<T, std::nullptr_t>::value)
         {
             oprands.push_back(nullptr);
         }
         else
         {
-            oprands.push_back(make_shared<T>(value));
+            oprands.push_back(std::make_shared<T>(value));
+        }
+
+        if constexpr (sizeof...(Args))
+        {
+            helper(oprands, args...);
         }
     }
 

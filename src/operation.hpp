@@ -11,7 +11,7 @@ class Operation
 {
   public:
     virtual ~Operation() = default;
-    virtual void execute(VM &vm);
+    virtual void execute(VM &vm) = 0;
 };
 
 class Push : public Operation
