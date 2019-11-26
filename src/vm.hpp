@@ -6,7 +6,6 @@
 
 namespace ice_language
 {
-class Instruction;
 class Code;
 
 class VM
