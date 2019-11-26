@@ -7,6 +7,7 @@ namespace ice_language
 enum class Opcode
 {
     Push,
-    Add
+    Add,
+    Sub
 };
 }
