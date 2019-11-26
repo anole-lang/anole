@@ -5,41 +5,16 @@ using namespace std;
 
 namespace ice_language
 {
-void VM::execute_ins(Instruction &ins)
+void VM::execute_op(Operation &op)
 {
-    switch (ins.opcode)
-    {
-    case Opcode::Push:
-        push(ins);
-        break;
-
-    case Opcode::Add:
-        add();
-        break;
-
-    default:
-        break;
-    }
+    op.execute(*this);
 }
 
 void VM::execute_code(Code &code)
 {
-    for (auto &ins : code.get_instructions())
+    for (auto op : code.get_operations())
     {
-        execute_ins(ins);
+        op->execute(*this);
     }
 }
-
-void VM::push(Instruction &ins)
-{
-    stack_.push(ins.oprands[0]);
-}
-
-void VM::add()
-{
-    long a = *pop<long>();
-    long b = *pop<long>();
-    stack_.push(make_shared<long>(a + b));
-}
-
 }
