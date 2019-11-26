@@ -1,5 +1,4 @@
-#include "../src/token.cpp"
-#include "../src/tokenizer.cpp"
+#include "../src/tokenizer.hpp"
 #include "tester.hpp"
 
 using namespace std;

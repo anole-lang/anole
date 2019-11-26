@@ -1,10 +1,5 @@
-#include <sstream>
-#include <iostream>
-#include "../src/codegen.cpp"
-#include "../src/parser.cpp"
-#include "../src/token.cpp"
-#include "../src/tokenizer.cpp"
-#include "../src/vm.cpp"
+#include "../src/parser.hpp"
+#include "../src/vm.hpp"
 #include "tester.hpp"
 
 using namespace std;
