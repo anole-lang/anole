@@ -119,6 +119,7 @@ void ExprStmt::codegen(Code &code)
 
 }
 
+// only support for @var: expr
 void VariableDeclarationStmt::codegen(Code &code)
 {
     expr->codegen(code);
