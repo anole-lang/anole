@@ -14,32 +14,32 @@ void BlockExpr::codegen(Code &code)
 
 void NoneExpr::codegen(Code &code)
 {
-    code.add_op<Push>(nullptr);
+    code.add_ins<Push>(nullptr);
 }
 
 void IntegerExpr::codegen(Code &code)
 {
-    code.add_op<Push>(value);
+    code.add_ins<Push>(value);
 }
 
 void FloatExpr::codegen(Code &code)
 {
-    code.add_op<Push>(value);
+    code.add_ins<Push>(value);
 }
 
 void BoolExpr::codegen(Code &code)
 {
-    code.add_op<Push>(value);
+    code.add_ins<Push>(value);
 }
 
 void StringExpr::codegen(Code &code)
 {
-    code.add_op<Push>(value);
+    code.add_ins<Push>(value);
 }
 
 void IdentifierExpr::codegen(Code &code)
 {
-
+    code.add_ins<Load>(name);
 }
 
 void ParenOperatorExpr::codegen(Code &code)
@@ -57,11 +57,11 @@ void BinaryOperatorExpr::codegen(Code &code)
     switch (op)
     {
     case TokenId::Add:
-        code.add_op<Add>();
+        code.add_ins<Add>();
         break;
 
     case TokenId::Sub:
-        code.add_op<Sub>();
+        code.add_ins<Sub>();
         break;
 
     default:
@@ -121,7 +121,9 @@ void ExprStmt::codegen(Code &code)
 
 void VariableDeclarationStmt::codegen(Code &code)
 {
-
+    expr->codegen(code);
+    left->codegen(code);
+    code.add_ins<Store>();
 }
 
 void VariableAssignStmt::codegen(Code &code)
