@@ -44,7 +44,12 @@ void IdentifierExpr::codegen(Code &code)
 
 void ParenOperatorExpr::codegen(Code &code)
 {
-
+    for (auto arg : args)
+    {
+        arg->codegen(code);
+    }
+    expr->codegen(code);
+    code.add_ins<Call>(args.size());
 }
 
 void UnaryOperatorExpr::codegen(Code &code)

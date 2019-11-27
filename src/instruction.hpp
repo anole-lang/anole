@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include "helper.hpp"
 
 namespace ice_language
 {
@@ -24,29 +25,39 @@ class Pop : public Instruction
 class Push : public Instruction
 {
   public:
-    Push(std::shared_ptr<void> oprand)
+    Push(Ptr<void> oprand)
       : oprand_(oprand) {}
     void execute(Scope &scope) override;
 
   private:
-    std::shared_ptr<void> oprand_;
+    Ptr<void> oprand_;
 };
 
 class Load : public Instruction
 {
   public:
-    Load(std::shared_ptr<std::string> name)
+    Load(Ptr<std::string> name)
       : name_(name) {}
     void execute(Scope &scope) override;
 
   private:
-    std::shared_ptr<std::string> name_;
+    Ptr<std::string> name_;
 };
 
 class Store : public Instruction
 {
   public:
     void execute(Scope &scope) override;
+};
+
+class Call : public Instruction
+{
+  public:
+    Call(Ptr<std::size_t> num) : num_(num) {}
+    void execute(Scope &scope) override;
+
+  private:
+    Ptr<std::size_t> num_;
 };
 
 class Add: public Instruction

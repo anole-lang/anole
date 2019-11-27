@@ -26,6 +26,11 @@ void Store::execute(Scope &scope)
     *p = scope.pop();
 }
 
+void Call::execute(Scope &scope)
+{
+    // ... to complete
+}
+
 void Add::execute(Scope &scope)
 {
     auto lhs = *scope.pop<long>();
