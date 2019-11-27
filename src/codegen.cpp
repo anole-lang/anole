@@ -116,10 +116,10 @@ void UsingStmt::codegen(Code &code)
 
 void ExprStmt::codegen(Code &code)
 {
-
+    expr->codegen(code);
+    code.add_ins<Pop>();
 }
 
-// only support for @var: expr
 void VariableDeclarationStmt::codegen(Code &code)
 {
     expr->codegen(code);

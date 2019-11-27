@@ -5,6 +5,11 @@ using namespace std;
 
 namespace ice_language
 {
+void Pop::execute(Scope &scope)
+{
+    scope.pop();
+}
+
 void Push::execute(Scope &scope)
 {
     scope.push(oprand_);

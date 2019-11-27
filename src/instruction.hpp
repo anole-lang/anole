@@ -15,6 +15,12 @@ class Instruction
     virtual void execute(Scope &scope) = 0;
 };
 
+class Pop : public Instruction
+{
+  public:
+    void execute(Scope &scope) override;
+};
+
 class Push : public Instruction
 {
   public:

@@ -45,7 +45,9 @@ class Scope
         }
         else
         {
-            return pre_ ? pre_->load_symbol(name) : nullptr;
+            return pre_
+                 ? pre_->load_symbol(name)
+                 : std::make_shared<VoidPtr>(nullptr);
         }
     }
 
