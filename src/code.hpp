@@ -3,52 +3,39 @@
 #include <list>
 #include <memory>
 #include <type_traits>
-#include "operation.hpp"
+#include "instruction.hpp"
 
 namespace ice_language
 {
 class Code
 {
   public:
-    template <typename Op, typename ...Args>
-    void add_op(Args ...args)
+    template <typename Ins>
+    void add_ins()
     {
-        if constexpr (sizeof...(Args) == 0)
+        instructions_.push_back(std::make_shared<Ins>());
+    }
+
+    template <typename Ins, typename T>
+    void add_ins(T value)
+    {
+        if constexpr (std::is_same<T, nullptr_t>::value)
         {
-            operations_.push_back(std::make_shared<Op>());
+            instructions_.push_back(std::make_shared<Ins>(nullptr));
         }
         else
         {
-            std::vector<std::shared_ptr<void>> oprands;
-            helper(oprands, args...);
+            instructions_.push_back(std::make_shared<Ins>(std::make_shared<T>(value)));
         }
     }
 
-    std::list<std::shared_ptr<Operation>> &get_operations()
+    std::list<std::shared_ptr<Instruction>> &get_instructions()
     {
-        return operations_;
+        return instructions_;
     }
 
   private:
-    template <typename T, typename ...Args>
-    void helper(std::vector<std::shared_ptr<void>> &oprands,
-        T value, Args ...args)
-    {
-        if (std::is_same<T, std::nullptr_t>::value)
-        {
-            oprands.push_back(nullptr);
-        }
-        else
-        {
-            oprands.push_back(std::make_shared<T>(value));
-        }
 
-        if constexpr (sizeof...(Args))
-        {
-            helper(oprands, args...);
-        }
-    }
-
-    std::list<std::shared_ptr<Operation>> operations_;
+    std::list<std::shared_ptr<Instruction>> instructions_;
 };
 }
