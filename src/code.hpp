@@ -3,6 +3,7 @@
 #include <list>
 #include <memory>
 #include <type_traits>
+#include "helper.hpp"
 #include "instruction.hpp"
 
 namespace ice_language
@@ -29,13 +30,13 @@ class Code
         }
     }
 
-    std::list<std::shared_ptr<Instruction>> &get_instructions()
+    std::list<Ptr<Instruction>> &get_instructions()
     {
         return instructions_;
     }
 
   private:
 
-    std::list<std::shared_ptr<Instruction>> instructions_;
+    std::list<Ptr<Instruction>> instructions_;
 };
 }
