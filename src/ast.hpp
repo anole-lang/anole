@@ -4,18 +4,12 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include "helper.hpp"
 #include "token.hpp"
 
 namespace ice_language
 {
 class Code;
-
-template <typename T>
-using Ptr         = std::shared_ptr<T>;
-using StmtList    = std::vector<Ptr<struct Stmt>>;
-using ExprList    = std::vector<Ptr<struct Expr>>;
-using IdentList   = std::vector<Ptr<struct IdentifierExpr>>;
-using VarDeclList = std::vector<Ptr<struct VariableDeclarationStmt>>;
 
 struct AST
 {
