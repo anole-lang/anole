@@ -2,44 +2,26 @@
 
 #include <stack>
 #include <memory>
-#include "code.hpp"
+#include "scope.hpp"
 
 namespace ice_language
 {
 class VM
 {
   public:
-    void push(std::shared_ptr<void> value)
-    {
-        stack_.push(value);
-    }
-    template <typename R>
-    std::shared_ptr<R> top()
-    {
-        return std::reinterpret_pointer_cast<R>(stack_.top());
-    }
-    template <typename R>
-    std::shared_ptr<R> pop()
-    {
-        auto res = top<R>();
-        stack_.pop();
-        return res;
-    }
+    VM() : scope_(nullptr) {}
 
-    void execute_op(Operation &op)
+    void execute_ins(Instruction &ins)
     {
-        op.execute(*this);
+        scope_.execute_ins(ins);
     }
 
     void execute_code(Code &code)
     {
-        for (auto op : code.get_operations())
-        {
-            op->execute(*this);
-        }
+        scope_.execute_code(code);
     }
 
   private:
-    std::stack<std::shared_ptr<void>> stack_;
+    Scope scope_;
 };
 } // namespace ice_language
