@@ -17,8 +17,8 @@ void Load::execute(Scope &scope)
 
 void Store::execute(Scope &scope)
 {
-    auto symbol = scope.pop<shared_ptr<void>>();
-    *symbol = scope.pop();
+    auto p = scope.pop_straight();
+    *p = scope.pop();
 }
 
 void Add::execute(Scope &scope)
