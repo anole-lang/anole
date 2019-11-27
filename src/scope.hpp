@@ -4,33 +4,33 @@
 #include <stack>
 #include <memory>
 #include <string>
+#include "helper.hpp"
 #include "code.hpp"
 
 namespace ice_language
 {
 class Scope
 {
-    using VoidPtr = std::shared_ptr<void>;
   public:
-    Scope(std::shared_ptr<Scope> pre) : pre_(pre) {}
+    Scope(Ptr<Scope> pre) : pre_(pre) {}
 
     void push(VoidPtr value)
     {
         stack_.push(std::make_shared<VoidPtr>(value));
     }
     template <typename R = void>
-    std::shared_ptr<R> top()
+    Ptr<R> top()
     {
         return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
     template <typename R = void>
-    std::shared_ptr<R> pop()
+    Ptr<R> pop()
     {
         auto res = top<R>();
         stack_.pop();
         return res;
     }
-    std::shared_ptr<VoidPtr> pop_straight()
+    Ptr<VoidPtr> pop_straight()
     {
         auto res = stack_.top();
         stack_.pop();
@@ -65,8 +65,8 @@ class Scope
     }
 
   private:
-    std::shared_ptr<Scope> pre_;
-    std::stack<std::shared_ptr<VoidPtr>> stack_;
-    std::map<std::string, std::shared_ptr<VoidPtr>> symbols_;
+    Ptr<Scope> pre_;
+    std::stack<Ptr<VoidPtr>> stack_;
+    std::map<std::string, Ptr<VoidPtr>> symbols_;
 };
 }
