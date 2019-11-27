@@ -10,17 +10,18 @@ namespace ice_language
 {
 class Scope
 {
+    using VoidPtr = std::shared_ptr<void>;
   public:
     Scope(std::shared_ptr<Scope> pre) : pre_(pre) {}
 
-    void push(std::shared_ptr<void> value)
+    void push(VoidPtr value)
     {
-        stack_.push(value);
+        stack_.push(std::make_shared<VoidPtr>(value));
     }
     template <typename R = void>
     std::shared_ptr<R> top()
     {
-        return std::reinterpret_pointer_cast<R>(stack_.top());
+        return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
     template <typename R = void>
     std::shared_ptr<R> pop()
@@ -29,8 +30,14 @@ class Scope
         stack_.pop();
         return res;
     }
+    std::shared_ptr<VoidPtr> pop_straight()
+    {
+        auto res = stack_.top();
+        stack_.pop();
+        return res;
+    }
 
-    std::shared_ptr<void> find_symbol(const std::string &name)
+    VoidPtr load_symbol(const std::string &name)
     {
         if (symbols_.count(name))
         {
@@ -38,20 +45,7 @@ class Scope
         }
         else
         {
-            return pre_->find_symbol(name);
-        }
-    }
-
-    std::shared_ptr<void> load_symbol(const std::string &name)
-    {
-        auto find = find_symbol(name);
-        if (find == nullptr)
-        {
-            return symbols_[name] = std::make_shared<void>(nullptr);
-        }
-        else
-        {
-            return find;
+            return pre_ ? pre_->load_symbol(name) : nullptr;
         }
     }
 
@@ -70,7 +64,7 @@ class Scope
 
   private:
     std::shared_ptr<Scope> pre_;
-    std::stack<std::shared_ptr<void>> stack_;
-    std::map<std::string, std::shared_ptr<void>> symbols_;
+    std::stack<std::shared_ptr<VoidPtr>> stack_;
+    std::map<std::string, std::shared_ptr<VoidPtr>> symbols_;
 };
 }
