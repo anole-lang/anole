@@ -16,7 +16,6 @@ test: tmp/tokenizer-tester\
 	  tmp/parser-tester
 	tmp/tokenizer-tester
 	tmp/parser-tester
-	rm -r ./tmp
 
 tmp/tokenizer-tester: ${CPP4Tokenizer} | tmp
 	${CC} ${FLAGS} $^ -o $@
