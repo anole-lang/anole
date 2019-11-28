@@ -11,21 +11,26 @@ namespace ice_language
 {
 class Code;
 
+using StmtList     = std::vector<Ptr<struct Stmt>>;
+using ExprList     = std::vector<Ptr<struct Expr>>;
+using IdentList    = std::vector<Ptr<struct IdentifierExpr>>;
+using VarDeclList  = std::vector<Ptr<struct VariableDeclarationStmt>>;
+
 struct AST
 {
-    virtual ~AST() = default;
+    virtual ~AST() = 0;
     virtual void codegen(Code &) = 0;
 };
 
 struct Stmt : AST
 {
-    virtual ~Stmt() = default;
+    virtual ~Stmt() = 0;
     virtual void codegen(Code &) = 0;
 };
 
 struct Expr : AST
 {
-    virtual ~Expr() = default;
+    virtual ~Expr() = 0;
     virtual void codegen(Code &) = 0;
 };
 

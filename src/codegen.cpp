@@ -7,6 +7,10 @@ using namespace std;
 
 namespace ice_language
 {
+AST::~AST() = default;
+Stmt::~Stmt() = default;
+Expr::~Expr() = default;
+
 void BlockExpr::codegen(Code &code)
 {
 

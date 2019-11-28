@@ -11,6 +11,11 @@
 
 namespace ice_language
 {
+using ASTPtr       = Ptr<struct AST>;
+using ExprPtr      = Ptr<struct Expr>;
+using StmtPtr      = Ptr<struct Stmt>;
+using BlockExprPtr = Ptr<struct BlockExpr>;
+
 class Parser
 {
   public:
