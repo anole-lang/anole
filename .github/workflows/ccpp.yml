@@ -1,0 +1,17 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: 
+      - master
+
+jobs:
+  test:
+    name: Test
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Test Tokenizer and Parser
+        run: |
+          cd test
+          make test
