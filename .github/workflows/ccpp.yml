@@ -2,7 +2,7 @@ name: C/C++ CI
 
 on:
   push:
-    branches: 
+    branches:
       - master
 
 jobs:
@@ -12,6 +12,4 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Test Tokenizer and Parser
-        run: |
-          cd test
-          make test
+        run: make test
