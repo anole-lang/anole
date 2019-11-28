@@ -20,7 +20,7 @@ class Code
     template <typename Ins, typename T>
     void add_ins(T value)
     {
-        if constexpr (std::is_same<T, nullptr_t>::value)
+        if constexpr (std::is_same<T, std::nullptr_t>::value)
         {
             instructions_.push_back(std::make_shared<Ins>(nullptr));
         }
