@@ -200,6 +200,14 @@ StmtPtr Parser::gen_decl_or_assign()
 
     ExprPtr node = gen_ident();
 
+    if (current_token_.token_id != TokenId::LParen
+      && current_token_.token_id != TokenId::Dot
+      && current_token_.token_id != TokenId::LBracket)
+    {
+        get_next_token();
+        return make_shared<VariableDeclarationStmt>(node, gen_expr());
+    }
+
     while (current_token_.token_id == TokenId::LParen
       || current_token_.token_id == TokenId::Dot
       || current_token_.token_id == TokenId::LBracket)
@@ -220,7 +228,7 @@ StmtPtr Parser::gen_decl_or_assign()
     }
 
     get_next_token();
-    return make_shared<VariableDeclarationStmt>(node, gen_expr());
+    return make_shared<NonVariableAssignStmt>(node, gen_expr());
 }
 
 // generate assignment as @.ident: expr

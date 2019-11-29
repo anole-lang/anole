@@ -182,9 +182,9 @@ struct ExprStmt : Stmt
 
 struct VariableDeclarationStmt : Stmt
 {
-    Ptr<Expr> left, expr;
-    VariableDeclarationStmt(Ptr<Expr> left, Ptr<Expr> expr)
-      : left(left), expr(expr) {}
+    Ptr<IdentifierExpr> id;
+    Ptr<Expr> expr;
+    VariableDeclarationStmt(Ptr<IdentifierExpr> id, Ptr<Expr>expr) : id(id), expr(expr) {}
     void codegen(Code &) override;
 };
 
@@ -193,6 +193,14 @@ struct VariableAssignStmt : Stmt
     Ptr<IdentifierExpr> id;
     Ptr<Expr> expr;
     VariableAssignStmt(Ptr<IdentifierExpr> id, Ptr<Expr>expr) : id(id), expr(expr) {}
+    void codegen(Code &) override;
+};
+
+struct NonVariableAssignStmt : Stmt
+{
+    Ptr<Expr> left, expr;
+    NonVariableAssignStmt(Ptr<Expr> left, Ptr<Expr> expr)
+      : left(left), expr(expr) {}
     void codegen(Code &) override;
 };
 

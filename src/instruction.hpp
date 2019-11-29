@@ -33,6 +33,17 @@ class Push : public Instruction
     Ptr<void> oprand_;
 };
 
+class Create : public Instruction
+{
+  public:
+    Create(Ptr<std::string> name)
+      : name_(name) {}
+    void execute(Scope &scope) override;
+
+  private:
+    Ptr<std::string> name_;
+};
+
 class Load : public Instruction
 {
   public:

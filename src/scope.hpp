@@ -39,7 +39,7 @@ class Scope
         return res;
     }
 
-    VoidPtr load_symbol(const std::string &name)
+    VoidPtr find_symbol(const std::string &name)
     {
         if (symbols_.count(name))
         {
@@ -48,9 +48,20 @@ class Scope
         else
         {
             return pre_
-                 ? pre_->load_symbol(name)
-                 : std::make_shared<VoidPtr>(nullptr);
+                 ? pre_->find_symbol(name)
+                 : nullptr;
         }
+    }
+
+    void create_symbol(const std::string &name)
+    {
+        symbols_[name] = std::make_shared<VoidPtr>(nullptr);
+    }
+
+    VoidPtr load_symbol(const std::string &name)
+    {
+        auto ptr = find_symbol(name);
+        return ptr ? ptr : std::make_shared<VoidPtr>(nullptr);
     }
 
     void execute_ins(Instruction &ins)

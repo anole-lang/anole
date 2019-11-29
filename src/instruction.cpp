@@ -15,6 +15,11 @@ void Push::execute(Scope &scope)
     scope.push(oprand_);
 }
 
+void Create::execute(Scope &scope)
+{
+    scope.create_symbol(*name_);
+}
+
 void Load::execute(Scope &scope)
 {
     scope.push(scope.load_symbol(*name_));

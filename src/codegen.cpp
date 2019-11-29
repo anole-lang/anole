@@ -91,16 +91,19 @@ void LambdaExpr::codegen(Code &code)
 
 }
 
+// [AFTER] [CLASS]
 void NewExpr::codegen(Code &code)
 {
 
 }
 
+// [AFTER] [CLASS]
 void DotExpr::codegen(Code &code)
 {
 
 }
 
+// [AFTER] [CLASS]
 void EnumExpr::codegen(Code &code)
 {
 
@@ -111,16 +114,19 @@ void MatchExpr::codegen(Code &code)
 
 }
 
+// [AFTER] [CLASS]
 void ListExpr::codegen(Code &code)
 {
 
 }
 
+// [AFTER] [CLASS]
 void IndexExpr::codegen(Code &code)
 {
 
 }
 
+// [AFTER] [CLASS]
 void DictExpr::codegen(Code &code)
 {
 
@@ -140,13 +146,23 @@ void ExprStmt::codegen(Code &code)
 void VariableDeclarationStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    left->codegen(code);
+    code.add_ins<Create>(id->name);
+    code.add_ins<Load>(id->name);
     code.add_ins<Store>();
 }
 
 void VariableAssignStmt::codegen(Code &code)
 {
+    expr->codegen(code);
+    code.add_ins<Load>(id->name);
+    code.add_ins<Store>();
+}
 
+void NonVariableAssignStmt::codegen(Code &code)
+{
+    expr->codegen(code);
+    left->codegen(code);
+    code.add_ins<Store>();
 }
 
 void FunctionDeclarationStmt::codegen(Code &code)
