@@ -58,7 +58,15 @@ void ParenOperatorExpr::codegen(Code &code)
 
 void UnaryOperatorExpr::codegen(Code &code)
 {
+    switch (op)
+    {
+    case TokenId::Sub:
+        code.add_ins<Neg>();
+        break;
 
+    default:
+        break;
+    }
 }
 
 void BinaryOperatorExpr::codegen(Code &code)

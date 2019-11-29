@@ -60,6 +60,12 @@ class Call : public Instruction
     Ptr<std::size_t> num_;
 };
 
+class Neg : public Instruction
+{
+  public:
+    void execute(Scope &scope) override;
+};
+
 class Add: public Instruction
 {
   public:
