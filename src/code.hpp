@@ -1,7 +1,6 @@
 #pragma once
 
 #include <list>
-#include <memory>
 #include <type_traits>
 #include "helper.hpp"
 #include "instruction.hpp"

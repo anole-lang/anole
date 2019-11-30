@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <string>
-#include <memory>
 #include <utility>
 #include "helper.hpp"
 #include "token.hpp"
