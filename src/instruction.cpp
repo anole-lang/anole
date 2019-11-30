@@ -5,59 +5,61 @@ using namespace std;
 
 namespace ice_language
 {
-void Pop::execute(Scope &scope)
+void Pop::execute(Ptr<Scope> scope)
 {
-    scope.pop();
+    scope->pop();
 }
 
-void Push::execute(Scope &scope)
+void Push::execute(Ptr<Scope> scope)
 {
-    scope.push(oprand_);
+    scope->push(oprand_);
 }
 
-void Create::execute(Scope &scope)
+void Create::execute(Ptr<Scope> scope)
 {
-    scope.create_symbol(*name_);
+    scope->create_symbol(*name_);
 }
 
-void Load::execute(Scope &scope)
+void Load::execute(Ptr<Scope> scope)
 {
-    scope.push(scope.load_symbol(*name_));
+    scope->push(scope->load_symbol(*name_));
 }
 
-void Store::execute(Scope &scope)
+void Store::execute(Ptr<Scope> scope)
 {
-    auto p = scope.pop_straight();
-    *p = scope.pop();
+    auto p = scope->pop_straight();
+    *p = scope->pop();
 }
 
-void Call::execute(Scope &scope)
+void Call::execute(Ptr<Scope> scope)
 {
     // ... to complete
+    // auto func = scope->pop<FunctionObject>();
+    // func->set_return_to(scope);
 }
 
-void Neg::execute(Scope &scope)
+void Neg::execute(Ptr<Scope> scope)
 {
-    auto value = *scope.pop<long>();
-    scope.push(make_shared<long>(-value));
+    auto value = *scope->pop<long>();
+    scope->push(make_shared<long>(-value));
 }
 
-void Add::execute(Scope &scope)
+void Add::execute(Ptr<Scope> scope)
 {
-    auto lhs = *scope.pop<long>();
-    auto rhs = *scope.pop<long>();
-    scope.push(make_shared<long>(lhs + rhs));
+    auto lhs = *scope->pop<long>();
+    auto rhs = *scope->pop<long>();
+    scope->push(make_shared<long>(lhs + rhs));
 }
 
-void Sub::execute(Scope &scope)
+void Sub::execute(Ptr<Scope> scope)
 {
-    auto lhs = *scope.pop<long>();
-    auto rhs = *scope.pop<long>();
-    scope.push(make_shared<long>(lhs - rhs));
+    auto lhs = *scope->pop<long>();
+    auto rhs = *scope->pop<long>();
+    scope->push(make_shared<long>(lhs - rhs));
 }
 
-void Return::execute(Scope &scope)
+void Return::execute(Ptr<Scope> scope)
 {
-    scope.set_return();
+    scope->set_return();
 }
 }

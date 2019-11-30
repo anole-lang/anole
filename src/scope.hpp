@@ -2,7 +2,6 @@
 
 #include <map>
 #include <stack>
-#include <memory>
 #include <string>
 #include "helper.hpp"
 #include "code.hpp"
@@ -11,13 +10,12 @@ namespace ice_language
 {
 using VoidPtr = Ptr<void>;
 
-class Scope
+class Scope : public std::enable_shared_from_this<Scope>
 {
   public:
-    Scope(Ptr<Scope> pre)
-      : return_to_(nullptr), pre_(pre) {}
-    Scope(const Scope &scope)
-      : return_to_(nullptr), pre_(scope.pre_) {}
+    Scope() : Scope(nullptr) {}
+    Scope(Ptr<Scope> pre) : return_to_(nullptr), pre_(pre) {}
+    Scope(const Scope &scope) : Scope(scope.pre_) {}
 
     void set_return_to(Ptr<Scope> return_to)
     {
@@ -82,14 +80,14 @@ class Scope
 
     void execute_ins(Instruction &ins)
     {
-        ins.execute(*this);
+        ins.execute(shared_from_this());
     }
 
     void execute_code(Code &code)
     {
         for (auto ins : code.get_instructions())
         {
-            ins->execute(*this);
+            ins->execute(shared_from_this());
         }
     }
 

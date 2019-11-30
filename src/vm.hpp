@@ -9,19 +9,19 @@ namespace ice_language
 class VM
 {
   public:
-    VM() : scope_(nullptr) {}
+    VM() : scope_(std::make_shared<Scope>()) {}
 
     void execute_ins(Instruction &ins)
     {
-        scope_.execute_ins(ins);
+        scope_->execute_ins(ins);
     }
 
     void execute_code(Code &code)
     {
-        scope_.execute_code(code);
+        scope_->execute_code(code);
     }
 
   private:
-    Scope scope_;
+    Ptr<Scope> scope_;
 };
 } // namespace ice_language
