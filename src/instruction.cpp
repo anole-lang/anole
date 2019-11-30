@@ -36,6 +36,12 @@ void Call::execute(Scope &scope)
     // ... to complete
 }
 
+void Neg::execute(Scope &scope)
+{
+    auto value = *scope.pop<long>();
+    scope.push(make_shared<long>(-value));
+}
+
 void Add::execute(Scope &scope)
 {
     auto lhs = *scope.pop<long>();
@@ -48,5 +54,10 @@ void Sub::execute(Scope &scope)
     auto lhs = *scope.pop<long>();
     auto rhs = *scope.pop<long>();
     scope.push(make_shared<long>(lhs - rhs));
+}
+
+void Return::execute(Scope &scope)
+{
+    scope.set_return();
 }
 }

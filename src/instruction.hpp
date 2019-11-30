@@ -88,4 +88,10 @@ class Sub: public Instruction
   public:
     void execute(Scope &scope) override;
 };
+
+class Return : public Instruction
+{
+  public:
+    void execute(Scope &scope) override;
+};
 }

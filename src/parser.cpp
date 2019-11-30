@@ -205,7 +205,10 @@ StmtPtr Parser::gen_decl_or_assign()
       && current_token_.token_id != TokenId::LBracket)
     {
         get_next_token();
-        return make_shared<VariableDeclarationStmt>(node, gen_expr());
+        return make_shared<VariableDeclarationStmt>(
+            reinterpret_pointer_cast<IdentifierExpr>(node),
+            gen_expr()
+        );
     }
 
     while (current_token_.token_id == TokenId::LParen

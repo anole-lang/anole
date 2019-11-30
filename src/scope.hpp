@@ -14,7 +14,23 @@ using VoidPtr = Ptr<void>;
 class Scope
 {
   public:
-    Scope(Ptr<Scope> pre) : pre_(pre) {}
+    Scope(Ptr<Scope> pre)
+      : return_to_(nullptr), pre_(pre) {}
+    Scope(const Scope &scope)
+      : return_to_(nullptr), pre_(scope.pre_) {}
+
+    void set_return_to(Ptr<Scope> return_to)
+    {
+        // assert return_to_ is not nullptr
+        return_to_ = return_to;
+    }
+
+    void set_return()
+    {
+        // assert stack_ is not empty
+        // assert return_to_ is not nullptr
+        return_to_->push(pop());
+    }
 
     void push(VoidPtr value)
     {
@@ -78,6 +94,7 @@ class Scope
     }
 
   private:
+    Ptr<Scope> return_to_;
     Ptr<Scope> pre_;
     std::stack<Ptr<VoidPtr>> stack_;
     std::map<std::string, Ptr<VoidPtr>> symbols_;

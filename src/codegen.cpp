@@ -187,7 +187,8 @@ void ContinueStmt::codegen(Code &code)
 
 void ReturnStmt::codegen(Code &code)
 {
-
+    expr->codegen(code);
+    code.add_ins<Return>();
 }
 
 void IfElseStmt::codegen(Code &code)
