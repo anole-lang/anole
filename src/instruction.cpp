@@ -5,6 +5,8 @@ using namespace std;
 
 namespace ice_language
 {
+Instruction::~Instruction() = default;
+
 void Pop::execute(Ptr<Scope> scope)
 {
     scope->pop();

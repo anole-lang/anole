@@ -13,7 +13,10 @@ Expr::~Expr() = default;
 
 void BlockExpr::codegen(Code &code)
 {
-
+    for (auto statement : statements)
+    {
+        statement->codegen(code);
+    }
 }
 
 void NoneExpr::codegen(Code &code)
@@ -167,7 +170,9 @@ void NonVariableAssignStmt::codegen(Code &code)
 
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-
+    // new function object with code
+    // add instructions to code
+    // push
 }
 
 void ClassDeclarationStmt::codegen(Code &code)

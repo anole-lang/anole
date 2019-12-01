@@ -12,7 +12,7 @@ class Scope;
 class Instruction
 {
   public:
-    virtual ~Instruction() = default;
+    virtual ~Instruction() = 0;
     virtual void execute(Ptr<Scope> scope) = 0;
 };
 
