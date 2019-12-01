@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include "helper.hpp"
 
 namespace ice_language
@@ -35,23 +36,23 @@ class Push : public Instruction
 class Create : public Instruction
 {
   public:
-    Create(Ptr<std::string> name)
-      : name_(name) {}
+    Create(std::string name)
+      : name_(std::move(name)) {}
     void execute(Ptr<Scope> scope) override;
 
   private:
-    Ptr<std::string> name_;
+    std::string name_;
 };
 
 class Load : public Instruction
 {
   public:
-    Load(Ptr<std::string> name)
-      : name_(name) {}
+    Load(std::string name)
+      : name_(std::move(name)) {}
     void execute(Ptr<Scope> scope) override;
 
   private:
-    Ptr<std::string> name_;
+    std::string name_;
 };
 
 class Store : public Instruction
@@ -63,11 +64,11 @@ class Store : public Instruction
 class Call : public Instruction
 {
   public:
-    Call(Ptr<std::size_t> num) : num_(num) {}
+    Call(std::size_t num) : num_(num) {}
     void execute(Ptr<Scope> scope) override;
 
   private:
-    Ptr<std::size_t> num_;
+    std::size_t num_;
 };
 
 class Neg : public Instruction

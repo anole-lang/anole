@@ -17,12 +17,12 @@ void Push::execute(Ptr<Scope> scope)
 
 void Create::execute(Ptr<Scope> scope)
 {
-    scope->create_symbol(*name_);
+    scope->create_symbol(name_);
 }
 
 void Load::execute(Ptr<Scope> scope)
 {
-    scope->push(scope->load_symbol(*name_));
+    scope->push(scope->load_symbol(name_));
 }
 
 void Store::execute(Ptr<Scope> scope)
@@ -35,7 +35,7 @@ void Call::execute(Ptr<Scope> scope)
 {
     // ... to complete
     // auto func = scope->pop<FunctionObject>();
-    // func->set_return_to(scope);
+    // func->pre_socpe()->execute(func->code());
 }
 
 void Neg::execute(Ptr<Scope> scope)

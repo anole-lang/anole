@@ -23,9 +23,13 @@ class Code
         {
             instructions_.push_back(std::make_shared<Ins>(nullptr));
         }
+        else if constexpr (std::is_same<Ins, Push>::value)
+        {
+            instructions_.push_back(std::make_shared<Push>(std::make_shared<T>(value)));
+        }
         else
         {
-            instructions_.push_back(std::make_shared<Ins>(std::make_shared<T>(value)));
+            instructions_.push_back(std::make_shared<Ins>(value));
         }
     }
 
