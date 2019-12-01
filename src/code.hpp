@@ -23,16 +23,24 @@ class Code
         {
             if constexpr (std::is_same<T, std::nullptr_t>::value)
             {
-                instructions_.push_back(std::make_shared<Ins>(nullptr));
+                instructions_.push_back(
+                    std::make_shared<Ins>(nullptr)
+                );
             }
             else
             {
-                instructions_.push_back(std::make_shared<Push>(std::make_shared<T>(value)));
+                instructions_.push_back(
+                    std::make_shared<Push>(
+                        std::make_shared<T>(value)
+                    )
+                );
             }
         }
         else
         {
-            instructions_.push_back(std::make_shared<Ins>(value));
+            instructions_.push_back(
+                std::make_shared<Ins>(value)
+            );
         }
     }
 
