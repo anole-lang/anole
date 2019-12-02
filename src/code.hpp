@@ -1,6 +1,6 @@
 #pragma once
 
-#include <list>
+#include <vector>
 #include <type_traits>
 #include "helper.hpp"
 #include "instruction.hpp"
@@ -44,13 +44,13 @@ class Code
         }
     }
 
-    std::list<Ptr<Instruction>> &get_instructions()
+    std::vector<Ptr<Instruction>> &get_instructions()
     {
         return instructions_;
     }
 
   private:
 
-    std::list<Ptr<Instruction>> instructions_;
+    std::vector<Ptr<Instruction>> instructions_;
 };
 }

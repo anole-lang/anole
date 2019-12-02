@@ -94,4 +94,15 @@ class Return : public Instruction
   public:
     void execute(Ptr<Scope> scope) override;
 };
+
+class JumpIf : public Instruction
+{
+  public:
+    JumpIf(std::size_t ind)
+      : ind_(ind) {}
+    void execute(Ptr<Scope> scope) override;
+
+  private:
+    std::size_t ind_;
+};
 }

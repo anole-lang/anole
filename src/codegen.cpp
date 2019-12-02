@@ -170,9 +170,9 @@ void NonVariableAssignStmt::codegen(Code &code)
 
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-    // new function object with code
-    // add instructions to code
-    // push
+    // code will be gen in code
+    // but there should be a function object after
+    // the code's running
 }
 
 void ClassDeclarationStmt::codegen(Code &code)
@@ -198,7 +198,8 @@ void ReturnStmt::codegen(Code &code)
 
 void IfElseStmt::codegen(Code &code)
 {
-
+    cond->codegen(code);
+    // code.add_ins<JumpIf>()
 }
 
 void WhileStmt::codegen(Code &code)

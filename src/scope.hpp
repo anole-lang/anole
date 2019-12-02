@@ -78,19 +78,6 @@ class Scope : public std::enable_shared_from_this<Scope>
         return ptr ? ptr : std::make_shared<VoidPtr>(nullptr);
     }
 
-    void execute_ins(Instruction &ins)
-    {
-        ins.execute(shared_from_this());
-    }
-
-    void execute_code(Code &code)
-    {
-        for (auto ins : code.get_instructions())
-        {
-            ins->execute(shared_from_this());
-        }
-    }
-
   private:
     Ptr<Scope> return_to_;
     Ptr<Scope> pre_;
