@@ -199,7 +199,12 @@ void ReturnStmt::codegen(Code &code)
 void IfElseStmt::codegen(Code &code)
 {
     cond->codegen(code);
-    // code.add_ins<JumpIf>()
+    auto o1 = code.add_ins();
+    block_true->codegen(code);
+    code.set_ins<JumpIfNot>(o1, code.size());
+    auto o2 = code.add_ins();
+    else_stmt->codegen(code);
+    code.set_ins<Jump>(o2, code.size());
 }
 
 void WhileStmt::codegen(Code &code)

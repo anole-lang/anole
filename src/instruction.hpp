@@ -95,10 +95,21 @@ class Return : public Instruction
     void execute(Ptr<Scope> scope) override;
 };
 
-class JumpIf : public Instruction
+class Jump : public Instruction
 {
   public:
-    JumpIf(std::size_t ind)
+    Jump(std::size_t ind)
+      : ind_(ind) {}
+    void execute(Ptr<Scope> scope) override;
+
+  private:
+    std::size_t ind_;
+};
+
+class JumpIfNot : public Instruction
+{
+  public:
+    JumpIfNot(std::size_t ind)
       : ind_(ind) {}
     void execute(Ptr<Scope> scope) override;
 

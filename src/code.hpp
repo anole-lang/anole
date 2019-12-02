@@ -10,14 +10,22 @@ namespace ice_language
 class Code
 {
   public:
-    template <typename Ins>
-    void add_ins()
+    template <typename Ins = void>
+    std::size_t add_ins()
     {
-        instructions_.push_back(std::make_shared<Ins>());
+        if constexpr (std::is_same(Ins, void)::value)
+        {
+            instructions_.push_back(nullptr);
+        }
+        else
+        {
+            instructions_.push_back(std::make_shared<Ins>());
+        }
+        return instructions_.size() - 1;
     }
 
     template <typename Ins, typename T>
-    void add_ins(T value)
+    std::size_t add_ins(T value)
     {
         if constexpr (std::is_same<Ins, Push>::value)
         {
@@ -42,6 +50,40 @@ class Code
                 std::make_shared<Ins>(value)
             );
         }
+        return instructions_.size() - 1;
+    }
+
+    template <typename Ins>
+    void set_ins(std::size_t ind)
+    {
+        instructions_.push_back(std::make_shared<Ins>());
+    }
+
+    template <typename Ins, typename T>
+    void set_ins(std::size_t ind, T value)
+    {
+        if constexpr (std::is_same<Ins, Push>::value)
+        {
+            if constexpr (std::is_same<T, std::nullptr_t>::value)
+            {
+                instructions_[ind] = std::make_shared<Ins>(nullptr);
+            }
+            else
+            {
+                instructions_[ind] = std::make_shared<Push>(
+                    std::make_shared<T>(value)
+                );
+            }
+        }
+        else
+        {
+            instructions_[ind] = std::make_shared<Ins>(value);
+        }
+    }
+
+    std::size_t size()
+    {
+        return instructions_.size();
     }
 
     std::vector<Ptr<Instruction>> &get_instructions()
