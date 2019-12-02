@@ -10,74 +10,55 @@ namespace ice_language
 class Code
 {
   public:
-    template <typename Ins = void>
+    template <Op op = Op::PlaceHolder>
     std::size_t add_ins()
     {
-        if constexpr (std::is_same(Ins, void)::value)
-        {
-            instructions_.push_back(nullptr);
-        }
-        else
-        {
-            instructions_.push_back(std::make_shared<Ins>());
-        }
+        instructions_.push_back({
+            op, nullptr
+        });
         return instructions_.size() - 1;
     }
 
-    template <typename Ins, typename T>
+    template <Op op, typename T>
     std::size_t add_ins(T value)
     {
-        if constexpr (std::is_same<Ins, Push>::value)
+        if constexpr (std::is_same<Op, Op::Push>::value
+            and std::is_same<T, std::nullptr_t>::value)
         {
-            if constexpr (std::is_same<T, std::nullptr_t>::value)
-            {
-                instructions_.push_back(
-                    std::make_shared<Ins>(nullptr)
-                );
-            }
-            else
-            {
-                instructions_.push_back(
-                    std::make_shared<Push>(
-                        std::make_shared<T>(value)
-                    )
-                );
-            }
+            instructions_.push_back({
+                Op::Push, nullptr
+            });
         }
         else
         {
-            instructions_.push_back(
-                std::make_shared<Ins>(value)
-            );
+            instructions_.push_back({
+                op, std::make_shared<T>(value)
+            });
         }
         return instructions_.size() - 1;
     }
 
-    template <typename Ins>
+    template <Op op>
     void set_ins(std::size_t ind)
     {
-        instructions_.push_back(std::make_shared<Ins>());
+        instructions_[ind] = {op, nullptr};
     }
 
-    template <typename Ins, typename T>
+    template <Op op, typename T>
     void set_ins(std::size_t ind, T value)
     {
-        if constexpr (std::is_same<Ins, Push>::value)
+        if constexpr (std::is_same<Op, Op::Push>::value
+            and std::is_same<T, std::nullptr_t>::value)
         {
-            if constexpr (std::is_same<T, std::nullptr_t>::value)
-            {
-                instructions_[ind] = std::make_shared<Ins>(nullptr);
-            }
-            else
-            {
-                instructions_[ind] = std::make_shared<Push>(
-                    std::make_shared<T>(value)
-                );
-            }
+            instructions_[ind] = {
+                Op::Push, nullptr
+            };
         }
         else
         {
-            instructions_[ind] = std::make_shared<Ins>(value);
+            instructions_[ind] = {
+                op, std::make_shared<T>(value)
+            };
         }
     }
 
@@ -86,13 +67,13 @@ class Code
         return instructions_.size();
     }
 
-    std::vector<Ptr<Instruction>> &get_instructions()
+    std::vector<Instruction> &get_instructions()
     {
         return instructions_;
     }
 
   private:
 
-    std::vector<Ptr<Instruction>> instructions_;
+    std::vector<Instruction> instructions_;
 };
 }

@@ -5,21 +5,12 @@
 #include <utility>
 #include "helper.hpp"
 
-namespace ice_language
-{
-class Scope;
-
-class Instruction
-{
-  public:
-    virtual ~Instruction() = 0;
-    virtual void execute(Ptr<Scope> scope) = 0;
-};
+/*
 
 class Pop : public Instruction
 {
   public:
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 };
 
 class Push : public Instruction
@@ -27,7 +18,7 @@ class Push : public Instruction
   public:
     Push(Ptr<void> oprand)
       : oprand_(oprand) {}
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 
   private:
     Ptr<void> oprand_;
@@ -38,7 +29,7 @@ class Create : public Instruction
   public:
     Create(std::string name)
       : name_(std::move(name)) {}
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 
   private:
     std::string name_;
@@ -49,7 +40,7 @@ class Load : public Instruction
   public:
     Load(std::string name)
       : name_(std::move(name)) {}
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 
   private:
     std::string name_;
@@ -58,14 +49,14 @@ class Load : public Instruction
 class Store : public Instruction
 {
   public:
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 };
 
 class Call : public Instruction
 {
   public:
     Call(std::size_t num) : num_(num) {}
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 
   private:
     std::size_t num_;
@@ -74,25 +65,25 @@ class Call : public Instruction
 class Neg : public Instruction
 {
   public:
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 };
 
 class Add: public Instruction
 {
   public:
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 };
 
 class Sub: public Instruction
 {
   public:
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 };
 
 class Return : public Instruction
 {
   public:
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 };
 
 class Jump : public Instruction
@@ -100,7 +91,7 @@ class Jump : public Instruction
   public:
     Jump(std::size_t ind)
       : ind_(ind) {}
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 
   private:
     std::size_t ind_;
@@ -111,9 +102,37 @@ class JumpIfNot : public Instruction
   public:
     JumpIfNot(std::size_t ind)
       : ind_(ind) {}
-    void execute(Ptr<Scope> scope) override;
+    void execute(Ptr<Frame> scope) override;
 
   private:
     std::size_t ind_;
+};
+*/
+
+namespace ice_language
+{
+class Frame;
+
+enum class Op
+{
+    PlaceHolder,
+    Pop,
+    Push,
+    Create,
+    Load,
+    Store,
+    Call,
+    Neg,
+    Add,
+    Sub,
+    Return,
+    Jump,
+    JumpIfNot
+};
+
+struct Instruction
+{
+    Op op;
+    std::shared_ptr<void> oprand;
 };
 }

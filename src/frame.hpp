@@ -10,14 +10,16 @@ namespace ice_language
 {
 using VoidPtr = Ptr<void>;
 
-class Scope : public std::enable_shared_from_this<Scope>
+class Frame
 {
   public:
-    Scope() : Scope(nullptr) {}
-    Scope(Ptr<Scope> pre) : return_to_(nullptr), pre_(pre) {}
-    Scope(const Scope &scope) : Scope(scope.pre_) {}
+    Frame() : Frame(nullptr) {}
+    Frame(Ptr<Frame> pre) : return_to_(nullptr), pre_(pre) {}
+    Frame(const Frame &scope) : Frame(scope.pre_) {}
 
-    void set_return_to(Ptr<Scope> return_to)
+    void execute_code(Code &code);
+
+    void set_return_to(Ptr<Frame> return_to)
     {
         // assert return_to_ is not nullptr
         return_to_ = return_to;
@@ -79,8 +81,8 @@ class Scope : public std::enable_shared_from_this<Scope>
     }
 
   private:
-    Ptr<Scope> return_to_;
-    Ptr<Scope> pre_;
+    Ptr<Frame> return_to_;
+    Ptr<Frame> pre_;
     std::stack<Ptr<VoidPtr>> stack_;
     std::map<std::string, Ptr<VoidPtr>> symbols_;
 };

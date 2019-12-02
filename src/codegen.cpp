@@ -21,32 +21,32 @@ void BlockExpr::codegen(Code &code)
 
 void NoneExpr::codegen(Code &code)
 {
-    code.add_ins<Push>(nullptr);
+    code.add_ins<Op::Push>(nullptr);
 }
 
 void IntegerExpr::codegen(Code &code)
 {
-    code.add_ins<Push>(value);
+    code.add_ins<Op::Push>(value);
 }
 
 void FloatExpr::codegen(Code &code)
 {
-    code.add_ins<Push>(value);
+    code.add_ins<Op::Push>(value);
 }
 
 void BoolExpr::codegen(Code &code)
 {
-    code.add_ins<Push>(value);
+    code.add_ins<Op::Push>(value);
 }
 
 void StringExpr::codegen(Code &code)
 {
-    code.add_ins<Push>(value);
+    code.add_ins<Op::Push>(value);
 }
 
 void IdentifierExpr::codegen(Code &code)
 {
-    code.add_ins<Load>(name);
+    code.add_ins<Op::Load>(name);
 }
 
 void ParenOperatorExpr::codegen(Code &code)
@@ -56,7 +56,7 @@ void ParenOperatorExpr::codegen(Code &code)
         arg->codegen(code);
     }
     expr->codegen(code);
-    code.add_ins<Call>(args.size());
+    code.add_ins<Op::Call>(args.size());
 }
 
 void UnaryOperatorExpr::codegen(Code &code)
@@ -64,7 +64,7 @@ void UnaryOperatorExpr::codegen(Code &code)
     switch (op)
     {
     case TokenId::Sub:
-        code.add_ins<Neg>();
+        code.add_ins<Op::Neg>();
         break;
 
     default:
@@ -77,11 +77,11 @@ void BinaryOperatorExpr::codegen(Code &code)
     switch (op)
     {
     case TokenId::Add:
-        code.add_ins<Add>();
+        code.add_ins<Op::Add>();
         break;
 
     case TokenId::Sub:
-        code.add_ins<Sub>();
+        code.add_ins<Op::Sub>();
         break;
 
     default:
@@ -143,29 +143,29 @@ void UsingStmt::codegen(Code &code)
 void ExprStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Pop>();
+    code.add_ins<Op::Pop>();
 }
 
 void VariableDeclarationStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Create>(id->name);
-    code.add_ins<Load>(id->name);
-    code.add_ins<Store>();
+    code.add_ins<Op::Create>(id->name);
+    code.add_ins<Op::Load>(id->name);
+    code.add_ins<Op::Store>();
 }
 
 void VariableAssignStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Load>(id->name);
-    code.add_ins<Store>();
+    code.add_ins<Op::Load>(id->name);
+    code.add_ins<Op::Store>();
 }
 
 void NonVariableAssignStmt::codegen(Code &code)
 {
     expr->codegen(code);
     left->codegen(code);
-    code.add_ins<Store>();
+    code.add_ins<Op::Store>();
 }
 
 void FunctionDeclarationStmt::codegen(Code &code)
@@ -193,7 +193,7 @@ void ContinueStmt::codegen(Code &code)
 void ReturnStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Return>();
+    code.add_ins<Op::Return>();
 }
 
 void IfElseStmt::codegen(Code &code)
@@ -201,10 +201,10 @@ void IfElseStmt::codegen(Code &code)
     cond->codegen(code);
     auto o1 = code.add_ins();
     block_true->codegen(code);
-    code.set_ins<JumpIfNot>(o1, code.size());
+    code.set_ins<Op::JumpIfNot>(o1, code.size());
     auto o2 = code.add_ins();
     else_stmt->codegen(code);
-    code.set_ins<Jump>(o2, code.size());
+    code.set_ins<Op::Jump>(o2, code.size());
 }
 
 void WhileStmt::codegen(Code &code)
