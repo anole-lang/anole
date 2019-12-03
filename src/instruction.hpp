@@ -116,17 +116,21 @@ class Frame;
 enum class Op
 {
     PlaceHolder,
-    Pop,
-    Push,
-    Create,
-    Load,
-    Store,
+
+    Pop,          // ok
+    Push,         // ok
+
+    Create,       // ok
+    Load,         // ok
+    Store,        // ok
+
+    Neg,          // ok
+    Add,          // ok
+    Sub,          // ok
+
     Call,
-    Neg,
-    Add,
-    Sub,
-    Return,
-    Jump,
+    Return,       // ok
+    Jump,         // ok
     JumpIfNot
 };
 

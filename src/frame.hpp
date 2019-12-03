@@ -37,11 +37,13 @@ class Frame
     {
         stack_.push(std::make_shared<VoidPtr>(value));
     }
+
     template <typename R = void>
     Ptr<R> top()
     {
         return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
+
     template <typename R = void>
     Ptr<R> pop()
     {
@@ -49,6 +51,7 @@ class Frame
         stack_.pop();
         return res;
     }
+
     Ptr<VoidPtr> pop_straight()
     {
         auto res = stack_.top();
