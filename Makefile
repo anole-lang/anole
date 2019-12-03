@@ -9,8 +9,7 @@ CPP4Parser = test/parser-tester.cpp \
 			 src/token.cpp \
 			 src/tokenizer.cpp \
 			 src/parser.cpp \
-			 src/codegen.cpp \
-			 src/instruction.cpp
+			 src/codegen.cpp
 
 test: tmp/tokenizer-tester\
 	  tmp/parser-tester

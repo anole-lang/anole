@@ -22,7 +22,7 @@ class Code
     template <Op op, typename T>
     std::size_t add_ins(T value)
     {
-        if constexpr (std::is_same<Op, Op::Push>::value
+        if constexpr (op == Op::Push
             and std::is_same<T, std::nullptr_t>::value)
         {
             instructions_.push_back({
@@ -47,7 +47,7 @@ class Code
     template <Op op, typename T>
     void set_ins(std::size_t ind, T value)
     {
-        if constexpr (std::is_same<Op, Op::Push>::value
+        if constexpr (op == Op::Push
             and std::is_same<T, std::nullptr_t>::value)
         {
             instructions_[ind] = {

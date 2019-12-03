@@ -10,12 +10,13 @@ namespace ice_language
 {
 using VoidPtr = Ptr<void>;
 
+using Scope = class Frame;
 class Frame
 {
   public:
     Frame() : Frame(nullptr) {}
-    Frame(Ptr<Frame> pre) : return_to_(nullptr), pre_(pre) {}
-    Frame(const Frame &scope) : Frame(scope.pre_) {}
+    Frame(Ptr<Scope> pre_scope) : return_to_(nullptr), pre_scope_(pre_scope) {}
+    Frame(const Frame &scope) : Frame(scope.pre_scope_) {}
 
     void execute_code(Code &code);
 
@@ -63,8 +64,8 @@ class Frame
         }
         else
         {
-            return pre_
-                 ? pre_->find_symbol(name)
+            return pre_scope_
+                 ? pre_scope_->find_symbol(name)
                  : nullptr;
         }
     }
@@ -82,7 +83,7 @@ class Frame
 
   private:
     Ptr<Frame> return_to_;
-    Ptr<Frame> pre_;
+    Ptr<Scope> pre_scope_;
     std::stack<Ptr<VoidPtr>> stack_;
     std::map<std::string, Ptr<VoidPtr>> symbols_;
 };
