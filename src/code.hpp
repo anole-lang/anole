@@ -107,6 +107,7 @@ class Code
             // throw
             return false;
         }
+        return true;
     }
 
   private:
