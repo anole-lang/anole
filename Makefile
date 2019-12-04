@@ -40,16 +40,28 @@ CPP4Parser = test/parser-tester.cpp \
 			 src/parser.cpp \
 			 src/codegen.cpp
 
+CPP4Frame = test/frame-tester.cpp \
+			src/token.cpp \
+			src/tokenizer.cpp \
+			src/parser.cpp \
+			src/codegen.cpp \
+			src/frame.cpp \
+
 tmp/tokenizer-tester: ${CPP4Tokenizer} | ./tmp
 	${CC} ${FLAGS} $^ -o $@
+	$@
 
 tmp/parser-tester: ${CPP4Parser}
 	${CC} ${FLAGS} $^ -o $@
+	$@
 
-test: tmp/tokenizer-tester\
-	  tmp/parser-tester
-	tmp/tokenizer-tester
-	tmp/parser-tester
+tmp/frame-tester: ${CPP4Frame}
+	${CC} ${FLAGS} $^ -o $@
+	$@
+
+test: tmp/tokenizer-tester \
+	  tmp/parser-tester \
+	  tmp/frame-tester
 
 ./tmp:
 	mkdir tmp

@@ -8,7 +8,7 @@ using namespace ice_language;
 TEST_CLASS(Frame)
     TEST_METHOD(SimpleRun)
         istringstream ss(R"(1)");
-        Code code; Frame frame;
+        Code code{true}; Frame frame;
         auto ast = Parser(ss).gen_ast();
         ast->codegen(code);
         frame.execute_code(code);

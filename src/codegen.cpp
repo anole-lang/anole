@@ -143,7 +143,10 @@ void UsingStmt::codegen(Code &code)
 void ExprStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Op::Pop>();
+    if (!code.interpret_mode())
+    {
+        code.add_ins<Op::Pop>();
+    }
 }
 
 void VariableDeclarationStmt::codegen(Code &code)
