@@ -131,7 +131,7 @@ enum class Op
     Call,
     Return,       // ok
     Jump,         // ok
-    JumpIfNot
+    JumpIfNot,
 };
 
 struct Instruction

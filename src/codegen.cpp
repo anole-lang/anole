@@ -182,12 +182,12 @@ void ClassDeclarationStmt::codegen(Code &code)
 
 void BreakStmt::codegen(Code &code)
 {
-
+    code.push_break(code.add_ins());
 }
 
 void ContinueStmt::codegen(Code &code)
 {
-
+    code.push_continue(code.add_ins());
 }
 
 void ReturnStmt::codegen(Code &code)
@@ -209,7 +209,13 @@ void IfElseStmt::codegen(Code &code)
 
 void WhileStmt::codegen(Code &code)
 {
-
+    cond->codegen(code);
+    auto o1 = code.add_ins();
+    block->codegen(code);
+    code.add_ins<Op::Jump>(o1);
+    code.set_ins<Op::JumpIfNot>(o1, code.size());
+    code.set_break_to(code.size());
+    code.set_continue_to(o1);
 }
 
 void DoWhileStmt::codegen(Code &code)

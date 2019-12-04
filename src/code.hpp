@@ -72,8 +72,46 @@ class Code
         return instructions_;
     }
 
-  private:
+    void push_break(std::size_t ind)
+    {
+        breaks_.push_back(ind);
+    }
 
+    void set_break_to(std::size_t ind)
+    {
+        for (auto i : breaks_)
+        {
+            set_ins<Op::Jump>(i, ind);
+        }
+        breaks_.clear();
+    }
+
+    void push_continue(std::size_t ind)
+    {
+        continues_.push_back(ind);
+    }
+
+    void set_continue_to(std::size_t ind)
+    {
+        for (auto i : continues_)
+        {
+            set_ins<Op::Jump>(i, ind);
+        }
+        continues_.clear();
+    }
+
+    bool check()
+    {
+        if (!breaks_.empty() && !continues_.empty())
+        {
+            // throw
+            return false;
+        }
+    }
+
+  private:
     std::vector<Instruction> instructions_;
+    // these two should be checked is empty or not
+    std::vector<std::size_t> breaks_, continues_;
 };
 }
