@@ -212,18 +212,25 @@ void IfElseStmt::codegen(Code &code)
 
 void WhileStmt::codegen(Code &code)
 {
+    auto o1 = code.size();
     cond->codegen(code);
-    auto o1 = code.add_ins();
+    auto o2 = code.add_ins();
     block->codegen(code);
     code.add_ins<Op::Jump>(o1);
-    code.set_ins<Op::JumpIfNot>(o1, code.size());
+    code.set_ins<Op::JumpIfNot>(o2, code.size());
     code.set_break_to(code.size());
     code.set_continue_to(o1);
 }
 
 void DoWhileStmt::codegen(Code &code)
 {
-
+    auto o1 = code.size();
+    block->codegen(code);
+    auto o2 = code.size();
+    cond->codegen(code);
+    code.add_ins<Op::JumpIf>(o1);
+    code.set_break_to(code.size());
+    code.set_continue_to(o2);
 }
 
 void ForStmt::codegen(Code &code)

@@ -131,6 +131,7 @@ enum class Op
     Call,
     Return,       // ok
     Jump,         // ok
+    JumpIf,
     JumpIfNot,
 };
 
