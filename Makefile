@@ -3,7 +3,7 @@ TARGET = ice
 ADD =
 
 CC = clang++
-FLAGS = -g -std=c++17 -stdlib=libstdc++
+FLAGS = -g -std=c++17 -stdlib=libstdc++ ${ADD}
 
 DIR_SRC = ./src
 DIR_OBJ = ./obj
@@ -11,6 +11,8 @@ DIR_BIN = ./bin
 
 SRC = $(wildcard ${DIR_SRC}/*.cpp)
 OBJ = $(patsubst %.cpp, ${DIR_OBJ}/%.o, $(notdir ${SRC}))
+
+# for ice
 
 BIN_TARGET = $(DIR_BIN)/$(TARGET)
 
@@ -26,7 +28,7 @@ ${DIR_BIN}:
 ${DIR_OBJ}:
 	mkdir $@
 
-.PHONY: test clean
+# for testers
 
 CPP4Tokenizer = test/tokenizer-tester.cpp \
 			src/token.cpp \
@@ -38,20 +40,21 @@ CPP4Parser = test/parser-tester.cpp \
 			 src/parser.cpp \
 			 src/codegen.cpp
 
-test: tmp/tokenizer-tester\
-	  tmp/parser-tester
-	tmp/tokenizer-tester
-	tmp/parser-tester
-
-tmp/tokenizer-tester: ${CPP4Tokenizer} | tmp
+tmp/tokenizer-tester: ${CPP4Tokenizer} | ./tmp
 	${CC} ${FLAGS} $^ -o $@
 
 tmp/parser-tester: ${CPP4Parser}
 	${CC} ${FLAGS} $^ -o $@
 
-tmp:
+test: tmp/tokenizer-tester\
+	  tmp/parser-tester
+	tmp/tokenizer-tester
+	tmp/parser-tester
+
+./tmp:
 	mkdir tmp
 
+.PHONY: clean
 clean:
-	rm -rf ${DIR_OBJ}/*.o
+	rm -rf ${DIR_BIN} ${DIR_OBJ}
 	rm -rf ./tmp

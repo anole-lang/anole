@@ -11,5 +11,7 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v1
-      - name: Test Tokenizer and Parser
-        run: make test
+      - name: make and make test
+        run: |
+          make
+          make test
