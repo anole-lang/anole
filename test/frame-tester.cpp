@@ -7,11 +7,11 @@ using namespace ice_language;
 
 TEST_CLASS(Frame)
     TEST_METHOD(SimpleRun)
-        istringstream ss(R"(1)");
+        istringstream ss(R"(1 + 2)");
         Code code{true}; Frame frame;
         auto ast = Parser(ss).gen_ast();
         ast->codegen(code);
         frame.execute_code(code);
-        cout << *frame.pop<long>() << endl;
+        ASSERT(*frame.pop<long>() == 3);
     TEST_END
 TEST_END

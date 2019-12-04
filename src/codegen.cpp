@@ -61,6 +61,7 @@ void ParenOperatorExpr::codegen(Code &code)
 
 void UnaryOperatorExpr::codegen(Code &code)
 {
+    expr->codegen(code);
     switch (op)
     {
     case TokenId::Sub:
@@ -74,6 +75,8 @@ void UnaryOperatorExpr::codegen(Code &code)
 
 void BinaryOperatorExpr::codegen(Code &code)
 {
+    lhs->codegen(code);
+    rhs->codegen(code);
     switch (op)
     {
     case TokenId::Add:
