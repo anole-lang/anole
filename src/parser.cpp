@@ -19,9 +19,14 @@ Parser::Parser(istream &in)
 }
 
 // use when interacting & return stmt node
-ASTPtr Parser::gen_ast()
+ASTPtr Parser::gen_statement()
 {
     return gen_stmt();
+}
+
+ASTPtr Parser::gen_statements()
+{
+    return gen_stmts();
 }
 
 // update current token when cannot find the next token
@@ -200,9 +205,7 @@ StmtPtr Parser::gen_decl_or_assign()
 
     ExprPtr node = gen_ident();
 
-    if (current_token_.token_id != TokenId::LParen
-      && current_token_.token_id != TokenId::Dot
-      && current_token_.token_id != TokenId::LBracket)
+    if (current_token_.token_id == TokenId::Assign)
     {
         get_next_token();
         return make_shared<VariableDeclarationStmt>(

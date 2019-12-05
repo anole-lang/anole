@@ -7,7 +7,7 @@ using namespace ice_language;
 int main(int argc, char *agrv[])
 {
     Code code; Frame frame;
-    auto ast = Parser().gen_ast();
+    auto ast = Parser().gen_statement();
     ast->codegen(code);
     frame.execute_code(code);
     {

@@ -28,7 +28,7 @@ void Frame::execute_code(Code &code)
             break;
 
         case Op::Load:
-            push(load_symbol(*OPRAND(string)));
+            push_straight(load_symbol(*OPRAND(string)));
             break;
 
         case Op::Store:

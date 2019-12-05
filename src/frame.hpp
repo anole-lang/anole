@@ -38,6 +38,11 @@ class Frame
         stack_.push(std::make_shared<VoidPtr>(value));
     }
 
+    void push_straight(Ptr<VoidPtr> ptr)
+    {
+        stack_.push(ptr);
+    }
+
     template <typename R = void>
     Ptr<R> top()
     {
@@ -59,7 +64,7 @@ class Frame
         return res;
     }
 
-    VoidPtr find_symbol(const std::string &name)
+    Ptr<VoidPtr> find_symbol(const std::string &name)
     {
         if (symbols_.count(name))
         {
@@ -75,13 +80,17 @@ class Frame
 
     void create_symbol(const std::string &name)
     {
-        symbols_[name] = std::make_shared<VoidPtr>(nullptr);
+        if (!symbols_.count(name))
+        {
+            symbols_[name] = std::make_shared<VoidPtr>(nullptr);
+        }
     }
 
-    VoidPtr load_symbol(const std::string &name)
+    Ptr<VoidPtr> load_symbol(const std::string &name)
     {
         auto ptr = find_symbol(name);
-        return ptr ? ptr : std::make_shared<VoidPtr>(nullptr);
+        return ptr ? ptr
+             : (symbols_[name] = std::make_shared<VoidPtr>(nullptr));
     }
 
   private:

@@ -19,7 +19,8 @@ class Parser
 {
   public:
     Parser(std::istream &in = std::cin);
-    Ptr<AST> gen_ast();
+    ASTPtr gen_statement();
+    ASTPtr gen_statements();
 
   private:
     Token current_token_;
