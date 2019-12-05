@@ -5,18 +5,19 @@
 #include <string>
 #include "helper.hpp"
 #include "code.hpp"
+#include "scope.hpp"
 
 namespace ice_language
 {
-using VoidPtr = Ptr<void>;
-
-using Scope = class Frame;
 class Frame
 {
   public:
-    Frame() : Frame(nullptr) {}
-    Frame(Ptr<Scope> pre_scope) : return_to_(nullptr), pre_scope_(pre_scope) {}
-    Frame(const Frame &scope) : Frame(scope.pre_scope_) {}
+    Frame()
+      : return_to_(nullptr),
+        scope_(std::make_shared<Scope>(nullptr)) {}
+    Frame(Ptr<Scope> scope)
+      : return_to_(nullptr),
+        scope_(scope) {}
 
     void execute_code(Code &code);
 
@@ -64,39 +65,9 @@ class Frame
         return res;
     }
 
-    Ptr<VoidPtr> find_symbol(const std::string &name)
-    {
-        if (symbols_.count(name))
-        {
-            return symbols_[name];
-        }
-        else
-        {
-            return pre_scope_
-                 ? pre_scope_->find_symbol(name)
-                 : nullptr;
-        }
-    }
-
-    void create_symbol(const std::string &name)
-    {
-        if (!symbols_.count(name))
-        {
-            symbols_[name] = std::make_shared<VoidPtr>(nullptr);
-        }
-    }
-
-    Ptr<VoidPtr> load_symbol(const std::string &name)
-    {
-        auto ptr = find_symbol(name);
-        return ptr ? ptr
-             : (symbols_[name] = std::make_shared<VoidPtr>(nullptr));
-    }
-
   private:
     Ptr<Frame> return_to_;
-    Ptr<Scope> pre_scope_;
+    Ptr<Scope> scope_;
     std::stack<Ptr<VoidPtr>> stack_;
-    std::map<std::string, Ptr<VoidPtr>> symbols_;
 };
 }

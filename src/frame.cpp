@@ -24,11 +24,11 @@ void Frame::execute_code(Code &code)
             break;
 
         case Op::Create:
-            create_symbol(*OPRAND(string));
+            scope_->create_symbol(*OPRAND(string));
             break;
 
         case Op::Load:
-            push_straight(load_symbol(*OPRAND(string)));
+            push_straight(scope_->load_symbol(*OPRAND(string)));
             break;
 
         case Op::Store:
@@ -37,7 +37,6 @@ void Frame::execute_code(Code &code)
                 *p = pop();
             }
             break;
-
 
         case Op::Neg:
             {
@@ -60,6 +59,14 @@ void Frame::execute_code(Code &code)
                 auto rhs = *pop<long>();
                 push(make_shared<long>(lhs - rhs));
             }
+            break;
+
+        case Op::ScopeBegin:
+            scope_ = std::make_shared<Scope>(scope_);
+            break;
+
+        case Op::ScopeEnd:
+            scope_ = scope_->pre();
             break;
 
         case Op::Call:

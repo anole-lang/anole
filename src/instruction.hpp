@@ -128,6 +128,8 @@ enum class Op
     Add,          // ok
     Sub,          // ok
 
+    ScopeBegin,
+    ScopeEnd,
     Call,
     Return,       // ok
     Jump,         // ok

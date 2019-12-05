@@ -13,10 +13,12 @@ Expr::~Expr() = default;
 
 void BlockExpr::codegen(Code &code)
 {
+    code.add_ins<Op::ScopeBegin>();
     for (auto statement : statements)
     {
         statement->codegen(code);
     }
+    code.add_ins<Op::ScopeEnd>();
 }
 
 void NoneExpr::codegen(Code &code)
@@ -94,7 +96,10 @@ void BinaryOperatorExpr::codegen(Code &code)
 
 void LambdaExpr::codegen(Code &code)
 {
-
+    // scope should be linked to where declaration is
+    // Draft.
+    // LambdaObject should contains the pointer of the socpe
+    // Frame should be constructed when call expr runs
 }
 
 // [AFTER] [CLASS]
