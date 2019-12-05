@@ -38,7 +38,6 @@ enum class TokenId
     Double,     // [0-9]+\.[0-9]*
     String,     // "[^"\n]"
 
-    Assign,    // :
     Comma,     // ,
     Dot,       // .
 
@@ -49,6 +48,7 @@ enum class TokenId
     LBrace,    // {
     RBrace,    // }
 
+    Assign,    // :
     Add,       // +
     Sub,       // -
     Mul,       // *

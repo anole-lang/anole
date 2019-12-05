@@ -203,20 +203,14 @@ struct VariableDeclarationStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct VariableAssignStmt : Stmt
+struct FunctionDeclarationStmt : Stmt
 {
     Ptr<IdentifierExpr> id;
-    Ptr<Expr> expr;
-    VariableAssignStmt(Ptr<IdentifierExpr> id,
-        Ptr<Expr>expr) : id(id), expr(expr) {}
-    void codegen(Code &) override;
-};
-
-struct NonVariableAssignStmt : Stmt
-{
-    Ptr<Expr> left, expr;
-    NonVariableAssignStmt(Ptr<Expr> left, Ptr<Expr> expr)
-      : left(left), expr(expr) {}
+    VarDeclList arg_decls;
+    Ptr<BlockExpr> block;
+    FunctionDeclarationStmt(Ptr<IdentifierExpr> id,
+        VarDeclList arg_decls, Ptr<BlockExpr> block)
+      : id(id), arg_decls(arg_decls), block(block) {}
     void codegen(Code &) override;
 };
 

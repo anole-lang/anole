@@ -154,7 +154,7 @@ TEST_CLASS(ParseTerm)
     TEST_END
 
     TEST_METHOD(ParseDictExpr)
-        istringstream ss(R"({} {1: 2} {3: 4, 5: 6})");
+        istringstream ss(R"({} {1 => 2} {3 => 4, 5 => 6})");
         Parser parser{ss};
         auto dictExpr = cast<DictExpr>(cast<ExprStmt>(parser.gen_statement())->expr);
         ASSERT(dictExpr->keys.empty() and dictExpr->values.empty());

@@ -34,7 +34,7 @@ class Parser
     BlockExprPtr gen_block();
 
     StmtPtr gen_stmt();
-    StmtPtr gen_decl_or_assign();
+    StmtPtr gen_declaration();
     StmtPtr gen_var_assign();
     StmtPtr gen_class_decl();
     StmtPtr gen_using_stmt();

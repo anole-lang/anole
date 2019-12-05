@@ -77,10 +77,14 @@ void UnaryOperatorExpr::codegen(Code &code)
 
 void BinaryOperatorExpr::codegen(Code &code)
 {
-    lhs->codegen(code);
     rhs->codegen(code);
+    lhs->codegen(code);
     switch (op)
     {
+    case TokenId::Assign:
+        code.add_ins<Op::Store>();
+        break;
+
     case TokenId::Add:
         code.add_ins<Op::Add>();
         break;
@@ -159,24 +163,18 @@ void ExprStmt::codegen(Code &code)
 
 void VariableDeclarationStmt::codegen(Code &code)
 {
-    expr->codegen(code);
     code.add_ins<Op::Create>(id->name);
-    code.add_ins<Op::Load>(id->name);
-    code.add_ins<Op::Store>();
+    if (expr)
+    {
+        expr->codegen(code);
+        code.add_ins<Op::Load>(id->name);
+        code.add_ins<Op::Store>();
+    }
 }
 
-void VariableAssignStmt::codegen(Code &code)
+void FunctionDeclarationStmt::codegen(Code &code)
 {
-    expr->codegen(code);
-    code.add_ins<Op::Load>(id->name);
-    code.add_ins<Op::Store>();
-}
-
-void NonVariableAssignStmt::codegen(Code &code)
-{
-    expr->codegen(code);
-    left->codegen(code);
-    code.add_ins<Op::Store>();
+    // ...
 }
 
 void ClassDeclarationStmt::codegen(Code &code)

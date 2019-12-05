@@ -137,7 +137,7 @@ StmtPtr Parser::gen_stmt()
         }
         else if (current_token_.token_id != TokenId::End)
         {
-            return gen_decl_or_assign();
+            return gen_declaration();
         }
         break;
 
@@ -196,58 +196,50 @@ StmtPtr Parser::gen_stmt()
 }
 
 // generate declaration or assignment (@.var:)
-StmtPtr Parser::gen_decl_or_assign()
+StmtPtr Parser::gen_declaration()
 {
-    if (current_token_.token_id == TokenId::Dot)
-    {
-        return gen_var_assign();
-    }
-
     ExprPtr node = gen_ident();
 
-    if (current_token_.token_id == TokenId::Assign)
+    switch (current_token_.token_id)
     {
+    case TokenId::Assign:
         get_next_token();
         return make_shared<VariableDeclarationStmt>(
             reinterpret_pointer_cast<IdentifierExpr>(node),
             gen_expr()
         );
+
+    case TokenId::LParen:
+        {
+            auto args = gen_decl_arguments();
+            BlockExprPtr block = nullptr;
+            if (current_token_.token_id == TokenId::Assign)
+            {
+                get_next_token();
+                block = make_shared<BlockExpr>();
+                block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
+            }
+            else if (current_token_.token_id == TokenId::LBrace)
+            {
+                block = gen_block();
+            }
+            else
+            {
+                THROW("missing symbol ':' or '{' after @()");
+            }
+            return make_shared<FunctionDeclarationStmt>(
+                reinterpret_pointer_cast<IdentifierExpr>(node),
+                args, block
+            );
+        }
+
+    default:
+        break;
     }
-
-    while (current_token_.token_id == TokenId::LParen
-      || current_token_.token_id == TokenId::Dot
-      || current_token_.token_id == TokenId::LBracket)
-    {
-        if (current_token_.token_id == TokenId::LParen)
-        {
-            node = make_shared<ParenOperatorExpr>(node,
-                gen_arguments());
-        }
-        else if (current_token_.token_id == TokenId::Dot)
-        {
-            node = gen_dot_expr(node);
-        }
-        else if (current_token_.token_id == TokenId::LBracket)
-        {
-            node = gen_index_expr(node);
-        }
-    }
-
-    get_next_token();
-    return make_shared<NonVariableAssignStmt>(node, gen_expr());
-}
-
-// generate assignment as @.ident: expr
-StmtPtr Parser::gen_var_assign()
-{
-    get_next_token();
-
-    auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
-
-    CHECK_AND_THROW(TokenId::Assign, "missing symbol ':'");
-    get_next_token();
-
-    return make_shared<VariableAssignStmt>(id, gen_expr());
+    return make_shared<VariableDeclarationStmt>(
+        reinterpret_pointer_cast<IdentifierExpr>(node),
+        nullptr
+    );
 }
 
 StmtPtr Parser::gen_class_decl()
@@ -382,6 +374,7 @@ static const vector<set<TokenId>> &get_operators()
 {
     static const vector<set<TokenId>> operators
     {
+        { TokenId::Assign },
         { TokenId::Or },
         { TokenId::And },
         { TokenId::CEQ, TokenId::CNE, TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
@@ -560,7 +553,7 @@ ExprPtr Parser::gen_enum_or_dict()
         return make_shared<DictExpr>();
     }
     auto node = gen_expr();
-    if (current_token_.token_id == TokenId::Assign)
+    if (current_token_.token_id == TokenId::Ret)
     {
         node = gen_dict_expr(node);
     }
@@ -600,7 +593,7 @@ ExprPtr Parser::gen_enum_expr(ExprPtr first)
 
 ExprPtr Parser::gen_dict_expr(ExprPtr first)
 {
-    CHECK_AND_THROW(TokenId::Assign, "missing symbol ':'");
+    CHECK_AND_THROW(TokenId::Ret, "missing symbol ':'");
     ExprList keys, values;
     keys.push_back(first);
 
@@ -612,7 +605,7 @@ ExprPtr Parser::gen_dict_expr(ExprPtr first)
     {
         keys.push_back(gen_expr());
 
-        CHECK_AND_THROW(TokenId::Assign, "missing symbol ':'");
+        CHECK_AND_THROW(TokenId::Ret, "missing symbol '=>'");
         get_next_token();
 
         values.push_back(gen_expr());
