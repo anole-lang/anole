@@ -174,13 +174,6 @@ void NonVariableAssignStmt::codegen(Code &code)
     code.add_ins<Op::Store>();
 }
 
-void FunctionDeclarationStmt::codegen(Code &code)
-{
-    // code will be gen in code
-    // but there should be a function object after
-    // the code's running
-}
-
 void ClassDeclarationStmt::codegen(Code &code)
 {
 

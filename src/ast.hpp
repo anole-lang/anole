@@ -220,17 +220,6 @@ struct NonVariableAssignStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct FunctionDeclarationStmt : Stmt
-{
-    Ptr<IdentifierExpr> id;
-    VarDeclList arg_decls;
-    Ptr<BlockExpr> block;
-    FunctionDeclarationStmt(Ptr<IdentifierExpr> id,
-        VarDeclList arg_decls, Ptr<BlockExpr> block)
-      : id(id), arg_decls(arg_decls), block(block) {}
-    void codegen(Code &) override;
-};
-
 struct ClassDeclarationStmt : Stmt
 {
     Ptr<IdentifierExpr> id;
