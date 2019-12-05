@@ -35,6 +35,7 @@ void Frame::execute_code(Code &code)
             {
                 auto p = pop_straight();
                 *p = pop();
+                push_straight(p);
             }
             break;
 

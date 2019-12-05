@@ -405,16 +405,10 @@ ExprPtr Parser::gen_expr(int priority)
 
     auto lhs = gen_expr(priority + 1);
     auto op = current_token_.token_id;
-    while (get_operators()[priority].count(op))
+    if (get_operators()[priority].count(op))
     {
         get_next_token();
-        auto rhs = gen_expr(priority + 1);
-        if (rhs == nullptr)
-        {
-            return nullptr;
-        }
-        lhs = make_shared<BinaryOperatorExpr>(lhs, op, rhs);
-        op = current_token_.token_id;
+        lhs = make_shared<BinaryOperatorExpr>(lhs, op, gen_expr(priority));
     }
     return lhs;
 }
