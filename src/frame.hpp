@@ -63,6 +63,16 @@ class Frame : std::enable_shared_from_this<Frame>
         return res;
     }
 
+    std::size_t size()
+    {
+        return stack_.size();
+    }
+
+    bool empty()
+    {
+        return stack_.empty();
+    }
+
   private:
     Ptr<Frame> return_to_;
     Ptr<Scope> scope_;

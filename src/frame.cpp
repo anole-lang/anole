@@ -35,7 +35,10 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::Store:
             {
                 auto p = pop_straight();
-                *p = pop();
+                if (!empty())
+                {
+                    *p = pop();
+                }
                 push_straight(p);
             }
             break;
@@ -74,14 +77,18 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::Call:
             {
                 auto func = pop<FunctionObject>();
-                Frame(shared_from_this(), func->scope()).execute_code(
-                    func->code(), func->base());
+                Frame frame{shared_from_this(), func->scope()};
+                for (std::size_t i = 0; i < *OPRAND(size_t); ++i)
+                {
+                    frame.push(pop());
+                }
+                frame.execute_code(func->code(), func->base());
             }
             break;
 
         case Op::Return:
             set_return();
-            break;
+            return;
 
         case Op::Jump:
             pc = *OPRAND(size_t);
@@ -97,6 +104,11 @@ void Frame::execute_code(Code &code, size_t base)
                 */
             }
             break;
+
+        case Op::LambdaDecl:
+            push(make_shared<FunctionObject>(scope_, code, pc + 1));
+            pc = *OPRAND(size_t);
+            continue;
 
         default:
             break;
