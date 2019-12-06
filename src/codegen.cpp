@@ -58,7 +58,7 @@ void ParenOperatorExpr::codegen(Code &code)
         arg->codegen(code);
     }
     expr->codegen(code);
-    code.add_ins<Op::Call>();
+    code.add_ins<Op::Call>(args.size());
 }
 
 void UnaryOperatorExpr::codegen(Code &code)
@@ -100,10 +100,28 @@ void BinaryOperatorExpr::codegen(Code &code)
 
 void LambdaExpr::codegen(Code &code)
 {
-    // scope should be linked to where declaration is
-    // Draft.
-    // LambdaObject should contains the pointer of the socpe
-    // Frame should be constructed when call expr runs
+    auto o1 = code.add_ins();
+    for (auto arg_decl : arg_decls)
+    {
+        code.add_ins<Op::Create>(arg_decl->id->name);
+        if (arg_decl->expr)
+        {
+            arg_decl->expr->codegen(code);
+        }
+        else
+        {
+            code.add_ins<Op::Push>(0);
+        }
+        code.add_ins<Op::Load>(arg_decl->id->name);
+        code.add_ins<Op::Store>();
+        code.add_ins<Op::Pop>();
+        code.add_ins<Op::Load>(arg_decl->id->name);
+        code.add_ins<Op::Store>();
+    }
+    block->codegen(code);
+    code.add_ins<Op::Push>(0);
+    code.add_ins<Op::Return>();
+    code.set_ins<Op::LambdaDecl>(code.size());
 }
 
 // [AFTER] [CLASS]
@@ -174,7 +192,10 @@ void VariableDeclarationStmt::codegen(Code &code)
 
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-    // ...
+    code.add_ins<Op::Create>(id->name);
+    lambda->codegen(code);
+    code.add_ins<Op::Load>(id->name);
+    code.add_ins<Op::Store>();
 }
 
 void ClassDeclarationStmt::codegen(Code &code)
