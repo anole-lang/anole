@@ -229,7 +229,7 @@ StmtPtr Parser::gen_declaration()
             }
             return make_shared<FunctionDeclarationStmt>(
                 reinterpret_pointer_cast<IdentifierExpr>(node),
-                args, block
+                make_shared<LambdaExpr>(args, block)
             );
         }
 
