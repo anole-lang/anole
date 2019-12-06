@@ -206,11 +206,10 @@ struct VariableDeclarationStmt : Stmt
 struct FunctionDeclarationStmt : Stmt
 {
     Ptr<IdentifierExpr> id;
-    VarDeclList arg_decls;
-    Ptr<BlockExpr> block;
+    Ptr<LambdaExpr> lambda;
     FunctionDeclarationStmt(Ptr<IdentifierExpr> id,
-        VarDeclList arg_decls, Ptr<BlockExpr> block)
-      : id(id), arg_decls(arg_decls), block(block) {}
+        Ptr<LambdaExpr> lambda)
+      : id(id), lambda(lambda) {}
     void codegen(Code &) override;
 };
 
