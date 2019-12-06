@@ -1,4 +1,5 @@
 #include "frame.hpp"
+#include "funcobject.hpp"
 
 #define OPRAND(TYPE) reinterpret_pointer_cast<TYPE>(ins.oprand)
 
@@ -6,10 +7,10 @@ using namespace std;
 
 namespace ice_language
 {
-void Frame::execute_code(Code &code)
+void Frame::execute_code(Code &code, size_t base)
 {
     auto instructions = code.get_instructions();
-    std::size_t pc = 0;
+    std::size_t pc = base;
     while (pc < instructions.size())
     {
         auto ins = instructions[pc];
@@ -71,13 +72,11 @@ void Frame::execute_code(Code &code)
             break;
 
         case Op::Call:
-            // ... to complete
-            // the code of the definination
-            // should be contained by the function object
-            // code may be what here:
-            // auto func = scope->pop<FunctionObject>();
-            // func->call(pre_);
-            // // in this call, it will set all frames' retrun_to_
+            {
+                auto func = pop<FunctionObject>();
+                Frame(shared_from_this(), func->scope()).execute_code(
+                    func->code(), func->base());
+            }
             break;
 
         case Op::Return:

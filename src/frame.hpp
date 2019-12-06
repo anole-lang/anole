@@ -9,17 +9,15 @@
 
 namespace ice_language
 {
-class Frame
+class Frame : std::enable_shared_from_this<Frame>
 {
   public:
-    Frame()
-      : return_to_(nullptr),
-        scope_(std::make_shared<Scope>(nullptr)) {}
-    Frame(Ptr<Scope> scope)
-      : return_to_(nullptr),
-        scope_(scope) {}
+    Frame() : Frame(std::make_shared<Scope>(nullptr)) {}
+    Frame(Ptr<Scope> scope) : Frame(nullptr, scope) {}
+    Frame(Ptr<Frame> return_to, Ptr<Scope> scope)
+      : return_to_(return_to), scope_(scope) {}
 
-    void execute_code(Code &code);
+    void execute_code(Code &code, std::size_t base = 0);
 
     void set_return_to(Ptr<Frame> return_to)
     {

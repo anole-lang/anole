@@ -58,7 +58,7 @@ void ParenOperatorExpr::codegen(Code &code)
         arg->codegen(code);
     }
     expr->codegen(code);
-    code.add_ins<Op::Call>(args.size());
+    code.add_ins<Op::Call>();
 }
 
 void UnaryOperatorExpr::codegen(Code &code)
