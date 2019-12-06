@@ -29,6 +29,7 @@ enum class Op
     Jump,         // done
     JumpIf,
     JumpIfNot,
+    LambdaDecl,
 };
 
 struct Instruction
