@@ -23,17 +23,14 @@ a + b
 
     TEST_METHOD(SimpleFunc)
         istringstream ss(R"(
-a: @(a) {
-    return @() {
-        return a
-    }
-}(1)()
+@adddd: @(a): @(b): @(c): @(d): a + b + c + d
+adddd(1)(2)(3)(4)
         )");
         Code code(true);
         auto frame = make_shared<Frame>();
-        auto ast = Parser(ss).gen_statement();
+        auto ast = Parser(ss).gen_statements();
         ast->codegen(code);
         frame->execute_code(code);
-        ASSERT(*frame->pop<long>() == 1);
+        ASSERT(*frame->pop<long>() == 10);
     TEST_END
 TEST_END
