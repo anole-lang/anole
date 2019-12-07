@@ -80,13 +80,22 @@ class Code
         breaks_.push_back(ind);
     }
 
-    void set_break_to(std::size_t ind)
+    void set_break_to(std::size_t ind,
+        std::size_t base)
     {
+        decltype(breaks_) breaks;
         for (auto i : breaks_)
         {
-            set_ins<Op::Jump>(i, ind);
+            if (i > base)
+            {
+                set_ins<Op::Jump>(i, ind);
+            }
+            else
+            {
+                breaks.push_back(i);
+            }
         }
-        breaks_.clear();
+        breaks_ = breaks;
     }
 
     void push_continue(std::size_t ind)
@@ -94,13 +103,22 @@ class Code
         continues_.push_back(ind);
     }
 
-    void set_continue_to(std::size_t ind)
+    void set_continue_to(std::size_t ind,
+        std::size_t base)
     {
+        decltype(continues_) continues;
         for (auto i : continues_)
         {
-            set_ins<Op::Jump>(i, ind);
+            if (i > base)
+            {
+                set_ins<Op::Jump>(i, ind);
+            }
+            else
+            {
+                continues.push_back(i);
+            }
         }
-        continues_.clear();
+        continues_ = continues;
     }
 
     bool check()
