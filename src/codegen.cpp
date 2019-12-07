@@ -98,30 +98,35 @@ void BinaryOperatorExpr::codegen(Code &code)
     }
 }
 
+// not support default argumnets now
 void LambdaExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
+    auto o2 = code.add_ins();
+    /*
     for (auto arg_decl : arg_decls)
     {
         code.add_ins<Op::Create>(arg_decl->id->name);
         if (arg_decl->expr)
         {
             arg_decl->expr->codegen(code);
+            code.add_ins<Op::Load>(arg_decl->id->name);
+            code.add_ins<Op::Store>();
+            code.add_ins<Op::Pop>();
         }
-        else
-        {
-            code.add_ins<Op::Push>(0);
-        }
+    }
+    */
+    for (auto arg_decl : arg_decls)
+    {
         code.add_ins<Op::Load>(arg_decl->id->name);
         code.add_ins<Op::Store>();
         code.add_ins<Op::Pop>();
-        code.add_ins<Op::Load>(arg_decl->id->name);
-        code.add_ins<Op::Store>();
     }
     block->codegen(code);
     code.add_ins<Op::Push>(0);
     code.add_ins<Op::Return>();
-    code.set_ins<Op::LambdaDecl>(code.size());
+    code.set_ins<Op::LambdaDecl>(o1, arg_decls.size());
+    code.set_ins<Op::LambdaDecl>(o2, code.size());
 }
 
 // [AFTER] [CLASS]
@@ -238,8 +243,8 @@ void WhileStmt::codegen(Code &code)
     block->codegen(code);
     code.add_ins<Op::Jump>(o1);
     code.set_ins<Op::JumpIfNot>(o2, code.size());
-    code.set_break_to(code.size());
-    code.set_continue_to(o1);
+    code.set_break_to(code.size(), o1);
+    code.set_continue_to(o1, o1);
 }
 
 void DoWhileStmt::codegen(Code &code)
@@ -249,8 +254,8 @@ void DoWhileStmt::codegen(Code &code)
     auto o2 = code.size();
     cond->codegen(code);
     code.add_ins<Op::JumpIf>(o1);
-    code.set_break_to(code.size());
-    code.set_continue_to(o2);
+    code.set_break_to(code.size(), o1);
+    code.set_continue_to(o2, o1);
 }
 
 void ForStmt::codegen(Code &code)
