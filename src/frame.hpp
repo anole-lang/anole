@@ -9,7 +9,8 @@
 
 namespace ice_language
 {
-class Frame : std::enable_shared_from_this<Frame>
+// Frame should be contructed by make_shared
+class Frame : public std::enable_shared_from_this<Frame>
 {
   public:
     Frame() : Frame(std::make_shared<Scope>(nullptr)) {}
@@ -78,4 +79,5 @@ class Frame : std::enable_shared_from_this<Frame>
     Ptr<Scope> scope_;
     std::stack<Ptr<VoidPtr>> stack_;
 };
+
 }

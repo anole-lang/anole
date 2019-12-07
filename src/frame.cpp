@@ -1,7 +1,8 @@
 #include "frame.hpp"
 #include "funcobject.hpp"
 
-#define OPRAND(TYPE) reinterpret_pointer_cast<TYPE>(ins.oprand)
+#define INS (instructions[pc])
+#define OPRAND(TYPE) (reinterpret_pointer_cast<TYPE>(INS.oprand))
 
 using namespace std;
 
@@ -13,15 +14,14 @@ void Frame::execute_code(Code &code, size_t base)
     std::size_t pc = base;
     while (pc < instructions.size())
     {
-        auto ins = instructions[pc];
-        switch (ins.op)
+        switch (INS.op)
         {
         case Op::Pop:
             pop();
             break;
 
         case Op::Push:
-            push(ins.oprand);
+            push(INS.oprand);
             break;
 
         case Op::Create:
@@ -35,10 +35,7 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::Store:
             {
                 auto p = pop_straight();
-                if (!empty())
-                {
-                    *p = pop();
-                }
+                *p = pop();
                 push_straight(p);
             }
             break;
@@ -77,12 +74,19 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::Call:
             {
                 auto func = pop<FunctionObject>();
-                Frame frame{shared_from_this(), func->scope()};
-                for (std::size_t i = 0; i < *OPRAND(size_t); ++i)
+                auto frame = make_shared<Frame>(
+                    shared_from_this(), func->scope());
+                auto call_agrs_size = *OPRAND(size_t);
+                for (std::size_t i = call_agrs_size;
+                    i < func->args_size(); ++i)
                 {
-                    frame.push(pop());
+                    frame->push(make_shared<long>(0));
                 }
-                frame.execute_code(func->code(), func->base());
+                for (std::size_t i = 0; i < call_agrs_size; ++i)
+                {
+                    frame->push(pop());
+                }
+                frame->execute_code(func->code(), func->base());
             }
             break;
 
@@ -106,8 +110,11 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::LambdaDecl:
-            push(make_shared<FunctionObject>(scope_, code, pc + 1));
-            pc = *OPRAND(size_t);
+            {
+                auto args_size = *OPRAND(size_t);
+                push(make_shared<FunctionObject>(scope_, code, ++pc + 1, args_size));
+                pc = *OPRAND(size_t);
+            }
             continue;
 
         default:
