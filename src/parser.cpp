@@ -103,7 +103,6 @@ BlockExprPtr Parser::gen_block()
     // '}' means the end of a block
     while (current_token_.token_id != TokenId::RBrace)
     {
-        get_next_token();
         auto stmt = gen_stmt();
         if (stmt) block->statements.push_back(stmt);
     }

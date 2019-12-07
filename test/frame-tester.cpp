@@ -13,10 +13,27 @@ b: 2
 b: a : 3
 a + b
         )");
-        Code code{true}; Frame frame;
+        Code code{true};
+        auto frame = make_shared<Frame>();
         auto ast = Parser(ss).gen_statements();
         ast->codegen(code);
-        frame.execute_code(code);
-        ASSERT(*frame.pop<long>() == 6);
+        frame->execute_code(code);
+        ASSERT(*frame->pop<long>() == 6);
+    TEST_END
+
+    TEST_METHOD(SimpleFunc)
+        istringstream ss(R"(
+a: @(a) {
+    return @() {
+        return a
+    }
+}(1)()
+        )");
+        Code code(true);
+        auto frame = make_shared<Frame>();
+        auto ast = Parser(ss).gen_statement();
+        ast->codegen(code);
+        frame->execute_code(code);
+        ASSERT(*frame->pop<long>() == 1);
     TEST_END
 TEST_END
