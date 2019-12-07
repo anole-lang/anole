@@ -50,19 +50,19 @@ CPP4Frame = test/frame-tester.cpp \
 
 tmp/tokenizer-tester: ${CPP4Tokenizer} | ./tmp
 	${CC} ${FLAGS} $^ -o $@
-	$@
 
 tmp/parser-tester: ${CPP4Parser}
 	${CC} ${FLAGS} $^ -o $@
-	$@
 
 tmp/frame-tester: ${CPP4Frame}
 	${CC} ${FLAGS} $^ -o $@
-	$@
 
 test: tmp/tokenizer-tester \
 	  tmp/parser-tester \
 	  tmp/frame-tester
+	tmp/tokenizer-tester
+	tmp/parser-tester
+	tmp/frame-tester
 
 ./tmp:
 	mkdir tmp
