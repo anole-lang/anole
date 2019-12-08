@@ -14,6 +14,8 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 + [ ] Reporting errors with line info in detail in front
 + [ ] Add more tests for the front end
 + [ ] Complete basic things in vm such as function, control flow and some operators
++ [ ] Support the built-in classes
++ [ ] Support call-by-need
 
 ## Done
 
