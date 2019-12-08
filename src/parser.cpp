@@ -496,6 +496,7 @@ ExprPtr Parser::gen_term_tail(ExprPtr expr)
 
     if (current_token_.token_id == TokenId::Colon)
     {
+        get_next_token();
         return make_shared<BinaryOperatorExpr>(
             expr, TokenId::Colon, gen_delay_expr());
     }
