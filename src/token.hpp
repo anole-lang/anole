@@ -7,7 +7,7 @@ namespace ice_language
 {
 enum class TokenId
 {
-    End,       // #
+    End,
 
     At,        // @
     AtAt,      // @@
@@ -74,7 +74,9 @@ enum class TokenId
     CGT,       // >
     CGE,       // >=
 
-    Ret        // =>
+    Ret,       // =>
+
+    Ques,      // ?
 };
 
 struct Token

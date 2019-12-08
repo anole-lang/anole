@@ -186,6 +186,16 @@ struct DelayExpr : Expr
     void codegen(Code &) override;
 };
 
+struct QuesExpr : Expr
+{
+    Ptr<Expr> cond, true_expr, false_expr;
+    QuesExpr(Ptr<Expr> cond,
+        Ptr<Expr> true_expr, Ptr<Expr> false_expr)
+      : cond(cond), true_expr(true_expr),
+        false_expr(false_expr) {}
+    void codegen(Code &code) override;
+};
+
 struct UsingStmt : Stmt
 {
     std::string name;

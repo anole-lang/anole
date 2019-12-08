@@ -1,4 +1,5 @@
 #include <cctype>
+#include <memory>
 #include "tokenizer.hpp"
 
 using namespace std;
@@ -36,7 +37,7 @@ Token Tokenizer::next()
         last_input_ = input_stream_.get();
     }
 
-    Token *token = nullptr;
+    shared_ptr<Token> token = nullptr;
     string value;
     while (!token)
     {
@@ -46,7 +47,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '$':
-                token = new Token(TokenId::End);
+                token = make_shared<Token>(TokenId::End);
                 break;
 
             case '#':
@@ -62,75 +63,79 @@ Token Tokenizer::next()
                 break;
 
             case ':':
-                token = new Token(TokenId::Colon);
+                token = make_shared<Token>(TokenId::Colon);
                 break;
 
             case ',':
-                token = new Token(TokenId::Comma);
+                token = make_shared<Token>(TokenId::Comma);
                 break;
 
             case '.':
-                token = new Token(TokenId::Dot);
+                token = make_shared<Token>(TokenId::Dot);
                 break;
 
             case '(':
-                token = new Token(TokenId::LParen);
+                token = make_shared<Token>(TokenId::LParen);
                 break;
 
             case ')':
-                token = new Token(TokenId::RParen);
+                token = make_shared<Token>(TokenId::RParen);
                 break;
 
             case '[':
-                token = new Token(TokenId::LBracket);
+                token = make_shared<Token>(TokenId::LBracket);
                 break;
 
             case ']':
-                token = new Token(TokenId::RBracket);
+                token = make_shared<Token>(TokenId::RBracket);
                 break;
 
             case '{':
-                token = new Token(TokenId::LBrace);
+                token = make_shared<Token>(TokenId::LBrace);
                 break;
 
             case '}':
-                token = new Token(TokenId::RBrace);
+                token = make_shared<Token>(TokenId::RBrace);
                 break;
 
             case '+':
-                token = new Token(TokenId::Add);
+                token = make_shared<Token>(TokenId::Add);
                 break;
 
             case '-':
-                token = new Token(TokenId::Sub);
+                token = make_shared<Token>(TokenId::Sub);
                 break;
 
             case '*':
-                token = new Token(TokenId::Mul);
+                token = make_shared<Token>(TokenId::Mul);
                 break;
 
             case '/':
-                token = new Token(TokenId::Div);
+                token = make_shared<Token>(TokenId::Div);
                 break;
 
             case '%':
-                token = new Token(TokenId::Mod);
+                token = make_shared<Token>(TokenId::Mod);
                 break;
 
             case '&':
-                token = new Token(TokenId::BAnd);
+                token = make_shared<Token>(TokenId::BAnd);
                 break;
 
             case '|':
-                token = new Token(TokenId::BOr);
+                token = make_shared<Token>(TokenId::BOr);
                 break;
 
             case '^':
-                token = new Token(TokenId::BXor);
+                token = make_shared<Token>(TokenId::BXor);
                 break;
 
             case '~':
-                token = new Token(TokenId::BNeg);
+                token = make_shared<Token>(TokenId::BNeg);
+                break;
+
+            case '?':
+                token = make_shared<Token>(TokenId::Ques);
                 break;
 
             case '=':
@@ -168,7 +173,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '@':
-                token = new Token(TokenId::AtAt);
+                token = make_shared<Token>(TokenId::AtAt);
                 break;
 
             default:
@@ -180,7 +185,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '>':
-                token = new Token(TokenId::Ret);
+                token = make_shared<Token>(TokenId::Ret);
                 break;
 
             default:
@@ -192,7 +197,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '=':
-                token = new Token(TokenId::CNE);
+                token = make_shared<Token>(TokenId::CNE);
                 break;
 
             default:
@@ -204,11 +209,11 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '=':
-                token = new Token(TokenId::CLE);
+                token = make_shared<Token>(TokenId::CLE);
                 break;
 
             case '<':
-                token = new Token(TokenId::BLS);
+                token = make_shared<Token>(TokenId::BLS);
                 break;
 
             default:
@@ -220,11 +225,11 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '=':
-                token = new Token(TokenId::CGE);
+                token = make_shared<Token>(TokenId::CGE);
                 break;
 
             case '>':
-                token = new Token(TokenId::BRS);
+                token = make_shared<Token>(TokenId::BRS);
                 break;
 
             default:
@@ -287,7 +292,7 @@ Token Tokenizer::next()
                 break;
 
             case '"':
-                token = new Token(TokenId::String, value);
+                token = make_shared<Token>(TokenId::String, value);
                 break;
 
             default:
@@ -368,7 +373,7 @@ Token Tokenizer::next()
     }
     if (!token)
     {
-        token = new Token(TokenId::End);
+        token = make_shared<Token>(TokenId::End);
     }
     return *token;
 }

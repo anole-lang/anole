@@ -175,6 +175,11 @@ void DelayExpr::codegen(Code &code)
 
 }
 
+void QuesExpr::codegen(Code &code)
+{
+
+}
+
 void UsingStmt::codegen(Code &code)
 {
 

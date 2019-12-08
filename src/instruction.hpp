@@ -24,12 +24,12 @@ enum class Op
 
     ScopeBegin,   // done
     ScopeEnd,     // done
-    Call,
+    Call,         // draft
     Return,       // done
     Jump,         // done
-    JumpIf,
-    JumpIfNot,
-    LambdaDecl,
+    JumpIf,       // draft
+    JumpIfNot,    // draft
+    LambdaDecl,   // done
 };
 
 struct Instruction

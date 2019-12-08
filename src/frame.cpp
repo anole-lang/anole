@@ -72,6 +72,7 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Call:
+            // draft
             {
                 auto func = pop<FunctionObject>();
                 auto frame = make_shared<Frame>(
@@ -80,6 +81,7 @@ void Frame::execute_code(Code &code, size_t base)
                 for (std::size_t i = call_agrs_size;
                     i < func->args_size(); ++i)
                 {
+                    // draft
                     frame->push(make_shared<long>(0));
                 }
                 for (std::size_t i = 0; i < call_agrs_size; ++i)
@@ -98,14 +100,33 @@ void Frame::execute_code(Code &code, size_t base)
             pc = *OPRAND(size_t);
             continue;
 
+        case Op::JumpIf:
+            {
+                // draft
+                auto cond = *pop<long>();
+                if (!cond)
+                {
+                    pc = *OPRAND(size_t);
+                    continue;
+                }
+            }
+            break;
+
         case Op::JumpIfNot:
             {
-                auto cond = pop();
+                // auto cond = pop();
                 /*
                 if cond is false
                     pc = *OPRAND(size_t)
                     continue
                 */
+                // Draft
+                auto cond = *pop<long>();
+                if (!cond)
+                {
+                    pc = *OPRAND(size_t);
+                    continue;
+                }
             }
             break;
 
