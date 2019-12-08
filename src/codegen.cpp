@@ -239,12 +239,16 @@ void IfElseStmt::codegen(Code &code)
     cond->codegen(code);
     auto o1 = code.add_ins();
     block_true->codegen(code);
-    code.set_ins<Op::JumpIfNot>(o1, code.size());
     if (else_stmt)
     {
         auto o2 = code.add_ins();
+        code.set_ins<Op::JumpIfNot>(o1, code.size());
         else_stmt->codegen(code);
         code.set_ins<Op::Jump>(o2, code.size());
+    }
+    else
+    {
+        code.set_ins<Op::JumpIfNot>(o1, code.size());
     }
 }
 
