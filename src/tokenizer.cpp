@@ -62,7 +62,7 @@ Token Tokenizer::next()
                 break;
 
             case ':':
-                token = new Token(TokenId::Assign);
+                token = new Token(TokenId::Colon);
                 break;
 
             case ',':

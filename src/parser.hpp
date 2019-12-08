@@ -46,6 +46,7 @@ class Parser
     StmtPtr gen_foreach_stmt();
     StmtPtr gen_return_stmt();
 
+    ExprPtr gen_delay_expr();
     ExprPtr gen_expr(int priority = 0);
     ExprPtr gen_term();
     ExprPtr gen_term_tail(ExprPtr expr);

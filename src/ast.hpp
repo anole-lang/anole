@@ -179,6 +179,13 @@ struct DictExpr : Expr
     void codegen(Code &) override;
 };
 
+struct DelayExpr : Expr
+{
+    Ptr<Expr> expr;
+    DelayExpr(Ptr<Expr> expr) : expr(expr) {}
+    void codegen(Code &) override;
+};
+
 struct UsingStmt : Stmt
 {
     std::string name;

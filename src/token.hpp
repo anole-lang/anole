@@ -26,6 +26,7 @@ enum class TokenId
     Continue,  // continue
     Return,    // return
     Match,     // match
+    Delay,     // delay
 
     New,       // new
 
@@ -48,7 +49,7 @@ enum class TokenId
     LBrace,    // {
     RBrace,    // }
 
-    Assign,    // :
+    Colon,     // :
     Add,       // +
     Sub,       // -
     Mul,       // *

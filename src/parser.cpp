@@ -41,7 +41,7 @@ ExprList Parser::gen_arguments()
     get_next_token(); // eat '('
     while (current_token_.token_id != TokenId::RParen)
     {
-        args.push_back(gen_expr());
+        args.push_back(gen_delay_expr());
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token(); // eat ','
@@ -63,7 +63,7 @@ VarDeclList Parser::gen_decl_arguments()
     {
         auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
         ExprPtr expression = make_shared<NoneExpr>();
-        if (current_token_.token_id == TokenId::Assign)
+        if (current_token_.token_id == TokenId::Colon)
         {
             get_next_token();
             expression = gen_expr();
@@ -201,18 +201,18 @@ StmtPtr Parser::gen_declaration()
 
     switch (current_token_.token_id)
     {
-    case TokenId::Assign:
+    case TokenId::Colon:
         get_next_token();
         return make_shared<VariableDeclarationStmt>(
             reinterpret_pointer_cast<IdentifierExpr>(node),
-            gen_expr()
+            gen_delay_expr()
         );
 
     case TokenId::LParen:
         {
             auto args = gen_decl_arguments();
             BlockExprPtr block = nullptr;
-            if (current_token_.token_id == TokenId::Assign)
+            if (current_token_.token_id == TokenId::Colon)
             {
                 get_next_token();
                 block = make_shared<BlockExpr>();
@@ -369,11 +369,23 @@ StmtPtr Parser::gen_return_stmt()
     return make_shared<ReturnStmt>(gen_expr());
 }
 
+ExprPtr Parser::gen_delay_expr()
+{
+    if (current_token_.token_id == TokenId::Delay)
+    {
+        get_next_token();
+        return make_shared<DelayExpr>(gen_expr());
+    }
+    else
+    {
+        return gen_expr();
+    }
+}
+
 static const vector<set<TokenId>> &get_operators()
 {
     static const vector<set<TokenId>> operators
     {
-        { TokenId::Assign },
         { TokenId::Or },
         { TokenId::And },
         { TokenId::CEQ, TokenId::CNE, TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
@@ -481,6 +493,13 @@ ExprPtr Parser::gen_term_tail(ExprPtr expr)
             expr = gen_index_expr(expr);
         }
     }
+
+    if (current_token_.token_id == TokenId::Colon)
+    {
+        return make_shared<BinaryOperatorExpr>(
+            expr, TokenId::Colon, gen_delay_expr());
+    }
+
     return expr;
 }
 
@@ -620,7 +639,7 @@ ExprPtr Parser::gen_lambda_expr()
     auto args = gen_decl_arguments();
     BlockExprPtr block = nullptr;
 
-    if (current_token_.token_id == TokenId::Assign)
+    if (current_token_.token_id == TokenId::Colon)
     {
         get_next_token();
         block = make_shared<BlockExpr>();

@@ -81,7 +81,7 @@ void BinaryOperatorExpr::codegen(Code &code)
     lhs->codegen(code);
     switch (op)
     {
-    case TokenId::Assign:
+    case TokenId::Colon:
         code.add_ins<Op::Store>();
         break;
 
@@ -166,6 +166,11 @@ void IndexExpr::codegen(Code &code)
 
 // [AFTER] [CLASS]
 void DictExpr::codegen(Code &code)
+{
+
+}
+
+void DelayExpr::codegen(Code &code)
 {
 
 }
