@@ -216,7 +216,7 @@ struct VariableDeclarationStmt : Stmt
     Ptr<IdentifierExpr> id;
     Ptr<Expr> expr;
     VariableDeclarationStmt(Ptr<IdentifierExpr> id,
-        Ptr<Expr>expr) : id(id), expr(expr) {}
+        Ptr<Expr> expr) : id(id), expr(expr) {}
     void codegen(Code &) override;
 };
 
@@ -261,10 +261,10 @@ struct ReturnStmt : Stmt
 struct IfElseStmt : Stmt
 {
     Ptr<Expr> cond;
-    Ptr<BlockExpr> block_true;
-    Ptr<IfElseStmt> else_stmt;
-    IfElseStmt(Ptr<Expr> cond, Ptr<BlockExpr> block_true,
-        Ptr<IfElseStmt> else_stmt)
+    Ptr<Expr> block_true;
+    Ptr<Stmt> else_stmt;
+    IfElseStmt(Ptr<Expr> cond,
+        Ptr<Expr> block_true, Ptr<Stmt> else_stmt)
       : cond(cond), block_true(block_true),
         else_stmt(else_stmt) {}
     void codegen(Code &) override;

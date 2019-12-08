@@ -240,9 +240,12 @@ void IfElseStmt::codegen(Code &code)
     auto o1 = code.add_ins();
     block_true->codegen(code);
     code.set_ins<Op::JumpIfNot>(o1, code.size());
-    auto o2 = code.add_ins();
-    else_stmt->codegen(code);
-    code.set_ins<Op::Jump>(o2, code.size());
+    if (else_stmt)
+    {
+        auto o2 = code.add_ins();
+        else_stmt->codegen(code);
+        code.set_ins<Op::Jump>(o2, code.size());
+    }
 }
 
 void WhileStmt::codegen(Code &code)

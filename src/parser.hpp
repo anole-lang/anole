@@ -10,17 +10,12 @@
 
 namespace ice_language
 {
-using ASTPtr       = Ptr<struct AST>;
-using ExprPtr      = Ptr<struct Expr>;
-using StmtPtr      = Ptr<struct Stmt>;
-using BlockExprPtr = Ptr<struct BlockExpr>;
-
 class Parser
 {
   public:
     Parser(std::istream &in = std::cin);
-    ASTPtr gen_statement();
-    ASTPtr gen_statements();
+    Ptr<AST> gen_statement();
+    Ptr<AST> gen_statements();
 
   private:
     Token current_token_;
@@ -30,39 +25,40 @@ class Parser
     ExprList gen_arguments();
     VarDeclList gen_decl_arguments();
 
-    BlockExprPtr gen_stmts();
-    BlockExprPtr gen_block();
+    Ptr<BlockExpr> gen_stmts();
+    Ptr<BlockExpr> gen_block();
 
-    StmtPtr gen_stmt();
-    StmtPtr gen_declaration();
-    StmtPtr gen_var_assign();
-    StmtPtr gen_class_decl();
-    StmtPtr gen_using_stmt();
-    StmtPtr gen_if_else();
-    StmtPtr gen_if_else_tail();
-    StmtPtr gen_while_stmt();
-    StmtPtr gen_do_while_stmt();
-    StmtPtr gen_for_stmt();
-    StmtPtr gen_foreach_stmt();
-    StmtPtr gen_return_stmt();
+    Ptr<Stmt> gen_stmt();
+    Ptr<Stmt> gen_declaration();
+    Ptr<Stmt> gen_var_assign();
+    Ptr<Stmt> gen_class_decl();
+    Ptr<Stmt> gen_using_stmt();
+    // should be rewrited
+    Ptr<Stmt> gen_if_else();
+    Ptr<Stmt> gen_if_else_tail();
+    Ptr<Stmt> gen_while_stmt();
+    Ptr<Stmt> gen_do_while_stmt();
+    Ptr<Stmt> gen_for_stmt();
+    Ptr<Stmt> gen_foreach_stmt();
+    Ptr<Stmt> gen_return_stmt();
 
-    ExprPtr gen_delay_expr();
-    ExprPtr gen_expr(int priority = 0);
-    ExprPtr gen_term();
-    ExprPtr gen_term_tail(ExprPtr expr);
-    ExprPtr gen_ident();
-    ExprPtr gen_numeric();
-    ExprPtr gen_none();
-    ExprPtr gen_boolean();
-    ExprPtr gen_string();
-    ExprPtr gen_dot_expr(ExprPtr left);
-    ExprPtr gen_index_expr(ExprPtr expr);
-    ExprPtr gen_enum_or_dict();
-    ExprPtr gen_enum_expr(ExprPtr first);
-    ExprPtr gen_dict_expr(ExprPtr first);
-    ExprPtr gen_lambda_expr();
-    ExprPtr gen_new_expr();
-    ExprPtr gen_match_expr();
-    ExprPtr gen_list_expr();
+    Ptr<Expr> gen_delay_expr();
+    Ptr<Expr> gen_expr(int priority = -1);
+    Ptr<Expr> gen_term();
+    Ptr<Expr> gen_term_tail(Ptr<Expr> expr);
+    Ptr<Expr> gen_ident();
+    Ptr<Expr> gen_numeric();
+    Ptr<Expr> gen_none();
+    Ptr<Expr> gen_boolean();
+    Ptr<Expr> gen_string();
+    Ptr<Expr> gen_dot_expr(Ptr<Expr> left);
+    Ptr<Expr> gen_index_expr(Ptr<Expr> expr);
+    Ptr<Expr> gen_enum_or_dict();
+    Ptr<Expr> gen_enum_expr(Ptr<Expr> first);
+    Ptr<Expr> gen_dict_expr(Ptr<Expr> first);
+    Ptr<Expr> gen_lambda_expr();
+    Ptr<Expr> gen_new_expr();
+    Ptr<Expr> gen_match_expr();
+    Ptr<Expr> gen_list_expr();
 };
 }

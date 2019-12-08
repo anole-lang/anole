@@ -6,6 +6,8 @@
 
 namespace ice_language
 {
+using VoidPtr = Ptr<void>;
+
 class Scope
 {
   public:
