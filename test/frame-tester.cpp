@@ -51,6 +51,7 @@ foo(1)
 foo(0)
         )");
         PRE;
+        // code.print();
         ASSERT(*frame->pop<long>() == 3);
         ASSERT(*frame->pop<long>() == 2);
     TEST_END

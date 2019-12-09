@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 #include <type_traits>
 #include "helper.hpp"
 #include "instruction.hpp"
@@ -134,6 +135,72 @@ class Code
     bool interpret_mode()
     {
         return interpret_mode_;
+    }
+
+    // Simple Print
+    void print(std::ostream &out = std::cout)
+    {
+#define OPRAND(TYPE) std::reinterpret_pointer_cast<TYPE>(ins.oprand)
+        for (std::size_t i = 0; i < instructions_.size(); ++i)
+        {
+            auto &ins = instructions_[i];
+            switch (ins.op)
+            {
+            case Op::PlaceHolder:
+                break;
+            case Op::Pop:
+                out << i << "\tPop" << std::endl;
+                break;
+            case Op::Push:
+                out << i << "\tPush\t\t" << *OPRAND(long) << std::endl;
+                break;
+            case Op::Create:
+                out << i << "\tCreate\t" << *OPRAND(std::string) << std::endl;
+                break;
+            case Op::Load:
+                out << i << "\tLoad\t\t" << *OPRAND(std::string) << std::endl;
+                break;
+            case Op::Store:
+                out << i << "\tStore" << std::endl;
+                break;
+
+            case Op::Neg:
+                out << i << "\tNeg" << std::endl;
+                break;
+            case Op::Add:
+                out << i << "\tAdd" << std::endl;
+                break;
+            case Op::Sub:
+                out << i << "\tSub" << std::endl;
+                break;
+
+            case Op::ScopeBegin:
+                out << i << "\tScopeBegin" << std::endl;
+                break;
+            case Op::ScopeEnd:
+                out << i << "\tScopeEnd" << std::endl;
+                break;
+            case Op::Call:
+                out << i << "\tCall" << std::endl;
+                break;
+            case Op::Return:
+                out << i << "\tReturn" << std::endl;
+                break;
+            case Op::Jump:
+                out << i << "\tJump\t\t" << *OPRAND(size_t) << std::endl;
+                break;
+            case Op::JumpIf:
+                out << i << "\tJumpIf\t\t" << *OPRAND(size_t) << std::endl;
+                break;
+            case Op::JumpIfNot:
+                out << i << "\tJumpIfNot\t" << *OPRAND(size_t) << std::endl;
+                break;
+            case Op::LambdaDecl:
+                out << i << "\tLambdaDecl\t" << *OPRAND(size_t) << std::endl;
+                break;
+            }
+        }
+#undef OPRAND
     }
 
   private:
