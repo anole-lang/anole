@@ -9,6 +9,9 @@ Tokenizer::Tokenizer(istream &in)
   : input_stream_(in), last_input_(' ')
 {
     // ...
+    cur_line_num_ = last_line_num_ = 1;
+    cur_char_at_line_ = last_char_at_line_ = 0;
+    cur_line_.clear();
 };
 
 Token Tokenizer::next()
@@ -30,11 +33,26 @@ Token Tokenizer::next()
         InString,
         InStringEscaping
     };
+    auto update_location = [&] () {
+        if(this->last_input_ == '\n') {
+            this->cur_line_num_++;
+            this->cur_char_at_line_ = 0;
+            this->cur_line_.clear();
+        }
+        else {
+            this->cur_char_at_line_++;
+            this->cur_line_.push_back(this->last_input_);
+        }
+    };
+    
     auto state = State::Begin;
     while (isspace(last_input_))
     {
         last_input_ = input_stream_.get();
+        update_location();
     }
+    last_char_at_line_ = cur_char_at_line_;
+    last_line_num_ = cur_line_num_;
 
     Token *token = nullptr;
     string value;
@@ -365,11 +383,27 @@ Token Tokenizer::next()
             break;
         }
         last_input_ = input_stream_.get();
+        update_location();
     }
     if (!token)
     {
         token = new Token(TokenId::End);
     }
     return *token;
+}
+
+std::string Tokenizer::location()
+{
+    auto res = "\n" + cur_line_ + "....(At line " + 
+        std::to_string(last_line_num_) + ":" + 
+        std::to_string(last_char_at_line_) + ")\n";
+    for(int i = 1; i < cur_line_.size(); i++) {
+        if(i == last_char_at_line_)
+            res.push_back('^');
+        else
+            res.push_back(' ');
+    }
+    res = res + " :";
+    return res;
 }
 }

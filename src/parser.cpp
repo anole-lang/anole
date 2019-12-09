@@ -6,7 +6,7 @@
 
 #define THROW(MESSAGE)                      throw runtime_error(MESSAGE)
 #define CHECK_AND_THROW(TOKEN_ID, MESSAGE)  if (current_token_.token_id != TOKEN_ID) \
-                                                THROW(MESSAGE)
+                                                THROW(get_location() + MESSAGE)
 
 using namespace std;
 
@@ -731,6 +731,11 @@ ExprPtr Parser::gen_list_expr()
     get_next_token(); // eat(']')
 
     return make_shared<ListExpr>(expressions);
+}
+
+std::string Parser::get_location()
+{
+    return tokenizer_.location();
 }
 }
 
