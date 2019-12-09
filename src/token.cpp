@@ -57,6 +57,7 @@ Token::Token(std::string value) : value(value)
     case "continue"_hash:   token_id = TokenId::Continue; break;
     case "return"_hash:     token_id = TokenId::Return;   break;
     case "match"_hash:      token_id = TokenId::Match;    break;
+    case "delay"_hash:      token_id = TokenId::Delay;    break;
 
     case "new"_hash:        token_id = TokenId::New;      break;
 

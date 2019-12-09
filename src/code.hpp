@@ -1,54 +1,212 @@
 #pragma once
 
-#include <list>
-#include <memory>
+#include <vector>
+#include <iostream>
 #include <type_traits>
-#include "operation.hpp"
+#include "helper.hpp"
+#include "instruction.hpp"
 
 namespace ice_language
 {
 class Code
 {
   public:
-    template <typename Op, typename ...Args>
-    void add_op(Args ...args)
+    Code(bool interpret_mode = false)
+      : interpret_mode_(interpret_mode) {}
+
+    template <Op op = Op::PlaceHolder>
+    std::size_t add_ins()
     {
-        if constexpr (sizeof...(Args) == 0)
+        instructions_.push_back({
+            op, nullptr
+        });
+        return instructions_.size() - 1;
+    }
+
+    template <Op op, typename T>
+    std::size_t add_ins(T value)
+    {
+        if constexpr (op == Op::Push
+            and std::is_same<T, std::nullptr_t>::value)
         {
-            operations_.push_back(std::make_shared<Op>());
+            instructions_.push_back({
+                Op::Push, nullptr
+            });
         }
         else
         {
-            std::vector<std::shared_ptr<void>> oprands;
-            helper(oprands, args...);
+            instructions_.push_back({
+                op, std::make_shared<T>(value)
+            });
+        }
+        return instructions_.size() - 1;
+    }
+
+    template <Op op>
+    void set_ins(std::size_t ind)
+    {
+        instructions_[ind] = {op, nullptr};
+    }
+
+    template <Op op, typename T>
+    void set_ins(std::size_t ind, T value)
+    {
+        if constexpr (op == Op::Push
+            and std::is_same<T, std::nullptr_t>::value)
+        {
+            instructions_[ind] = {
+                Op::Push, nullptr
+            };
+        }
+        else
+        {
+            instructions_[ind] = {
+                op, std::make_shared<T>(value)
+            };
         }
     }
 
-    std::list<std::shared_ptr<Operation>> &get_operations()
+    std::size_t size()
     {
-        return operations_;
+        return instructions_.size();
+    }
+
+    std::vector<Instruction> &get_instructions()
+    {
+        return instructions_;
+    }
+
+    void push_break(std::size_t ind)
+    {
+        breaks_.push_back(ind);
+    }
+
+    void set_break_to(std::size_t ind,
+        std::size_t base)
+    {
+        decltype(breaks_) breaks;
+        for (auto i : breaks_)
+        {
+            if (i > base)
+            {
+                set_ins<Op::Jump>(i, ind);
+            }
+            else
+            {
+                breaks.push_back(i);
+            }
+        }
+        breaks_ = breaks;
+    }
+
+    void push_continue(std::size_t ind)
+    {
+        continues_.push_back(ind);
+    }
+
+    void set_continue_to(std::size_t ind,
+        std::size_t base)
+    {
+        decltype(continues_) continues;
+        for (auto i : continues_)
+        {
+            if (i > base)
+            {
+                set_ins<Op::Jump>(i, ind);
+            }
+            else
+            {
+                continues.push_back(i);
+            }
+        }
+        continues_ = continues;
+    }
+
+    bool check()
+    {
+        if (!breaks_.empty() && !continues_.empty())
+        {
+            // throw
+            return false;
+        }
+        return true;
+    }
+
+    bool interpret_mode()
+    {
+        return interpret_mode_;
+    }
+
+    // Simple Print
+    void print(std::ostream &out = std::cout)
+    {
+#define OPRAND(TYPE) std::reinterpret_pointer_cast<TYPE>(ins.oprand)
+        for (std::size_t i = 0; i < instructions_.size(); ++i)
+        {
+            auto &ins = instructions_[i];
+            switch (ins.op)
+            {
+            case Op::PlaceHolder:
+                break;
+            case Op::Pop:
+                out << i << "\tPop" << std::endl;
+                break;
+            case Op::Push:
+                out << i << "\tPush\t\t" << *OPRAND(long) << std::endl;
+                break;
+            case Op::Create:
+                out << i << "\tCreate\t" << *OPRAND(std::string) << std::endl;
+                break;
+            case Op::Load:
+                out << i << "\tLoad\t\t" << *OPRAND(std::string) << std::endl;
+                break;
+            case Op::Store:
+                out << i << "\tStore" << std::endl;
+                break;
+
+            case Op::Neg:
+                out << i << "\tNeg" << std::endl;
+                break;
+            case Op::Add:
+                out << i << "\tAdd" << std::endl;
+                break;
+            case Op::Sub:
+                out << i << "\tSub" << std::endl;
+                break;
+
+            case Op::ScopeBegin:
+                out << i << "\tScopeBegin" << std::endl;
+                break;
+            case Op::ScopeEnd:
+                out << i << "\tScopeEnd" << std::endl;
+                break;
+            case Op::Call:
+                out << i << "\tCall" << std::endl;
+                break;
+            case Op::Return:
+                out << i << "\tReturn" << std::endl;
+                break;
+            case Op::Jump:
+                out << i << "\tJump\t\t" << *OPRAND(size_t) << std::endl;
+                break;
+            case Op::JumpIf:
+                out << i << "\tJumpIf\t\t" << *OPRAND(size_t) << std::endl;
+                break;
+            case Op::JumpIfNot:
+                out << i << "\tJumpIfNot\t" << *OPRAND(size_t) << std::endl;
+                break;
+            case Op::LambdaDecl:
+                out << i << "\tLambdaDecl\t" << *OPRAND(size_t) << std::endl;
+                break;
+            }
+        }
+#undef OPRAND
     }
 
   private:
-    template <typename T, typename ...Args>
-    void helper(std::vector<std::shared_ptr<void>> &oprands,
-        T value, Args ...args)
-    {
-        if (std::is_same<T, std::nullptr_t>::value)
-        {
-            oprands.push_back(nullptr);
-        }
-        else
-        {
-            oprands.push_back(std::make_shared<T>(value));
-        }
-
-        if constexpr (sizeof...(Args))
-        {
-            helper(oprands, args...);
-        }
-    }
-
-    std::list<std::shared_ptr<Operation>> operations_;
+    std::vector<Instruction> instructions_;
+    // these two should be checked is empty or not
+    std::vector<std::size_t> breaks_, continues_;
+    bool interpret_mode_;
 };
 }

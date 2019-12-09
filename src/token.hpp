@@ -7,7 +7,7 @@ namespace ice_language
 {
 enum class TokenId
 {
-    End,       // #
+    End,
 
     At,        // @
     AtAt,      // @@
@@ -26,6 +26,7 @@ enum class TokenId
     Continue,  // continue
     Return,    // return
     Match,     // match
+    Delay,     // delay
 
     New,       // new
 
@@ -38,7 +39,6 @@ enum class TokenId
     Double,     // [0-9]+\.[0-9]*
     String,     // "[^"\n]"
 
-    Assign,    // :
     Comma,     // ,
     Dot,       // .
 
@@ -49,6 +49,7 @@ enum class TokenId
     LBrace,    // {
     RBrace,    // }
 
+    Colon,     // :
     Add,       // +
     Sub,       // -
     Mul,       // *
@@ -73,12 +74,14 @@ enum class TokenId
     CGT,       // >
     CGE,       // >=
 
-    Ret        // =>
+    Ret,       // =>
+
+    Ques,      // ?
 };
+
 struct Token
 {
   public:
-
     Token() = default;
     Token(TokenId token_id, std::string value = "");
     Token(std::string value);

@@ -19,9 +19,14 @@ Parser::Parser(istream &in)
 }
 
 // use when interacting & return stmt node
-ASTPtr Parser::gen_ast()
+Ptr<AST> Parser::gen_statement()
 {
     return gen_stmt();
+}
+
+Ptr<AST> Parser::gen_statements()
+{
+    return gen_stmts();
 }
 
 // update current token when cannot find the next token
@@ -36,7 +41,7 @@ ExprList Parser::gen_arguments()
     get_next_token(); // eat '('
     while (current_token_.token_id != TokenId::RParen)
     {
-        args.push_back(gen_expr());
+        args.push_back(gen_delay_expr());
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token(); // eat ','
@@ -57,8 +62,8 @@ VarDeclList Parser::gen_decl_arguments()
     while (current_token_.token_id != TokenId::RParen)
     {
         auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
-        ExprPtr expression = make_shared<NoneExpr>();
-        if (current_token_.token_id == TokenId::Assign)
+        Ptr<Expr> expression = make_shared<NoneExpr>();
+        if (current_token_.token_id == TokenId::Colon)
         {
             get_next_token();
             expression = gen_expr();
@@ -78,7 +83,7 @@ VarDeclList Parser::gen_decl_arguments()
 }
 
 // usually use when interacting
-BlockExprPtr Parser::gen_stmts()
+Ptr<BlockExpr> Parser::gen_stmts()
 {
     auto stmts = make_shared<BlockExpr>();
     while (current_token_.token_id != TokenId::End)
@@ -89,7 +94,7 @@ BlockExprPtr Parser::gen_stmts()
 }
 
 // gen normal block as {...}
-BlockExprPtr Parser::gen_block()
+Ptr<BlockExpr> Parser::gen_block()
 {
     CHECK_AND_THROW(TokenId::LBrace, "missing symbol '{'");
     get_next_token(); // eat '{'
@@ -98,7 +103,6 @@ BlockExprPtr Parser::gen_block()
     // '}' means the end of a block
     while (current_token_.token_id != TokenId::RBrace)
     {
-        get_next_token();
         auto stmt = gen_stmt();
         if (stmt) block->statements.push_back(stmt);
     }
@@ -107,7 +111,7 @@ BlockExprPtr Parser::gen_block()
     return block;
 }
 
-ExprPtr Parser::gen_index_expr(ExprPtr expression)
+Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
 {
     get_next_token();
 
@@ -120,7 +124,7 @@ ExprPtr Parser::gen_index_expr(ExprPtr expression)
 }
 
 // generate normal statement
-StmtPtr Parser::gen_stmt()
+Ptr<Stmt> Parser::gen_stmt()
 {
     switch (current_token_.token_id)
     {
@@ -132,7 +136,7 @@ StmtPtr Parser::gen_stmt()
         }
         else if (current_token_.token_id != TokenId::End)
         {
-            return gen_decl_or_assign();
+            return gen_declaration();
         }
         break;
 
@@ -187,56 +191,58 @@ StmtPtr Parser::gen_stmt()
     default:
         break;
     }
-    return nullptr;
+    get_next_token();
+    return gen_stmt();
 }
 
 // generate declaration or assignment (@.var:)
-StmtPtr Parser::gen_decl_or_assign()
+Ptr<Stmt> Parser::gen_declaration()
 {
-    if (current_token_.token_id == TokenId::Dot)
+    Ptr<Expr> node = gen_ident();
+
+    switch (current_token_.token_id)
     {
-        return gen_var_assign();
+    case TokenId::Colon:
+        get_next_token();
+        return make_shared<VariableDeclarationStmt>(
+            reinterpret_pointer_cast<IdentifierExpr>(node),
+            gen_delay_expr()
+        );
+
+    case TokenId::LParen:
+        {
+            auto args = gen_decl_arguments();
+            Ptr<BlockExpr> block = nullptr;
+            if (current_token_.token_id == TokenId::Colon)
+            {
+                get_next_token();
+                block = make_shared<BlockExpr>();
+                block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
+            }
+            else if (current_token_.token_id == TokenId::LBrace)
+            {
+                block = gen_block();
+            }
+            else
+            {
+                THROW("missing symbol ':' or '{' after @()");
+            }
+            return make_shared<FunctionDeclarationStmt>(
+                reinterpret_pointer_cast<IdentifierExpr>(node),
+                make_shared<LambdaExpr>(args, block)
+            );
+        }
+
+    default:
+        break;
     }
-
-    ExprPtr node = gen_ident();
-
-    while (current_token_.token_id == TokenId::LParen
-      || current_token_.token_id == TokenId::Dot
-      || current_token_.token_id == TokenId::LBracket)
-    {
-        if (current_token_.token_id == TokenId::LParen)
-        {
-            node = make_shared<ParenOperatorExpr>(node,
-                gen_arguments());
-        }
-        else if (current_token_.token_id == TokenId::Dot)
-        {
-            node = gen_dot_expr(node);
-        }
-        else if (current_token_.token_id == TokenId::LBracket)
-        {
-            node = gen_index_expr(node);
-        }
-    }
-
-    get_next_token();
-    return make_shared<VariableDeclarationStmt>(node, gen_expr());
+    return make_shared<VariableDeclarationStmt>(
+        reinterpret_pointer_cast<IdentifierExpr>(node),
+        nullptr
+    );
 }
 
-// generate assignment as @.ident: expr
-StmtPtr Parser::gen_var_assign()
-{
-    get_next_token();
-
-    auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
-
-    CHECK_AND_THROW(TokenId::Assign, "missing symbol ':'");
-    get_next_token();
-
-    return make_shared<VariableAssignStmt>(id, gen_expr());
-}
-
-StmtPtr Parser::gen_class_decl()
+Ptr<Stmt> Parser::gen_class_decl()
 {
     get_next_token();
 
@@ -265,7 +271,7 @@ StmtPtr Parser::gen_class_decl()
     return make_shared<ClassDeclarationStmt>(id, bases, block);
 }
 
-StmtPtr Parser::gen_using_stmt()
+Ptr<Stmt> Parser::gen_using_stmt()
 {
     get_next_token();
     CHECK_AND_THROW(TokenId::Identifier, "missing an identifier after 'using'");
@@ -274,19 +280,17 @@ StmtPtr Parser::gen_using_stmt()
     return using_stmt;
 }
 
-StmtPtr Parser::gen_if_else()
+Ptr<Stmt> Parser::gen_if_else()
 {
     get_next_token();
     auto cond = gen_expr();
     auto block_true = gen_block();
-    auto else_stmt = dynamic_pointer_cast<IfElseStmt>(gen_if_else_tail());
+    auto else_stmt = gen_if_else_tail();
     return make_shared<IfElseStmt>(cond, block_true, else_stmt);
 }
 
-StmtPtr Parser::gen_if_else_tail()
+Ptr<Stmt> Parser::gen_if_else_tail()
 {
-    get_next_token();
-
     if (current_token_.token_id == TokenId::Elif)
     {
         return gen_if_else();
@@ -295,12 +299,16 @@ StmtPtr Parser::gen_if_else_tail()
     {
         get_next_token();
         auto block = gen_block();
-        return make_shared<IfElseStmt>(make_shared<BoolExpr>(true), block, nullptr);
+        return make_shared<IfElseStmt>(
+            make_shared<IntegerExpr>(1), block, nullptr);
     }
-    else return nullptr;
+    else
+    {
+        return nullptr;
+    }
 }
 
-StmtPtr Parser::gen_while_stmt()
+Ptr<Stmt> Parser::gen_while_stmt()
 {
     get_next_token();
 
@@ -309,7 +317,7 @@ StmtPtr Parser::gen_while_stmt()
     return make_shared<WhileStmt>(cond, block);
 }
 
-StmtPtr Parser::gen_do_while_stmt()
+Ptr<Stmt> Parser::gen_do_while_stmt()
 {
     get_next_token();
 
@@ -322,7 +330,7 @@ StmtPtr Parser::gen_do_while_stmt()
     return make_shared<DoWhileStmt>(cond, block);
 }
 
-StmtPtr Parser::gen_for_stmt()
+Ptr<Stmt> Parser::gen_for_stmt()
 {
     get_next_token();
 
@@ -343,7 +351,7 @@ StmtPtr Parser::gen_for_stmt()
     return make_shared<ForStmt>(begin, end, id, block);
 }
 
-StmtPtr Parser::gen_foreach_stmt()
+Ptr<Stmt> Parser::gen_foreach_stmt()
 {
     get_next_token();
 
@@ -358,10 +366,23 @@ StmtPtr Parser::gen_foreach_stmt()
     return make_shared<ForeachStmt>(expression, id, block);
 }
 
-StmtPtr Parser::gen_return_stmt()
+Ptr<Stmt> Parser::gen_return_stmt()
 {
     get_next_token();
     return make_shared<ReturnStmt>(gen_expr());
+}
+
+Ptr<Expr> Parser::gen_delay_expr()
+{
+    if (current_token_.token_id == TokenId::Delay)
+    {
+        get_next_token();
+        return make_shared<DelayExpr>(gen_expr());
+    }
+    else
+    {
+        return gen_expr();
+    }
 }
 
 static const vector<set<TokenId>> &get_operators()
@@ -378,8 +399,21 @@ static const vector<set<TokenId>> &get_operators()
     return operators;
 }
 
-ExprPtr Parser::gen_expr(int priority)
+Ptr<Expr> Parser::gen_expr(int priority)
 {
+    if (priority == -1)
+    {
+        auto expr = gen_expr(0);
+        if (current_token_.token_id == TokenId::Ques)
+        {
+            get_next_token();
+            auto true_expr = gen_expr();
+            auto false_expr = gen_expr();
+            expr = make_shared<QuesExpr>(expr, true_expr, false_expr);
+        }
+        return expr;
+    }
+
     if (priority == get_operators().size() - 1)
     {
         if (get_operators()[priority].count(current_token_.token_id))
@@ -398,23 +432,17 @@ ExprPtr Parser::gen_expr(int priority)
 
     auto lhs = gen_expr(priority + 1);
     auto op = current_token_.token_id;
-    while (get_operators()[priority].count(op))
+    if (get_operators()[priority].count(op))
     {
         get_next_token();
-        auto rhs = gen_expr(priority + 1);
-        if (rhs == nullptr)
-        {
-            return nullptr;
-        }
-        lhs = make_shared<BinaryOperatorExpr>(lhs, op, rhs);
-        op = current_token_.token_id;
+        lhs = make_shared<BinaryOperatorExpr>(lhs, op, gen_expr(priority));
     }
     return lhs;
 }
 
-ExprPtr Parser::gen_term()
+Ptr<Expr> Parser::gen_term()
 {
-    ExprPtr node = nullptr;
+    Ptr<Expr> node = nullptr;
     switch (current_token_.token_id)
     {
     case TokenId::Identifier:
@@ -462,7 +490,7 @@ ExprPtr Parser::gen_term()
     }
 }
 
-ExprPtr Parser::gen_term_tail(ExprPtr expr)
+Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 {
     while (current_token_.token_id == TokenId::Dot
       || current_token_.token_id == TokenId::LParen
@@ -481,19 +509,27 @@ ExprPtr Parser::gen_term_tail(ExprPtr expr)
             expr = gen_index_expr(expr);
         }
     }
+
+    if (current_token_.token_id == TokenId::Colon)
+    {
+        get_next_token();
+        return make_shared<BinaryOperatorExpr>(
+            expr, TokenId::Colon, gen_delay_expr());
+    }
+
     return expr;
 }
 
-ExprPtr Parser::gen_ident()
+Ptr<Expr> Parser::gen_ident()
 {
     auto ident_expr = make_shared<IdentifierExpr>(current_token_.value);
     get_next_token();
     return ident_expr;
 }
 
-ExprPtr Parser::gen_numeric()
+Ptr<Expr> Parser::gen_numeric()
 {
-    ExprPtr numeric_expr = nullptr;
+    Ptr<Expr> numeric_expr = nullptr;
     if (current_token_.token_id == TokenId::Integer)
     {
         numeric_expr = make_shared<IntegerExpr>(stoi(current_token_.value));
@@ -506,13 +542,13 @@ ExprPtr Parser::gen_numeric()
     return numeric_expr;
 }
 
-ExprPtr Parser::gen_none()
+Ptr<Expr> Parser::gen_none()
 {
     get_next_token();
     return make_shared<NoneExpr>();
 }
 
-ExprPtr Parser::gen_boolean()
+Ptr<Expr> Parser::gen_boolean()
 {
     auto bool_expr = make_shared<BoolExpr>(
         ((current_token_.token_id == TokenId::True)
@@ -521,14 +557,14 @@ ExprPtr Parser::gen_boolean()
     return bool_expr;
 }
 
-ExprPtr Parser::gen_string()
+Ptr<Expr> Parser::gen_string()
 {
     auto string_expr = make_shared<StringExpr>(current_token_.value);
     get_next_token();
     return string_expr;
 }
 
-ExprPtr Parser::gen_dot_expr(ExprPtr left)
+Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
     get_next_token();
     return make_shared<DotExpr>(left, gen_ident());
@@ -536,7 +572,7 @@ ExprPtr Parser::gen_dot_expr(ExprPtr left)
 
 // generate enum as { NAME1, NAME2, ..., NAMEN }
 // or dict as {KEY1: VAL1, KEY2: VAL2, ..., KEYN: VALN}
-ExprPtr Parser::gen_enum_or_dict()
+Ptr<Expr> Parser::gen_enum_or_dict()
 {
     get_next_token();
 
@@ -546,7 +582,7 @@ ExprPtr Parser::gen_enum_or_dict()
         return make_shared<DictExpr>();
     }
     auto node = gen_expr();
-    if (current_token_.token_id == TokenId::Assign)
+    if (current_token_.token_id == TokenId::Ret)
     {
         node = gen_dict_expr(node);
     }
@@ -559,7 +595,7 @@ ExprPtr Parser::gen_enum_or_dict()
     return node;
 }
 
-ExprPtr Parser::gen_enum_expr(ExprPtr first)
+Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
 {
     IdentList enumerators;
     enumerators.push_back(dynamic_pointer_cast<IdentifierExpr>(first));
@@ -584,9 +620,9 @@ ExprPtr Parser::gen_enum_expr(ExprPtr first)
     return make_shared<EnumExpr>(enumerators);
 }
 
-ExprPtr Parser::gen_dict_expr(ExprPtr first)
+Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
 {
-    CHECK_AND_THROW(TokenId::Assign, "missing symbol ':'");
+    CHECK_AND_THROW(TokenId::Ret, "missing symbol ':'");
     ExprList keys, values;
     keys.push_back(first);
 
@@ -598,7 +634,7 @@ ExprPtr Parser::gen_dict_expr(ExprPtr first)
     {
         keys.push_back(gen_expr());
 
-        CHECK_AND_THROW(TokenId::Assign, "missing symbol ':'");
+        CHECK_AND_THROW(TokenId::Ret, "missing symbol '=>'");
         get_next_token();
 
         values.push_back(gen_expr());
@@ -615,12 +651,12 @@ ExprPtr Parser::gen_dict_expr(ExprPtr first)
 }
 
 // generate lambda expr as @(): expr, @(){} and also @(){}()..
-ExprPtr Parser::gen_lambda_expr()
+Ptr<Expr> Parser::gen_lambda_expr()
 {
     auto args = gen_decl_arguments();
-    BlockExprPtr block = nullptr;
+    Ptr<BlockExpr> block = nullptr;
 
-    if (current_token_.token_id == TokenId::Assign)
+    if (current_token_.token_id == TokenId::Colon)
     {
         get_next_token();
         block = make_shared<BlockExpr>();
@@ -635,7 +671,7 @@ ExprPtr Parser::gen_lambda_expr()
         THROW("missing symbol ':' or '{' after @()");
     }
 
-    ExprPtr node = make_shared<LambdaExpr>(args, block);
+    Ptr<Expr> node = make_shared<LambdaExpr>(args, block);
     while (current_token_.token_id == TokenId::LParen)
     {
         node = make_shared<ParenOperatorExpr>(node, gen_arguments());
@@ -645,7 +681,7 @@ ExprPtr Parser::gen_lambda_expr()
 }
 
 // generate new expr as @instance: new Class()
-ExprPtr Parser::gen_new_expr()
+Ptr<Expr> Parser::gen_new_expr()
 {
     get_next_token();
 
@@ -656,14 +692,14 @@ ExprPtr Parser::gen_new_expr()
     return make_shared<NewExpr>(id, args);
 }
 
-/* ExprPtr SyntaxAnalyzer::gen_match_expr()
+/* Ptr<Expr> SyntaxAnalyzer::gen_match_expr()
 generate match expr as follow:
     match value {
         1, 2, 3, 4 => "smaller than five",
         5 => "five"
     } else "bigger than five"
 */
-ExprPtr Parser::gen_match_expr()
+Ptr<Expr> Parser::gen_match_expr()
 {
     get_next_token(); // eat 'match'
     auto expression = gen_expr();
@@ -717,7 +753,7 @@ ExprPtr Parser::gen_match_expr()
 }
 
 // generate list as [expr1, expr2, ..., exprN]
-ExprPtr Parser::gen_list_expr()
+Ptr<Expr> Parser::gen_list_expr()
 {
     get_next_token(); // eat '['
 
