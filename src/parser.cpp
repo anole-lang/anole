@@ -4,9 +4,12 @@
 #include "ast.hpp"
 #include "parser.hpp"
 
-#define THROW(MESSAGE)                      throw runtime_error(MESSAGE)
-#define CHECK_AND_THROW(TOKEN_ID, MESSAGE)  if (current_token_.token_id != TOKEN_ID) \
-                                                THROW(get_location() + MESSAGE + "\033[0m")
+#define THROW(MESSAGE) \
+    throw runtime_error(MESSAGE)
+
+#define CHECK_AND_THROW(TOKEN_ID, MESSAGE) \
+    if (current_token_.token_id != TOKEN_ID) \
+        THROW(get_err_info(MESSAGE) + "\033[0m")
 
 using namespace std;
 
@@ -769,11 +772,8 @@ Ptr<Expr> Parser::gen_list_expr()
     return make_shared<ListExpr>(expressions);
 }
 
-std::string Parser::get_location()
+std::string Parser::get_err_info(const string &message)
 {
-    return tokenizer_.location();
+    return tokenizer_.get_err_info(message);
 }
 }
-
-#undef THROW
-#undef CHECK_AND_THROW

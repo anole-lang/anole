@@ -21,7 +21,7 @@ class Parser
     Token current_token_;
     Tokenizer tokenizer_;
     Token get_next_token();
-    std::string get_location();
+    std::string get_err_info(const std::string &message);
 
     ExprList gen_arguments();
     VarDeclList gen_decl_arguments();

@@ -7,27 +7,32 @@ using namespace std;
 namespace ice_language
 {
 Tokenizer::Tokenizer(istream &in)
-  : input_stream_(in), last_input_(' ')
+  : input_stream_(in), last_input_(' '),
+    cur_line_num_(1), last_line_num_(1),
+    cur_char_at_line_(0), last_char_at_line_(0)
 {
-    cur_line_num_ = last_line_num_ = 1;
-    cur_char_at_line_ = last_char_at_line_ = 0;
-    cur_line_.clear();
-};
+    // ...
+}
+
+void Tokenizer::get_next_input()
+{
+    last_input_ = input_stream_.get();
+    if (last_input_ == '\n')
+    {
+        ++cur_line_num_;
+        cur_char_at_line_ = 0;
+        pre_line_ = cur_line_;
+        cur_line_.clear();
+    }
+    else
+    {
+        ++cur_char_at_line_;
+        cur_line_ += last_input_;
+    }
+}
 
 Token Tokenizer::next()
 {
-    auto update_location = [&] () {
-        if(this->last_input_ == '\n') {
-            this->cur_line_num_++;
-            this->cur_char_at_line_ = 0;
-            this->cur_line_.clear();
-        }
-        else {
-            this->cur_char_at_line_++;
-            this->cur_line_.push_back(this->last_input_);
-        }
-    };
-
     enum class State
     {
         Begin,
@@ -48,8 +53,7 @@ Token Tokenizer::next()
     auto state = State::Begin;
     while (isspace(last_input_))
     {
-        last_input_ = input_stream_.get();
-        update_location();
+        get_next_input();
     }
 
     last_char_at_line_ = cur_char_at_line_;
@@ -387,8 +391,7 @@ Token Tokenizer::next()
         {
             break;
         }
-        last_input_ = input_stream_.get();
-        update_location();
+        get_next_input();
     }
     if (!token)
     {
@@ -397,19 +400,16 @@ Token Tokenizer::next()
     return *token;
 }
 
-std::string Tokenizer::location()
+std::string Tokenizer::get_err_info(const string &message)
 {
-    auto res = "\n" + cur_line_ + "\033[34m....(At line " + 
-        std::to_string(last_line_num_) + ":" + 
-        std::to_string(last_char_at_line_) + ")\033[0m\n" +
-        "\033[1m\033[31m";
-    for(int i = 1; i < cur_line_.size(); i++) {
-        if(i == last_char_at_line_)
-            res.push_back('^');
-        else
-            res.push_back(' ');
-    }
-    res = res + " :";
+    auto line = (cur_line_num_ != last_line_num_)
+        ? pre_line_ : cur_line_;
+    auto res = "\n\033[1mAt Line "
+        + to_string(last_line_num_) + ":"
+        + to_string(last_char_at_line_) + ": "
+        + "\033[31merror:\033[0m "s + message + "\033[0m\n"
+        + line + "\n"
+        + string(last_char_at_line_ - 1, ' ') + "^";
     return res;
 }
 }

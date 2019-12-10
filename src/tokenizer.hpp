@@ -13,15 +13,19 @@ class Tokenizer
   public:
     Tokenizer(std::istream &in = std::cin);
     Token next();
-    std::string location();
+    std::string get_err_info(const std::string &message);
 
   private:
+    void get_next_input();
+
+    std::size_t cur_line_num_;
+    std::size_t cur_char_at_line_;
+    std::size_t last_line_num_;
+    std::size_t last_char_at_line_;
+    std::string cur_line_;
+    std::string pre_line_;
+
     std::istream &input_stream_;
     char last_input_;
-    u_int32_t cur_line_num_;
-    u_int32_t cur_char_at_line_;
-    u_int32_t last_line_num_;
-    u_int32_t last_char_at_line_;
-    std::string cur_line_;
 };
 }
