@@ -1,6 +1,5 @@
 #include <set>
 #include <exception>
-#include <functional>
 #include "ast.hpp"
 #include "parser.hpp"
 
