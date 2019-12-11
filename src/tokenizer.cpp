@@ -411,7 +411,7 @@ std::string Tokenizer::get_err_info(const string &message)
 {
     auto line = (cur_line_num_ != last_line_num_)
         ? pre_line_ : cur_line_;
-    auto res = "\n\033[1mAt Line "
+    auto res = "\033[1mAt Line "
         + to_string(last_line_num_) + ":"
         + to_string(last_char_at_line_) + ": "
         + "\033[31merror:\033[0m "s + message + "\033[0m\n"
