@@ -4,11 +4,11 @@
 #include "parser.hpp"
 
 #define THROW(MESSAGE) \
-    throw runtime_error(MESSAGE)
+    throw runtime_error(get_err_info(MESSAGE) + "\033[0m")
 
 #define CHECK_AND_THROW(TOKEN_ID, MESSAGE) \
     if (current_token_.token_id != TOKEN_ID) \
-        THROW(get_err_info(MESSAGE) + "\033[0m")
+        THROW(MESSAGE)
 
 using namespace std;
 
@@ -17,6 +17,12 @@ namespace ice_language
 Parser::Parser(istream &in)
   : tokenizer_(in)
 {
+    get_next_token();
+}
+
+void Parser::reset()
+{
+    tokenizer_.reset();
     get_next_token();
 }
 
@@ -194,7 +200,7 @@ Ptr<Stmt> Parser::gen_stmt()
         break;
     }
     get_next_token();
-    return gen_stmt();
+    THROW("wrong token here");
 }
 
 // generate declaration or assignment (@.var:)

@@ -11,8 +11,7 @@ namespace ice_language
 class Code
 {
   public:
-    Code(bool interpret_mode = false)
-      : interpret_mode_(interpret_mode) {}
+    Code() = default;
 
     template <Op op = Op::PlaceHolder>
     std::size_t add_ins()
@@ -132,11 +131,6 @@ class Code
         return true;
     }
 
-    bool interpret_mode()
-    {
-        return interpret_mode_;
-    }
-
     // Simple Print
     void print(std::ostream &out = std::cout)
     {
@@ -207,6 +201,5 @@ class Code
     std::vector<Instruction> instructions_;
     // these two should be checked is empty or not
     std::vector<std::size_t> breaks_, continues_;
-    bool interpret_mode_;
 };
 }

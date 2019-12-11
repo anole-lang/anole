@@ -14,6 +14,7 @@ class Parser
 {
   public:
     Parser(std::istream &in = std::cin);
+    void reset();
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();
 

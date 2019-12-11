@@ -14,6 +14,13 @@ Tokenizer::Tokenizer(istream &in)
     // ...
 }
 
+void Tokenizer::reset()
+{
+    last_input_ = ' ';
+    cur_line_num_ = last_line_num_ = 1;
+    cur_char_at_line_ = last_char_at_line_ = 0;
+}
+
 void Tokenizer::get_next_input()
 {
     last_input_ = input_stream_.get();

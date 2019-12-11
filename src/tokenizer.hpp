@@ -13,6 +13,7 @@ class Tokenizer
   public:
     Tokenizer(std::istream &in = std::cin);
     Token next();
+    void reset();
     std::string get_err_info(const std::string &message);
 
   private:

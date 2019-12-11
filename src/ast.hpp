@@ -19,6 +19,13 @@ struct AST
 {
     virtual ~AST() = 0;
     virtual void codegen(Code &) = 0;
+
+    // for codegen
+    static bool &interpret_mode()
+    {
+        static bool interpret_mode = false;
+        return interpret_mode;
+    }
 };
 
 struct Stmt : AST

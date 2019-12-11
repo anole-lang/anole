@@ -5,7 +5,7 @@
 using namespace std;
 using namespace ice_language;
 
-#define PRE Code code{true};\
+#define PRE Code code; AST::interpret_mode() = true; \
             auto frame = make_shared<Frame>();\
             auto ast = Parser(ss).gen_statements();\
             ast->codegen(code);\

@@ -188,7 +188,7 @@ void UsingStmt::codegen(Code &code)
 void ExprStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    if (!code.interpret_mode())
+    if (!interpret_mode())
     {
         code.add_ins<Op::Pop>();
     }
