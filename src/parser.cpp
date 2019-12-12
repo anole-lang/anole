@@ -40,7 +40,7 @@ Ptr<AST> Parser::gen_statements()
 // update current token when cannot find the next token
 Token Parser::get_next_token()
 {
-    return (current_token_ = tokenizer_.next());
+    return current_token_ = tokenizer_.next();
 }
 
 ExprList Parser::gen_arguments()
