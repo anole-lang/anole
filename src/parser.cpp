@@ -4,10 +4,16 @@
 #include "parser.hpp"
 
 #define THROW(MESSAGE) \
-    throw runtime_error(get_err_info(MESSAGE))
+    { if (current_token_.token_id == TokenId::End \
+        && AST::interpret_mode()) \
+        throw exception(); \
+    throw runtime_error(get_err_info(MESSAGE)); }
 
 #define CHECK_AND_THROW(TOKEN_ID, MESSAGE) \
-    if (current_token_.token_id != TOKEN_ID) \
+    if (current_token_.token_id == TokenId::End \
+        && AST::interpret_mode()) \
+        throw exception(); \
+    else if (current_token_.token_id != TOKEN_ID) \
         THROW(MESSAGE)
 
 using namespace std;
@@ -494,7 +500,7 @@ Ptr<Expr> Parser::gen_term()
         return gen_enum_or_dict();
 
     default:
-        return nullptr;
+        THROW("miss an expr behind here");
     }
 }
 

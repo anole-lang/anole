@@ -19,14 +19,20 @@ Tokenizer::Tokenizer(istream &in, string name_of_in)
 
 void Tokenizer::reset()
 {
-    last_input_ = ' ';
     cur_line_num_ = last_line_num_ = 1;
     cur_char_at_line_ = last_char_at_line_ = 0;
+    cur_line_.clear(), pre_line_.clear();
+    last_input_ = ' ';
 }
 
 void Tokenizer::get_next_input()
 {
     last_input_ = input_stream_.get();
+    if (last_input_ == EOF)
+    {
+        return;
+    }
+
     if (last_input_ == '\n')
     {
         ++cur_line_num_;

@@ -1,3 +1,4 @@
+#include <sstream>
 #include "repl.hpp"
 #include "parser.hpp"
 
@@ -5,13 +6,8 @@ using namespace std;
 
 namespace ice_language
 {
-// Draft
 void ReadEvalPrintLoop::run()
 {
-    AST::interpret_mode() = true;
-    Code code;
-    auto frame = make_shared<Frame>();
-    // should be in interpret class
     std::cout <<
 "    _____________________\n"
 "   /_  ___/ _____/ _____/\n"
@@ -20,22 +16,42 @@ void ReadEvalPrintLoop::run()
 "/______/______/______/   \n"
     << std::endl;
     std::cout << ">> ";
-    Parser parser;
+    AST::interpret_mode() = true;
+
+    string line;
+    std::getline(cin, line);
+    istringstream ss(line);
+
+    Parser parser{ss}; Code code;
+    auto frame = make_shared<Frame>();
+
     while (true)
     {
         try
         {
-            auto ast = parser.gen_statement();
-            ast->codegen(code);
+            parser.gen_statement()->codegen(code);
             frame->execute_code(code);
             cout << *frame->pop<long>() << endl;
-            cout << ">> ";
-            parser.reset();
         }
         catch (const runtime_error &e)
         {
             cerr << e.what() << endl;
         }
+        catch (...)
+        {
+            auto temp = line;
+            cout << ".. ";
+            std::getline(cin, line);
+            line = temp + '\n' + line;
+            ss.clear(); ss.str(temp);
+            parser.reset();
+            continue;
+        }
+
+        cout << ">> ";
+        std::getline(cin, line);
+        ss.clear(); ss.str(line);
+        parser.reset();
     }
 }
 }
