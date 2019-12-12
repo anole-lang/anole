@@ -85,7 +85,7 @@ struct Token
     Token() = default;
     Token(TokenId token_id, std::string value = "");
     Token(std::string value);
-    Token(Token &&token);
+    Token(Token &&token) noexcept;
     Token(const Token &token);
     Token &operator=(const Token &token);
 
