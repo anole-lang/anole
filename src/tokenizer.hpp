@@ -11,7 +11,7 @@ namespace ice_language
 class Tokenizer
 {
   public:
-    Tokenizer(std::istream &in = std::cin);
+    Tokenizer(std::istream &, std::string);
     Token next();
     void reset();
     std::string get_err_info(const std::string &message);
@@ -27,6 +27,7 @@ class Tokenizer
     std::string pre_line_;
 
     std::istream &input_stream_;
+    std::string name_of_in_;
     char last_input_;
 };
 }

@@ -1,15 +1,18 @@
 #include <cctype>
 #include <memory>
 #include "tokenizer.hpp"
+#include "ast.hpp"
 
 using namespace std;
 
 namespace ice_language
 {
-Tokenizer::Tokenizer(istream &in)
-  : input_stream_(in), last_input_(' '),
-    cur_line_num_(1), last_line_num_(1),
-    cur_char_at_line_(0), last_char_at_line_(0)
+Tokenizer::Tokenizer(istream &in, string name_of_in)
+  : cur_line_num_(1), last_line_num_(1),
+    cur_char_at_line_(0), last_char_at_line_(0),
+    input_stream_(in),
+    name_of_in_(move(name_of_in)),
+    last_input_(' ')
 {
     // ...
 }
@@ -411,12 +414,12 @@ std::string Tokenizer::get_err_info(const string &message)
 {
     auto line = (cur_line_num_ != last_line_num_)
         ? pre_line_ : cur_line_;
-    auto res = "\033[1mAt Line "
+    auto res = "\033[1m" + name_of_in_ + ":"
         + to_string(last_line_num_) + ":"
         + to_string(last_char_at_line_) + ": "
-        + "\033[31merror:\033[0m "s + message + "\033[0m\n"
-        + line + "\n"
-        + string(last_char_at_line_ - 1, ' ') + "^";
+        + "\033[31merror:\033[0m "s + message + "\n"s
+        + "\033[0m" + line + "\n"
+        + string(last_char_at_line_ - 1, ' ') + "\033[31m^\033[0m";
     return res;
 }
 }

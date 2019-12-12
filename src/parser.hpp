@@ -13,7 +13,8 @@ namespace ice_language
 class Parser
 {
   public:
-    Parser(std::istream &in = std::cin);
+    Parser(std::istream & = std::cin,
+        std::string = "<stdin>");
     void reset();
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();

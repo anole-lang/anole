@@ -12,6 +12,13 @@ int main(int argc, char *agrv[])
     Ptr<Parser> parser = nullptr;
     if (argc == 1)
     {
+        cout <<
+"    _____________________\n"
+"   /_  ___/ _____/ _____/\n"
+"    / /  / /    / /____      Version 0.0.1 \n"
+" __/ /__/ /____/ /____       http://ice.jusot.com\n"
+"/______/______/______/   \n"
+        << endl;
         cout << ">> ";
         parser = make_shared<Parser>();
         AST::interpret_mode() = true;

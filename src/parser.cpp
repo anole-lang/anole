@@ -4,7 +4,7 @@
 #include "parser.hpp"
 
 #define THROW(MESSAGE) \
-    throw runtime_error(get_err_info(MESSAGE) + "\033[0m")
+    throw runtime_error(get_err_info(MESSAGE))
 
 #define CHECK_AND_THROW(TOKEN_ID, MESSAGE) \
     if (current_token_.token_id != TOKEN_ID) \
@@ -14,8 +14,8 @@ using namespace std;
 
 namespace ice_language
 {
-Parser::Parser(istream &in)
-  : tokenizer_(in)
+Parser::Parser(istream &in, string name_of_in)
+  : tokenizer_(in, name_of_in)
 {
     get_next_token();
 }
