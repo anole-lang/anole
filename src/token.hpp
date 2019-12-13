@@ -81,7 +81,6 @@ enum class TokenId
 
 struct Token
 {
-  public:
     Token() = default;
     Token(TokenId token_id, std::string value = "");
     Token(std::string value);

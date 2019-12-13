@@ -24,7 +24,7 @@ namespace ice_language
 Token::Token(TokenId token_id, std::string value)
     : token_id(token_id), value(std::move(value)) {}
 
-Token::Token(Token &&token)
+Token::Token(Token &&token) noexcept
     : token_id(token.token_id),
     value(std::move(token.value)) {}
 

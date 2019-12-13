@@ -39,13 +39,16 @@ void ReadEvalPrintLoop::run()
         }
         catch (...)
         {
-            auto temp = line;
-            cout << ".. ";
-            std::getline(cin, line);
-            line = temp + '\n' + line;
-            ss.clear(); ss.str(temp);
-            parser.reset();
-            continue;
+            if (!line.empty())
+            {
+                cout << ".. ";
+                string temp;
+                std::getline(cin, temp);
+                line += '\n' + temp;
+                ss.clear(); ss.str(line);
+                parser.reset();
+                continue;
+            }
         }
 
         cout << ">> ";
