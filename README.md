@@ -11,12 +11,14 @@ In fact, I am trying to rewrite this program now. If you want to use this langua
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine. I am planning to implement the front end firstly, then virtual machine and the codegen part finally.
 
-+ [ ] Reporting errors with line info in detail in front
++ [ ] Better implementation of REPL without try-throw
 + [ ] Add more tests for the front end
-+ [ ] Complete basic things in vm such as function, control flow and some operators
 + [ ] Support the built-in classes
 + [ ] Support call-by-need
 
 ## Done
 
++ [X] Simple REPL with try-throw
++ [X] Complete basic things in vm such as function, control flow and some operators
++ [X] Report errors with line info in detail in front
 + [X] Implementation of the front end but without reporting errors with line info in detail
