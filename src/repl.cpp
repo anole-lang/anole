@@ -1,8 +1,10 @@
 #include <sstream>
+#include <iostream>
 #include "repl.hpp"
 #include "parser.hpp"
 
 using namespace std;
+using std::cout;
 
 namespace ice_language
 {
