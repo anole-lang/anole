@@ -4,6 +4,7 @@
 #include <istream>
 #include <iostream>
 #include <iterator>
+#include <functional>
 #include "helper.hpp"
 #include "ast.hpp"
 #include "tokenizer.hpp"
@@ -16,14 +17,17 @@ class Parser
     Parser(std::istream & = std::cin,
         std::string = "<stdin>");
     void reset();
+    void set_continue_action(std::function<void()>);
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();
 
   private:
     Token current_token_;
     Tokenizer tokenizer_;
-    Token get_next_token();
+    std::function<void()> continue_action_;
 
+    Token get_next_token();
+    void try_continue();
     std::string get_err_info(const std::string &message);
 
     ExprList gen_arguments();

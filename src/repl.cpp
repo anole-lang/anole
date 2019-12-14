@@ -10,22 +10,33 @@ namespace ice_language
 {
 void ReadEvalPrintLoop::run()
 {
-    std::cout <<
+    cout <<
 "    _____________________\n"
 "   /_  ___/ _____/ _____/\n"
 "    / /  / /    / /____      Version 0.0.1 \n"
 " __/ /__/ /____/ /____       http://ice.jusot.com\n"
 "/______/______/______/   \n"
-    << std::endl;
-    std::cout << ">> ";
+    << endl;
     AST::interpret_mode() = true;
 
     string line;
-    std::getline(cin, line);
-    istringstream ss(line);
+    while (line.empty())
+    {
+        cout << ">> ";
+        std::getline(cin, line);
+    }
+    istringstream ss(line += '\n');
 
     Parser parser{ss}; Code code;
     auto frame = make_shared<Frame>();
+
+    parser.set_continue_action([&ss, &line, &parser]
+    {
+        cout << ".. ";
+        std::getline(cin, line);
+        ss.clear(); ss.str(line += '\n');
+        parser.reset();
+    });
 
     while (true)
     {
@@ -39,23 +50,13 @@ void ReadEvalPrintLoop::run()
         {
             cerr << e.what() << endl;
         }
-        catch (...)
-        {
-            if (!line.empty())
-            {
-                cout << ".. ";
-                string temp;
-                std::getline(cin, temp);
-                line += '\n' + temp;
-                ss.clear(); ss.str(line);
-                parser.reset();
-                continue;
-            }
-        }
 
-        cout << ">> ";
-        std::getline(cin, line);
-        ss.clear(); ss.str(line);
+        do
+        {
+            cout << ">> ";
+            std::getline(cin, line);
+        } while (line.empty());
+        ss.clear(); ss.str(line += '\n');
         parser.reset();
     }
 }

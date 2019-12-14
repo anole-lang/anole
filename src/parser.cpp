@@ -5,14 +5,10 @@
 #include "parser.hpp"
 
 #define THROW(MESSAGE) \
-    { \
-        if (current_token_.token_id == TokenId::End \
-            && AST::interpret_mode()) \
-            throw exception(); \
-        throw runtime_error(get_err_info(MESSAGE)); \
-    }
+    throw runtime_error(get_err_info(MESSAGE))
 
 #define CHECK_AND_THROW(TOKEN_ID, MESSAGE) \
+    try_continue(); \
     if (current_token_.token_id != TOKEN_ID) \
         THROW(MESSAGE)
 
@@ -32,6 +28,13 @@ void Parser::reset()
     get_next_token();
 }
 
+void Parser::set_continue_action(
+    function<void()> action
+)
+{
+    continue_action_ = move(action);
+}
+
 // use when interacting & return stmt node
 Ptr<AST> Parser::gen_statement()
 {
@@ -47,6 +50,20 @@ Ptr<AST> Parser::gen_statements()
 Token Parser::get_next_token()
 {
     return current_token_ = tokenizer_.next();
+}
+
+void Parser::try_continue()
+{
+    if (current_token_.token_id == TokenId::End
+        and AST::interpret_mode())
+    {
+        continue_action_();
+    }
+}
+
+std::string Parser::get_err_info(const string &message)
+{
+    return tokenizer_.get_err_info(message);
 }
 
 ExprList Parser::gen_arguments()
@@ -112,7 +129,7 @@ Ptr<BlockExpr> Parser::gen_block()
 {
     CHECK_AND_THROW(TokenId::LBrace, "missing symbol '{'");
     get_next_token(); // eat '{'
-
+    try_continue();
     auto block = make_shared<BlockExpr>();
     // '}' means the end of a block
     while (current_token_.token_id != TokenId::RBrace)
@@ -205,7 +222,6 @@ Ptr<Stmt> Parser::gen_stmt()
     default:
         break;
     }
-    get_next_token();
     THROW("wrong token here");
 }
 
@@ -226,6 +242,7 @@ Ptr<Stmt> Parser::gen_declaration()
     case TokenId::LParen:
         {
             auto args = gen_decl_arguments();
+            try_continue();
             Ptr<BlockExpr> block = nullptr;
             if (current_token_.token_id == TokenId::Colon)
             {
@@ -434,6 +451,7 @@ Ptr<Expr> Parser::gen_expr(int priority)
         {
             auto op = current_token_.token_id;
             get_next_token();
+            try_continue();
             return make_shared<UnaryOperatorExpr>(
                 op, gen_expr(priority)
             );
@@ -456,6 +474,7 @@ Ptr<Expr> Parser::gen_expr(int priority)
 
 Ptr<Expr> Parser::gen_term()
 {
+    try_continue();
     Ptr<Expr> node = nullptr;
     switch (current_token_.token_id)
     {
@@ -668,6 +687,7 @@ Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
 Ptr<Expr> Parser::gen_lambda_expr()
 {
     auto args = gen_decl_arguments();
+    try_continue();
     Ptr<BlockExpr> block = nullptr;
 
     if (current_token_.token_id == TokenId::Colon)
@@ -781,10 +801,5 @@ Ptr<Expr> Parser::gen_list_expr()
     get_next_token(); // eat(']')
 
     return make_shared<ListExpr>(expressions);
-}
-
-std::string Parser::get_err_info(const string &message)
-{
-    return tokenizer_.get_err_info(message);
 }
 }
