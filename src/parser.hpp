@@ -16,6 +16,7 @@ class Parser
   public:
     Parser(std::istream & = std::cin,
         std::string = "<stdin>");
+    void cont();
     void reset();
     void set_continue_action(std::function<void()>);
     Ptr<AST> gen_statement();

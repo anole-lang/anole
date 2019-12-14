@@ -17,6 +17,11 @@ Tokenizer::Tokenizer(istream &in, string name_of_in)
     // ...
 }
 
+void Tokenizer::cont()
+{
+    last_input_ = ' ';
+}
+
 void Tokenizer::reset()
 {
     cur_line_num_ = last_line_num_ = 1;
@@ -425,7 +430,7 @@ std::string Tokenizer::get_err_info(const string &message)
         + to_string(last_char_at_line_) + ": "
         + "\033[31merror:\033[0m "s + message + "\n"s
         + "\033[0m" + line + "\n"
-        + string(last_char_at_line_ - 1, ' ') + "\033[31m^\033[0m";
+        + string(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ') + "\033[31m^\033[0m";
     return res;
 }
 }

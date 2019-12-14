@@ -22,6 +22,12 @@ Parser::Parser(istream &in, string name_of_in)
     get_next_token();
 }
 
+void Parser::cont()
+{
+    tokenizer_.cont();
+    get_next_token();
+}
+
 void Parser::reset()
 {
     tokenizer_.reset();
@@ -405,6 +411,7 @@ Ptr<Stmt> Parser::gen_return_stmt()
 
 Ptr<Expr> Parser::gen_delay_expr()
 {
+    try_continue();
     if (current_token_.token_id == TokenId::Delay)
     {
         get_next_token();

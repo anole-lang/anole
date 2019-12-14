@@ -34,8 +34,8 @@ void ReadEvalPrintLoop::run()
     {
         cout << ".. ";
         std::getline(cin, line);
-        ss.clear(); ss.str(line += '\n');
-        parser.reset();
+        ss.clear(); ss.str(line.empty() ? line : (line += '\n'));
+        parser.cont();
     });
 
     while (true)
