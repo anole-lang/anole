@@ -1,5 +1,6 @@
 #include "frame.hpp"
 #include "funcobject.hpp"
+#include "thunkobject.hpp"
 
 #define INS (instructions[pc])
 #define OPRAND(TYPE) (reinterpret_pointer_cast<TYPE>(INS.oprand))
@@ -29,7 +30,19 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Load:
-            push_straight(scope_->load_symbol(*OPRAND(string)));
+            {
+                auto obj = scope_->load_symbol(*OPRAND(string));
+                if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
+                {
+                    auto frame = make_shared<Frame>(
+                        shared_from_this(), thunk->scope());
+                    frame->execute_code(thunk->code(), thunk->base());
+                }
+                else
+                {
+                    push_straight(obj);
+                }
+            }
             break;
 
         case Op::Store:
@@ -133,9 +146,16 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::LambdaDecl:
             {
                 auto args_size = *OPRAND(size_t);
-                push(make_shared<FunctionObject>(scope_, code, ++pc + 1, args_size));
+                push(make_shared<FunctionObject>(
+                    scope_, code, ++pc + 1, args_size));
                 pc = *OPRAND(size_t);
             }
+            continue;
+
+        case Op::ThunkDecl:
+            push(make_shared<ThunkObject>(
+                scope_, code, pc + 1));
+            pc = *OPRAND(size_t);
             continue;
 
         default:

@@ -30,6 +30,7 @@ enum class Op
     JumpIf,       // draft
     JumpIfNot,    // draft
     LambdaDecl,   // done
+    ThunkDecl,
 };
 
 struct Instruction

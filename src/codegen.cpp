@@ -172,7 +172,10 @@ void DictExpr::codegen(Code &code)
 
 void DelayExpr::codegen(Code &code)
 {
-
+    auto o1 = code.add_ins();
+    expr->codegen(code);
+    code.add_ins<Op::Return>();
+    code.set_ins<Op::ThunkDecl>(o1, code.size());
 }
 
 void QuesExpr::codegen(Code &code)
