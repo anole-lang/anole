@@ -33,23 +33,23 @@ class Frame : public std::enable_shared_from_this<Frame>
         return_to_->push(pop());
     }
 
-    void push(VoidPtr value)
+    void push(ObjectPtr value)
     {
-        stack_.push(std::make_shared<VoidPtr>(value));
+        stack_.push(std::make_shared<ObjectPtr>(value));
     }
 
-    void push_straight(Ptr<VoidPtr> ptr)
+    void push_straight(Ptr<ObjectPtr> ptr)
     {
         stack_.push(ptr);
     }
 
-    template <typename R = void>
+    template <typename R = Object>
     Ptr<R> top()
     {
         return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
 
-    template <typename R = void>
+    template <typename R = Object>
     Ptr<R> pop()
     {
         auto res = top<R>();
@@ -57,7 +57,7 @@ class Frame : public std::enable_shared_from_this<Frame>
         return res;
     }
 
-    Ptr<VoidPtr> pop_straight()
+    Ptr<ObjectPtr> pop_straight()
     {
         auto res = stack_.top();
         stack_.pop();
@@ -77,7 +77,7 @@ class Frame : public std::enable_shared_from_this<Frame>
   private:
     Ptr<Frame> return_to_;
     Ptr<Scope> scope_;
-    std::stack<Ptr<VoidPtr>> stack_;
+    std::stack<Ptr<ObjectPtr>> stack_;
 };
 
 }

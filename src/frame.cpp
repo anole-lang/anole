@@ -1,6 +1,8 @@
 #include "frame.hpp"
+#include "noneobject.hpp"
 #include "funcobject.hpp"
 #include "thunkobject.hpp"
+#include "integerobject.hpp"
 
 #define INS (instructions[pc])
 #define OPRAND(TYPE) (reinterpret_pointer_cast<TYPE>(INS.oprand))
@@ -22,7 +24,8 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Push:
-            push(INS.oprand);
+            // Draft
+            push(make_shared<IntegerObject>(*OPRAND(long)));
             break;
 
         case Op::Create:
@@ -55,24 +58,23 @@ void Frame::execute_code(Code &code, size_t base)
 
         case Op::Neg:
             {
-                auto v = *pop<long>();
-                push(make_shared<long>(-v));
+                push(pop()->neg());
             }
             break;
 
         case Op::Add:
             {
-                auto lhs = *pop<long>();
-                auto rhs = *pop<long>();
-                push(make_shared<long>(lhs + rhs));
+                auto lhs = pop();
+                auto rhs = pop();
+                push(lhs->add(rhs));
             }
             break;
 
         case Op::Sub:
             {
-                auto lhs = *pop<long>();
-                auto rhs = *pop<long>();
-                push(make_shared<long>(lhs - rhs));
+                auto lhs = pop();
+                auto rhs = pop();
+                push(lhs->sub(rhs));
             }
             break;
 
@@ -91,13 +93,13 @@ void Frame::execute_code(Code &code, size_t base)
                 auto frame = make_shared<Frame>(
                     shared_from_this(), func->scope());
                 auto call_agrs_size = *OPRAND(size_t);
-                for (std::size_t i = call_agrs_size;
+                for (size_t i = call_agrs_size;
                     i < func->args_size(); ++i)
                 {
                     // draft
-                    frame->push(make_shared<long>(0));
+                    frame->push(make_shared<NoneObject>());
                 }
-                for (std::size_t i = 0; i < call_agrs_size; ++i)
+                for (size_t i = 0; i < call_agrs_size; ++i)
                 {
                     frame->push(pop());
                 }
@@ -116,8 +118,8 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::JumpIf:
             {
                 // draft
-                auto cond = *pop<long>();
-                if (!cond)
+                auto cond = pop();
+                if (cond->to_bool())
                 {
                     pc = *OPRAND(size_t);
                     continue;
@@ -134,8 +136,8 @@ void Frame::execute_code(Code &code, size_t base)
                     continue
                 */
                 // Draft
-                auto cond = *pop<long>();
-                if (!cond)
+                auto cond = pop();
+                if (!cond->to_bool())
                 {
                     pc = *OPRAND(size_t);
                     continue;
