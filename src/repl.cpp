@@ -17,7 +17,7 @@ void ReadEvalPrintLoop::run()
 " __/ /__/ /____/ /____       http://ice.jusot.com\n"
 "/______/______/______/   \n"
     << endl;
-    AST::interpret_mode() = true;
+    AST::interpretive() = true;
 
     string line;
     while (line.empty())
@@ -44,7 +44,7 @@ void ReadEvalPrintLoop::run()
         {
             parser.gen_statement()->codegen(code);
             frame->execute_code(code);
-            cout << *frame->pop<long>() << endl;
+            cout << frame->pop()->to_str() << endl;
         }
         catch (const runtime_error &e)
         {
