@@ -12,7 +12,7 @@ enum class Op
     PlaceHolder,
 
     Pop,          // done
-    Push,         // done
+    Push,
 
     Create,       // done
     Load,         // done
@@ -24,13 +24,13 @@ enum class Op
 
     ScopeBegin,   // done
     ScopeEnd,     // done
-    Call,         // draft
+    Call,         // done
     Return,       // done
     Jump,         // done
-    JumpIf,       // draft
-    JumpIfNot,    // draft
+    JumpIf,       // done
+    JumpIfNot,    // done
     LambdaDecl,   // done
-    ThunkDecl,
+    ThunkDecl,    // done
 };
 
 struct Instruction
