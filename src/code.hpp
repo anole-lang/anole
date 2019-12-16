@@ -192,6 +192,9 @@ class Code
             case Op::LambdaDecl:
                 out << i << "\tLambdaDecl\t" << *OPRAND(size_t) << std::endl;
                 break;
+            case Op::ThunkDecl:
+                out << i << "\tThunkDecl\t" << *OPRAND(size_t) << std::endl;
+                break;
             }
         }
 #undef OPRAND
