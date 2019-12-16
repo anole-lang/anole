@@ -6,10 +6,6 @@
 
 namespace ice_language
 {
-/*
-Draft
-
-*/
 class FunctionObject : public Object
 {
   public:
