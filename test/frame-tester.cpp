@@ -5,7 +5,7 @@
 using namespace std;
 using namespace ice_language;
 
-#define PRE Code code; AST::interpret_mode() = true; \
+#define PRE Code code; AST::interpretive() = true; \
             auto frame = make_shared<Frame>();\
             auto ast = Parser(ss).gen_statements();\
             ast->codegen(code);\
@@ -20,7 +20,7 @@ b: a : 3
 a + b
         )");
         PRE;
-        ASSERT(*frame->pop<long>() == 6);
+        ASSERT(frame->pop()->to_str() == "6");
     TEST_END
 
     TEST_METHOD(SimpleFunc)
@@ -29,7 +29,7 @@ a + b
 adddd(1)(2)(3)(4)
         )");
         PRE;
-        ASSERT(*frame->pop<long>() == 10);
+        ASSERT(frame->pop()->to_str() == "10");
     TEST_END
 
     TEST_METHOD(SimpleIfElseStmt)
@@ -52,7 +52,7 @@ foo(0)
         )");
         PRE;
         // code.print();
-        ASSERT(*frame->pop<long>() == 3);
-        ASSERT(*frame->pop<long>() == 2);
+        ASSERT(frame->pop()->to_str() == "3");
+        ASSERT(frame->pop()->to_str() == "2");
     TEST_END
 TEST_END

@@ -3,11 +3,10 @@
 #include <map>
 #include <string>
 #include "helper.hpp"
+#include "object.hpp"
 
 namespace ice_language
 {
-using VoidPtr = Ptr<void>;
-
 class Scope
 {
   public:
@@ -23,19 +22,19 @@ class Scope
     {
         if (!symbols_.count(name))
         {
-            symbols_[name] = std::make_shared<VoidPtr>(nullptr);
+            symbols_[name] = std::make_shared<ObjectPtr>(nullptr);
         }
     }
 
-    Ptr<VoidPtr> load_symbol(const std::string &name)
+    Ptr<ObjectPtr> load_symbol(const std::string &name)
     {
         auto ptr = find_symbol(name);
         return ptr ? ptr
-             : (symbols_[name] = std::make_shared<VoidPtr>(nullptr));
+             : (symbols_[name] = std::make_shared<ObjectPtr>(nullptr));
     }
 
   private:
-    Ptr<VoidPtr> find_symbol(const std::string &name)
+    Ptr<ObjectPtr> find_symbol(const std::string &name)
     {
         if (symbols_.count(name))
         {
@@ -50,6 +49,6 @@ class Scope
     }
 
     Ptr<Scope> pre_scope_;
-    std::map<std::string, Ptr<VoidPtr>> symbols_;
+    std::map<std::string, Ptr<ObjectPtr>> symbols_;
 };
 }
