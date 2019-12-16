@@ -61,7 +61,7 @@ Token Parser::get_next_token()
 void Parser::try_continue()
 {
     if (current_token_.token_id == TokenId::End
-        and AST::interpret_mode())
+        and AST::interpretive())
     {
         continue_action_();
     }
