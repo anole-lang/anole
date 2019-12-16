@@ -32,15 +32,7 @@ adddd(1)(2)(3)(4)
   (@(x): f(delay x(delay x)))
 
 @fact(f):
-  @(n):
-    if n = 0
-    {
-      return 1
-    }
-    else
-    {
-      retrun n * f(n-1)
-    }
+  @(n): (n = 0) ? 1 n * f(n-1)
 
 @result: Y(fact)(5)
 ```
