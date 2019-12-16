@@ -21,10 +21,10 @@ struct AST
     virtual void codegen(Code &) = 0;
 
     // for codegen
-    static bool &interpret_mode()
+    static bool &interpretive()
     {
-        static bool interpret_mode = false;
-        return interpret_mode;
+        static bool mode = false;
+        return mode;
     }
 };
 
