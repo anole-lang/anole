@@ -29,10 +29,10 @@ adddd(1)(2)(3)(4)
 ```
 @Y(f):
   (@(x): f(delay x(delay x)))
-  (@(x): f(delay x(delay x)))
+  (@(x): f(delay x(delay x)));
 
 @fact(f):
-  @(n): (n = 0) ? 1 n * f(n-1)
+  @(n): n ? (n * f(n-1)) 1;
 
-@result: Y(fact)(5)
+@result: Y(fact)(5);
 ```
