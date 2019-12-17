@@ -149,7 +149,7 @@ class Code
                 out << i << "\tPush\t\t" << *OPRAND(long) << std::endl;
                 break;
             case Op::Create:
-                out << i << "\tCreate\t" << *OPRAND(std::string) << std::endl;
+                out << i << "\tCreate\t\t" << *OPRAND(std::string) << std::endl;
                 break;
             case Op::Load:
                 out << i << "\tLoad\t\t" << *OPRAND(std::string) << std::endl;

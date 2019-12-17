@@ -454,6 +454,8 @@ Ptr<Expr> Parser::gen_expr(int priority)
         {
             get_next_token();
             auto true_expr = gen_expr();
+            CHECK_AND_THROW(TokenId::Comma, "miss , here");
+            get_next_token();
             auto false_expr = gen_expr();
             expr = make_shared<QuesExpr>(expr, true_expr, false_expr);
         }
