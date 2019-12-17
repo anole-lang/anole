@@ -93,6 +93,10 @@ void BinaryOperatorExpr::codegen(Code &code)
         code.add_ins<Op::Sub>();
         break;
 
+    case TokenId::Mul:
+        code.add_ins<Op::Mul>();
+        break;
+
     default:
         break;
     }
@@ -180,7 +184,13 @@ void DelayExpr::codegen(Code &code)
 
 void QuesExpr::codegen(Code &code)
 {
-
+    cond->codegen(code);
+    auto o1 = code.add_ins();
+    true_expr->codegen(code);
+    auto o2 = code.add_ins();
+    code.set_ins<Op::JumpIfNot>(o1, code.size());
+    false_expr->codegen(code);
+    code.set_ins<Op::Jump>(o2, code.size());
 }
 
 void UsingStmt::codegen(Code &code)
