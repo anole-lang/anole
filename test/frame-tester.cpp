@@ -14,10 +14,10 @@ using namespace ice_language;
 TEST_CLASS(Frame)
     TEST_METHOD(SimpleRun)
         istringstream ss(R"(
-a: 1
-b: 2
-b: a : 3
-a + b
+a: 1;
+b: 2;
+b: a : 3;
+a + b;
         )");
         PRE;
         ASSERT(frame->pop()->to_str() == "6");
@@ -25,8 +25,8 @@ a + b
 
     TEST_METHOD(SimpleFunc)
         istringstream ss(R"(
-@adddd: @(a): @(b): @(c): @(d): a + b + c + d
-adddd(1)(2)(3)(4)
+@adddd: @(a): @(b): @(c): @(d): a + b + c + d;
+adddd(1)(2)(3)(4);
         )");
         PRE;
         ASSERT(frame->pop()->to_str() == "10");
@@ -34,21 +34,21 @@ adddd(1)(2)(3)(4)
 
     TEST_METHOD(SimpleIfElseStmt)
         istringstream ss(R"(
-a: 1
+a: 1;
 @foo(x)
 {
-    a : 1
+    a : 1;
     if x
     {
-        return a: 2
+        return a: 2;
     }
     else
     {
-        return a: 3
-    }
-}
-foo(1)
-foo(0)
+        return a: 3;
+    };
+};
+foo(1);
+foo(0);
         )");
         PRE;
         // code.print();
