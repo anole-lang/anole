@@ -126,6 +126,8 @@ Ptr<BlockExpr> Parser::gen_stmts()
     while (current_token_.token_id != TokenId::End)
     {
         stmts->statements.push_back(gen_stmt());
+        CHECK_AND_THROW(TokenId::Semicolon, "miss { here");
+        get_next_token();
     }
     return stmts;
 }
@@ -142,6 +144,8 @@ Ptr<BlockExpr> Parser::gen_block()
     {
         auto stmt = gen_stmt();
         if (stmt) block->statements.push_back(stmt);
+        CHECK_AND_THROW(TokenId::Semicolon, "miss { here");
+        get_next_token();
     }
     get_next_token(); // eat '}'
 
@@ -532,6 +536,7 @@ Ptr<Expr> Parser::gen_term()
 
 Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 {
+    try_continue();
     while (current_token_.token_id == TokenId::Dot
       || current_token_.token_id == TokenId::LParen
       || current_token_.token_id == TokenId::LBracket)
@@ -548,6 +553,7 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
         {
             expr = gen_index_expr(expr);
         }
+        try_continue();
     }
 
     if (current_token_.token_id == TokenId::Colon)
@@ -713,9 +719,11 @@ Ptr<Expr> Parser::gen_lambda_expr()
     }
 
     Ptr<Expr> node = make_shared<LambdaExpr>(args, block);
+    try_continue();
     while (current_token_.token_id == TokenId::LParen)
     {
         node = make_shared<ParenOperatorExpr>(node, gen_arguments());
+        try_continue();
     }
 
     return node;
