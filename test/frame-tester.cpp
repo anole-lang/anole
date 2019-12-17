@@ -51,8 +51,22 @@ foo(1);
 foo(0);
         )");
         PRE;
-        // code.print();
         ASSERT(frame->pop()->to_str() == "3");
         ASSERT(frame->pop()->to_str() == "2");
+    TEST_END
+
+    TEST_METHOD(Y)
+        istringstream ss(R"(
+@Y(f):
+  (@(x): f(delay x(delay x)))
+  (@(x): f(delay x(delay x)));
+
+@fact(f):
+  @(n): n ? (n * f(n-1)) 1;
+
+@result: Y(fact)(5);
+        )");
+        PRE;
+        ASSERT(frame->pop()->to_str() == "120");
     TEST_END
 TEST_END

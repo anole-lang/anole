@@ -1,27 +1,27 @@
 ###### Declare local variable or function
 
 ```
-@var: 1
-@foo(): none
+@var: 1;
+@foo(): none;
 @foo()
 {
   return none
-}
+};
 ```
 
 ###### Assignment
 ```
-a: 1
-b: 2
-b: a: 3
-@foo(): a: 4  # it will assign the global a to 4
+a: 1;
+b: 2;
+b: a: 3;
+@foo(): a: 4  # it will assign the global a to 4;
 ```
 
 ###### Closure
 
 ```
-@adddd: @(a): @(b): @(c): @(d): a + b + c + d
-adddd(1)(2)(3)(4)
+@adddd: @(a): @(b): @(c): @(d): a + b + c + d;
+adddd(1)(2)(3)(4);
 ```
 
 ###### Delay expr

@@ -126,8 +126,10 @@ Ptr<BlockExpr> Parser::gen_stmts()
     while (current_token_.token_id != TokenId::End)
     {
         stmts->statements.push_back(gen_stmt());
-        CHECK_AND_THROW(TokenId::Semicolon, "miss { here");
-        get_next_token();
+        if (current_token_.token_id == TokenId::Semicolon)
+        {
+            get_next_token();
+        }
     }
     return stmts;
 }
@@ -144,8 +146,10 @@ Ptr<BlockExpr> Parser::gen_block()
     {
         auto stmt = gen_stmt();
         if (stmt) block->statements.push_back(stmt);
-        CHECK_AND_THROW(TokenId::Semicolon, "miss { here");
-        get_next_token();
+        if (current_token_.token_id == TokenId::Semicolon)
+        {
+            get_next_token();
+        }
     }
     get_next_token(); // eat '}'
 
