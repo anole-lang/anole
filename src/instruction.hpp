@@ -21,6 +21,7 @@ enum class Op
     Neg,          // done
     Add,          // done
     Sub,          // done
+    Mul,
 
     ScopeBegin,   // done
     ScopeEnd,     // done

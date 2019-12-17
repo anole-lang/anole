@@ -167,6 +167,9 @@ class Code
             case Op::Sub:
                 out << i << "\tSub" << std::endl;
                 break;
+            case Op::Mul:
+                out << i << "\tMul" << std::endl;
+                break;
 
             case Op::ScopeBegin:
                 out << i << "\tScopeBegin" << std::endl;
