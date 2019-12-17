@@ -109,6 +109,10 @@ Token Tokenizer::next()
                 token = make_shared<Token>(TokenId::Colon);
                 break;
 
+            case ';':
+                token = make_shared<Token>(TokenId::Semicolon);
+                break;
+
             case ',':
                 token = make_shared<Token>(TokenId::Comma);
                 break;

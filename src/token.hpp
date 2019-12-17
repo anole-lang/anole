@@ -50,6 +50,7 @@ enum class TokenId
     RBrace,    // }
 
     Colon,     // :
+    Semicolon, // ;
     Add,       // +
     Sub,       // -
     Mul,       // *
