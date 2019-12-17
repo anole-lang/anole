@@ -13,11 +13,11 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 + [ ] Add more tests for the front end
 + [ ] Support the built-in classes
-+ [ ] Support call-by-need
 + [ ] Read from file and complie IR to file
 
 ## Done
 
++ [X] Support call-by-need
 + [X] Better implementation of REPL without try-throw
 + [X] Simple REPL with try-throw
 + [X] Complete basic things in vm such as function, control flow and some operators
