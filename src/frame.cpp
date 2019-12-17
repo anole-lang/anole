@@ -78,6 +78,14 @@ void Frame::execute_code(Code &code, size_t base)
             }
             break;
 
+        case Op::Mul:
+            {
+                auto lhs = pop();
+                auto rhs = pop();
+                push(lhs->mul(rhs));
+            }
+            break;
+
         case Op::ScopeBegin:
             scope_ = std::make_shared<Scope>(scope_);
             break;
@@ -129,13 +137,6 @@ void Frame::execute_code(Code &code, size_t base)
 
         case Op::JumpIfNot:
             {
-                // auto cond = pop();
-                /*
-                if cond is false
-                    pc = *OPRAND(size_t)
-                    continue
-                */
-                // Draft
                 auto cond = pop();
                 if (!cond->to_bool())
                 {
