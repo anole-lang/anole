@@ -21,6 +21,8 @@ class FunctionObject : public Object
     std::size_t base() { return base_; }
     std::size_t args_size() { return args_size_; }
 
+    std::string to_str() override;
+
   private:
     Ptr<Scope> scope_;
     Code &code_;
