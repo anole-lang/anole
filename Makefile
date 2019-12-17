@@ -47,7 +47,8 @@ CPP4Frame = test/frame-tester.cpp \
 			src/codegen.cpp \
 			src/frame.cpp \
 			src/object.cpp \
-			src/integerobject.cpp
+			src/integerobject.cpp \
+			src/funcobject.cpp
 
 tmp/tokenizer-tester: ${CPP4Tokenizer} | ./tmp
 	${CC} ${FLAGS} $^ -o $@
