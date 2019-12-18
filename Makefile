@@ -39,6 +39,7 @@ CPP4Parser = test/parser-tester.cpp \
 			 src/tokenizer.cpp \
 			 src/parser.cpp \
 			 src/codegen.cpp \
+			 src/code.cpp \
 			 src/object.cpp \
 			 src/integerobject.cpp \
 			 src/funcobject.cpp
@@ -48,6 +49,7 @@ CPP4Frame = test/frame-tester.cpp \
 			src/tokenizer.cpp \
 			src/parser.cpp \
 			src/codegen.cpp \
+			src/code.cpp \
 			src/frame.cpp \
 			src/object.cpp \
 			src/integerobject.cpp \
