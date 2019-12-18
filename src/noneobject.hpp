@@ -1,11 +1,14 @@
 #pragma once
 
+#include <memory>
 #include "object.hpp"
 
 namespace ice_language
 {
 class NoneObject : public Object
 {
-  public:
+
 };
+
+inline auto TheNoneObject = std::make_shared<NoneObject>();
 }
