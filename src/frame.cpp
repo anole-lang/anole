@@ -23,11 +23,6 @@ void Frame::execute_code(Code &code, size_t base)
             pop();
             break;
 
-        case Op::Push:
-            // Draft
-            push(make_shared<IntegerObject>(*OPRAND(long)));
-            break;
-
         case Op::Create:
             scope_->create_symbol(*OPRAND(string));
             break;
@@ -46,6 +41,10 @@ void Frame::execute_code(Code &code, size_t base)
                     push_straight(obj);
                 }
             }
+            break;
+
+        case Op::LoadConst:
+            push(code.load_const(*OPRAND(size_t)));
             break;
 
         case Op::Store:
