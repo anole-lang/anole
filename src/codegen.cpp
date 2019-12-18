@@ -2,6 +2,9 @@
 #include <memory>
 #include "ast.hpp"
 #include "code.hpp"
+#include "floatobject.hpp"
+#include "stringobject.hpp"
+#include "integerobject.hpp"
 
 using namespace std;
 
@@ -23,27 +26,41 @@ void BlockExpr::codegen(Code &code)
 
 void NoneExpr::codegen(Code &code)
 {
-    code.add_ins<Op::Push>(nullptr);
+    code.add_ins<Op::LoadConst>(0);
 }
 
 void IntegerExpr::codegen(Code &code)
 {
-    code.add_ins<Op::Push>(value);
+    code.add_ins<Op::LoadConst>(
+        code.create_const<IntegerObject>(
+            to_string(value), value
+        )
+    );
 }
 
 void FloatExpr::codegen(Code &code)
 {
-    code.add_ins<Op::Push>(value);
+    code.add_ins<Op::LoadConst>(
+        code.create_const<FloatObject>(
+            to_string(value), value
+        )
+    );
 }
 
 void BoolExpr::codegen(Code &code)
 {
-    code.add_ins<Op::Push>(value);
+    code.add_ins<Op::LoadConst>(
+        static_cast<size_t>(value ? 1 : 2)
+    );
 }
 
 void StringExpr::codegen(Code &code)
 {
-    code.add_ins<Op::Push>(value);
+    code.add_ins<Op::LoadConst>(
+        code.create_const<StringObject>(
+            's' + value, value
+        )
+    );
 }
 
 void IdentifierExpr::codegen(Code &code)
@@ -114,7 +131,7 @@ void LambdaExpr::codegen(Code &code)
         code.add_ins<Op::Pop>();
     }
     block->codegen(code);
-    code.add_ins<Op::Push>(0);
+    code.add_ins<Op::LoadConst>(0);
     code.add_ins<Op::Return>();
     code.set_ins<Op::LambdaDecl>(o1, arg_decls.size());
     code.set_ins<Op::LambdaDecl>(o2, code.size());
