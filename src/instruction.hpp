@@ -12,16 +12,16 @@ enum class Op
     PlaceHolder,
 
     Pop,          // done
-    Push,
 
     Create,       // done
     Load,         // done
+    LoadConst,
     Store,        // done
 
     Neg,          // done
     Add,          // done
     Sub,          // done
-    Mul,
+    Mul,          // done
 
     ScopeBegin,   // done
     ScopeEnd,     // done
