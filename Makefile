@@ -5,64 +5,47 @@ ADD =
 CC = clang++
 FLAGS = -g -std=c++17 -stdlib=libstdc++ ${ADD}
 
-DIR_SRC = ./src
 DIR_OBJ = ./obj
 DIR_BIN = ./bin
 
-SRC = $(wildcard ${DIR_SRC}/*.cpp)
-OBJ = $(patsubst %.cpp, ${DIR_OBJ}/%.o, $(notdir ${SRC}))
-
-# for ice
+OBJ = obj/tokenizer.so obj/parser.so obj/code.so obj/objects.so obj/frame.so obj/repl.so
+FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 
 BIN_TARGET = $(DIR_BIN)/$(TARGET)
 
-${BIN_TARGET}: ${OBJ} | ${DIR_BIN}
-	${CC} ${FLAGS} ${OBJ} -o $@
+${BIN_TARGET}: src/main.cpp ${OBJ} | ${DIR_BIN}
+	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
-${DIR_OBJ}/%.o: ${DIR_SRC}/%.cpp | ${DIR_OBJ}
-	${CC} ${FLAGS} -c $< -o $@
+obj/tokenizer.so: src/token.cpp \
+				  src/tokenizer.cpp | ${DIR_OBJ}
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-${DIR_BIN}:
-	mkdir $@
+obj/parser.so: src/parser.cpp
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-${DIR_OBJ}:
-	mkdir $@
+obj/code.so: src/codegen.cpp \
+			 src/code.cpp
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-# for testers
+obj/objects.so: src/object.cpp \
+				src/funcobject.cpp \
+				src/integerobject.cpp
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-CPP4Tokenizer = test/tokenizer-tester.cpp \
-			src/token.cpp \
-			src/tokenizer.cpp
+obj/frame.so: src/frame.cpp
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-CPP4Parser = test/parser-tester.cpp \
-			 src/token.cpp \
-			 src/tokenizer.cpp \
-			 src/parser.cpp \
-			 src/codegen.cpp \
-			 src/code.cpp \
-			 src/object.cpp \
-			 src/integerobject.cpp \
-			 src/funcobject.cpp
+obj/repl.so: src/repl.cpp
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-CPP4Frame = test/frame-tester.cpp \
-			src/token.cpp \
-			src/tokenizer.cpp \
-			src/parser.cpp \
-			src/codegen.cpp \
-			src/code.cpp \
-			src/frame.cpp \
-			src/object.cpp \
-			src/integerobject.cpp \
-			src/funcobject.cpp
+tmp/tokenizer-tester: test/tokenizer-tester.cpp ${OBJ} | ./tmp
+	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
-tmp/tokenizer-tester: ${CPP4Tokenizer} | ./tmp
-	${CC} ${FLAGS} $^ -o $@
+tmp/parser-tester: test/parser-tester.cpp ${OBJ}
+	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
-tmp/parser-tester: ${CPP4Parser}
-	${CC} ${FLAGS} $^ -o $@
-
-tmp/frame-tester: ${CPP4Frame}
-	${CC} ${FLAGS} $^ -o $@
+tmp/frame-tester: test/frame-tester.cpp ${OBJ}
+	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
 test: tmp/tokenizer-tester \
 	  tmp/parser-tester \
@@ -70,6 +53,12 @@ test: tmp/tokenizer-tester \
 	tmp/tokenizer-tester
 	tmp/parser-tester
 	tmp/frame-tester
+
+${DIR_BIN}:
+	mkdir $@
+
+${DIR_OBJ}:
+	mkdir $@
 
 ./tmp:
 	mkdir tmp
