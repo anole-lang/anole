@@ -15,6 +15,7 @@ class Code
 {
   public:
     Code();
+    Code(std::istream &in);
 
     template <Op op = Op::PlaceHolder>
     std::size_t add_ins()
@@ -76,6 +77,8 @@ class Code
     void print(std::ostream &out = std::cout);
 
   private:
+    void create_const(char type, const std::string &value);
+
     std::vector<Instruction> instructions_;
     // these two should be checked is empty or not
     std::vector<std::size_t> breaks_, continues_;

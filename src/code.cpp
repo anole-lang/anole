@@ -1,6 +1,8 @@
 #include "code.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
+#include "stringobject.hpp"
+#include "integerobject.hpp"
 
 #define OPRAND(TYPE) std::reinterpret_pointer_cast<TYPE>(ins.oprand)
 
@@ -17,6 +19,26 @@ Code::Code()
     }
 {
     // ...
+}
+
+Code::Code(istream &in)
+  : Code()
+{
+    string line;
+    std::getline(in, line);
+    auto constants_num = stoull(line);
+    for (uint64_t i = 0; i < constants_num; ++i)
+    {
+        std::getline(in, line);
+        auto len = stoull(line);
+        char type = in.get(); string value;
+        for (uint64_t j = 1; j < len; ++j)
+        {
+            value += in.get();
+        }
+        create_const(type, value);
+        in.get();
+    }
 }
 
 size_t Code::size()
@@ -90,6 +112,13 @@ ObjectPtr Code::load_const(size_t ind)
 
 void Code::print(ostream &out)
 {
+    cout << constants_literals_.size() << endl;
+
+    for (auto &literal : constants_literals_)
+    {
+        out << literal.size() << endl << literal << endl;
+    }
+
     for (std::size_t i = 0; i < instructions_.size(); ++i)
     {
         auto &ins = instructions_[i];
@@ -154,6 +183,27 @@ void Code::print(ostream &out)
             out << i << "\tThunkDecl\t" << *OPRAND(size_t) << std::endl;
             break;
         }
+    }
+}
+
+void Code::create_const(char type, const string &value)
+{
+    auto literal = type + value;
+    constants_map_[literal] = constants_.size();
+    constants_literals_.push_back(literal);
+    switch (type)
+    {
+    case 'i':
+        constants_.push_back(make_shared<IntegerObject>(stol(value)));
+        break;
+    case 'f':
+        constants_.push_back(make_shared<IntegerObject>(stod(value)));
+        break;
+    case 's':
+        constants_.push_back(make_shared<StringObject>(value));
+        break;
+    default:
+        break;
     }
 }
 }

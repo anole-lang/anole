@@ -33,7 +33,7 @@ void IntegerExpr::codegen(Code &code)
 {
     code.add_ins<Op::LoadConst>(
         code.create_const<IntegerObject>(
-            to_string(value), value
+            'i' + to_string(value), value
         )
     );
 }
@@ -42,7 +42,7 @@ void FloatExpr::codegen(Code &code)
 {
     code.add_ins<Op::LoadConst>(
         code.create_const<FloatObject>(
-            to_string(value), value
+            'f' + to_string(value), value
         )
     );
 }
