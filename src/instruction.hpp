@@ -15,7 +15,7 @@ enum class Op
 
     Create,       // done
     Load,         // done
-    LoadConst,
+    LoadConst,    // done
     Store,        // done
 
     Neg,          // done
