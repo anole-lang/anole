@@ -75,10 +75,9 @@ class Code
     }
 
     void print(std::ostream &out = std::cout);
+    void to_file(std::ostream &out);
 
   private:
-    void create_const(char type, const std::string &value);
-
     std::vector<Instruction> instructions_;
     // these two should be checked is empty or not
     std::vector<std::size_t> breaks_, continues_;

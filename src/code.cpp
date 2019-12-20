@@ -24,21 +24,7 @@ Code::Code()
 Code::Code(istream &in)
   : Code()
 {
-    string line;
-    std::getline(in, line);
-    auto constants_num = stoull(line);
-    for (uint64_t i = 0; i < constants_num; ++i)
-    {
-        std::getline(in, line);
-        auto len = stoull(line);
-        char type = in.get(); string value;
-        for (uint64_t j = 1; j < len; ++j)
-        {
-            value += in.get();
-        }
-        create_const(type, value);
-        in.get();
-    }
+    // ...
 }
 
 size_t Code::size()
@@ -112,14 +98,16 @@ ObjectPtr Code::load_const(size_t ind)
 
 void Code::print(ostream &out)
 {
-    cout << constants_literals_.size() << endl;
+    cout << "Constants:\nConsIndex\tValue" << endl;
 
-    for (auto &literal : constants_literals_)
+    for (size_t i = 0; i < constants_literals_.size(); ++i)
     {
-        out << literal.size() << endl << literal << endl;
+        cout << i + 3 << "\t\t" << constants_literals_[i] << endl;
     }
 
-    for (std::size_t i = 0; i < instructions_.size(); ++i)
+    cout << "\nInstructions:\nLine\tOp" << endl;
+
+    for (size_t i = 0; i < instructions_.size(); ++i)
     {
         auto &ins = instructions_[i];
         switch (ins.op)
@@ -186,24 +174,8 @@ void Code::print(ostream &out)
     }
 }
 
-void Code::create_const(char type, const string &value)
+void Code::to_file(ostream &out)
 {
-    auto literal = type + value;
-    constants_map_[literal] = constants_.size();
-    constants_literals_.push_back(literal);
-    switch (type)
-    {
-    case 'i':
-        constants_.push_back(make_shared<IntegerObject>(stol(value)));
-        break;
-    case 'f':
-        constants_.push_back(make_shared<IntegerObject>(stod(value)));
-        break;
-    case 's':
-        constants_.push_back(make_shared<StringObject>(value));
-        break;
-    default:
-        break;
-    }
+    // ...
 }
 }
