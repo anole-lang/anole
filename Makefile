@@ -29,10 +29,12 @@ obj/code.so: src/codegen.cpp \
 
 obj/objects.so: src/object.cpp \
 				src/funcobject.cpp \
-				src/integerobject.cpp
+				src/integerobject.cpp \
+				src/builtinfuncobject.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-obj/frame.so: src/frame.cpp
+obj/frame.so: src/frame.cpp \
+			  src/builtins.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 obj/repl.so: src/repl.cpp
