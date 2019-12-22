@@ -4,6 +4,7 @@
 #include <string>
 #include "helper.hpp"
 #include "object.hpp"
+#include "builtinfuncobject.hpp"
 
 namespace ice_language
 {
@@ -40,11 +41,17 @@ class Scope
         {
             return symbols_[name];
         }
+        else if (pre_scope_)
+        {
+            return pre_scope_->find_symbol(name);
+        }
+        else if (auto func = BuiltInFunctionObject::load_built_in_function(name))
+        {
+            return std::make_shared<ObjectPtr>(func);
+        }
         else
         {
-            return pre_scope_
-                 ? pre_scope_->find_symbol(name)
-                 : nullptr;
+            return nullptr;
         }
     }
 
