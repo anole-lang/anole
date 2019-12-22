@@ -15,7 +15,7 @@ bool Object::to_bool()
 
 string Object::to_str()
 {
-    return "easy to string"s;
+    return "";
 }
 
 ObjectPtr Object::neg()
