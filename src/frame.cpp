@@ -3,6 +3,7 @@
 #include "funcobject.hpp"
 #include "thunkobject.hpp"
 #include "integerobject.hpp"
+#include "builtinfuncobject.hpp"
 
 #define INS (instructions[pc])
 #define OPRAND(TYPE) (reinterpret_pointer_cast<TYPE>(INS.oprand))
@@ -95,6 +96,7 @@ void Frame::execute_code(Code &code, size_t base)
 
         case Op::Call:
             // draft
+            if (dynamic_pointer_cast<FunctionObject>(top()))
             {
                 auto func = pop<FunctionObject>();
                 auto frame = make_shared<Frame>(
@@ -111,6 +113,11 @@ void Frame::execute_code(Code &code, size_t base)
                     frame->push(pop());
                 }
                 frame->execute_code(func->code(), func->base());
+            }
+            else if (dynamic_pointer_cast<BuiltInFunctionObject>(top()))
+            {
+                auto builtin = pop<BuiltInFunctionObject>();
+                (*builtin)(shared_from_this());
             }
             break;
 
