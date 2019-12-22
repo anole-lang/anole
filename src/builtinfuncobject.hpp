@@ -1,15 +1,21 @@
 #pragma once
 
+#include <cstdio>
 #include <vector>
 #include <string>
 #include <functional>
-#include "frame.hpp"
 #include "object.hpp"
+
+#define REGISTER_BUILTIN(NAME, ARGS_NUM, FUNC) \
+    __attribute__((constructor)) void T ## __LINE__ () \
+    { \
+        BuiltInFunctionObject::register_built_in_function(NAME, ARGS_NUM, [](vector<ObjectPtr> args) -> ObjectPtr \
+            FUNC \
+        ); \
+    }
 
 namespace ice_language
 {
-ObjectPtr load_built_in_function(std::string);
-
 class BuiltInFunctionObject : public Object
 {
   public:
@@ -18,19 +24,12 @@ class BuiltInFunctionObject : public Object
       : args_num_(args_num),
         func_(std::move(func)) {}
 
-    void operator()(std::shared_ptr<Frame> frame)
-    {
-        std::vector<ObjectPtr> args;
-        for (size_t i = 0; i < args_num_; ++i)
-        {
-            args.push_back(frame->pop());
-        }
-        auto res = func_(args);
-        if (res)
-        {
-            frame->push(res);
-        }
-    }
+    static ObjectPtr load_built_in_function(const std::string &);
+    static void register_built_in_function(
+        const std::string &, std::size_t,
+        std::function<ObjectPtr(std::vector<ObjectPtr>&)>);
+
+    void operator()(std::shared_ptr<class Frame> frame);
 
   private:
     std::size_t args_num_;
