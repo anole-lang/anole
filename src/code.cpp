@@ -13,9 +13,9 @@ namespace ice_language
 Code::Code()
   : constants_
     {
-        TheNoneObject,
-        TheTrueBool,
-        TheFalseBool
+        theNone,
+        theTrue,
+        theFalse
     }
 {
     // ...

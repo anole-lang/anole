@@ -48,7 +48,7 @@ void ReadEvalPrintLoop::run()
             parser.gen_statement()->codegen(code);
             frame->execute_code(code, base);
             base = code.size();
-            if (frame->top() != TheNoneObject)
+            if (frame->top() != theNone)
             {
                 cout << frame->pop()->to_str() << endl;
             }

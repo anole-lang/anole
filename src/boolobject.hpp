@@ -14,6 +14,6 @@ class BoolObject : public Object
     bool value_;
 };
 
-inline auto TheTrueBool = std::make_shared<BoolObject>(true);
-inline auto TheFalseBool = std::make_shared<BoolObject>(false);
+inline auto theTrue = std::make_shared<BoolObject>(true);
+inline auto theFalse = std::make_shared<BoolObject>(false);
 }

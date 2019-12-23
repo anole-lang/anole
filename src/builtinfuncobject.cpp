@@ -41,6 +41,6 @@ void BuiltInFunctionObject::operator()(Ptr<Frame> frame)
         args.push_back(frame->pop());
     }
     auto res = func_(args);
-    frame->push(res ? res : TheNoneObject);
+    frame->push(res ? res : theNone);
 }
 }

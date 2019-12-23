@@ -10,5 +10,5 @@ class NoneObject : public Object
 
 };
 
-inline auto TheNoneObject = std::make_shared<NoneObject>();
+inline auto theNone = std::make_shared<NoneObject>();
 }
