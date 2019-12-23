@@ -46,8 +46,8 @@ void ReadEvalPrintLoop::run()
         {
             parser.gen_statement()->codegen(code);
             frame->execute_code(code, base);
-            base = code.size();
             cout << frame->pop()->to_str() << endl;
+            base = code.size();
         }
         catch (const runtime_error &e)
         {
