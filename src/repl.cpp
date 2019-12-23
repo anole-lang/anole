@@ -2,6 +2,7 @@
 #include <iostream>
 #include "repl.hpp"
 #include "parser.hpp"
+#include "noneobject.hpp"
 
 using namespace std;
 using std::cout;
@@ -46,8 +47,11 @@ void ReadEvalPrintLoop::run()
         {
             parser.gen_statement()->codegen(code);
             frame->execute_code(code, base);
-            cout << frame->pop()->to_str() << endl;
             base = code.size();
+            if (frame->top() != TheNoneObject)
+            {
+                cout << frame->pop()->to_str() << endl;
+            }
         }
         catch (const runtime_error &e)
         {
