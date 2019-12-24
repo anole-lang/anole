@@ -1,5 +1,6 @@
 #include "frame.hpp"
 #include "noneobject.hpp"
+#include "boolobject.hpp"
 #include "funcobject.hpp"
 #include "thunkobject.hpp"
 #include "integerobject.hpp"
@@ -29,19 +30,19 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Load:
+        {
+            auto obj = scope_->load_symbol(*OPRAND(string));
+            if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
             {
-                auto obj = scope_->load_symbol(*OPRAND(string));
-                if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
-                {
-                    auto frame = make_shared<Frame>(
-                        shared_from_this(), thunk->scope());
-                    frame->execute_code(thunk->code(), thunk->base());
-                }
-                else
-                {
-                    push_straight(obj);
-                }
+                auto frame = make_shared<Frame>(
+                    shared_from_this(), thunk->scope());
+                frame->execute_code(thunk->code(), thunk->base());
             }
+            else
+            {
+                push_straight(obj);
+            }
+        }
             break;
 
         case Op::LoadConst:
@@ -49,41 +50,39 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Store:
-            {
-                auto p = pop_straight();
-                *p = pop();
-                push_straight(p);
-            }
+        {
+            auto p = pop_straight();
+            *p = pop();
+            push_straight(p);
+        }
             break;
 
         case Op::Neg:
-            {
-                push(pop()->neg());
-            }
+            push(pop()->neg());
             break;
 
         case Op::Add:
-            {
-                auto lhs = pop();
-                auto rhs = pop();
-                push(lhs->add(rhs));
-            }
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->add(rhs));
+        }
             break;
 
         case Op::Sub:
-            {
-                auto lhs = pop();
-                auto rhs = pop();
-                push(lhs->sub(rhs));
-            }
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->sub(rhs));
+        }
             break;
 
         case Op::Mul:
-            {
-                auto lhs = pop();
-                auto rhs = pop();
-                push(lhs->mul(rhs));
-            }
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->mul(rhs));
+        }
             break;
 
         case Op::ScopeBegin:
@@ -130,35 +129,32 @@ void Frame::execute_code(Code &code, size_t base)
             continue;
 
         case Op::JumpIf:
+        {
+            if (pop()->to_bool())
             {
-                // draft
-                auto cond = pop();
-                if (cond->to_bool())
-                {
-                    pc = *OPRAND(size_t);
-                    continue;
-                }
+                pc = *OPRAND(size_t);
+                continue;
             }
+        }
             break;
 
         case Op::JumpIfNot:
+        {
+            if (!pop()->to_bool())
             {
-                auto cond = pop();
-                if (!cond->to_bool())
-                {
-                    pc = *OPRAND(size_t);
-                    continue;
-                }
+                pc = *OPRAND(size_t);
+                continue;
             }
+        }
             break;
 
         case Op::LambdaDecl:
-            {
-                auto args_size = *OPRAND(size_t);
-                push(make_shared<FunctionObject>(
-                    scope_, code, ++pc + 1, args_size));
-                pc = *OPRAND(size_t);
-            }
+        {
+            auto args_size = *OPRAND(size_t);
+            push(make_shared<FunctionObject>(
+                scope_, code, ++pc + 1, args_size));
+            pc = *OPRAND(size_t);
+        }
             continue;
 
         case Op::ThunkDecl:

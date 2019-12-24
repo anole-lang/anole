@@ -50,6 +50,11 @@ class Frame : public std::enable_shared_from_this<Frame>
         return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
 
+    Ptr<ObjectPtr> top_straight()
+    {
+        return stack_.top();
+    }
+
     template <typename R = Object>
     Ptr<R> pop()
     {
@@ -60,7 +65,7 @@ class Frame : public std::enable_shared_from_this<Frame>
 
     Ptr<ObjectPtr> pop_straight()
     {
-        auto res = stack_.top();
+        auto res = top_straight();
         stack_.pop();
         return res;
     }
