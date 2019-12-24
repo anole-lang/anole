@@ -45,10 +45,12 @@ void ReadEvalPrintLoop::run()
     {
         try
         {
-            parser.gen_statement()->codegen(code);
+            auto stmt = parser.gen_statement();
+            stmt->codegen(code);
             frame->execute_code(code, base);
             base = code.size();
-            if (frame->top() != theNone)
+            if (dynamic_pointer_cast<ExprStmt>(stmt)
+                and frame->top() != theNone)
             {
                 cout << frame->pop()->to_str() << endl;
             }
