@@ -150,6 +150,7 @@ Ptr<BlockExpr> Parser::gen_block()
         {
             get_next_token();
         }
+        try_continue();
     }
     get_next_token(); // eat '}'
 
