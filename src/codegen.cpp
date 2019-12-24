@@ -87,6 +87,17 @@ void UnaryOperatorExpr::codegen(Code &code)
         code.add_ins<Op::Neg>();
         break;
 
+    case TokenId::Not:
+    {
+        auto o1 = code.add_ins();
+        code.add_ins<Op::LoadConst>(static_cast<size_t>(1)); // theTrue
+        auto o2 = code.add_ins();
+        code.set_ins<Op::JumpIf>(o1, code.size());
+        code.add_ins<Op::LoadConst>(static_cast<size_t>(2)); // theFalse
+        code.set_ins<Op::Jump>(o2, code.size());
+    }
+        break;
+
     default:
         break;
     }
@@ -94,24 +105,96 @@ void UnaryOperatorExpr::codegen(Code &code)
 
 void BinaryOperatorExpr::codegen(Code &code)
 {
-    rhs->codegen(code);
-    lhs->codegen(code);
     switch (op)
     {
     case TokenId::Colon:
+        rhs->codegen(code);
+        lhs->codegen(code);
         code.add_ins<Op::Store>();
         break;
 
     case TokenId::Add:
+        lhs->codegen(code);
+        rhs->codegen(code);
         code.add_ins<Op::Add>();
         break;
 
     case TokenId::Sub:
+        lhs->codegen(code);
+        rhs->codegen(code);
         code.add_ins<Op::Sub>();
         break;
 
     case TokenId::Mul:
+        lhs->codegen(code);
+        rhs->codegen(code);
         code.add_ins<Op::Mul>();
+        break;
+
+    case TokenId::Div:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Op::Div>();
+        break;
+
+    case TokenId::Mod:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Op::Mod>();
+        break;
+
+    case TokenId::And:
+    {
+        lhs->codegen(code);
+        auto o1 = code.add_ins();
+        rhs->codegen(code);
+        auto o2 = code.add_ins();
+        code.add_ins<Op::LoadConst>(static_cast<size_t>(1));
+        auto o3 = code.add_ins();
+        code.set_ins<Op::JumpIfNot>(o1, code.size());
+        code.set_ins<Op::JumpIfNot>(o2, code.size());
+        code.add_ins<Op::LoadConst>(static_cast<size_t>(2));
+        code.set_ins<Op::Jump>(o3, code.size());
+    }
+        break;
+
+    case TokenId::Or:
+    {
+        lhs->codegen(code);
+        auto o1 = code.add_ins();
+        rhs->codegen(code);
+        auto o2 = code.add_ins();
+        code.add_ins<Op::LoadConst>(static_cast<size_t>(2));
+        auto o3 = code.add_ins();
+        code.set_ins<Op::JumpIf>(o1, code.size());
+        code.set_ins<Op::JumpIf>(o2, code.size());
+        code.add_ins<Op::LoadConst>(static_cast<size_t>(1));
+        code.set_ins<Op::Jump>(o3, code.size());
+    }
+        break;
+
+    case TokenId::CEQ:
+        code.add_ins<Op::CEQ>();
+        break;
+
+    case TokenId::CNE:
+        code.add_ins<Op::CNE>();
+        break;
+
+    case TokenId::CLT:
+        code.add_ins<Op::CLT>();
+        break;
+
+    case TokenId::CLE:
+        code.add_ins<Op::CLE>();
+        break;
+
+    case TokenId::CGT:
+        code.add_ins<Op::CGT>();
+        break;
+
+    case TokenId::CGE:
+        code.add_ins<Op::CGE>();
         break;
 
     default:
