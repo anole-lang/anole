@@ -22,6 +22,15 @@ enum class Op
     Add,          // done
     Sub,          // done
     Mul,          // done
+    Div,
+    Mod,
+
+    CEQ,
+    CNE,
+    CLT,
+    CLE,
+    CGT,
+    CGE,
 
     ScopeBegin,   // done
     ScopeEnd,     // done
