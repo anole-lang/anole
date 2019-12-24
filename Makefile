@@ -28,6 +28,7 @@ obj/code.so: src/codegen.cpp \
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 obj/objects.so: src/object.cpp \
+				src/boolobject.cpp \
 				src/funcobject.cpp \
 				src/integerobject.cpp \
 				src/builtinfuncobject.cpp
