@@ -78,54 +78,6 @@ TEST_CLASS(ParseTerm)
         ASSERT(cast<FloatExpr>(newExpr->args[1])->value == 2.3);
     TEST_END
 
-    TEST_METHOD(ParseMatchExpr)
-        istringstream ss(R"(match var { } match var { 1 => 2 }
-            match var { 1, 2 => 3 } match var { 1 => 2, 3 => 4 }
-            match var { 1 => 2 } else 3)");
-        Parser parser(ss);
-        auto getMatchExpr = [&] {
-            return cast<MatchExpr>(cast<ExprStmt>(parser.gen_statement())->expr); };
-        {
-            auto matchExpr = getMatchExpr();
-            ASSERT(cast<IdentifierExpr>(matchExpr->expr)->name == "var");
-            ASSERT(matchExpr->match_exprs.empty());
-            cast<NoneExpr>(matchExpr->else_expr);
-        }
-        {
-            auto matchExpr = getMatchExpr();
-            ASSERT(matchExpr->match_exprs.size() == 1);
-            ASSERT(matchExpr->return_exprs.size() == 1);
-            ASSERT(cast<IntegerExpr>(matchExpr->match_exprs[0])->value == 1);
-            ASSERT(cast<IntegerExpr>(matchExpr->return_exprs[0])->value == 2);
-        }
-        {
-            auto matchExpr = getMatchExpr();
-            ASSERT(matchExpr->match_exprs.size() == 2);
-            ASSERT(matchExpr->return_exprs.size() == 2);
-            ASSERT(cast<IntegerExpr>(matchExpr->match_exprs[0])->value == 1);
-            ASSERT(cast<IntegerExpr>(matchExpr->match_exprs[1])->value == 2);
-            ASSERT(cast<IntegerExpr>(matchExpr->return_exprs[0])->value == 3);
-            ASSERT(matchExpr->return_exprs[0] == matchExpr->return_exprs[1]);
-        }
-        {
-            auto matchExpr = getMatchExpr();
-            ASSERT(matchExpr->match_exprs.size() == 2);
-            ASSERT(matchExpr->return_exprs.size() == 2);
-            ASSERT(cast<IntegerExpr>(matchExpr->match_exprs[0])->value == 1);
-            ASSERT(cast<IntegerExpr>(matchExpr->match_exprs[1])->value == 3);
-            ASSERT(cast<IntegerExpr>(matchExpr->return_exprs[0])->value == 2);
-            ASSERT(cast<IntegerExpr>(matchExpr->return_exprs[1])->value == 4);
-        }
-        {
-            auto matchExpr = getMatchExpr();
-            ASSERT(matchExpr->match_exprs.size() == 1);
-            ASSERT(matchExpr->return_exprs.size() == 1);
-            ASSERT(cast<IntegerExpr>(matchExpr->match_exprs[0])->value == 1);
-            ASSERT(cast<IntegerExpr>(matchExpr->return_exprs[0])->value == 2);
-            ASSERT(cast<IntegerExpr>(matchExpr->else_expr)->value == 3);
-        }
-    TEST_END
-
     TEST_METHOD(ParseListExpr)
         istringstream ss(R"([1, 2.3, none, true,
             false, "Do you love me", @(){}, new A()])");
