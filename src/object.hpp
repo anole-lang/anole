@@ -17,5 +17,11 @@ class Object
     virtual ObjectPtr add(ObjectPtr);
     virtual ObjectPtr sub(ObjectPtr);
     virtual ObjectPtr mul(ObjectPtr);
+    virtual ObjectPtr div(ObjectPtr);
+    virtual ObjectPtr mod(ObjectPtr);
+    virtual ObjectPtr ceq(ObjectPtr);
+    virtual ObjectPtr cne(ObjectPtr);
+    virtual ObjectPtr clt(ObjectPtr);
+    virtual ObjectPtr cle(ObjectPtr);
 };
 }

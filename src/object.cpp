@@ -37,4 +37,34 @@ ObjectPtr Object::mul(ObjectPtr obj)
 {
     throw runtime_error("no mul method");
 }
+
+ObjectPtr Object::div(ObjectPtr obj)
+{
+    throw runtime_error("no div method");
+}
+
+ObjectPtr Object::mod(ObjectPtr obj)
+{
+    throw runtime_error("no mod method");
+}
+
+ObjectPtr Object::ceq(ObjectPtr obj)
+{
+    throw runtime_error("no ceq method");
+}
+
+ObjectPtr Object::cne(ObjectPtr obj)
+{
+    throw runtime_error("no cne method");
+}
+
+ObjectPtr Object::clt(ObjectPtr obj)
+{
+    throw runtime_error("no clt method");
+}
+
+ObjectPtr Object::cle(ObjectPtr obj)
+{
+    throw runtime_error("no cle method");
+}
 }
