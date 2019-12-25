@@ -3,6 +3,7 @@
 ```
 @var: 1;
 @foo(): none;
+@foo(), return none
 @foo()
 {
   return none
@@ -44,15 +45,9 @@ adddd(1)(2)(3)(4);
   return true;
 }
 
-if true or foo()
-{
-  print(2);
-}
+if true or foo(), print(2);
 
-if false and foo()
-{
-  print(2);
-}
+if false and foo(), print(2);
 ```
 
 ###### Control flow
@@ -62,9 +57,6 @@ while a < 10
 {
   print(a);
   a: a + 1;
-  if a = 7
-  {
-    break;
-  }
+  if a = 7, break;
 }
 ```
