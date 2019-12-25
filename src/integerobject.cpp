@@ -1,3 +1,4 @@
+#include "boolobject.hpp"
 #include "integerobject.hpp"
 
 using namespace std;
@@ -43,6 +44,18 @@ ObjectPtr IntegerObject::mul(ObjectPtr obj)
     if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
     {
         return make_shared<IntegerObject>(value_ * p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
+ObjectPtr IntegerObject::ceq(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return value_ == p->value_ ? theTrue : theFalse;
     }
     else
     {
