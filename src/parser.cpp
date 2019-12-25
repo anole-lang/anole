@@ -137,22 +137,37 @@ Ptr<BlockExpr> Parser::gen_stmts()
 // gen normal block as {...}
 Ptr<BlockExpr> Parser::gen_block()
 {
-    CHECK_AND_THROW(TokenId::LBrace, "missing symbol '{'");
-    get_next_token(); // eat '{'
-    try_continue();
-    auto block = make_shared<BlockExpr>();
-    // '}' means the end of a block
-    while (current_token_.token_id != TokenId::RBrace)
+    Ptr<BlockExpr> block;
+
+    if (current_token_.token_id == TokenId::LBrace)
     {
-        auto stmt = gen_stmt();
-        if (stmt) block->statements.push_back(stmt);
-        if (current_token_.token_id == TokenId::Semicolon)
-        {
-            get_next_token();
-        }
+        get_next_token(); // eat '{'
         try_continue();
+        block = make_shared<BlockExpr>();
+        // '}' means the end of a block
+        while (current_token_.token_id != TokenId::RBrace)
+        {
+            auto stmt = gen_stmt();
+            if (stmt) block->statements.push_back(stmt);
+            if (current_token_.token_id == TokenId::Semicolon)
+            {
+                get_next_token();
+            }
+            try_continue();
+        }
+        get_next_token(); // eat '}'
     }
-    get_next_token(); // eat '}'
+    else if (current_token_.token_id == TokenId::Comma)
+    {
+        get_next_token();
+        try_continue();
+        block = make_shared<BlockExpr>();
+        block->statements.push_back(gen_stmt());
+    }
+    else
+    {
+        THROW("miss '{' or ',' here");
+    }
 
     return block;
 }
