@@ -62,4 +62,16 @@ ObjectPtr IntegerObject::ceq(ObjectPtr obj)
         throw runtime_error("no match method");
     }
 }
+
+ObjectPtr IntegerObject::clt(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return value_ < p->value_ ? theTrue : theFalse;
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
 }

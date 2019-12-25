@@ -16,6 +16,7 @@ class IntegerObject : public Object
     ObjectPtr sub(ObjectPtr) override;
     ObjectPtr mul(ObjectPtr) override;
     ObjectPtr ceq(ObjectPtr) override;
+    ObjectPtr clt(ObjectPtr) override;
 
   private:
     long value_;
