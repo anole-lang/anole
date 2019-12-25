@@ -240,7 +240,7 @@ Ptr<Stmt> Parser::gen_stmt()
     THROW("wrong token here");
 }
 
-// generate declaration or assignment (@.var:)
+// generate declaration or assignment (@var:)
 Ptr<Stmt> Parser::gen_declaration()
 {
     Ptr<Expr> node = gen_ident();
@@ -255,29 +255,29 @@ Ptr<Stmt> Parser::gen_declaration()
         );
 
     case TokenId::LParen:
+    {
+        auto args = gen_decl_arguments();
+        try_continue();
+        Ptr<BlockExpr> block = nullptr;
+        if (current_token_.token_id == TokenId::Colon)
         {
-            auto args = gen_decl_arguments();
-            try_continue();
-            Ptr<BlockExpr> block = nullptr;
-            if (current_token_.token_id == TokenId::Colon)
-            {
-                get_next_token();
-                block = make_shared<BlockExpr>();
-                block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
-            }
-            else if (current_token_.token_id == TokenId::LBrace)
-            {
-                block = gen_block();
-            }
-            else
-            {
-                THROW("missing symbol ':' or '{' after @()");
-            }
-            return make_shared<FunctionDeclarationStmt>(
-                reinterpret_pointer_cast<IdentifierExpr>(node),
-                make_shared<LambdaExpr>(args, block)
-            );
+            get_next_token();
+            block = make_shared<BlockExpr>();
+            block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
         }
+        else if (current_token_.token_id == TokenId::LBrace)
+        {
+            block = gen_block();
+        }
+        else
+        {
+            THROW("missing symbol ':' or '{' after @()");
+        }
+        return make_shared<FunctionDeclarationStmt>(
+            reinterpret_pointer_cast<IdentifierExpr>(node),
+            make_shared<LambdaExpr>(args, block)
+        );
+    }
 
     default:
         break;
