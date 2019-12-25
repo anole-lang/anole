@@ -757,33 +757,29 @@ generate match expr as follow:
 */
 Ptr<Expr> Parser::gen_match_expr()
 {
+    auto match_expr = make_shared<MatchExpr>();
+
     get_next_token(); // eat 'match'
-    auto expression = gen_expr();
-    ExprList mat_expressions, ret_expressions;
+    match_expr->expr = gen_expr();
 
     CHECK_AND_THROW(TokenId::LBrace, "missing symbol '{'");
     get_next_token(); // eat '{'
 
     while (current_token_.token_id != TokenId::RBrace)
     {
-        int counter = 1;
-        mat_expressions.push_back(gen_expr());
-
+        match_expr->keylists.push_back({});
+        match_expr->keylists.back().push_back(gen_expr());
         while (current_token_.token_id == TokenId::Comma)
         {
+            try_continue();
             get_next_token();
-            mat_expressions.push_back(gen_expr());
-            counter++;
+            match_expr->keylists.back().push_back(gen_expr());
         }
 
         CHECK_AND_THROW(TokenId::Ret, "missing symbol '=>'");
         get_next_token();
 
-        auto ret_expression = gen_expr();
-        while (counter--)
-        {
-            ret_expressions.push_back(ret_expression);
-        }
+        match_expr->values.push_back(gen_expr());
 
         if (current_token_.token_id == TokenId::Comma)
         {
@@ -801,11 +797,14 @@ Ptr<Expr> Parser::gen_match_expr()
     if (current_token_.token_id == TokenId::Else)
     {
         get_next_token();
-        return make_shared<MatchExpr>(expression,
-            mat_expressions, ret_expressions, gen_expr());
+        match_expr->else_expr = gen_expr();
     }
-    return make_shared<MatchExpr>(expression,
-        mat_expressions, ret_expressions, make_shared<NoneExpr>());
+    else
+    {
+        match_expr->else_expr = nullptr;
+    }
+
+    return match_expr;
 }
 
 // generate list as [expr1, expr2, ..., exprN]
