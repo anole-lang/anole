@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 #include <string>
 #include <utility>
@@ -153,12 +154,10 @@ struct EnumExpr : Expr
 struct MatchExpr : Expr
 {
     Ptr<Expr> expr;
-    ExprList match_exprs, return_exprs;
+    std::vector<ExprList> keylists;
+    std::vector<Ptr<Expr>> values;
     Ptr<Expr> else_expr;
-    MatchExpr(Ptr<Expr> expr, ExprList match_exprs,
-        ExprList return_exprs, Ptr<Expr> else_expr)
-      : expr(expr), match_exprs(match_exprs),
-        return_exprs(return_exprs), else_expr(else_expr) {}
+    MatchExpr() {}
     void codegen(Code &) override;
 };
 
