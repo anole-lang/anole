@@ -351,12 +351,16 @@ void ExprStmt::codegen(Code &code)
 // completed
 void VariableDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Op::Create>(id->name);
     if (expr)
     {
         expr->codegen(code);
+        code.add_ins<Op::Create>(id->name);
         code.add_ins<Op::Load>(id->name);
         code.add_ins<Op::Store>();
+    }
+    else
+    {
+        code.add_ins<Op::Create>(id->name);
     }
 }
 
