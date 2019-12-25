@@ -133,18 +133,6 @@ void Frame::execute_code(Code &code, size_t base)
         }
             break;
 
-        case Op::Match:
-        {
-            auto key = pop();
-            if (top()->ceq(key)->to_bool())
-            {
-                pop();
-                pc = *OPRAND(size_t);
-                continue;
-            }
-        }
-            break;
-
         case Op::ScopeBegin:
             scope_ = std::make_shared<Scope>(scope_);
             break;
@@ -202,6 +190,18 @@ void Frame::execute_code(Code &code, size_t base)
         {
             if (!pop()->to_bool())
             {
+                pc = *OPRAND(size_t);
+                continue;
+            }
+        }
+            break;
+
+        case Op::Match:
+        {
+            auto key = pop();
+            if (top()->ceq(key)->to_bool())
+            {
+                pop();
                 pc = *OPRAND(size_t);
                 continue;
             }

@@ -30,15 +30,15 @@ enum class Op
     CLT,          // done
     CLE,          // done
 
-    Match,        // done
-
     ScopeBegin,   // done
     ScopeEnd,     // done
+
     Call,         // done
     Return,       // done
     Jump,         // done
     JumpIf,       // done
     JumpIfNot,    // done
+    Match,        // done
     LambdaDecl,   // done
     ThunkDecl,    // done
 };
