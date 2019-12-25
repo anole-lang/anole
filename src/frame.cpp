@@ -85,6 +85,66 @@ void Frame::execute_code(Code &code, size_t base)
         }
             break;
 
+        case Op::Div:
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->div(rhs));
+        }
+            break;
+
+        case Op::Mod:
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->mod(rhs));
+        }
+            break;
+
+        case Op::CEQ:
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->ceq(rhs));
+        }
+            break;
+
+        case Op::CNE:
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->cne(rhs));
+        }
+            break;
+
+        case Op::CLT:
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->clt(rhs));
+        }
+            break;
+
+        case Op::CLE:
+        {
+            auto rhs = pop();
+            auto lhs = pop();
+            push(lhs->cle(rhs));
+        }
+            break;
+
+        case Op::Match:
+        {
+            auto key = pop();
+            if (top()->ceq(key)->to_bool())
+            {
+                pop();
+                pc = *OPRAND(size_t);
+                continue;
+            }
+        }
+            break;
+
         case Op::ScopeBegin:
             scope_ = std::make_shared<Scope>(scope_);
             break;
