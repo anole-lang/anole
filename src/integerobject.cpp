@@ -15,6 +15,11 @@ string IntegerObject::to_str()
     return to_string(value_);
 }
 
+string IntegerObject::to_key()
+{
+    return 'i' + to_str();
+}
+
 ObjectPtr IntegerObject::neg()
 {
     return make_shared<IntegerObject>(-value_);

@@ -12,6 +12,7 @@ class IntegerObject : public Object
 
     bool to_bool() override;
     std::string to_str() override;
+    std::string to_key() override;
     ObjectPtr neg() override;
     ObjectPtr add(ObjectPtr) override;
     ObjectPtr sub(ObjectPtr) override;
