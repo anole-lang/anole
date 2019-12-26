@@ -8,13 +8,17 @@ namespace ice_language
 class ListObject : public Object
 {
   public:
-    ListObject(std::vector<ObjectPtr> objects);
+    ListObject();
 
     bool to_bool() override;
     std::string to_str() override;
-    ObjectPtr index(ObjectPtr) override;
+    Ptr<ObjectPtr> index(ObjectPtr) override;
+    Ptr<ObjectPtr> load_member(const std::string &name) override;
+
+    std::vector<Ptr<ObjectPtr>> &objects();
+    void append(ObjectPtr obj);
 
   private:
-    std::vector<ObjectPtr> objects_;
+    std::vector<Ptr<ObjectPtr>> objects_;
 };
 }

@@ -1,3 +1,6 @@
+#include <map>
+#include <utility>
+#include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "listobject.hpp"
 #include "integerobject.hpp"
@@ -7,8 +10,42 @@ using namespace std;
 
 namespace ice_language
 {
-ListObject::ListObject(std::vector<ObjectPtr> objects)
-  : objects_(std::move(objects)) {}
+static map<string, pair<size_t, function<ObjectPtr(ListObject *, vector<ObjectPtr>&)>>>
+built_in_methods_for_list
+{
+    {
+        "empty",
+        {
+            0, [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+            {
+                return obj->objects().empty() ? theTrue : theFalse;
+            }
+        }
+    },
+    {
+        "size",
+        {
+            0,
+            [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+            {
+                return make_shared<IntegerObject>(static_cast<long>(obj->objects().size()));
+            }
+        }
+    },
+    {
+        "append",
+        {
+            1,
+            [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+            {
+                obj->append(objs[0]);
+                return nullptr;
+            }
+        }
+    }
+};
+
+ListObject::ListObject() = default;
 
 bool ListObject::to_bool()
 {
@@ -21,12 +58,12 @@ string ListObject::to_str()
     for (size_t i = 0; i < objects_.size(); ++i)
     {
         if (i) res += ", ";
-        res += objects_[i]->to_str();
+        res += (*objects_[i])->to_str();
     }
     return res + "]";
 }
 
-ObjectPtr ListObject::index(ObjectPtr index)
+Ptr<ObjectPtr> ListObject::index(ObjectPtr index)
 {
     if (auto p = dynamic_pointer_cast<IntegerObject>(index))
     {
@@ -36,6 +73,34 @@ ObjectPtr ListObject::index(ObjectPtr index)
     {
         throw runtime_error("index should be integer");
     }
+}
+
+Ptr<ObjectPtr> ListObject::load_member(const string &name)
+{
+    if (built_in_methods_for_list.count(name))
+    {
+        auto &num_func = built_in_methods_for_list[name];
+        auto func = num_func.second;
+        return make_shared<ObjectPtr>(
+            make_shared<BuiltInFunctionObject>(num_func.first,
+                [this, func](vector<ObjectPtr> &objs) -> ObjectPtr
+                {
+                    return func(this, objs);
+                }
+            )
+        );
+    }
+    return Object::load_member(name);
+}
+
+vector<Ptr<ObjectPtr>> &ListObject::objects()
+{
+    return objects_;
+}
+
+void ListObject::append(ObjectPtr obj)
+{
+    objects_.push_back(make_shared<ObjectPtr>(obj));
 }
 
 /*
