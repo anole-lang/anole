@@ -12,6 +12,9 @@ class StringObject : public Object
     StringObject(std::string value)
       : value_(std::move(value)) {}
 
+    bool to_bool() override;
+    std::string to_str() override;
+
   private:
     std::string value_;
 };
