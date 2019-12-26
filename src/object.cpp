@@ -18,6 +18,11 @@ string Object::to_str()
     return "";
 }
 
+string Object::to_key()
+{
+    return "";
+}
+
 ObjectPtr Object::neg()
 {
     throw runtime_error("no neg method");

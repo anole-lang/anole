@@ -13,6 +13,7 @@ class Object
     virtual ~Object() = 0;
     virtual bool to_bool();
     virtual std::string to_str();
+    virtual std::string to_key();
     virtual ObjectPtr neg();
     virtual ObjectPtr add(ObjectPtr);
     virtual ObjectPtr sub(ObjectPtr);
