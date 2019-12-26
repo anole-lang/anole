@@ -26,7 +26,7 @@ void BlockExpr::codegen(Code &code)
 // completed
 void NoneExpr::codegen(Code &code)
 {
-    code.add_ins<Op::LoadConst>(0);
+    code.add_ins<Op::LoadConst, size_t>(0);
 }
 
 // completed
@@ -52,9 +52,7 @@ void FloatExpr::codegen(Code &code)
 // completed
 void BoolExpr::codegen(Code &code)
 {
-    code.add_ins<Op::LoadConst>(
-        static_cast<size_t>(value ? 1 : 2)
-    );
+    code.add_ins<Op::LoadConst, size_t>(value ? 1 : 2);
 }
 
 // completed
@@ -97,10 +95,10 @@ void UnaryOperatorExpr::codegen(Code &code)
     case TokenId::Not:
     {
         auto o1 = code.add_ins();
-        code.add_ins<Op::LoadConst>(static_cast<size_t>(1)); // theTrue
+        code.add_ins<Op::LoadConst, size_t>(1); // theTrue
         auto o2 = code.add_ins();
         code.set_ins<Op::JumpIf>(o1, code.size());
-        code.add_ins<Op::LoadConst>(static_cast<size_t>(2)); // theFalse
+        code.add_ins<Op::LoadConst, size_t>(2); // theFalse
         code.set_ins<Op::Jump>(o2, code.size());
     }
         break;
@@ -156,11 +154,11 @@ void BinaryOperatorExpr::codegen(Code &code)
         auto o1 = code.add_ins();
         rhs->codegen(code);
         auto o2 = code.add_ins();
-        code.add_ins<Op::LoadConst>(static_cast<size_t>(1));
+        code.add_ins<Op::LoadConst, size_t>(1);
         auto o3 = code.add_ins();
         code.set_ins<Op::JumpIfNot>(o1, code.size());
         code.set_ins<Op::JumpIfNot>(o2, code.size());
-        code.add_ins<Op::LoadConst>(static_cast<size_t>(2));
+        code.add_ins<Op::LoadConst, size_t>(2);
         code.set_ins<Op::Jump>(o3, code.size());
     }
         break;
@@ -171,11 +169,11 @@ void BinaryOperatorExpr::codegen(Code &code)
         auto o1 = code.add_ins();
         rhs->codegen(code);
         auto o2 = code.add_ins();
-        code.add_ins<Op::LoadConst>(static_cast<size_t>(2));
+        code.add_ins<Op::LoadConst, size_t>(2);
         auto o3 = code.add_ins();
         code.set_ins<Op::JumpIf>(o1, code.size());
         code.set_ins<Op::JumpIf>(o2, code.size());
-        code.add_ins<Op::LoadConst>(static_cast<size_t>(1));
+        code.add_ins<Op::LoadConst, size_t>(1);
         code.set_ins<Op::Jump>(o3, code.size());
     }
         break;
@@ -233,7 +231,7 @@ void LambdaExpr::codegen(Code &code)
         code.add_ins<Op::Pop>();
     }
     block->codegen(code);
-    code.add_ins<Op::LoadConst>(0);
+    code.add_ins<Op::LoadConst, size_t>(0);
     code.add_ins<Op::Return>();
     code.set_ins<Op::LambdaDecl>(o1, arg_decls.size());
     code.set_ins<Op::LambdaDecl>(o2, code.size());
