@@ -15,6 +15,11 @@ string IntegerObject::to_str()
     return to_string(value_);
 }
 
+ObjectPtr IntegerObject::neg()
+{
+    return make_shared<IntegerObject>(-value_);
+}
+
 ObjectPtr IntegerObject::add(ObjectPtr obj)
 {
     if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
@@ -51,6 +56,30 @@ ObjectPtr IntegerObject::mul(ObjectPtr obj)
     }
 }
 
+ObjectPtr IntegerObject::div(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return make_shared<IntegerObject>(value_ / p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
+ObjectPtr IntegerObject::mod(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return make_shared<IntegerObject>(value_ % p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
 ObjectPtr IntegerObject::ceq(ObjectPtr obj)
 {
     if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
@@ -63,11 +92,35 @@ ObjectPtr IntegerObject::ceq(ObjectPtr obj)
     }
 }
 
+ObjectPtr IntegerObject::cne(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return value_ != p->value_ ? theTrue : theFalse;
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
 ObjectPtr IntegerObject::clt(ObjectPtr obj)
 {
     if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
     {
         return value_ < p->value_ ? theTrue : theFalse;
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
+ObjectPtr IntegerObject::cle(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return value_ <= p->value_ ? theTrue : theFalse;
     }
     else
     {

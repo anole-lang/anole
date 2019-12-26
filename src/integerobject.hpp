@@ -12,11 +12,16 @@ class IntegerObject : public Object
 
     bool to_bool() override;
     std::string to_str() override;
+    ObjectPtr neg() override;
     ObjectPtr add(ObjectPtr) override;
     ObjectPtr sub(ObjectPtr) override;
     ObjectPtr mul(ObjectPtr) override;
+    ObjectPtr div(ObjectPtr) override;
+    ObjectPtr mod(ObjectPtr) override;
     ObjectPtr ceq(ObjectPtr) override;
+    ObjectPtr cne(ObjectPtr) override;
     ObjectPtr clt(ObjectPtr) override;
+    ObjectPtr cle(ObjectPtr) override;
 
   private:
     long value_;
