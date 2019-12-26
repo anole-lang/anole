@@ -639,7 +639,7 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 }
 
 // generate enum as { NAME1, NAME2, ..., NAMEN }
-// or dict as {KEY1: VAL1, KEY2: VAL2, ..., KEYN: VALN}
+// or dict as {KEY1 => VAL1, KEY2 => VAL2, ..., KEYN => VALN}
 Ptr<Expr> Parser::gen_enum_or_dict()
 {
     get_next_token();
@@ -690,12 +690,10 @@ Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
 
 Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
 {
-    CHECK_AND_THROW(TokenId::Ret, "missing symbol ':'");
+    CHECK_AND_THROW(TokenId::Ret, "missing symbol '=>'");
     ExprList keys, values;
     keys.push_back(first);
-
     get_next_token();
-
     values.push_back(gen_expr());
     if (current_token_.token_id == TokenId::Comma) get_next_token();
     while (current_token_.token_id != TokenId::RBrace)
