@@ -23,6 +23,7 @@ class Object
     virtual ObjectPtr cne(ObjectPtr);
     virtual ObjectPtr clt(ObjectPtr);
     virtual ObjectPtr cle(ObjectPtr);
-    virtual ObjectPtr index(ObjectPtr);
+    virtual Ptr<ObjectPtr> index(ObjectPtr);
+    virtual Ptr<ObjectPtr> load_member(const std::string &name);
 };
 }

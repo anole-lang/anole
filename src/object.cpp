@@ -68,8 +68,13 @@ ObjectPtr Object::cle(ObjectPtr)
     throw runtime_error("no cle method");
 }
 
-ObjectPtr Object::index(ObjectPtr)
+Ptr<ObjectPtr> Object::index(ObjectPtr)
 {
     throw runtime_error("not support index");
+}
+
+Ptr<ObjectPtr> Object::load_member(const string &name)
+{
+    throw runtime_error("no member named " + name);
 }
 }
