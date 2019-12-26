@@ -23,48 +23,53 @@ ObjectPtr Object::neg()
     throw runtime_error("no neg method");
 }
 
-ObjectPtr Object::add(ObjectPtr obj)
+ObjectPtr Object::add(ObjectPtr)
 {
     throw runtime_error("no add method");
 }
 
-ObjectPtr Object::sub(ObjectPtr obj)
+ObjectPtr Object::sub(ObjectPtr)
 {
     throw runtime_error("no sub method");
 }
 
-ObjectPtr Object::mul(ObjectPtr obj)
+ObjectPtr Object::mul(ObjectPtr)
 {
     throw runtime_error("no mul method");
 }
 
-ObjectPtr Object::div(ObjectPtr obj)
+ObjectPtr Object::div(ObjectPtr)
 {
     throw runtime_error("no div method");
 }
 
-ObjectPtr Object::mod(ObjectPtr obj)
+ObjectPtr Object::mod(ObjectPtr)
 {
     throw runtime_error("no mod method");
 }
 
-ObjectPtr Object::ceq(ObjectPtr obj)
+ObjectPtr Object::ceq(ObjectPtr)
 {
     throw runtime_error("no ceq method");
 }
 
-ObjectPtr Object::cne(ObjectPtr obj)
+ObjectPtr Object::cne(ObjectPtr)
 {
     throw runtime_error("no cne method");
 }
 
-ObjectPtr Object::clt(ObjectPtr obj)
+ObjectPtr Object::clt(ObjectPtr)
 {
     throw runtime_error("no clt method");
 }
 
-ObjectPtr Object::cle(ObjectPtr obj)
+ObjectPtr Object::cle(ObjectPtr)
 {
     throw runtime_error("no cle method");
+}
+
+ObjectPtr Object::index(ObjectPtr)
+{
+    throw runtime_error("not support index");
 }
 }
