@@ -30,6 +30,7 @@ obj/code.so: src/codegen.cpp \
 obj/objects.so: src/object.cpp \
 				src/boolobject.cpp \
 				src/listobject.cpp \
+				src/dictobject.cpp \
 				src/funcobject.cpp \
 				src/stringobject.cpp \
 				src/integerobject.cpp \
