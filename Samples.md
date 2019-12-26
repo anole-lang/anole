@@ -3,7 +3,7 @@
 ```
 @var: 1;
 @foo(): none;
-@foo(), return none
+@foo(), return none;
 @foo()
 {
   return none
@@ -59,4 +59,14 @@ while a < 10
   a: a + 1;
   if a = 7, break;
 }
+```
+
+###### Match expr
+```
+@number: 1 # or 2, 3, 4, ...
+@name: match number {
+  1 => "one",
+  2 => "two",
+  3, 4 => "three or four"
+} else "greater than 4";
 ```
