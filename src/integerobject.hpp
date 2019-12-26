@@ -23,6 +23,8 @@ class IntegerObject : public Object
     ObjectPtr clt(ObjectPtr) override;
     ObjectPtr cle(ObjectPtr) override;
 
+    long value() const { return value_; }
+
   private:
     long value_;
 };
