@@ -17,12 +17,10 @@ Expr::~Expr() = default;
 // completed
 void BlockExpr::codegen(Code &code)
 {
-    code.add_ins<Op::ScopeBegin>();
     for (auto statement : statements)
     {
         statement->codegen(code);
     }
-    code.add_ins<Op::ScopeEnd>();
 }
 
 // completed
@@ -400,6 +398,7 @@ void ReturnStmt::codegen(Code &code)
 // completed
 void IfElseStmt::codegen(Code &code)
 {
+    code.add_ins<Op::ScopeBegin>();
     cond->codegen(code);
     auto o1 = code.add_ins();
     block_true->codegen(code);
@@ -414,11 +413,13 @@ void IfElseStmt::codegen(Code &code)
     {
         code.set_ins<Op::JumpIfNot>(o1, code.size());
     }
+    code.add_ins<Op::ScopeEnd>();
 }
 
 // completed
 void WhileStmt::codegen(Code &code)
 {
+    code.add_ins<Op::ScopeBegin>();
     auto o1 = code.size();
     cond->codegen(code);
     auto o2 = code.add_ins();
@@ -427,11 +428,13 @@ void WhileStmt::codegen(Code &code)
     code.set_ins<Op::JumpIfNot>(o2, code.size());
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o1, o1);
+    code.add_ins<Op::ScopeEnd>();
 }
 
 // completed
 void DoWhileStmt::codegen(Code &code)
 {
+    code.add_ins<Op::ScopeBegin>();
     auto o1 = code.size();
     block->codegen(code);
     auto o2 = code.size();
@@ -439,6 +442,7 @@ void DoWhileStmt::codegen(Code &code)
     code.add_ins<Op::JumpIf>(o1);
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o2, o1);
+    code.add_ins<Op::ScopeEnd>();
 }
 
 void ForStmt::codegen(Code &code)
