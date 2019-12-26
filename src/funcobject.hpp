@@ -22,6 +22,7 @@ class FunctionObject : public Object
     std::size_t args_size() { return args_size_; }
 
     std::string to_str() override;
+    ObjectPtr ceq(ObjectPtr) override;
 
   private:
     Ptr<Scope> scope_;
