@@ -6,7 +6,7 @@
 #include "object.hpp"
 
 #define REGISTER_BUILTIN(NAME, ARGS_NUM, FUNC) \
-    __attribute__((constructor)) static void NAME () \
+    __attribute__((constructor)) static void F_##NAME () \
     { \
         BuiltInFunctionObject::register_built_in_function(#NAME, ARGS_NUM, \
             [](vector<ObjectPtr> args) -> ObjectPtr \
