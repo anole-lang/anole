@@ -16,7 +16,7 @@ enum class Op
     Create,       // done
     Load,         // done
     LoadConst,    // done
-    LoadMember,
+    LoadMember,   // done
     Store,        // done
 
     Neg,          // done
@@ -46,6 +46,7 @@ enum class Op
     ThunkDecl,    // done
 
     BuildList,    // done
+    BuildDict,
 };
 
 struct Instruction

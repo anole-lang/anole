@@ -2,6 +2,7 @@
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "listobject.hpp"
+#include "dictobject.hpp"
 #include "funcobject.hpp"
 #include "thunkobject.hpp"
 #include "integerobject.hpp"
@@ -248,6 +249,19 @@ void Frame::execute_code(Code &code, size_t base)
                 list->append(pop());
             }
             push(list);
+        }
+            break;
+
+        case Op::BuildDict:
+        {
+            auto dict = make_shared<DictObject>();
+            auto size = *OPRAND(size_t);
+            while (size--)
+            {
+                auto key = pop();
+                dict->insert(key, pop());
+            }
+            push(dict);
         }
             break;
 
