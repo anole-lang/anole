@@ -307,10 +307,15 @@ void IndexExpr::codegen(Code &code)
     code.add_ins<Op::Index>();
 }
 
-// [AFTER] [CLASS]
 void DictExpr::codegen(Code &code)
 {
-
+    auto num = keys.size();
+    while (num--)
+    {
+        values[num]->codegen(code);
+        keys[num]->codegen(code);
+    }
+    code.add_ins<Op::BuildDict>(keys.size());
 }
 
 // completed
