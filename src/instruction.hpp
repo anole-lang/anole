@@ -16,6 +16,7 @@ enum class Op
     Create,       // done
     Load,         // done
     LoadConst,    // done
+    LoadMember,
     Store,        // done
 
     Neg,          // done
@@ -30,6 +31,8 @@ enum class Op
     CLT,          // done
     CLE,          // done
 
+    Index,        // done
+
     ScopeBegin,   // done
     ScopeEnd,     // done
 
@@ -41,6 +44,8 @@ enum class Op
     Match,        // done
     LambdaDecl,   // done
     ThunkDecl,    // done
+
+    BuildList,    // done
 };
 
 struct Instruction
