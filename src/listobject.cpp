@@ -13,35 +13,51 @@ namespace ice_language
 static map<string, pair<size_t, function<ObjectPtr(ListObject *, vector<ObjectPtr>&)>>>
 built_in_methods_for_list
 {
-    {
-        "empty",
+    {"empty", {0,
+        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
-            0, [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
-            {
-                return obj->objects().empty() ? theTrue : theFalse;
-            }
-        }
+            return obj->objects().empty() ? theTrue : theFalse;
+        }}
     },
-    {
-        "size",
+    {"size", {0,
+        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
-            0,
-            [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
-            {
-                return make_shared<IntegerObject>(static_cast<long>(obj->objects().size()));
-            }
-        }
+            return make_shared<IntegerObject>(static_cast<long>(obj->objects().size()));
+        }}
     },
-    {
-        "append",
+    {"push", {1,
+        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
-            1,
-            [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
-            {
-                obj->append(objs[0]);
-                return nullptr;
-            }
-        }
+            obj->append(objs[0]);
+            return nullptr;
+        }}
+    },
+    {"pop", {0,
+        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        {
+            auto res = obj->objects().back();
+            obj->objects().pop_back();
+            return *res;
+        }}
+    },
+    {"front", {0,
+        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        {
+            return *obj->objects().front();
+        }}
+    },
+    {"back", {0,
+        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        {
+            return *obj->objects().back();
+        }}
+    },
+    {"clear", {0,
+        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        {
+            obj->objects().clear();
+            return nullptr;
+        }}
     }
 };
 
