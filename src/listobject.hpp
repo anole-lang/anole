@@ -1,8 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "scope.hpp"
-#include "instanceobject.hpp"
+#include "object.hpp"
 
 namespace ice_language
 {

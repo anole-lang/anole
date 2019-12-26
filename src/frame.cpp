@@ -53,7 +53,7 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::LoadMember:
         {
             auto name = *OPRAND(string);
-            auto obj = pop<InstanceObject>();
+            // obj = pop();
             // obj->load_member(name);
         }
             break;

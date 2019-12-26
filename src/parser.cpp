@@ -635,7 +635,7 @@ Ptr<Expr> Parser::gen_string()
 Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
     get_next_token();
-    return make_shared<DotExpr>(left, gen_ident());
+    return make_shared<DotExpr>(left, reinterpret_pointer_cast<IdentifierExpr>(gen_ident()));
 }
 
 // generate enum as { NAME1, NAME2, ..., NAMEN }
