@@ -53,8 +53,8 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::LoadMember:
         {
             auto name = *OPRAND(string);
-            // obj = pop();
-            // obj->load_member(name);
+            auto obj = pop();
+            push_straight(obj->load_member(name));
         }
             break;
 
@@ -146,7 +146,7 @@ void Frame::execute_code(Code &code, size_t base)
         {
             auto obj = pop();
             auto index = pop();
-            push(obj->index(index));
+            push_straight(obj->index(index));
         }
             break;
 
@@ -241,13 +241,13 @@ void Frame::execute_code(Code &code, size_t base)
 
         case Op::BuildList:
         {
-            vector<ObjectPtr> objects;
+            auto list = make_shared<ListObject>();
             auto size = *OPRAND(size_t);
             while (size--)
             {
-                objects.push_back(pop());
+                list->append(pop());
             }
-            push(make_shared<ListObject>(objects));
+            push(list);
         }
             break;
 
