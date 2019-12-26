@@ -1,6 +1,7 @@
 #include "frame.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
+#include "listobject.hpp"
 #include "funcobject.hpp"
 #include "thunkobject.hpp"
 #include "integerobject.hpp"
@@ -47,6 +48,14 @@ void Frame::execute_code(Code &code, size_t base)
 
         case Op::LoadConst:
             push(code.load_const(*OPRAND(size_t)));
+            break;
+
+        case Op::LoadMember:
+        {
+            auto name = *OPRAND(string);
+            auto obj = pop<InstanceObject>();
+            // obj->load_member(name);
+        }
             break;
 
         case Op::Store:
@@ -133,6 +142,14 @@ void Frame::execute_code(Code &code, size_t base)
         }
             break;
 
+        case Op::Index:
+        {
+            auto obj = pop();
+            auto index = pop();
+            push(obj->index(index));
+        }
+            break;
+
         case Op::ScopeBegin:
             scope_ = std::make_shared<Scope>(scope_);
             break;
@@ -142,7 +159,6 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Call:
-            // draft
             if (dynamic_pointer_cast<FunctionObject>(top()))
             {
                 auto func = pop<FunctionObject>();
@@ -222,6 +238,18 @@ void Frame::execute_code(Code &code, size_t base)
                 scope_, code, pc + 1));
             pc = *OPRAND(size_t);
             continue;
+
+        case Op::BuildList:
+        {
+            vector<ObjectPtr> objects;
+            auto size = *OPRAND(size_t);
+            while (size--)
+            {
+                objects.push_back(pop());
+            }
+            push(make_shared<ListObject>(objects));
+        }
+            break;
 
         default:
             break;
