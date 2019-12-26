@@ -37,4 +37,26 @@ ObjectPtr ListObject::index(ObjectPtr index)
         throw runtime_error("index should be integer");
     }
 }
+
+/*
+load_member
+{
+    if auto builtinmethod =  builtin.load(name)
+    {
+        return BuiltInFunction([this](vector &objs)
+        {
+            return builtinmethod(this, objs);
+        });
+    }
+    else
+    {
+        auto obj = scope_->load(name);
+        if (obj = func)
+        {
+            return method(shared_from_this(), func);
+        }
+        else return obj;
+    }
+}
+*/
 }
