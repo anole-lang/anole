@@ -138,9 +138,10 @@ struct NewExpr : Expr
 
 struct DotExpr : Expr
 {
-    Ptr<Expr> left, right;
-    DotExpr(Ptr<Expr> left, Ptr<Expr> right)
-      : left(left), right(right) {}
+    Ptr<Expr> left;
+    Ptr<IdentifierExpr> id;
+    DotExpr(Ptr<Expr> left, Ptr<IdentifierExpr> id)
+      : left(left), id(id) {}
     void codegen(Code &) override;
 };
 
