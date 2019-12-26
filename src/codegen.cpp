@@ -243,10 +243,10 @@ void NewExpr::codegen(Code &code)
 
 }
 
-// [AFTER] [CLASS]
 void DotExpr::codegen(Code &code)
 {
-
+    left->codegen(code);
+    code.add_ins<Op::LoadMember>(id->name);
 }
 
 // [AFTER] [CLASS]
@@ -290,16 +290,21 @@ void MatchExpr::codegen(Code &code)
     }
 }
 
-// [AFTER] [CLASS]
 void ListExpr::codegen(Code &code)
 {
-
+    for (auto it = exprs.rbegin();
+        it != exprs.rend(); ++it)
+    {
+        (*it)->codegen(code);
+    }
+    code.add_ins<Op::BuildList>(exprs.size());
 }
 
-// [AFTER] [CLASS]
 void IndexExpr::codegen(Code &code)
 {
-
+    index->codegen(code);
+    expr->codegen(code);
+    code.add_ins<Op::Index>();
 }
 
 // [AFTER] [CLASS]
