@@ -40,7 +40,7 @@ class Parser
     }
 
     template <TokenId token_id>
-    void eat(const std::string &err_info)
+    void eat(const std::string &err_info = "")
     {
         check<token_id>(err_info);
         get_next_token();

@@ -250,6 +250,7 @@ Ptr<Stmt> Parser::gen_stmt()
         break;
     }
     throw_err("wrong token here");
+    return nullptr;
 }
 
 // generate declaration or assignment (@var:)
@@ -284,6 +285,7 @@ Ptr<Stmt> Parser::gen_declaration()
         else
         {
             throw_err("missing symbol ':' or '{' after @()");
+            return nullptr;
         }
         return make_shared<FunctionDeclarationStmt>(
             reinterpret_pointer_cast<IdentifierExpr>(node),
@@ -548,6 +550,7 @@ Ptr<Expr> Parser::gen_term()
 
     default:
         throw_err("miss an expr behind here");
+        return nullptr;
     }
 }
 
@@ -811,8 +814,7 @@ Ptr<Expr> Parser::gen_match_expr()
 // generate list as [expr1, expr2, ..., exprN]
 Ptr<Expr> Parser::gen_list_expr()
 {
-    get_next_token(); // eat '['
-
+    eat<TokenId::LBracket>(); // eat '['
     ExprList expressions;
     while (current_token_.token_id != TokenId::RBracket)
     {
@@ -822,9 +824,7 @@ Ptr<Expr> Parser::gen_list_expr()
             get_next_token();
         }
     }
-
     get_next_token(); // eat(']')
-
     return make_shared<ListExpr>(expressions);
 }
 }
