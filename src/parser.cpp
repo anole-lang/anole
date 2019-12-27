@@ -4,14 +4,6 @@
 #include "ast.hpp"
 #include "parser.hpp"
 
-#define THROW(MESSAGE) \
-    throw runtime_error(get_err_info(MESSAGE))
-
-#define CHECK_AND_THROW(TOKEN_ID, MESSAGE) \
-    try_continue(); \
-    if (current_token_.token_id != TOKEN_ID) \
-        THROW(MESSAGE)
-
 using namespace std;
 
 namespace ice_language
@@ -52,6 +44,11 @@ Ptr<AST> Parser::gen_statements()
     return gen_stmts();
 }
 
+void Parser::throw_err(const string &err_info)
+{
+    throw runtime_error(get_err_info(err_info));
+}
+
 // update current token when cannot find the next token
 Token Parser::get_next_token()
 {
@@ -85,7 +82,7 @@ ExprList Parser::gen_arguments()
         }
         else
         {
-            CHECK_AND_THROW(TokenId::RParen, "miss ')'");
+            check<TokenId::RParen>("miss ')'");
         }
     }
     get_next_token(); // eat ')'
@@ -112,7 +109,7 @@ VarDeclList Parser::gen_decl_arguments()
         }
         else
         {
-            CHECK_AND_THROW(TokenId::RParen, "miss ')'");
+            check<TokenId::RParen>("miss ')'");
         }
     }
     get_next_token(); // eat ')'
@@ -166,7 +163,7 @@ Ptr<BlockExpr> Parser::gen_block()
     }
     else
     {
-        THROW("miss '{' or ',' here");
+        throw_err("miss '{' or ',' here");
     }
 
     return block;
@@ -178,7 +175,7 @@ Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
 
     auto node = gen_expr();
 
-    CHECK_AND_THROW(TokenId::RBracket, "missing symbol ']'");
+    check<TokenId::RBracket>("missing symbol ']'");
     get_next_token();
 
     return make_shared<IndexExpr>(expression, node);
@@ -252,7 +249,7 @@ Ptr<Stmt> Parser::gen_stmt()
     default:
         break;
     }
-    THROW("wrong token here");
+    throw_err("wrong token here");
 }
 
 // generate declaration or assignment (@var:)
@@ -286,7 +283,7 @@ Ptr<Stmt> Parser::gen_declaration()
         }
         else
         {
-            THROW("missing symbol ':' or '{' after @()");
+            throw_err("missing symbol ':' or '{' after @()");
         }
         return make_shared<FunctionDeclarationStmt>(
             reinterpret_pointer_cast<IdentifierExpr>(node),
@@ -310,7 +307,7 @@ Ptr<Stmt> Parser::gen_class_decl()
     auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
 
     IdentList bases;
-    CHECK_AND_THROW(TokenId::LParen, "missing symbol '('");
+    check<TokenId::LParen>("missing symbol '('");
     get_next_token();
 
     while (current_token_.token_id != TokenId::RParen)
@@ -322,7 +319,7 @@ Ptr<Stmt> Parser::gen_class_decl()
         }
         else
         {
-            CHECK_AND_THROW(TokenId::RParen, "miss ')'");
+            check<TokenId::RParen>("miss ')'");
         }
     }
     get_next_token();
@@ -335,7 +332,7 @@ Ptr<Stmt> Parser::gen_class_decl()
 Ptr<Stmt> Parser::gen_using_stmt()
 {
     get_next_token();
-    CHECK_AND_THROW(TokenId::Identifier, "missing an identifier after 'using'");
+    check<TokenId::Identifier>("missing an identifier after 'using'");
     auto using_stmt = make_shared<UsingStmt>(current_token_.value);
     get_next_token();
     return using_stmt;
@@ -384,7 +381,7 @@ Ptr<Stmt> Parser::gen_do_while_stmt()
 
     auto block = gen_block();
 
-    CHECK_AND_THROW(TokenId::While, "missing keyword 'while' after 'do'");
+    check<TokenId::While>("missing keyword 'while' after 'do'");
     get_next_token();
 
     auto cond = gen_expr();
@@ -397,7 +394,7 @@ Ptr<Stmt> Parser::gen_for_stmt()
 
     auto begin = gen_expr();
 
-    CHECK_AND_THROW(TokenId::To, "missing keyword 'to' in for");
+    check<TokenId::To>("missing keyword 'to' in for");
     get_next_token();
 
     auto end = gen_expr();
@@ -418,7 +415,7 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
 
     auto expression = gen_expr();
 
-    CHECK_AND_THROW(TokenId::As, "missing keyword 'as' in foreach");
+    check<TokenId::As>("missing keyword 'as' in foreach");
     get_next_token();
 
     auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
@@ -470,8 +467,7 @@ Ptr<Expr> Parser::gen_expr(int priority)
         {
             get_next_token();
             auto true_expr = gen_expr();
-            CHECK_AND_THROW(TokenId::Comma, "miss , here");
-            get_next_token();
+            eat<TokenId::Comma>("miss ',' here");
             auto false_expr = gen_expr();
             expr = make_shared<QuesExpr>(expr, true_expr, false_expr);
         }
@@ -531,8 +527,7 @@ Ptr<Expr> Parser::gen_term()
     case TokenId::LParen:
         get_next_token();
         node = gen_expr();
-        CHECK_AND_THROW(TokenId::RParen, "missing symbol ')' .");
-        get_next_token();
+        eat<TokenId::RParen>("miss ')' here");
         return node;
 
     case TokenId::At:
@@ -552,7 +547,7 @@ Ptr<Expr> Parser::gen_term()
         return gen_enum_or_dict();
 
     default:
-        THROW("miss an expr behind here");
+        throw_err("miss an expr behind here");
     }
 }
 
@@ -658,8 +653,7 @@ Ptr<Expr> Parser::gen_enum_or_dict()
     {
         node = gen_enum_expr(node);
     }
-    CHECK_AND_THROW(TokenId::RBrace, "missing symbol '}'");
-    get_next_token();
+    eat<TokenId::RBrace>("missing '}' here");
     return node;
 }
 
@@ -678,11 +672,11 @@ Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
-            CHECK_AND_THROW(TokenId::Identifier, "miss identifier");
+            check<TokenId::Identifier>("miss identifier here");
         }
         else
         {
-            CHECK_AND_THROW(TokenId::RBrace, "miss '}'");
+            check<TokenId::RBrace>("miss '}' here");
         }
     }
     return make_shared<EnumExpr>(enumerators);
@@ -690,18 +684,17 @@ Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
 
 Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
 {
-    CHECK_AND_THROW(TokenId::Ret, "missing symbol '=>'");
+    eat<TokenId::Ret>("missing symbol '=>'");
+
     ExprList keys, values;
     keys.push_back(first);
-    get_next_token();
     values.push_back(gen_expr());
+
     if (current_token_.token_id == TokenId::Comma) get_next_token();
     while (current_token_.token_id != TokenId::RBrace)
     {
         keys.push_back(gen_expr());
-
-        CHECK_AND_THROW(TokenId::Ret, "missing symbol '=>'");
-        get_next_token();
+        eat<TokenId::Ret>("missing symbol '=>'");
 
         values.push_back(gen_expr());
         if (current_token_.token_id == TokenId::Comma)
@@ -710,7 +703,7 @@ Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
         }
         else
         {
-            CHECK_AND_THROW(TokenId::RBrace, "miss '}'");
+            check<TokenId::RBrace>("miss '}'");
         }
     }
     return make_shared<DictExpr>(keys, values);
@@ -735,7 +728,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
     }
     else
     {
-        THROW("missing symbol ':' or '{' after @()");
+        throw_err("missing symbol ':' or '{' after @()");
     }
 
     Ptr<Expr> node = make_shared<LambdaExpr>(args, block);
@@ -753,11 +746,8 @@ Ptr<Expr> Parser::gen_lambda_expr()
 Ptr<Expr> Parser::gen_new_expr()
 {
     get_next_token();
-
     auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
-    CHECK_AND_THROW(TokenId::LParen, "missing symbol '('");
     ExprList args = gen_arguments();
-
     return make_shared<NewExpr>(id, args);
 }
 
@@ -775,8 +765,7 @@ Ptr<Expr> Parser::gen_match_expr()
     get_next_token(); // eat 'match'
     match_expr->expr = gen_expr();
 
-    CHECK_AND_THROW(TokenId::LBrace, "missing symbol '{'");
-    get_next_token(); // eat '{'
+    eat<TokenId::LBrace>("missing symbol '{'");
 
     while (current_token_.token_id != TokenId::RBrace)
     {
@@ -789,8 +778,7 @@ Ptr<Expr> Parser::gen_match_expr()
             match_expr->keylists.back().push_back(gen_expr());
         }
 
-        CHECK_AND_THROW(TokenId::Ret, "missing symbol '=>'");
-        get_next_token();
+        eat<TokenId::Ret>("missing symbol '=>'");
 
         match_expr->values.push_back(gen_expr());
 
@@ -800,7 +788,7 @@ Ptr<Expr> Parser::gen_match_expr()
         }
         else
         {
-            CHECK_AND_THROW(TokenId::RBrace, "miss '}'");
+            check<TokenId::RBrace>("miss '}'");
         }
     }
 
@@ -829,7 +817,10 @@ Ptr<Expr> Parser::gen_list_expr()
     while (current_token_.token_id != TokenId::RBracket)
     {
         expressions.push_back(gen_expr());
-        if (current_token_.token_id == TokenId::Comma) get_next_token();
+        if (current_token_.token_id == TokenId::Comma)
+        {
+            get_next_token();
+        }
     }
 
     get_next_token(); // eat(']')

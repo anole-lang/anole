@@ -27,6 +27,25 @@ class Parser
     Tokenizer tokenizer_;
     std::function<void()> continue_action_;
 
+    void throw_err(const std::string &err_info);
+
+    template <TokenId token_id>
+    void check(const std::string &err_info)
+    {
+        try_continue();
+        if (current_token_.token_id != token_id)
+        {
+            throw_err(err_info);
+        }
+    }
+
+    template <TokenId token_id>
+    void eat(const std::string &err_info)
+    {
+        check<token_id>(err_info);
+        get_next_token();
+    }
+
     Token get_next_token();
     void try_continue();
     std::string get_err_info(const std::string &message);
