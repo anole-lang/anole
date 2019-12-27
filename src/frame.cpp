@@ -169,7 +169,6 @@ void Frame::execute_code(Code &code, size_t base)
                 for (size_t i = call_agrs_size;
                     i < func->args_size(); ++i)
                 {
-                    // draft
                     frame->push(make_shared<NoneObject>());
                 }
                 for (size_t i = 0; i < call_agrs_size; ++i)

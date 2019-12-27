@@ -40,6 +40,7 @@ void BuiltInFunctionObject::operator()(Ptr<Frame> frame)
     {
         args.push_back(frame->pop());
     }
+    reverse(args.begin(), args.end());
     auto res = func_(args);
     frame->push(res ? res : theNone);
 }
