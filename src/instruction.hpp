@@ -46,7 +46,7 @@ enum class Op
     ThunkDecl,    // done
 
     BuildList,    // done
-    BuildDict,
+    BuildDict,    // done
 };
 
 struct Instruction

@@ -79,6 +79,11 @@ string ListObject::to_str()
     return res + "]";
 }
 
+string ListObject::to_key()
+{
+    return 'l' + to_str();
+}
+
 Ptr<ObjectPtr> ListObject::index(ObjectPtr index)
 {
     if (auto p = dynamic_pointer_cast<IntegerObject>(index))

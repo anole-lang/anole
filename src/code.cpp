@@ -112,8 +112,6 @@ void Code::print(ostream &out)
         auto &ins = instructions_[i];
         switch (ins.op)
         {
-        case Op::PlaceHolder:
-            break;
         case Op::Pop:
             out << i << "\tPop" << std::endl;
             break;
@@ -125,6 +123,9 @@ void Code::print(ostream &out)
             break;
         case Op::LoadConst:
             out << i << "\tLoadConst\t" << *OPRAND(std::size_t) << std::endl;
+            break;
+        case Op::LoadMember:
+            out << i << "\tLoadMember\t" << *OPRAND(std::string) << std::endl;
             break;
         case Op::Store:
             out << i << "\tStore" << std::endl;
@@ -142,6 +143,29 @@ void Code::print(ostream &out)
         case Op::Mul:
             out << i << "\tMul" << std::endl;
             break;
+        case Op::Div:
+            out << i << "\tDiv" << std::endl;
+            break;
+        case Op::Mod:
+            out << i << "\tMod" << std::endl;
+            break;
+
+        case Op::CEQ:
+            out << i << "\tCEQ" << std::endl;
+            break;
+        case Op::CNE:
+            out << i << "\tCNE" << std::endl;
+            break;
+        case Op::CLT:
+            out << i << "\tCLT" << std::endl;
+            break;
+        case Op::CLE:
+            out << i << "\tCLE" << std::endl;
+            break;
+
+        case Op::Index:
+            out << i << "\tIndex" << std::endl;
+            break;
 
         case Op::ScopeBegin:
             out << i << "\tScopeBegin" << std::endl;
@@ -149,6 +173,7 @@ void Code::print(ostream &out)
         case Op::ScopeEnd:
             out << i << "\tScopeEnd" << std::endl;
             break;
+
         case Op::Call:
             out << i << "\tCall" << std::endl;
             break;
@@ -164,11 +189,24 @@ void Code::print(ostream &out)
         case Op::JumpIfNot:
             out << i << "\tJumpIfNot\t" << *OPRAND(size_t) << std::endl;
             break;
+        case Op::Match:
+            out << i << "\tMatch\t\t" << *OPRAND(size_t) << std::endl;
+            break;
         case Op::LambdaDecl:
             out << i << "\tLambdaDecl\t" << *OPRAND(size_t) << std::endl;
             break;
         case Op::ThunkDecl:
             out << i << "\tThunkDecl\t" << *OPRAND(size_t) << std::endl;
+            break;
+
+        case Op::BuildList:
+            out << i << "\tBuildList\t" << *OPRAND(size_t) << std::endl;
+            break;
+        case Op::BuildDict:
+            out << i << "\tBuildDict\t" << *OPRAND(size_t) << std::endl;
+            break;
+
+        default:
             break;
         }
     }
