@@ -19,35 +19,40 @@ class Scope
         return pre_scope_;
     }
 
-    void create_symbol(const std::string &name)
+    Ptr<ObjectPtr> create_symbol(std::size_t id)
     {
-        if (!symbols_.count(name))
+        if (!symbols_.count(id))
         {
-            symbols_[name] = std::make_shared<ObjectPtr>(nullptr);
+            symbols_[id] = std::make_shared<ObjectPtr>(nullptr);
         }
+        return symbols_[id];
     }
 
-    Ptr<ObjectPtr> load_symbol(const std::string &name)
+    Ptr<ObjectPtr> load_symbol(std::size_t id)
     {
-        auto ptr = find_symbol(name);
-        return ptr ? ptr
-             : (symbols_[name] = std::make_shared<ObjectPtr>(nullptr));
+        auto ptr = find_symbol(id);
+        return ptr ? ptr : nullptr;
+    }
+
+    Ptr<ObjectPtr> load_builtin(const std::string &name)
+    {
+        if (auto func = BuiltInFunctionObject::load_built_in_function(name))
+        {
+            return std::make_shared<ObjectPtr>(func);
+        }
+        return nullptr;
     }
 
   private:
-    Ptr<ObjectPtr> find_symbol(const std::string &name)
+    Ptr<ObjectPtr> find_symbol(std::size_t id)
     {
-        if (symbols_.count(name))
+        if (symbols_.count(id))
         {
-            return symbols_[name];
+            return symbols_[id];
         }
         else if (pre_scope_)
         {
-            return pre_scope_->find_symbol(name);
-        }
-        else if (auto func = BuiltInFunctionObject::load_built_in_function(name))
-        {
-            return std::make_shared<ObjectPtr>(func);
+            return pre_scope_->find_symbol(id);
         }
         else
         {
@@ -56,6 +61,6 @@ class Scope
     }
 
     Ptr<Scope> pre_scope_;
-    std::map<std::string, Ptr<ObjectPtr>> symbols_;
+    std::map<std::size_t, Ptr<ObjectPtr>> symbols_;
 };
 }
