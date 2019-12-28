@@ -142,30 +142,6 @@ class ArgumentParser
         }
     }
 
-    Argument &add_positional_argument(
-        const std::string &key)
-    {
-        auto k = arguments_.size();
-        positional_arguments_[k] = key;
-        keys_[positional_arguments_[k]] = k;
-        arguments_[k] = std::move(Argument());
-        return arguments_[k];
-    }
-
-    template <typename ...Ts>
-    void add_optional_argument(
-        const std::string &key,
-        const Ts & ...keys)
-    {
-        auto k = arguments_.size();
-        optional_arguments_[k].push_back(key);
-        keys_[get_main(key)] = k;
-        if constexpr (sizeof...(Ts) > 0)
-        {
-            add_positional_argument(keys...);
-        }
-    }
-
     template <typename ...Ts>
     Argument &add_argument(const std::string &key,
         const Ts & ...keys)
@@ -196,6 +172,30 @@ class ArgumentParser
     }
 
   private:
+    Argument &add_positional_argument(
+        const std::string &key)
+    {
+        auto k = arguments_.size();
+        positional_arguments_[k] = key;
+        keys_[positional_arguments_[k]] = k;
+        arguments_[k] = std::move(Argument());
+        return arguments_[k];
+    }
+
+    template <typename ...Ts>
+    void add_optional_argument(
+        const std::string &key,
+        const Ts & ...keys)
+    {
+        auto k = arguments_.size();
+        optional_arguments_[k].push_back(key);
+        keys_[get_main(key)] = k;
+        if constexpr (sizeof...(Ts) > 0)
+        {
+            add_positional_argument(keys...);
+        }
+    }
+
     // assume arg starts with '-'
     std::string get_main(const std::string &arg)
     {
