@@ -21,7 +21,7 @@ class Code
     std::size_t add_ins()
     {
         instructions_.push_back({
-            op, nullptr
+            op
         });
         return instructions_.size() - 1;
     }
@@ -30,7 +30,7 @@ class Code
     std::size_t add_ins(T value)
     {
         instructions_.push_back({
-            op, std::make_shared<T>(value)
+            op, value
         });
         return instructions_.size() - 1;
     }
@@ -38,14 +38,14 @@ class Code
     template <Op op>
     void set_ins(std::size_t ind)
     {
-        instructions_[ind] = {op, nullptr};
+        instructions_[ind] = {op};
     }
 
     template <Op op, typename T>
     void set_ins(std::size_t ind, T value)
     {
         instructions_[ind] = {
-            op, std::make_shared<T>(value)
+            op, value
         };
     }
 

@@ -9,7 +9,7 @@
 #include "builtinfuncobject.hpp"
 
 #define INS (instructions[pc])
-#define OPRAND(TYPE) (reinterpret_pointer_cast<TYPE>(INS.oprand))
+#define OPRAND(TYPE) (INS.get<TYPE>())
 
 using namespace std;
 
@@ -28,12 +28,12 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Create:
-            scope_->create_symbol(*OPRAND(string));
+            scope_->create_symbol(OPRAND(string));
             break;
 
         case Op::Load:
         {
-            auto obj = scope_->load_symbol(*OPRAND(string));
+            auto obj = scope_->load_symbol(OPRAND(string));
             if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
             {
                 auto frame = make_shared<Frame>(
@@ -48,12 +48,12 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::LoadConst:
-            push(code.load_const(*OPRAND(size_t)));
+            push(code.load_const(OPRAND(size_t)));
             break;
 
         case Op::LoadMember:
         {
-            auto name = *OPRAND(string);
+            auto name = OPRAND(string);
             auto obj = pop();
             push_straight(obj->load_member(name));
         }
@@ -165,7 +165,7 @@ void Frame::execute_code(Code &code, size_t base)
                 auto func = pop<FunctionObject>();
                 auto frame = make_shared<Frame>(
                     shared_from_this(), func->scope());
-                auto call_agrs_size = *OPRAND(size_t);
+                auto call_agrs_size = OPRAND(size_t);
                 for (size_t i = call_agrs_size;
                     i < func->args_size(); ++i)
                 {
@@ -189,14 +189,14 @@ void Frame::execute_code(Code &code, size_t base)
             return;
 
         case Op::Jump:
-            pc = *OPRAND(size_t);
+            pc = OPRAND(size_t);
             continue;
 
         case Op::JumpIf:
         {
             if (pop()->to_bool())
             {
-                pc = *OPRAND(size_t);
+                pc = OPRAND(size_t);
                 continue;
             }
         }
@@ -206,7 +206,7 @@ void Frame::execute_code(Code &code, size_t base)
         {
             if (!pop()->to_bool())
             {
-                pc = *OPRAND(size_t);
+                pc = OPRAND(size_t);
                 continue;
             }
         }
@@ -218,7 +218,7 @@ void Frame::execute_code(Code &code, size_t base)
             if (top()->ceq(key)->to_bool())
             {
                 pop();
-                pc = *OPRAND(size_t);
+                pc = OPRAND(size_t);
                 continue;
             }
         }
@@ -226,23 +226,23 @@ void Frame::execute_code(Code &code, size_t base)
 
         case Op::LambdaDecl:
         {
-            auto args_size = *OPRAND(size_t);
+            auto args_size = OPRAND(size_t);
             push(make_shared<FunctionObject>(
                 scope_, code, ++pc + 1, args_size));
-            pc = *OPRAND(size_t);
+            pc = OPRAND(size_t);
         }
             continue;
 
         case Op::ThunkDecl:
             push(make_shared<ThunkObject>(
                 scope_, code, pc + 1));
-            pc = *OPRAND(size_t);
+            pc = OPRAND(size_t);
             continue;
 
         case Op::BuildList:
         {
             auto list = make_shared<ListObject>();
-            auto size = *OPRAND(size_t);
+            auto size = OPRAND(size_t);
             while (size--)
             {
                 list->append(pop());
@@ -254,7 +254,7 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::BuildDict:
         {
             auto dict = make_shared<DictObject>();
-            auto size = *OPRAND(size_t);
+            auto size = OPRAND(size_t);
             while (size--)
             {
                 auto key = pop();

@@ -4,7 +4,7 @@
 #include "stringobject.hpp"
 #include "integerobject.hpp"
 
-#define OPRAND(TYPE) std::reinterpret_pointer_cast<TYPE>(ins.oprand)
+#define OPRAND(TYPE) ins.get<TYPE>()
 
 using namespace std;
 
@@ -116,16 +116,16 @@ void Code::print(ostream &out)
             out << i << "\tPop" << std::endl;
             break;
         case Op::Create:
-            out << i << "\tCreate\t\t" << *OPRAND(std::string) << std::endl;
+            out << i << "\tCreate\t\t" << OPRAND(std::string) << std::endl;
             break;
         case Op::Load:
-            out << i << "\tLoad\t\t" << *OPRAND(std::string) << std::endl;
+            out << i << "\tLoad\t\t" << OPRAND(std::string) << std::endl;
             break;
         case Op::LoadConst:
-            out << i << "\tLoadConst\t" << *OPRAND(std::size_t) << std::endl;
+            out << i << "\tLoadConst\t" << OPRAND(std::size_t) << std::endl;
             break;
         case Op::LoadMember:
-            out << i << "\tLoadMember\t" << *OPRAND(std::string) << std::endl;
+            out << i << "\tLoadMember\t" << OPRAND(std::string) << std::endl;
             break;
         case Op::Store:
             out << i << "\tStore" << std::endl;
@@ -181,29 +181,29 @@ void Code::print(ostream &out)
             out << i << "\tReturn" << std::endl;
             break;
         case Op::Jump:
-            out << i << "\tJump\t\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tJump\t\t" << OPRAND(size_t) << std::endl;
             break;
         case Op::JumpIf:
-            out << i << "\tJumpIf\t\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tJumpIf\t\t" << OPRAND(size_t) << std::endl;
             break;
         case Op::JumpIfNot:
-            out << i << "\tJumpIfNot\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tJumpIfNot\t" << OPRAND(size_t) << std::endl;
             break;
         case Op::Match:
-            out << i << "\tMatch\t\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tMatch\t\t" << OPRAND(size_t) << std::endl;
             break;
         case Op::LambdaDecl:
-            out << i << "\tLambdaDecl\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tLambdaDecl\t" << OPRAND(size_t) << std::endl;
             break;
         case Op::ThunkDecl:
-            out << i << "\tThunkDecl\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tThunkDecl\t" << OPRAND(size_t) << std::endl;
             break;
 
         case Op::BuildList:
-            out << i << "\tBuildList\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tBuildList\t" << OPRAND(size_t) << std::endl;
             break;
         case Op::BuildDict:
-            out << i << "\tBuildDict\t" << *OPRAND(size_t) << std::endl;
+            out << i << "\tBuildDict\t" << OPRAND(size_t) << std::endl;
             break;
 
         default:

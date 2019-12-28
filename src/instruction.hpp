@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <vector>
 #include <string>
 #include <utility>
@@ -52,6 +53,12 @@ enum class Op
 struct Instruction
 {
     Op op;
-    std::shared_ptr<void> oprand;
+    std::any oprand;
+
+    template <typename T>
+    T get()
+    {
+        return std::any_cast<T>(oprand);
+    }
 };
 }
