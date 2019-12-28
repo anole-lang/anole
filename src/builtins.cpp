@@ -1,4 +1,6 @@
+#include <ctime>
 #include <iostream>
+#include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
 using namespace std;
@@ -21,5 +23,11 @@ REGISTER_BUILTIN(exit, 0,
 {
     exit(0);
     return nullptr;
+});
+
+REGISTER_BUILTIN(time, 0,
+{
+    time_t result = time(nullptr);
+    return make_shared<IntegerObject>(result);
 });
 }
