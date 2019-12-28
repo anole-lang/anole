@@ -68,7 +68,7 @@ void StringExpr::codegen(Code &code)
 // completed
 void IdentifierExpr::codegen(Code &code)
 {
-    code.add_ins<Op::Load>(name);
+    code.add_ins<Op::Load>(code.create_symbol(name));
 }
 
 // completed
@@ -226,7 +226,7 @@ void LambdaExpr::codegen(Code &code)
     auto o2 = code.add_ins();
     for (auto arg_decl : arg_decls)
     {
-        code.add_ins<Op::Load>(arg_decl->id->name);
+        arg_decl->id->codegen(code);
         code.add_ins<Op::Store>();
         code.add_ins<Op::Pop>();
     }
@@ -360,22 +360,22 @@ void VariableDeclarationStmt::codegen(Code &code)
     if (expr)
     {
         expr->codegen(code);
-        code.add_ins<Op::Create>(id->name);
-        code.add_ins<Op::Load>(id->name);
+        code.add_ins<Op::Create>(code.create_symbol(id->name));
+        id->codegen(code);
         code.add_ins<Op::Store>();
     }
     else
     {
-        code.add_ins<Op::Create>(id->name);
+        code.add_ins<Op::Create>(code.create_symbol(id->name));
     }
 }
 
 // completed
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Op::Create>(id->name);
+    code.add_ins<Op::Create>(code.create_symbol(id->name));
     lambda->codegen(code);
-    code.add_ins<Op::Load>(id->name);
+    id->codegen(code);
     code.add_ins<Op::Store>();
 }
 
