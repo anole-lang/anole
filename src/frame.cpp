@@ -28,12 +28,17 @@ void Frame::execute_code(Code &code, size_t base)
             break;
 
         case Op::Create:
-            scope_->create_symbol(OPRAND(string));
+            scope_->create_symbol(OPRAND(size_t));
             break;
 
         case Op::Load:
         {
-            auto obj = scope_->load_symbol(OPRAND(string));
+            auto id = OPRAND(size_t);
+            auto obj = scope_->load_symbol(id);
+            if (!obj and !(obj = scope_->load_builtin(code.load_symbol(id))))
+            {
+                obj = scope_->create_symbol(OPRAND(size_t));
+            }
             if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
             {
                 auto frame = make_shared<Frame>(
