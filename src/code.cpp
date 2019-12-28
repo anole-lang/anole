@@ -96,6 +96,24 @@ ObjectPtr Code::load_const(size_t ind)
     return constants_[ind];
 }
 
+size_t Code::create_symbol(const string &symbol)
+{
+    if (symbols_.count(symbol))
+    {
+        return symbols_[symbol];
+    }
+    else
+    {
+        id2syms_[symbols_.size()] = symbol;
+        return symbols_[symbol] = symbols_.size();
+    }
+}
+
+std::string &Code::load_symbol(size_t id)
+{
+    return id2syms_[id];
+}
+
 void Code::print(ostream &out)
 {
     cout << "Constants:\nConsIndex\tValue" << endl;
@@ -116,10 +134,10 @@ void Code::print(ostream &out)
             out << i << "\tPop" << std::endl;
             break;
         case Op::Create:
-            out << i << "\tCreate\t\t" << OPRAND(std::string) << std::endl;
+            out << i << "\tCreate\t\t" << OPRAND(std::size_t) << std::endl;
             break;
         case Op::Load:
-            out << i << "\tLoad\t\t" << OPRAND(std::string) << std::endl;
+            out << i << "\tLoad\t\t" << OPRAND(std::size_t) << std::endl;
             break;
         case Op::LoadConst:
             out << i << "\tLoadConst\t" << OPRAND(std::size_t) << std::endl;

@@ -74,6 +74,9 @@ class Code
         }
     }
 
+    std::size_t create_symbol(const std::string &symbol);
+    std::string &load_symbol(std::size_t id);
+
     void print(std::ostream &out = std::cout);
     void to_file(std::ostream &out);
 
@@ -82,7 +85,11 @@ class Code
     // these two should be checked is empty or not
     std::vector<std::size_t> breaks_, continues_;
     std::vector<std::string> constants_literals_;
+
     std::map<std::string, size_t> constants_map_;
     std::vector<ObjectPtr> constants_;
+
+    std::map<std::string, std::size_t> symbols_;
+    std::map<std::size_t, std::string> id2syms_;
 };
 }
