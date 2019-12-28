@@ -400,12 +400,9 @@ Token Tokenizer::next()
             break;
 
         case State::InComment:
-            while (input_stream_ >> last_input_)
+            while (last_input_ != '\n')
             {
-                if (last_input_ == '\n')
-                {
-                    break;
-                }
+                get_next_input();
             }
             return next();
 
