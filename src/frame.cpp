@@ -79,8 +79,8 @@ void Frame::execute_code(Code &code, size_t base)
         case Op::Add:
         {
             auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->add(rhs));
+            auto lhs = top();
+            set_top(lhs->add(rhs));
         }
             break;
 

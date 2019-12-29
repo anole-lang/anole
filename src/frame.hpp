@@ -55,6 +55,11 @@ class Frame : public std::enable_shared_from_this<Frame>
         return stack_.top();
     }
 
+    void set_top(ObjectPtr ptr)
+    {
+        stack_.top() = std::make_shared<ObjectPtr>(ptr);
+    }
+
     template <typename R = Object>
     Ptr<R> pop()
     {
