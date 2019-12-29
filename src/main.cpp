@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
         auto frame = make_shared<Frame>();
         Parser(fin).gen_statements()->codegen(code);
         frame->execute_code(code);
+
+        auto fout = ofstream("test.out");
+        code.print(fout);
     }
     return 0;
 }

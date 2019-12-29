@@ -116,14 +116,14 @@ std::string &Code::load_symbol(size_t id)
 
 void Code::print(ostream &out)
 {
-    cout << "Constants:\nConsIndex\tValue" << endl;
+    out << "Constants:\nConsIndex\tValue" << endl;
 
     for (size_t i = 0; i < constants_literals_.size(); ++i)
     {
-        cout << i + 3 << "\t\t" << constants_literals_[i] << endl;
+        out << i + 3 << "\t\t" << constants_literals_[i] << endl;
     }
 
-    cout << "\nInstructions:\nLine\tOp" << endl;
+    out << "\nInstructions:\nLine\tOp" << endl;
 
     for (size_t i = 0; i < instructions_.size(); ++i)
     {
