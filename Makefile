@@ -32,6 +32,7 @@ obj/objects.so: src/object.cpp \
 				src/listobject.cpp \
 				src/dictobject.cpp \
 				src/funcobject.cpp \
+				src/floatobject.cpp \
 				src/stringobject.cpp \
 				src/integerobject.cpp \
 				src/builtinfuncobject.cpp
