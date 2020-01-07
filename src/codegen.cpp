@@ -243,6 +243,7 @@ void NewExpr::codegen(Code &code)
 
 }
 
+// completed
 void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
@@ -255,6 +256,7 @@ void EnumExpr::codegen(Code &code)
 
 }
 
+// completed
 void MatchExpr::codegen(Code &code)
 {
     expr->codegen(code);
@@ -290,6 +292,7 @@ void MatchExpr::codegen(Code &code)
     }
 }
 
+// completed
 void ListExpr::codegen(Code &code)
 {
     for (auto it = exprs.rbegin();
@@ -300,6 +303,7 @@ void ListExpr::codegen(Code &code)
     code.add_ins<Op::BuildList>(exprs.size());
 }
 
+// completed
 void IndexExpr::codegen(Code &code)
 {
     index->codegen(code);
@@ -307,6 +311,7 @@ void IndexExpr::codegen(Code &code)
     code.add_ins<Op::Index>();
 }
 
+// completed
 void DictExpr::codegen(Code &code)
 {
     auto num = keys.size();
