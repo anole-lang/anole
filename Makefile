@@ -3,7 +3,7 @@ TARGET = ice
 ADD =
 
 CC = clang++
-FLAGS = -g -std=c++17 -stdlib=libstdc++ ${ADD}
+FLAGS = -O3 -std=c++17 -stdlib=libstdc++ ${ADD}
 
 DIR_OBJ = ./obj
 DIR_BIN = ./bin
