@@ -17,6 +17,6 @@ println("Let's start!");
 
 start: time();
 a: 1;
-while a < 1000000, a: a + 1;
+while a < 10000000, a: a + 1;
 print(time() - start);
 println("s");
