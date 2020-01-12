@@ -11,7 +11,6 @@ In fact, I am trying to rewrite this program now. If you want to use this langua
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine. I am planning to implement the front end firstly, then virtual machine and the codegen part finally.
 
-+ [ ] Refact relation between instruction and frame in order to reduce the switch-time
 + [ ] Complete all codegens
 + [ ] Add some optimization
 + [ ] Add more tests for the front end
@@ -22,6 +21,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Done
 
++ [X] Reduce the switch-time
 + [X] Support call-by-need
 + [X] Better implementation of REPL without try-throw
 + [X] Simple REPL with try-throw
