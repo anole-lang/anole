@@ -8,271 +8,333 @@
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
-#define INS (instructions[pc])
-#define OPRAND(TYPE) (INS.get<TYPE>())
+#define OPRAND(T) (any_cast<T>(code.get_instructions()[pc].oprand))
 
 using namespace std;
 
 namespace ice_language
 {
+namespace op_handles
+{
+void pop_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->pop();
+    ++pc;
+}
+
+void create_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->scope()->create_symbol(OPRAND(size_t));
+    ++pc;
+}
+
+void load_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto id = OPRAND(size_t);
+    auto obj = frame->scope()->load_symbol(id);
+
+    if (!obj and !(obj = frame->scope()->load_builtin(code.load_symbol(id))))
+    {
+        obj = frame->scope()->create_symbol(id);
+    }
+    if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
+    {
+        auto new_frame = make_shared<Frame>(
+            frame, thunk->scope());
+        new_frame->execute_code(code, thunk->base());
+    }
+    else
+    {
+        frame->push_straight(obj);
+    }
+    ++pc;
+}
+
+void loadconst_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->push(code.load_const(OPRAND(size_t)));
+    ++pc;
+}
+
+void loadmember_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto name = OPRAND(string);
+    frame->push_straight(frame->pop()->load_member(name));
+    ++pc;
+}
+
+void store_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto p = frame->pop_straight();
+    *p = frame->pop();
+    frame->push_straight(p);
+    ++pc;
+}
+
+void neg_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->push(frame->pop()->neg());
+    ++pc;
+}
+
+void add_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->add(rhs));
+    ++pc;
+}
+
+void sub_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->sub(rhs));
+    ++pc;
+}
+
+void mul_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->mul(rhs));
+    ++pc;
+}
+
+void div_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->div(rhs));
+    ++pc;
+}
+void mod_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->mod(rhs));
+    ++pc;
+}
+
+void ceq_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->ceq(rhs));
+    ++pc;
+}
+
+void cne_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->cne(rhs));
+    ++pc;
+}
+
+void clt_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->clt(rhs));
+    ++pc;
+}
+
+void cle_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    auto lhs = frame->top();
+    frame->set_top(lhs->cle(rhs));
+    ++pc;
+}
+
+void index_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto obj = frame->pop();
+    auto index = frame->pop();
+    frame->push_straight(obj->index(index));
+    ++pc;
+}
+
+void scopebegin_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->set_scope(make_shared<Scope>(frame->scope()));
+    ++pc;
+}
+
+void scopeend_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->set_scope(frame->scope()->pre());
+    ++pc;
+}
+
+void call_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    if (dynamic_pointer_cast<FunctionObject>(frame->top()))
+    {
+        auto func = frame->pop<FunctionObject>();
+        auto new_frame = make_shared<Frame>(
+            frame, func->scope());
+        auto call_agrs_size = OPRAND(size_t);
+        for (size_t i = call_agrs_size;
+            i < func->args_size(); ++i)
+        {
+            new_frame->push(theNone);
+        }
+        for (size_t i = 0; i < call_agrs_size; ++i)
+        {
+            new_frame->push(frame->pop());
+        }
+        new_frame->execute_code(code, func->base());
+    }
+    else if (dynamic_pointer_cast<BuiltInFunctionObject>(frame->top()))
+    {
+        auto builtin = frame->pop<BuiltInFunctionObject>();
+        (*builtin)(frame);
+    }
+    ++pc;
+}
+
+void return_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->set_return();
+}
+
+void jump_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    pc = OPRAND(size_t);
+}
+
+void jumpif_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    if (frame->pop()->to_bool())
+    {
+        pc = OPRAND(size_t);
+    }
+    else
+    {
+        ++pc;
+    }
+}
+
+void jumpifnot_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    if (!frame->pop()->to_bool())
+    {
+        pc = OPRAND(size_t);
+    }
+    else
+    {
+        ++pc;
+    }
+}
+
+void match_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto key = frame->pop();
+    if (frame->top()->ceq(key)->to_bool())
+    {
+        frame->pop();
+        pc = OPRAND(size_t);
+    }
+    else
+    {
+        ++pc;
+    }
+}
+
+void lambdadecl_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto args_size = OPRAND(size_t);
+    frame->push(make_shared<FunctionObject>(
+        frame->scope(), ++pc + 1, args_size));
+    pc = OPRAND(size_t);
+}
+
+void thunkdecl_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    frame->push(make_shared<ThunkObject>(
+        frame->scope(), pc + 1));
+    pc = OPRAND(size_t);
+}
+
+void buildlist_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto list = make_shared<ListObject>();
+    auto size = OPRAND(size_t);
+    while (size--)
+    {
+        list->append(frame->pop());
+    }
+    frame->push(list);
+    ++pc;
+}
+
+void builddict_handle(Ptr<Frame> frame, Code &code, size_t &pc)
+{
+    auto dict = make_shared<DictObject>();
+    auto size = OPRAND(size_t);
+    while (size--)
+    {
+        auto key = frame->pop();
+        dict->insert(key, frame->pop());
+    }
+    frame->push(dict);
+    ++pc;
+}
+}
+
+using OpHandle = void (*)(Ptr<Frame>, Code &, std::size_t &);
+
+constexpr OpHandle theOpHandles[] =
+{
+    nullptr,
+
+    &op_handles::pop_handle,
+
+    &op_handles::create_handle,
+    &op_handles::load_handle,
+    &op_handles::loadconst_handle,
+    &op_handles::loadmember_handle,
+    &op_handles::store_handle,
+
+    &op_handles::neg_handle,
+    &op_handles::add_handle,
+    &op_handles::sub_handle,
+    &op_handles::mul_handle,
+    &op_handles::div_handle,
+    &op_handles::mod_handle,
+
+    &op_handles::ceq_handle,
+    &op_handles::cne_handle,
+    &op_handles::clt_handle,
+    &op_handles::cle_handle,
+
+    &op_handles::index_handle,
+
+    &op_handles::scopebegin_handle,
+    &op_handles::scopeend_handle,
+
+    &op_handles::call_handle,
+    &op_handles::return_handle,
+    &op_handles::jump_handle,
+    &op_handles::jumpif_handle,
+    &op_handles::jumpifnot_handle,
+    &op_handles::match_handle,
+    &op_handles::lambdadecl_handle,
+    &op_handles::thunkdecl_handle,
+
+    &op_handles::buildlist_handle,
+    &op_handles::builddict_handle,
+};
+
 void Frame::execute_code(Code &code, size_t base)
 {
-    auto instructions = code.get_instructions();
-    std::size_t pc = base;
-    while (pc < instructions.size())
+    auto pc = base;
+    while (pc < code.size() && !has_return_)
     {
-        switch (INS.op)
-        {
-        case Op::Pop:
-            pop();
-            break;
-
-        case Op::Create:
-            scope_->create_symbol(OPRAND(size_t));
-            break;
-
-        case Op::Load:
-        {
-            auto id = OPRAND(size_t);
-            auto obj = scope_->load_symbol(id);
-            if (!obj and !(obj = scope_->load_builtin(code.load_symbol(id))))
-            {
-                obj = scope_->create_symbol(OPRAND(size_t));
-            }
-            if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
-            {
-                auto frame = make_shared<Frame>(
-                    shared_from_this(), thunk->scope());
-                frame->execute_code(thunk->code(), thunk->base());
-            }
-            else
-            {
-                push_straight(obj);
-            }
-        }
-            break;
-
-        case Op::LoadConst:
-            push(code.load_const(OPRAND(size_t)));
-            break;
-
-        case Op::LoadMember:
-        {
-            auto name = OPRAND(string);
-            auto obj = pop();
-            push_straight(obj->load_member(name));
-        }
-            break;
-
-        case Op::Store:
-        {
-            auto p = pop_straight();
-            *p = pop();
-            push_straight(p);
-        }
-            break;
-
-        case Op::Neg:
-            push(pop()->neg());
-            break;
-
-        case Op::Add:
-        {
-            auto rhs = pop();
-            auto lhs = top();
-            set_top(lhs->add(rhs));
-        }
-            break;
-
-        case Op::Sub:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->sub(rhs));
-        }
-            break;
-
-        case Op::Mul:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->mul(rhs));
-        }
-            break;
-
-        case Op::Div:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->div(rhs));
-        }
-            break;
-
-        case Op::Mod:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->mod(rhs));
-        }
-            break;
-
-        case Op::CEQ:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->ceq(rhs));
-        }
-            break;
-
-        case Op::CNE:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->cne(rhs));
-        }
-            break;
-
-        case Op::CLT:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->clt(rhs));
-        }
-            break;
-
-        case Op::CLE:
-        {
-            auto rhs = pop();
-            auto lhs = pop();
-            push(lhs->cle(rhs));
-        }
-            break;
-
-        case Op::Index:
-        {
-            auto obj = pop();
-            auto index = pop();
-            push_straight(obj->index(index));
-        }
-            break;
-
-        case Op::ScopeBegin:
-            scope_ = std::make_shared<Scope>(scope_);
-            break;
-
-        case Op::ScopeEnd:
-            scope_ = scope_->pre();
-            break;
-
-        case Op::Call:
-            if (dynamic_pointer_cast<FunctionObject>(top()))
-            {
-                auto func = pop<FunctionObject>();
-                auto frame = make_shared<Frame>(
-                    shared_from_this(), func->scope());
-                auto call_agrs_size = OPRAND(size_t);
-                for (size_t i = call_agrs_size;
-                    i < func->args_size(); ++i)
-                {
-                    frame->push(make_shared<NoneObject>());
-                }
-                for (size_t i = 0; i < call_agrs_size; ++i)
-                {
-                    frame->push(pop());
-                }
-                frame->execute_code(func->code(), func->base());
-            }
-            else if (dynamic_pointer_cast<BuiltInFunctionObject>(top()))
-            {
-                auto builtin = pop<BuiltInFunctionObject>();
-                (*builtin)(shared_from_this());
-            }
-            break;
-
-        case Op::Return:
-            set_return();
-            return;
-
-        case Op::Jump:
-            pc = OPRAND(size_t);
-            continue;
-
-        case Op::JumpIf:
-        {
-            if (pop()->to_bool())
-            {
-                pc = OPRAND(size_t);
-                continue;
-            }
-        }
-            break;
-
-        case Op::JumpIfNot:
-        {
-            if (!pop()->to_bool())
-            {
-                pc = OPRAND(size_t);
-                continue;
-            }
-        }
-            break;
-
-        case Op::Match:
-        {
-            auto key = pop();
-            if (top()->ceq(key)->to_bool())
-            {
-                pop();
-                pc = OPRAND(size_t);
-                continue;
-            }
-        }
-            break;
-
-        case Op::LambdaDecl:
-        {
-            auto args_size = OPRAND(size_t);
-            push(make_shared<FunctionObject>(
-                scope_, code, ++pc + 1, args_size));
-            pc = OPRAND(size_t);
-        }
-            continue;
-
-        case Op::ThunkDecl:
-            push(make_shared<ThunkObject>(
-                scope_, code, pc + 1));
-            pc = OPRAND(size_t);
-            continue;
-
-        case Op::BuildList:
-        {
-            auto list = make_shared<ListObject>();
-            auto size = OPRAND(size_t);
-            while (size--)
-            {
-                list->append(pop());
-            }
-            push(list);
-        }
-            break;
-
-        case Op::BuildDict:
-        {
-            auto dict = make_shared<DictObject>();
-            auto size = OPRAND(size_t);
-            while (size--)
-            {
-                auto key = pop();
-                dict->insert(key, pop());
-            }
-            push(dict);
-        }
-            break;
-
-        default:
-            break;
-        }
-        ++pc;
+        theOpHandles[code.get_instructions()[pc].opcode]
+            (shared_from_this(), code, pc);
     }
 }
 }

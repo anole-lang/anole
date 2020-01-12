@@ -16,7 +16,7 @@ class Frame : public std::enable_shared_from_this<Frame>
     Frame() : Frame(nullptr) {}
     Frame(Ptr<Scope> scope) : Frame(nullptr, scope) {}
     Frame(Ptr<Frame> return_to, Ptr<Scope> scope)
-      : return_to_(return_to),
+      : has_return_(false), return_to_(return_to),
         scope_(std::make_shared<Scope>(scope)) {}
 
     void execute_code(Code &code, std::size_t base = 0);
@@ -32,6 +32,17 @@ class Frame : public std::enable_shared_from_this<Frame>
         // assert stack_ is not empty
         // assert return_to_ is not nullptr
         return_to_->push(pop());
+        has_return_ = true;
+    }
+
+    Ptr<Scope> scope()
+    {
+        return scope_;
+    }
+
+    void set_scope(Ptr<Scope> scope)
+    {
+        scope_ = scope;
     }
 
     void push(ObjectPtr value)
@@ -86,6 +97,7 @@ class Frame : public std::enable_shared_from_this<Frame>
     }
 
   private:
+    bool has_return_;
     Ptr<Frame> return_to_;
     Ptr<Scope> scope_;
     std::stack<Ptr<ObjectPtr>> stack_;
