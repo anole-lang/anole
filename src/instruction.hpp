@@ -8,7 +8,7 @@
 
 namespace ice_language
 {
-enum class Op
+enum Opcode
 {
     PlaceHolder,
 
@@ -52,13 +52,7 @@ enum class Op
 
 struct Instruction
 {
-    Op op;
+    Opcode opcode;
     std::any oprand;
-
-    template <typename T>
-    T get()
-    {
-        return std::any_cast<T>(oprand);
-    }
 };
 }
