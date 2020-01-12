@@ -26,13 +26,13 @@ void BlockExpr::codegen(Code &code)
 // completed
 void NoneExpr::codegen(Code &code)
 {
-    code.add_ins<Op::LoadConst, size_t>(0);
+    code.add_ins<Opcode::LoadConst, size_t>(0);
 }
 
 // completed
 void IntegerExpr::codegen(Code &code)
 {
-    code.add_ins<Op::LoadConst>(
+    code.add_ins<Opcode::LoadConst>(
         code.create_const<IntegerObject>(
             'i' + to_string(value), value
         )
@@ -42,7 +42,7 @@ void IntegerExpr::codegen(Code &code)
 // completed
 void FloatExpr::codegen(Code &code)
 {
-    code.add_ins<Op::LoadConst>(
+    code.add_ins<Opcode::LoadConst>(
         code.create_const<FloatObject>(
             'f' + to_string(value), value
         )
@@ -52,13 +52,13 @@ void FloatExpr::codegen(Code &code)
 // completed
 void BoolExpr::codegen(Code &code)
 {
-    code.add_ins<Op::LoadConst, size_t>(value ? 1 : 2);
+    code.add_ins<Opcode::LoadConst, size_t>(value ? 1 : 2);
 }
 
 // completed
 void StringExpr::codegen(Code &code)
 {
-    code.add_ins<Op::LoadConst>(
+    code.add_ins<Opcode::LoadConst>(
         code.create_const<StringObject>(
             's' + value, value
         )
@@ -68,7 +68,7 @@ void StringExpr::codegen(Code &code)
 // completed
 void IdentifierExpr::codegen(Code &code)
 {
-    code.add_ins<Op::Load>(code.create_symbol(name));
+    code.add_ins<Opcode::Load>(code.create_symbol(name));
 }
 
 // completed
@@ -79,7 +79,7 @@ void ParenOperatorExpr::codegen(Code &code)
         arg->codegen(code);
     }
     expr->codegen(code);
-    code.add_ins<Op::Call>(args.size());
+    code.add_ins<Opcode::Call>(args.size());
 }
 
 // completed
@@ -89,17 +89,17 @@ void UnaryOperatorExpr::codegen(Code &code)
     switch (op)
     {
     case TokenId::Sub:
-        code.add_ins<Op::Neg>();
+        code.add_ins<Opcode::Neg>();
         break;
 
     case TokenId::Not:
     {
         auto o1 = code.add_ins();
-        code.add_ins<Op::LoadConst, size_t>(1); // theTrue
+        code.add_ins<Opcode::LoadConst, size_t>(1); // theTrue
         auto o2 = code.add_ins();
-        code.set_ins<Op::JumpIf>(o1, code.size());
-        code.add_ins<Op::LoadConst, size_t>(2); // theFalse
-        code.set_ins<Op::Jump>(o2, code.size());
+        code.set_ins<Opcode::JumpIf>(o1, code.size());
+        code.add_ins<Opcode::LoadConst, size_t>(2); // theFalse
+        code.set_ins<Opcode::Jump>(o2, code.size());
     }
         break;
 
@@ -115,37 +115,37 @@ void BinaryOperatorExpr::codegen(Code &code)
     case TokenId::Colon:
         rhs->codegen(code);
         lhs->codegen(code);
-        code.add_ins<Op::Store>();
+        code.add_ins<Opcode::Store>();
         break;
 
     case TokenId::Add:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::Add>();
+        code.add_ins<Opcode::Add>();
         break;
 
     case TokenId::Sub:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::Sub>();
+        code.add_ins<Opcode::Sub>();
         break;
 
     case TokenId::Mul:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::Mul>();
+        code.add_ins<Opcode::Mul>();
         break;
 
     case TokenId::Div:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::Div>();
+        code.add_ins<Opcode::Div>();
         break;
 
     case TokenId::Mod:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::Mod>();
+        code.add_ins<Opcode::Mod>();
         break;
 
     case TokenId::And:
@@ -154,12 +154,12 @@ void BinaryOperatorExpr::codegen(Code &code)
         auto o1 = code.add_ins();
         rhs->codegen(code);
         auto o2 = code.add_ins();
-        code.add_ins<Op::LoadConst, size_t>(1);
+        code.add_ins<Opcode::LoadConst, size_t>(1);
         auto o3 = code.add_ins();
-        code.set_ins<Op::JumpIfNot>(o1, code.size());
-        code.set_ins<Op::JumpIfNot>(o2, code.size());
-        code.add_ins<Op::LoadConst, size_t>(2);
-        code.set_ins<Op::Jump>(o3, code.size());
+        code.set_ins<Opcode::JumpIfNot>(o1, code.size());
+        code.set_ins<Opcode::JumpIfNot>(o2, code.size());
+        code.add_ins<Opcode::LoadConst, size_t>(2);
+        code.set_ins<Opcode::Jump>(o3, code.size());
     }
         break;
 
@@ -169,49 +169,49 @@ void BinaryOperatorExpr::codegen(Code &code)
         auto o1 = code.add_ins();
         rhs->codegen(code);
         auto o2 = code.add_ins();
-        code.add_ins<Op::LoadConst, size_t>(2);
+        code.add_ins<Opcode::LoadConst, size_t>(2);
         auto o3 = code.add_ins();
-        code.set_ins<Op::JumpIf>(o1, code.size());
-        code.set_ins<Op::JumpIf>(o2, code.size());
-        code.add_ins<Op::LoadConst, size_t>(1);
-        code.set_ins<Op::Jump>(o3, code.size());
+        code.set_ins<Opcode::JumpIf>(o1, code.size());
+        code.set_ins<Opcode::JumpIf>(o2, code.size());
+        code.add_ins<Opcode::LoadConst, size_t>(1);
+        code.set_ins<Opcode::Jump>(o3, code.size());
     }
         break;
 
     case TokenId::CEQ:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::CEQ>();
+        code.add_ins<Opcode::CEQ>();
         break;
 
     case TokenId::CNE:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::CNE>();
+        code.add_ins<Opcode::CNE>();
         break;
 
     case TokenId::CLT:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::CLT>();
+        code.add_ins<Opcode::CLT>();
         break;
 
     case TokenId::CLE:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.add_ins<Op::CLE>();
+        code.add_ins<Opcode::CLE>();
         break;
 
     case TokenId::CGT:
         rhs->codegen(code);
         lhs->codegen(code);
-        code.add_ins<Op::CLE>();
+        code.add_ins<Opcode::CLE>();
         break;
 
     case TokenId::CGE:
         rhs->codegen(code);
         lhs->codegen(code);
-        code.add_ins<Op::CLT>();
+        code.add_ins<Opcode::CLT>();
         break;
 
     default:
@@ -227,14 +227,14 @@ void LambdaExpr::codegen(Code &code)
     for (auto arg_decl : arg_decls)
     {
         arg_decl->id->codegen(code);
-        code.add_ins<Op::Store>();
-        code.add_ins<Op::Pop>();
+        code.add_ins<Opcode::Store>();
+        code.add_ins<Opcode::Pop>();
     }
     block->codegen(code);
-    code.add_ins<Op::LoadConst, size_t>(0);
-    code.add_ins<Op::Return>();
-    code.set_ins<Op::LambdaDecl>(o1, arg_decls.size());
-    code.set_ins<Op::LambdaDecl>(o2, code.size());
+    code.add_ins<Opcode::LoadConst, size_t>(0);
+    code.add_ins<Opcode::Return>();
+    code.set_ins<Opcode::LambdaDecl>(o1, arg_decls.size());
+    code.set_ins<Opcode::LambdaDecl>(o2, code.size());
 }
 
 // [AFTER] [CLASS]
@@ -247,7 +247,7 @@ void NewExpr::codegen(Code &code)
 void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
-    code.add_ins<Op::LoadMember>(id->name);
+    code.add_ins<Opcode::LoadMember>(id->name);
 }
 
 // [AFTER] [CLASS]
@@ -280,7 +280,7 @@ void MatchExpr::codegen(Code &code)
     {
         for (auto where : matchfroms[i])
         {
-            code.set_ins<Op::Match>(where, code.size());
+            code.set_ins<Opcode::Match>(where, code.size());
         }
         values[i]->codegen(code);
         jumpfroms.push_back(code.add_ins());
@@ -288,7 +288,7 @@ void MatchExpr::codegen(Code &code)
 
     for (auto where : jumpfroms)
     {
-        code.set_ins<Op::Jump>(where, code.size());
+        code.set_ins<Opcode::Jump>(where, code.size());
     }
 }
 
@@ -300,7 +300,7 @@ void ListExpr::codegen(Code &code)
     {
         (*it)->codegen(code);
     }
-    code.add_ins<Op::BuildList>(exprs.size());
+    code.add_ins<Opcode::BuildList>(exprs.size());
 }
 
 // completed
@@ -308,7 +308,7 @@ void IndexExpr::codegen(Code &code)
 {
     index->codegen(code);
     expr->codegen(code);
-    code.add_ins<Op::Index>();
+    code.add_ins<Opcode::Index>();
 }
 
 // completed
@@ -320,7 +320,7 @@ void DictExpr::codegen(Code &code)
         values[num]->codegen(code);
         keys[num]->codegen(code);
     }
-    code.add_ins<Op::BuildDict>(keys.size());
+    code.add_ins<Opcode::BuildDict>(keys.size());
 }
 
 // completed
@@ -328,8 +328,8 @@ void DelayExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
     expr->codegen(code);
-    code.add_ins<Op::Return>();
-    code.set_ins<Op::ThunkDecl>(o1, code.size());
+    code.add_ins<Opcode::Return>();
+    code.set_ins<Opcode::ThunkDecl>(o1, code.size());
 }
 
 // completed
@@ -339,9 +339,9 @@ void QuesExpr::codegen(Code &code)
     auto o1 = code.add_ins();
     true_expr->codegen(code);
     auto o2 = code.add_ins();
-    code.set_ins<Op::JumpIfNot>(o1, code.size());
+    code.set_ins<Opcode::JumpIfNot>(o1, code.size());
     false_expr->codegen(code);
-    code.set_ins<Op::Jump>(o2, code.size());
+    code.set_ins<Opcode::Jump>(o2, code.size());
 }
 
 void UsingStmt::codegen(Code &code)
@@ -355,7 +355,7 @@ void ExprStmt::codegen(Code &code)
     expr->codegen(code);
     if (!interpretive())
     {
-        code.add_ins<Op::Pop>();
+        code.add_ins<Opcode::Pop>();
     }
 }
 
@@ -365,23 +365,23 @@ void VariableDeclarationStmt::codegen(Code &code)
     if (expr)
     {
         expr->codegen(code);
-        code.add_ins<Op::Create>(code.create_symbol(id->name));
+        code.add_ins<Opcode::Create>(code.create_symbol(id->name));
         id->codegen(code);
-        code.add_ins<Op::Store>();
+        code.add_ins<Opcode::Store>();
     }
     else
     {
-        code.add_ins<Op::Create>(code.create_symbol(id->name));
+        code.add_ins<Opcode::Create>(code.create_symbol(id->name));
     }
 }
 
 // completed
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Op::Create>(code.create_symbol(id->name));
+    code.add_ins<Opcode::Create>(code.create_symbol(id->name));
     lambda->codegen(code);
     id->codegen(code);
-    code.add_ins<Op::Store>();
+    code.add_ins<Opcode::Store>();
 }
 
 void ClassDeclarationStmt::codegen(Code &code)
@@ -405,57 +405,57 @@ void ContinueStmt::codegen(Code &code)
 void ReturnStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Op::Return>();
+    code.add_ins<Opcode::Return>();
 }
 
 // completed
 void IfElseStmt::codegen(Code &code)
 {
-    code.add_ins<Op::ScopeBegin>();
+    code.add_ins<Opcode::ScopeBegin>();
     cond->codegen(code);
     auto o1 = code.add_ins();
     block_true->codegen(code);
     if (else_stmt)
     {
         auto o2 = code.add_ins();
-        code.set_ins<Op::JumpIfNot>(o1, code.size());
+        code.set_ins<Opcode::JumpIfNot>(o1, code.size());
         else_stmt->codegen(code);
-        code.set_ins<Op::Jump>(o2, code.size());
+        code.set_ins<Opcode::Jump>(o2, code.size());
     }
     else
     {
-        code.set_ins<Op::JumpIfNot>(o1, code.size());
+        code.set_ins<Opcode::JumpIfNot>(o1, code.size());
     }
-    code.add_ins<Op::ScopeEnd>();
+    code.add_ins<Opcode::ScopeEnd>();
 }
 
 // completed
 void WhileStmt::codegen(Code &code)
 {
-    code.add_ins<Op::ScopeBegin>();
+    code.add_ins<Opcode::ScopeBegin>();
     auto o1 = code.size();
     cond->codegen(code);
     auto o2 = code.add_ins();
     block->codegen(code);
-    code.add_ins<Op::Jump>(o1);
-    code.set_ins<Op::JumpIfNot>(o2, code.size());
+    code.add_ins<Opcode::Jump>(o1);
+    code.set_ins<Opcode::JumpIfNot>(o2, code.size());
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o1, o1);
-    code.add_ins<Op::ScopeEnd>();
+    code.add_ins<Opcode::ScopeEnd>();
 }
 
 // completed
 void DoWhileStmt::codegen(Code &code)
 {
-    code.add_ins<Op::ScopeBegin>();
+    code.add_ins<Opcode::ScopeBegin>();
     auto o1 = code.size();
     block->codegen(code);
     auto o2 = code.size();
     cond->codegen(code);
-    code.add_ins<Op::JumpIf>(o1);
+    code.add_ins<Opcode::JumpIf>(o1);
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o2, o1);
-    code.add_ins<Op::ScopeEnd>();
+    code.add_ins<Opcode::ScopeEnd>();
 }
 
 void ForStmt::codegen(Code &code)
