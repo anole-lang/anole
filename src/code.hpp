@@ -17,7 +17,7 @@ class Code
     Code();
     Code(std::istream &in);
 
-    template <Op op = Op::PlaceHolder>
+    template <Opcode op = Opcode::PlaceHolder>
     std::size_t add_ins()
     {
         instructions_.push_back({
@@ -26,7 +26,7 @@ class Code
         return instructions_.size() - 1;
     }
 
-    template <Op op, typename T>
+    template <Opcode op, typename T>
     std::size_t add_ins(T value)
     {
         instructions_.push_back({
@@ -35,13 +35,13 @@ class Code
         return instructions_.size() - 1;
     }
 
-    template <Op op>
+    template <Opcode op>
     void set_ins(std::size_t ind)
     {
         instructions_[ind] = {op};
     }
 
-    template <Op op, typename T>
+    template <Opcode op, typename T>
     void set_ins(std::size_t ind, T value)
     {
         instructions_[ind] = {
