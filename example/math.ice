@@ -1,5 +1,7 @@
 println("Let's start!");
 
+# define
+
 @fib1(n): (n < 2) ? 1, fib1(n - 1) + fib1(n - 2);
 
 @Y(f):
@@ -9,6 +11,7 @@ println("Let's start!");
 @fib2(f):
   @(n): (n < 2) ? 1, f(n - 1) + f(n - 2);
 
+# test time
 
 start: time();
 fib1(30);
