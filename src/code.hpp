@@ -15,7 +15,6 @@ class Code
 {
   public:
     Code();
-    Code(std::istream &in);
 
     template <Opcode op = Opcode::PlaceHolder>
     std::size_t add_ins()
@@ -74,9 +73,6 @@ class Code
         }
     }
 
-    std::size_t create_symbol(const std::string &symbol);
-    std::string &load_symbol(std::size_t id);
-
     void print(std::ostream &out = std::cout);
     void to_file(std::ostream &out);
 
@@ -88,8 +84,7 @@ class Code
 
     std::map<std::string, size_t> constants_map_;
     std::vector<ObjectPtr> constants_;
-
-    std::map<std::string, std::size_t> symbols_;
-    std::map<std::size_t, std::string> id2syms_;
 };
+
+inline Code theCode;
 }

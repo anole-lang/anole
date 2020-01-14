@@ -28,7 +28,7 @@ void ReadEvalPrintLoop::run()
     }
     istringstream ss(line += '\n');
 
-    Parser parser{ss}; Code code;
+    Parser parser{ss};
     auto frame = make_shared<Frame>();
 
     parser.set_continue_action([&ss, &line, &parser]
@@ -46,9 +46,9 @@ void ReadEvalPrintLoop::run()
         try
         {
             auto stmt = parser.gen_statement();
-            stmt->codegen(code);
-            frame->execute_code(code, base);
-            base = code.size();
+            stmt->codegen(theCode);
+            frame->execute_code(theCode, base);
+            base = theCode.size();
             if (dynamic_pointer_cast<ExprStmt>(stmt)
                 and frame->top() != theNone)
             {

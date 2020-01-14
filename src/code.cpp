@@ -21,12 +21,6 @@ Code::Code()
     // ...
 }
 
-Code::Code(istream &in)
-  : Code()
-{
-    // ...
-}
-
 size_t Code::size()
 {
     return instructions_.size();
@@ -96,24 +90,6 @@ ObjectPtr Code::load_const(size_t ind)
     return constants_[ind];
 }
 
-size_t Code::create_symbol(const string &symbol)
-{
-    if (symbols_.count(symbol))
-    {
-        return symbols_[symbol];
-    }
-    else
-    {
-        id2syms_[symbols_.size()] = symbol;
-        return symbols_[symbol] = symbols_.size();
-    }
-}
-
-std::string &Code::load_symbol(size_t id)
-{
-    return id2syms_[id];
-}
-
 void Code::print(ostream &out)
 {
     out << "Constants:\nConsIndex\tValue" << endl;
@@ -134,10 +110,10 @@ void Code::print(ostream &out)
             out << i << "\tPop" << std::endl;
             break;
         case Opcode::Create:
-            out << i << "\tCreate\t\t" << OPRAND(std::size_t) << std::endl;
+            out << i << "\tCreate\t\t" << OPRAND(string) << std::endl;
             break;
         case Opcode::Load:
-            out << i << "\tLoad\t\t" << OPRAND(std::size_t) << std::endl;
+            out << i << "\tLoad\t\t" << OPRAND(string) << std::endl;
             break;
         case Opcode::LoadConst:
             out << i << "\tLoadConst\t" << OPRAND(std::size_t) << std::endl;

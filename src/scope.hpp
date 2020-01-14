@@ -19,19 +19,19 @@ class Scope
         return pre_scope_;
     }
 
-    Ptr<ObjectPtr> create_symbol(std::size_t id)
+    Ptr<ObjectPtr> create_symbol(const std::string &name)
     {
-        if (!symbols_.count(id))
+        if (!symbols_.count(name))
         {
-            symbols_[id] = std::make_shared<ObjectPtr>(nullptr);
+            symbols_[name] = std::make_shared<ObjectPtr>(nullptr);
         }
-        return symbols_[id];
+        return symbols_[name];
     }
 
-    Ptr<ObjectPtr> load_symbol(std::size_t id)
+    Ptr<ObjectPtr> load_symbol(const std::string &name)
     {
-        auto ptr = find_symbol(id);
-        return ptr ? ptr : nullptr;
+        auto ptr = find_symbol(name);
+        return ptr ? ptr : load_builtin(name);
     }
 
     Ptr<ObjectPtr> load_builtin(const std::string &name)
@@ -44,15 +44,15 @@ class Scope
     }
 
   private:
-    Ptr<ObjectPtr> find_symbol(std::size_t id)
+    Ptr<ObjectPtr> find_symbol(const std::string &name)
     {
-        if (symbols_.count(id))
+        if (symbols_.count(name))
         {
-            return symbols_[id];
+            return symbols_[name];
         }
         else if (pre_scope_)
         {
-            return pre_scope_->find_symbol(id);
+            return pre_scope_->find_symbol(name);
         }
         else
         {
@@ -61,6 +61,6 @@ class Scope
     }
 
     Ptr<Scope> pre_scope_;
-    std::map<std::size_t, Ptr<ObjectPtr>> symbols_;
+    std::map<std::string, Ptr<ObjectPtr>> symbols_;
 };
 }

@@ -68,7 +68,7 @@ void StringExpr::codegen(Code &code)
 // completed
 void IdentifierExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::Load>(code.create_symbol(name));
+    code.add_ins<Opcode::Load>(name);
 }
 
 // completed
@@ -365,20 +365,20 @@ void VariableDeclarationStmt::codegen(Code &code)
     if (expr)
     {
         expr->codegen(code);
-        code.add_ins<Opcode::Create>(code.create_symbol(id->name));
+        code.add_ins<Opcode::Create>(id->name);
         id->codegen(code);
         code.add_ins<Opcode::Store>();
     }
     else
     {
-        code.add_ins<Opcode::Create>(code.create_symbol(id->name));
+        code.add_ins<Opcode::Create>(id->name);
     }
 }
 
 // completed
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::Create>(code.create_symbol(id->name));
+    code.add_ins<Opcode::Create>(id->name);
     lambda->codegen(code);
     id->codegen(code);
     code.add_ins<Opcode::Store>();

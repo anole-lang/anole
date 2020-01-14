@@ -103,4 +103,5 @@ class Frame : public std::enable_shared_from_this<Frame>
     std::stack<Ptr<ObjectPtr>> stack_;
 };
 
+inline Ptr<Frame> theCurrentFrame = nullptr;
 }

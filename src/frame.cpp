@@ -24,18 +24,18 @@ void pop_handle(Ptr<Frame> frame, Code &code, size_t &pc)
 
 void create_handle(Ptr<Frame> frame, Code &code, size_t &pc)
 {
-    frame->scope()->create_symbol(OPRAND(size_t));
+    frame->scope()->create_symbol(OPRAND(string));
     ++pc;
 }
 
 void load_handle(Ptr<Frame> frame, Code &code, size_t &pc)
 {
-    auto id = OPRAND(size_t);
-    auto obj = frame->scope()->load_symbol(id);
+    auto name = OPRAND(string);
+    auto obj = frame->scope()->load_symbol(name);
 
-    if (!obj and !(obj = frame->scope()->load_builtin(code.load_symbol(id))))
+    if (!obj)
     {
-        obj = frame->scope()->create_symbol(id);
+        obj = frame->scope()->create_symbol(name);
     }
     if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
     {
@@ -330,11 +330,15 @@ constexpr OpHandle theOpHandles[] =
 
 void Frame::execute_code(Code &code, size_t base)
 {
+    theCurrentFrame = shared_from_this();
+
     auto pc = base;
     while (pc < code.size() && !has_return_)
     {
         theOpHandles[code.get_instructions()[pc].opcode]
             (shared_from_this(), code, pc);
     }
+
+    theCurrentFrame = return_to_;
 }
 }
