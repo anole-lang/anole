@@ -19,11 +19,12 @@ int main(int argc, char *argv[])
         auto fin = ifstream(parser.get("file"));
 
         auto frame = make_shared<Frame>();
-        Parser(fin).gen_statements()->codegen(theCode);
-        frame->execute_code(theCode);
+        auto code = make_shared<Code>();
+        Parser(fin).gen_statements()->codegen(*code);
+        frame->execute_code(code);
 
         auto fout = ofstream("test.out");
-        theCode.print(fout);
+        code->print(fout);
     }
     return 0;
 }
