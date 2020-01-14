@@ -1,5 +1,11 @@
 #include <ctime>
+#include <sstream>
 #include <iostream>
+#include "code.hpp"
+#include "frame.hpp"
+#include "parser.hpp"
+#include "boolobject.hpp"
+#include "stringobject.hpp"
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
@@ -7,6 +13,17 @@ using namespace std;
 
 namespace ice_language
 {
+REGISTER_BUILTIN(eval, 1,
+{
+    auto str = dynamic_pointer_cast<StringObject>(args[0]);
+    istringstream ss{"return " + str->to_str() + ";"};
+    Code code;
+    Parser(ss).gen_statement()->codegen(code);
+    auto new_frame = make_shared<Frame>(theCurrentFrame, theCurrentFrame->scope());
+    new_frame->execute_code(code);
+    return theCurrentFrame->pop();
+});
+
 REGISTER_BUILTIN(print, 1,
 {
     cout << args[0]->to_str();
