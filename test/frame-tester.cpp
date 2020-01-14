@@ -5,10 +5,11 @@
 using namespace std;
 using namespace ice_language;
 
-#define PRE Code code; AST::interpretive() = true; \
+#define PRE AST::interpretive() = true; \
             auto frame = make_shared<Frame>();\
+            auto code = make_shared<Code>(); \
             auto ast = Parser(ss).gen_statements();\
-            ast->codegen(code);\
+            ast->codegen(*code);\
             frame->execute_code(code);
 
 TEST_CLASS(Frame)
