@@ -17,9 +17,9 @@ REGISTER_BUILTIN(eval, 1,
 {
     auto str = dynamic_pointer_cast<StringObject>(args[0]);
     istringstream ss{"return " + str->to_str() + ";"};
-    Code code;
-    Parser(ss).gen_statement()->codegen(code);
     auto new_frame = make_shared<Frame>(theCurrentFrame, theCurrentFrame->scope());
+    auto code = make_shared<Code>();
+    Parser(ss).gen_statement()->codegen(*code);
     new_frame->execute_code(code);
     return theCurrentFrame->pop();
 });
