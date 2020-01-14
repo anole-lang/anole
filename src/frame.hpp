@@ -19,7 +19,7 @@ class Frame : public std::enable_shared_from_this<Frame>
       : has_return_(false), return_to_(return_to),
         scope_(std::make_shared<Scope>(scope)) {}
 
-    void execute_code(Code &code, std::size_t base = 0);
+    void execute_code(Ptr<Code> code, std::size_t base = 0);
 
     void set_return_to(Ptr<Frame> return_to)
     {
