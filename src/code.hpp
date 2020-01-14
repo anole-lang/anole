@@ -85,6 +85,4 @@ class Code
     std::map<std::string, size_t> constants_map_;
     std::vector<ObjectPtr> constants_;
 };
-
-inline Code theCode;
 }
