@@ -21,6 +21,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Done
 
++ [X] Allow multi code objects when using eval
 + [X] Support eval function
 + [X] Reduce the switch-time
 + [X] Support call-by-need
