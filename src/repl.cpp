@@ -30,6 +30,7 @@ void ReadEvalPrintLoop::run()
 
     Parser parser{ss};
     auto frame = make_shared<Frame>();
+    auto code = make_shared<Code>();
 
     parser.set_continue_action([&ss, &line, &parser]
     {
@@ -46,9 +47,9 @@ void ReadEvalPrintLoop::run()
         try
         {
             auto stmt = parser.gen_statement();
-            stmt->codegen(theCode);
-            frame->execute_code(theCode, base);
-            base = theCode.size();
+            stmt->codegen(*code);
+            frame->execute_code(code, base);
+            base = code->size();
             if (dynamic_pointer_cast<ExprStmt>(stmt)
                 and frame->top() != theNone)
             {
