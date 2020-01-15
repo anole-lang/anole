@@ -5,7 +5,6 @@
 #include "noneobject.hpp"
 
 using namespace std;
-using std::cout;
 
 namespace ice_language
 {
