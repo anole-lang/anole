@@ -160,6 +160,10 @@ Ptr<BlockExpr> Parser::gen_block()
         try_continue();
         block = make_shared<BlockExpr>();
         block->statements.push_back(gen_stmt());
+        if (current_token_.token_id == TokenId::Semicolon)
+        {
+            get_next_token();
+        }
     }
     else
     {

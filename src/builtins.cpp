@@ -36,6 +36,13 @@ REGISTER_BUILTIN(println, 1,
     return nullptr;
 });
 
+REGISTER_BUILTIN(input, 0,
+{
+    string line;
+    std::getline(cin, line);
+    return make_shared<StringObject>(line);
+});
+
 REGISTER_BUILTIN(exit, 0,
 {
     exit(0);
