@@ -93,8 +93,8 @@ struct ParenOperatorExpr : Expr
 {
     Ptr<Expr> expr;
     ExprList args;
-    ParenOperatorExpr(Ptr<Expr> expr, ExprList args)
-      : expr(expr), args(args) {}
+    ParenOperatorExpr(Ptr<Expr> expr, ExprList &&args)
+      : expr(expr), args(std::move(args)) {}
     void codegen(Code &) override;
 };
 
@@ -121,9 +121,8 @@ struct LambdaExpr : Expr
 {
     VarDeclList arg_decls;
     Ptr<BlockExpr> block;
-    LambdaExpr(VarDeclList arg_decls,
-        Ptr<BlockExpr> block)
-      : arg_decls(arg_decls), block(block) {}
+    LambdaExpr(VarDeclList &&arg_decls, Ptr<BlockExpr> block)
+      : arg_decls(std::move(arg_decls)), block(block) {}
     void codegen(Code &) override;
 };
 
@@ -131,8 +130,8 @@ struct NewExpr : Expr
 {
     Ptr<IdentifierExpr> id;
     ExprList args;
-    NewExpr(Ptr<IdentifierExpr> id, ExprList args)
-      : id(id), args(args) {}
+    NewExpr(Ptr<IdentifierExpr> id, ExprList &&args)
+      : id(id), args(std::move(args)) {}
     void codegen(Code &) override;
 };
 
@@ -148,7 +147,7 @@ struct DotExpr : Expr
 struct EnumExpr : Expr
 {
     IdentList idents;
-    EnumExpr(IdentList idents) : idents(idents) {}
+    EnumExpr() = default;
     void codegen(Code &) override;
 };
 
@@ -165,7 +164,7 @@ struct MatchExpr : Expr
 struct ListExpr : Expr
 {
     ExprList exprs;
-    ListExpr(ExprList exprs) : exprs(exprs) {}
+    ListExpr() = default;
     void codegen(Code &) override;
 };
 
@@ -180,9 +179,7 @@ struct IndexExpr : Expr
 struct DictExpr : Expr
 {
     ExprList keys, values;
-    DictExpr() {}
-    DictExpr(ExprList keys, ExprList values)
-      : keys(keys), values(values) {}
+    DictExpr() = default;
     void codegen(Code &) override;
 };
 
@@ -243,8 +240,8 @@ struct ClassDeclarationStmt : Stmt
     IdentList bases;
     Ptr<BlockExpr> block;
     ClassDeclarationStmt(Ptr<IdentifierExpr> id,
-        IdentList bases, Ptr<BlockExpr> block)
-      : id(id), bases(bases), block(block) {}
+        IdentList &&bases, Ptr<BlockExpr> block)
+      : id(id), bases(std::move(bases)), block(block) {}
     void codegen(Code &) override;
 };
 

@@ -293,7 +293,7 @@ Ptr<Stmt> Parser::gen_declaration()
         }
         return make_shared<FunctionDeclarationStmt>(
             reinterpret_pointer_cast<IdentifierExpr>(node),
-            make_shared<LambdaExpr>(args, block)
+            make_shared<LambdaExpr>(move(args), block)
         );
     }
 
@@ -332,7 +332,7 @@ Ptr<Stmt> Parser::gen_class_decl()
 
     auto block = gen_block();
 
-    return make_shared<ClassDeclarationStmt>(id, bases, block);
+    return make_shared<ClassDeclarationStmt>(id, move(bases), block);
 }
 
 Ptr<Stmt> Parser::gen_using_stmt()
@@ -666,16 +666,16 @@ Ptr<Expr> Parser::gen_enum_or_dict()
 
 Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
 {
-    IdentList enumerators;
-    enumerators.push_back(dynamic_pointer_cast<IdentifierExpr>(first));
+    auto enum_expr = make_shared<EnumExpr>();
+    enum_expr->idents.push_back(dynamic_pointer_cast<IdentifierExpr>(first));
     if (current_token_.token_id == TokenId::RBrace)
     {
-        return make_shared<EnumExpr>(enumerators);
+        return enum_expr;
     }
     get_next_token();
     while (current_token_.token_id == TokenId::Identifier)
     {
-        enumerators.push_back(dynamic_pointer_cast<IdentifierExpr>(gen_ident()));
+        enum_expr->idents.push_back(dynamic_pointer_cast<IdentifierExpr>(gen_ident()));
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
@@ -686,24 +686,24 @@ Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
             check<TokenId::RBrace>("miss '}' here");
         }
     }
-    return make_shared<EnumExpr>(enumerators);
+    return enum_expr;
 }
 
 Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
 {
     eat<TokenId::Ret>("missing symbol '=>'");
+    auto dict_expr = make_shared<DictExpr>();
 
-    ExprList keys, values;
-    keys.push_back(first);
-    values.push_back(gen_expr());
+    dict_expr->keys.push_back(first);
+    dict_expr->values.push_back(gen_expr());
 
     if (current_token_.token_id == TokenId::Comma) get_next_token();
     while (current_token_.token_id != TokenId::RBrace)
     {
-        keys.push_back(gen_expr());
+        dict_expr->keys.push_back(gen_expr());
         eat<TokenId::Ret>("missing symbol '=>'");
 
-        values.push_back(gen_expr());
+        dict_expr->values.push_back(gen_expr());
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
@@ -713,7 +713,7 @@ Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
             check<TokenId::RBrace>("miss '}'");
         }
     }
-    return make_shared<DictExpr>(keys, values);
+    return dict_expr;
 }
 
 // generate lambda expr as @(): expr, @(){} and also @(){}()..
@@ -738,7 +738,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
         throw_err("missing symbol ':' or '{' after @()");
     }
 
-    Ptr<Expr> node = make_shared<LambdaExpr>(args, block);
+    Ptr<Expr> node = make_shared<LambdaExpr>(move(args), block);
     try_continue();
     while (current_token_.token_id == TokenId::LParen)
     {
@@ -754,8 +754,7 @@ Ptr<Expr> Parser::gen_new_expr()
 {
     get_next_token();
     auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
-    ExprList args = gen_arguments();
-    return make_shared<NewExpr>(id, args);
+    return make_shared<NewExpr>(id, gen_arguments());
 }
 
 /* Ptr<Expr> SyntaxAnalyzer::gen_match_expr()
@@ -819,16 +818,16 @@ Ptr<Expr> Parser::gen_match_expr()
 Ptr<Expr> Parser::gen_list_expr()
 {
     eat<TokenId::LBracket>(); // eat '['
-    ExprList expressions;
+    auto list_expr = make_shared<ListExpr>();
     while (current_token_.token_id != TokenId::RBracket)
     {
-        expressions.push_back(gen_expr());
+        list_expr->exprs.push_back(gen_expr());
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
         }
     }
     get_next_token(); // eat(']')
-    return make_shared<ListExpr>(expressions);
+    return list_expr;
 }
 }
