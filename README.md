@@ -16,12 +16,11 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 + [ ] Add some optimization
 + [ ] Add more tests for the front end
 + [ ] Support default arguments
-+ [ ] Support the built-in class and method
-+ [ ] Support class and method
 + [ ] Read from file and complie IR to file
 
 ## Done
 
++ [X] Support the built-in class and method
 + [X] Allow multi code objects when using eval
 + [X] Support eval function
 + [X] Reduce the switch-time
