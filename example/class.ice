@@ -1,5 +1,5 @@
 @Animal() {
-    @yep(),   println("I can't yep!");
+    @yep(), println("I can't yep!");
 
     return @() {};
 }
