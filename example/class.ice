@@ -22,8 +22,7 @@
 }
 
 pig: Pig();
-pig.yep();
-println(pig.weight);
-
 cat: Cat();
+
 cat.yep();
+pig.yep();
