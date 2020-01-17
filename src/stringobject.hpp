@@ -15,6 +15,8 @@ class StringObject : public Object
     bool to_bool() override;
     std::string to_str() override;
 
+    ObjectPtr add(ObjectPtr) override;
+
   private:
     std::string value_;
 };
