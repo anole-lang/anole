@@ -282,14 +282,9 @@ Ptr<Stmt> Parser::gen_declaration()
             block = make_shared<BlockExpr>();
             block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
         }
-        else if (current_token_.token_id == TokenId::LBrace)
-        {
-            block = gen_block();
-        }
         else
         {
-            throw_err("missing symbol ':' or '{' after @()");
-            return nullptr;
+            block = gen_block();
         }
         return make_shared<FunctionDeclarationStmt>(
             reinterpret_pointer_cast<IdentifierExpr>(node),
@@ -729,13 +724,9 @@ Ptr<Expr> Parser::gen_lambda_expr()
         block = make_shared<BlockExpr>();
         block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
     }
-    else if (current_token_.token_id == TokenId::LBrace)
-    {
-        block = gen_block();
-    }
     else
     {
-        throw_err("missing symbol ':' or '{' after @()");
+        block = gen_block();
     }
 
     Ptr<Expr> node = make_shared<LambdaExpr>(move(args), block);
