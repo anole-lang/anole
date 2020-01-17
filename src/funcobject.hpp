@@ -21,6 +21,7 @@ class FunctionObject : public Object
 
     std::string to_str() override;
     ObjectPtr ceq(ObjectPtr) override;
+    Ptr<ObjectPtr> load_member(const std::string &name) override;
 
   private:
     Ptr<Scope> scope_;
