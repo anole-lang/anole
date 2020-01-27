@@ -4,6 +4,7 @@
 #include "code.hpp"
 #include "frame.hpp"
 #include "parser.hpp"
+#include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "stringobject.hpp"
 #include "integerobject.hpp"
@@ -27,13 +28,13 @@ REGISTER_BUILTIN(eval, 1,
 REGISTER_BUILTIN(print, 1,
 {
     cout << args[0]->to_str();
-    return nullptr;
+    return theNone;
 });
 
 REGISTER_BUILTIN(println, 1,
 {
     cout << args[0]->to_str() << endl;
-    return nullptr;
+    return theNone;
 });
 
 REGISTER_BUILTIN(input, 0,
@@ -46,7 +47,7 @@ REGISTER_BUILTIN(input, 0,
 REGISTER_BUILTIN(exit, 0,
 {
     exit(0);
-    return nullptr;
+    return theNone;
 });
 
 REGISTER_BUILTIN(time, 0,
