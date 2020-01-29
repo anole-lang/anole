@@ -12,7 +12,7 @@ enum class TokenId
     At,        // @
     AtAt,      // @@
 
-    Using,     // using
+    Use,       // use
     If,        // if
     Elif,      // elif
     Else,      // else

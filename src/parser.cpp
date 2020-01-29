@@ -205,7 +205,7 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenId::AtAt:
         return gen_class_decl();
 
-    case TokenId::Using:
+    case TokenId::Use:
         return gen_using_stmt();
 
     case TokenId::If:
