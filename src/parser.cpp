@@ -95,7 +95,7 @@ VarDeclList Parser::gen_decl_arguments()
     get_next_token(); // eat '('
     while (current_token_.token_id != TokenId::RParen)
     {
-        auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
+        auto id = gen_ident();
         Ptr<Expr> expression = make_shared<NoneExpr>();
         if (current_token_.token_id == TokenId::Colon)
         {
@@ -305,7 +305,7 @@ Ptr<Stmt> Parser::gen_class_decl()
 {
     get_next_token();
 
-    auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
+    auto id = gen_ident();
 
     IdentList bases;
     check<TokenId::LParen>("missing symbol '('");
@@ -313,7 +313,7 @@ Ptr<Stmt> Parser::gen_class_decl()
 
     while (current_token_.token_id != TokenId::RParen)
     {
-        bases.push_back(dynamic_pointer_cast<IdentifierExpr>(gen_ident()));
+        bases.push_back(gen_ident());
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
@@ -403,7 +403,7 @@ Ptr<Stmt> Parser::gen_for_stmt()
     if (current_token_.token_id == TokenId::As)
     {
         get_next_token();
-        id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
+        id = gen_ident();
     }
     auto block = gen_block();
 
@@ -419,7 +419,7 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
     check<TokenId::As>("missing keyword 'as' in foreach");
     get_next_token();
 
-    auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
+    auto id = gen_ident();
     auto block = gen_block();
 
     return make_shared<ForeachStmt>(expression, id, block);
@@ -585,7 +585,7 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
     return expr;
 }
 
-Ptr<Expr> Parser::gen_ident()
+Ptr<IdentifierExpr> Parser::gen_ident()
 {
     auto ident_expr = make_shared<IdentifierExpr>(current_token_.value);
     get_next_token();
@@ -632,7 +632,7 @@ Ptr<Expr> Parser::gen_string()
 Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
     get_next_token();
-    return make_shared<DotExpr>(left, reinterpret_pointer_cast<IdentifierExpr>(gen_ident()));
+    return make_shared<DotExpr>(left, gen_ident());
 }
 
 // generate enum as { NAME1, NAME2, ..., NAMEN }
@@ -670,7 +670,7 @@ Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
     get_next_token();
     while (current_token_.token_id == TokenId::Identifier)
     {
-        enum_expr->idents.push_back(dynamic_pointer_cast<IdentifierExpr>(gen_ident()));
+        enum_expr->idents.push_back(gen_ident());
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
@@ -744,7 +744,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
 Ptr<Expr> Parser::gen_new_expr()
 {
     get_next_token();
-    auto id = dynamic_pointer_cast<IdentifierExpr>(gen_ident());
+    auto id = gen_ident();
     return make_shared<NewExpr>(id, gen_arguments());
 }
 

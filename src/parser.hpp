@@ -74,7 +74,7 @@ class Parser
     Ptr<Expr> gen_expr(int priority = -1);
     Ptr<Expr> gen_term();
     Ptr<Expr> gen_term_tail(Ptr<Expr> expr);
-    Ptr<Expr> gen_ident();
+    Ptr<IdentifierExpr> gen_ident();
     Ptr<Expr> gen_numeric();
     Ptr<Expr> gen_none();
     Ptr<Expr> gen_boolean();
