@@ -7,6 +7,22 @@
 
 In fact, I am trying to rewrite this program now. If you want to use this language to do something, you can visit [this](https://github.com/ice-lang/ice-old-version), a old version with the implementation of interpretor.
 
+## Quick Usage
+
+### Install
+
+```bash
+~> git clone https://github.com/ice-lang/ice-lang.git
+~> cd ice-lang
+~/ice-lang> make install
+```
+
+### Usage
+
+```bash
+~> ice
+```
+
 ## To Do
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine. I am planning to implement the front end firstly, then virtual machine and the codegen part finally.
