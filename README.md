@@ -31,7 +31,6 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 + [ ] Complete all codegens
 + [ ] Add some optimization
 + [ ] Add more tests for the front end
-+ [ ] Support default arguments
 + [ ] Read from file and complie IR to file
 
 ## Done
