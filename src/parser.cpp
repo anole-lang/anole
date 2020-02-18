@@ -123,7 +123,7 @@ Ptr<BlockExpr> Parser::gen_stmts()
     while (current_token_.token_id != TokenId::End)
     {
         stmts->statements.push_back(gen_stmt());
-        if (current_token_.token_id == TokenId::Semicolon)
+        while (current_token_.token_id == TokenId::Semicolon)
         {
             get_next_token();
         }
@@ -722,7 +722,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
     {
         get_next_token();
         block = make_shared<BlockExpr>();
-        block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
+        block->statements.push_back(make_shared<ReturnStmt>(gen_delay_expr()));
     }
     else
     {
