@@ -15,15 +15,21 @@ list_tail:
 
 list_last:
   @(l):
-    list_tail(l) = nil ? list_head(l), list_last(list_tail(l));
+    list_tail(l) = nil ?
+      list_head(l),
+      list_last(list_tail(l));
 
 list_size:
   @(l):
-    list_tail(l) = nil ? 1, 1 + list_size(list_tail(l));
+    list_tail(l) = nil ?
+      1,
+      1 + list_size(list_tail(l));
 
 list_append:
   @(l, item):
-    list(list_head(l), list_tail(l) = nil ? list(item, nil), list_append(list_tail(l), item));
+    list(list_head(l), list_tail(l) = nil ?
+      list(item, nil),
+      list_append(list_tail(l), item));
 
 l: list(1, nil);
 println(list_size(l));
