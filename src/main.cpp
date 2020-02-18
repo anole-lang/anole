@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
         auto frame = make_shared<Frame>();
         auto code = make_shared<Code>();
         Parser(fin).gen_statements()->codegen(*code);
-        frame->execute_code(code);
-
         auto fout = ofstream("test.out");
         code->print(fout);
+
+        frame->execute_code(code);
     }
     return 0;
 }
