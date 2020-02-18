@@ -27,10 +27,10 @@ In fact, I am trying to rewrite this program now. If you want to use this langua
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine. I am planning to implement the front end firstly, then virtual machine and the codegen part finally.
 
++ [ ] Complete use statement
++ [ ] Support type convertion
 + [ ] Support threads and processes
 + [ ] Complete all codegens
-+ [ ] Add some optimization
-+ [ ] Add more tests for the front end
 + [ ] Read from file and complie IR to file
 
 ## Done
