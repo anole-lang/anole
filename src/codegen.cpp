@@ -226,7 +226,8 @@ void LambdaExpr::codegen(Code &code)
     auto o2 = code.add_ins();
     for (auto arg_decl : arg_decls)
     {
-        arg_decl->id->codegen(code);
+        code.add_ins<Opcode::Create>(arg_decl->id->name);
+        code.add_ins<Opcode::Load>(arg_decl->id->name);
         code.add_ins<Opcode::Store>();
         code.add_ins<Opcode::Pop>();
     }
