@@ -25,7 +25,7 @@ In fact, I am trying to rewrite this program now. If you want to use this langua
 
 ### Extension in VSCode
 
-Search Ice-Lang
+Search `Ice-Lang`
 
 ## To Do
 
