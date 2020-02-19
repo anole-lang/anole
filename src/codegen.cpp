@@ -345,7 +345,7 @@ void QuesExpr::codegen(Code &code)
     code.set_ins<Opcode::Jump>(o2, code.size());
 }
 
-void UsingStmt::codegen(Code &code)
+void UseStmt::codegen(Code &code)
 {
 
 }

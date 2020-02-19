@@ -200,11 +200,11 @@ struct QuesExpr : Expr
     void codegen(Code &code) override;
 };
 
-struct UsingStmt : Stmt
+struct UseStmt : Stmt
 {
-    std::string name;
-    UsingStmt(std::string name)
-      : name(std::move(name)) {}
+    std::string path;
+    UseStmt(std::string path)
+      : path(std::move(path)) {}
     void codegen(Code &) override;
 };
 

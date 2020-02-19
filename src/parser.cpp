@@ -206,7 +206,7 @@ Ptr<Stmt> Parser::gen_stmt()
         return gen_class_decl();
 
     case TokenId::Use:
-        return gen_using_stmt();
+        return gen_use_stmt();
 
     case TokenId::If:
         return gen_if_else();
@@ -330,13 +330,13 @@ Ptr<Stmt> Parser::gen_class_decl()
     return make_shared<ClassDeclarationStmt>(id, move(bases), block);
 }
 
-Ptr<Stmt> Parser::gen_using_stmt()
+Ptr<Stmt> Parser::gen_use_stmt()
 {
     get_next_token();
     check<TokenId::Identifier>("missing an identifier after 'using'");
-    auto using_stmt = make_shared<UsingStmt>(current_token_.value);
+    auto use_stmt = make_shared<UseStmt>(current_token_.value);
     get_next_token();
-    return using_stmt;
+    return use_stmt;
 }
 
 Ptr<Stmt> Parser::gen_if_else()
