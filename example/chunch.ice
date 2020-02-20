@@ -1,36 +1,36 @@
-zero: @(f): @(x): x;
-succ: @(n): @(f): @(x): f(n(f)(x));
-pred: @(n): @(f): @(x): n(@(g): @(h): h(g(f)))(@(u): x)(@(u): u);
+Zero: @(f): @(x): x;
+Succ: @(n): @(f): @(x): f(n(f)(x));
+Pred: @(n): @(f): @(x): n(@(g): @(h): h(g(f)))(@(u): x)(@(u): u);
 
-ADD: @(m, n): @(f): @(x): m(f)(n(f)(x));
+Add: @(m, n): @(f): @(x): m(f)(n(f)(x));
 
-TRUE: @(x, y): x;
-FALSE: @(x, y): y;
+True: @(x, y): x;
+False: @(x, y): y;
 
-IsZero: @(n): n(@(x): FALSE)(TRUE);
+IsZero: @(n): n(@(x): False)(True);
 
-BoolAnd: @(x, y): x(delay y, FALSE);
-BoolOr: @(x, y): x(TRUE, delay y);
-BoolNot: @(x): x(FALSE, TRUE);
+BoolAnd: @(x, y): x(y, False);
+BoolOr: @(x, y): x(True, y);
+BoolNot: @(x): x(False, True);
 
 IfThenElse:
     @(cond, true_expr, false_expr):
         cond(delay true_expr, delay false_expr);
 
-ADD2: @(x, y): IfThenElsen(IsZero(x), y, succ(ADD2(pred(x), y)));
+Add2: @(x, y): IfThenElse(IsZero(x), y, delay Succ(Add2(Pred(x), y)));
 
-EQ: @(x, y):
+Equal: @(x, y):
     IfThenElse(BoolAnd(IsZero(x), IsZero(y)),
-        TRUE,
+        True,
         IfThenElse(BoolOr(IsZero(x), IsZero(y)),
-            FALSE,
-            delay EQ(pred(x), pred(y))
+            False,
+            delay Equal(Pred(x), Pred(y))
         )
     );
 
-one: succ(zero);
-two: ADD(one, one);
+One: Succ(Zero);
+Two: Add(One, One);
 
-println(EQ(two, ADD(one, one)) = TRUE);
-println(EQ(two, ADD(two, two)) = TRUE);
-println(EQ(two, ADD2(one, one)) = TRUE);
+println(Equal(Two, Add(One, One)) = True);
+println(Equal(Two, Add(Two, Two)) = True);
+println(Equal(Two, Add2(One, One)) = True);
