@@ -13,13 +13,11 @@ BoolAnd: @(x, y): x(delay y, FALSE);
 BoolOr: @(x, y): x(TRUE, delay y);
 BoolNot: @(x): x(FALSE, TRUE);
 
-IfThenElse: @(cond, true_expr, false_expr): cond(delay true_expr, delay false_expr);
+IfThenElse:
+    @(cond, true_expr, false_expr):
+        cond(delay true_expr, delay false_expr);
 
-ADD2: @(x, y):
-    IfThenElsen(IsZero(x),
-        y,
-        s(ADD2(p(x), y))
-    );
+ADD2: @(x, y): IfThenElsen(IsZero(x), y, s(ADD2(p(x), y)));
 
 EQ: @(x, y):
     IfThenElse(BoolAnd(IsZero(x), IsZero(y)),
