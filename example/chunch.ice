@@ -15,6 +15,12 @@ BoolNot: @(x): x(FALSE, TRUE);
 
 IfThenElse: @(cond, true_expr, false_expr): cond(delay true_expr, delay false_expr);
 
+ADD2: @(x, y):
+    IfThenElsen(IsZero(x),
+        y,
+        s(ADD2(p(x), y))
+    );
+
 EQ: @(x, y):
     IfThenElse(BoolAnd(IsZero(x), IsZero(y)),
         TRUE,
@@ -29,3 +35,4 @@ two: ADD(one, one);
 
 println(EQ(two, ADD(one, one)) = TRUE);
 println(EQ(two, ADD(two, two)) = TRUE);
+println(EQ(two, ADD2(one, one)) = TRUE);
