@@ -24,9 +24,7 @@ Equal: @(x, y):
         True,
         IfThenElse(BoolOr(IsZero(x), IsZero(y)),
             False,
-            delay Equal(Pred(x), Pred(y))
-        )
-    );
+            delay Equal(Pred(x), Pred(y))));
 
 One: Succ(Zero);
 Two: Add(One, One);
