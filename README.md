@@ -39,6 +39,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Done
 
++ [X] Prompt undefined symbol
 + [X] Allow nested delay expression
 + [X] Support the built-in class and method
 + [X] Allow multi code objects when using eval

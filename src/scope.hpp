@@ -44,6 +44,11 @@ class Scope
         return nullptr;
     }
 
+    const std::map<std::string, Ptr<ObjectPtr>> &symbols()
+    {
+        return symbols_;
+    }
+
   private:
     Ptr<ObjectPtr> find_symbol(const std::string &name)
     {

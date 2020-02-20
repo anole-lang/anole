@@ -3,6 +3,7 @@
 #include <map>
 #include <stack>
 #include <string>
+#include <exception>
 #include "helper.hpp"
 #include "code.hpp"
 #include "scope.hpp"
@@ -58,6 +59,18 @@ class Frame : public std::enable_shared_from_this<Frame>
     template <typename R = Object>
     Ptr<R> top()
     {
+        if (*stack_.top() == nullptr)
+        {
+            std::string name;
+            for (const auto &term : scope_->symbols())
+            {
+                if (term.second == stack_.top())
+                {
+                    name = term.first;
+                }
+            }
+            throw std::runtime_error("no symbol named " + name);
+        }
         return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
 
