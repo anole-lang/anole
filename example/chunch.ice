@@ -1,6 +1,6 @@
-z: @(f): @(x): x;
-s: @(n): @(f): @(x): f(n(f)(x));
-p: @(n): @(f): @(x): n(@(g): @(h): h(g(f)))(@(u): x)(@(u): u);
+zero: @(f): @(x): x;
+succ: @(n): @(f): @(x): f(n(f)(x));
+pred: @(n): @(f): @(x): n(@(g): @(h): h(g(f)))(@(u): x)(@(u): u);
 
 ADD: @(m, n): @(f): @(x): m(f)(n(f)(x));
 
@@ -17,18 +17,18 @@ IfThenElse:
     @(cond, true_expr, false_expr):
         cond(delay true_expr, delay false_expr);
 
-ADD2: @(x, y): IfThenElsen(IsZero(x), y, s(ADD2(p(x), y)));
+ADD2: @(x, y): IfThenElsen(IsZero(x), y, succ(ADD2(pred(x), y)));
 
 EQ: @(x, y):
     IfThenElse(BoolAnd(IsZero(x), IsZero(y)),
         TRUE,
         IfThenElse(BoolOr(IsZero(x), IsZero(y)),
             FALSE,
-            delay EQ(p(x), p(y))
+            delay EQ(pred(x), pred(y))
         )
     );
 
-one: s(z);
+one: succ(zero);
 two: ADD(one, one);
 
 println(EQ(two, ADD(one, one)) = TRUE);
