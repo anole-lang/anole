@@ -27,7 +27,7 @@ Search `Ice-Lang`
 
 ## To Do
 
-Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine. I am planning to implement the front end firstly, then virtual machine and the codegen part finally.
+Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine.
 
 + [ ] Complete use statement and try to design a package system
 + [ ] Support type convertion
