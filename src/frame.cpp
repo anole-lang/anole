@@ -39,9 +39,12 @@ void load_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
     }
     if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
     {
-        auto new_frame = make_shared<Frame>(
-            frame, thunk->scope());
-        new_frame->execute_code(thunk->code(), thunk->base());
+        do {
+            auto new_frame = make_shared<Frame>(
+                frame, thunk->scope());
+            new_frame->execute_code(thunk->code(), thunk->base());
+        } while ((thunk = dynamic_pointer_cast<ThunkObject>(frame->top())) != nullptr);
+        *obj = frame->top();
     }
     else
     {
@@ -108,6 +111,7 @@ void div_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
     frame->set_top(lhs->div(rhs));
     ++pc;
 }
+
 void mod_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
 {
     auto rhs = frame->pop();
