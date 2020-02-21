@@ -35,8 +35,9 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 + [ ] Complete all codegens
 + [ ] Read from file and complie IR to file
 
-## Done
+## Change Log
 
++ [X] Support tail call optimization
 + [X] Prompt undefined symbol
 + [X] Allow nested delay expression
 + [X] Support the built-in class and method

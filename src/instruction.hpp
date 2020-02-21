@@ -38,6 +38,7 @@ enum Opcode
     ScopeEnd,     // done
 
     Call,         // done
+    CallTail,     // done
     Return,       // done
     Jump,         // done
     JumpIf,       // done

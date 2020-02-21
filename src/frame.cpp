@@ -1,3 +1,4 @@
+#include <exception>
 #include "frame.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -193,10 +194,40 @@ void call_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
     }
     else if (dynamic_pointer_cast<BuiltInFunctionObject>(frame->top()))
     {
-        auto builtin = frame->pop<BuiltInFunctionObject>();
-        (*builtin)(frame);
+        frame->pop<BuiltInFunctionObject>()->operator()(frame);
+    }
+    else
+    {
+        throw runtime_error("error call because no such function");
     }
     ++pc;
+}
+
+void calltail_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
+{
+    if (dynamic_pointer_cast<FunctionObject>(frame->top()))
+    {
+        auto func = frame->pop<FunctionObject>();
+
+        stack<Ptr<ObjectPtr>> temp;
+        for (size_t i = 0; i < OPRAND(size_t); ++i)
+        {
+            temp.push(frame->pop_straight());
+        }
+
+        frame->stack().swap(temp);
+        frame->set_scope(make_shared<Scope>(func->scope()));
+        code = func->code(); pc = func->base();
+    }
+    else if (dynamic_pointer_cast<BuiltInFunctionObject>(frame->top()))
+    {
+        frame->pop<BuiltInFunctionObject>()->operator()(frame);
+        ++pc;
+    }
+    else
+    {
+        throw runtime_error("error call because no such function");
+    }
 }
 
 void return_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
@@ -320,6 +351,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::scopeend_handle,
 
     &op_handles::call_handle,
+    &op_handles::calltail_handle,
     &op_handles::return_handle,
     &op_handles::jump_handle,
     &op_handles::jumpif_handle,

@@ -109,6 +109,11 @@ class Frame : public std::enable_shared_from_this<Frame>
         return stack_.empty();
     }
 
+    std::stack<Ptr<ObjectPtr>> &stack()
+    {
+        return stack_;
+    }
+
   private:
     bool has_return_;
     Ptr<Frame> return_to_;
