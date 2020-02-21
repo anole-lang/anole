@@ -38,6 +38,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Change the type of the internal value of the integer from long to int64_t
 + [X] Support tail call optimization
 + [X] Allow nested delay expression
 + [X] Support the built-in class and method

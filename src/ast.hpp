@@ -54,8 +54,8 @@ struct NoneExpr : Expr
 
 struct IntegerExpr : Expr
 {
-    long value;
-    IntegerExpr(long value) : value(value) {}
+    int64_t value;
+    IntegerExpr(int64_t value) : value(value) {}
     void codegen(Code &) override;
 };
 

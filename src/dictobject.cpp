@@ -7,43 +7,43 @@ using namespace std;
 
 namespace ice_language
 {
-static map<string, pair<size_t, function<ObjectPtr(DictObject *, vector<ObjectPtr>&)>>>
+static map<string, pair<size_t, function<ObjectPtr(DictObject *, vector<Ptr<ObjectPtr>>&)>>>
 built_in_methods_for_dict
 {
     {"empty", {0,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
             return obj->data().empty() ? theTrue : theFalse;
         }}
     },
     {"size", {0,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
-            return make_shared<IntegerObject>(static_cast<long>(obj->data().size()));
+            return make_shared<IntegerObject>(static_cast<int64_t>(obj->data().size()));
         }}
     },
     {"at", {1,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
-            return *(obj->index(objs[0]));
+            return *(obj->index(*objs[0]));
         }}
     },
     {"insert", {2,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
-            obj->insert(objs[0], objs[1]);
+            obj->insert(*objs[0], *objs[1]);
             return nullptr;
         }}
     },
     {"erase", {1,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
-            obj->data().erase(objs[0]);
+            obj->data().erase(*objs[0]);
             return nullptr;
         }}
     },
     {"clear", {0,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
             obj->data().clear();
             return nullptr;
@@ -91,7 +91,7 @@ Ptr<ObjectPtr> DictObject::load_member(const string &name)
         auto func = num_func.second;
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>(num_func.first,
-                [this, func](vector<ObjectPtr> &objs) -> ObjectPtr
+                [this, func](vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
                 {
                     return func(this, objs);
                 }

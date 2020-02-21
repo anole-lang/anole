@@ -597,7 +597,7 @@ Ptr<Expr> Parser::gen_numeric()
     Ptr<Expr> numeric_expr = nullptr;
     if (current_token_.token_id == TokenId::Integer)
     {
-        numeric_expr = make_shared<IntegerExpr>(stoi(current_token_.value));
+        numeric_expr = make_shared<IntegerExpr>(stoll(current_token_.value));
     }
     else
     {

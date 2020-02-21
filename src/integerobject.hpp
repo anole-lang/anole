@@ -7,7 +7,7 @@ namespace ice_language
 class IntegerObject : public Object
 {
   public:
-    IntegerObject(long value)
+    IntegerObject(int64_t value)
       : value_(value) {}
 
     bool to_bool() override;
@@ -24,9 +24,9 @@ class IntegerObject : public Object
     ObjectPtr clt(ObjectPtr) override;
     ObjectPtr cle(ObjectPtr) override;
 
-    long value() const { return value_; }
+    int64_t value() const { return value_; }
 
   private:
-    long value_;
+    int64_t value_;
 };
 }

@@ -10,30 +10,30 @@ using namespace std;
 
 namespace ice_language
 {
-static map<string, pair<size_t, function<ObjectPtr(ListObject *, vector<ObjectPtr>&)>>>
+static map<string, pair<size_t, function<ObjectPtr(ListObject *, vector<Ptr<ObjectPtr>>&)>>>
 built_in_methods_for_list
 {
     {"empty", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](ListObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
             return obj->objects().empty() ? theTrue : theFalse;
         }}
     },
     {"size", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](ListObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
-            return make_shared<IntegerObject>(static_cast<long>(obj->objects().size()));
+            return make_shared<IntegerObject>(static_cast<int64_t>(obj->objects().size()));
         }}
     },
     {"push", {1,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](ListObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
-            obj->append(objs[0]);
+            obj->append(*objs[0]);
             return nullptr;
         }}
     },
     {"pop", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](ListObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
             auto res = obj->objects().back();
             obj->objects().pop_back();
@@ -41,19 +41,19 @@ built_in_methods_for_list
         }}
     },
     {"front", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](ListObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
             return *obj->objects().front();
         }}
     },
     {"back", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](ListObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
             return *obj->objects().back();
         }}
     },
     {"clear", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+        [](ListObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
         {
             obj->objects().clear();
             return nullptr;
@@ -104,7 +104,7 @@ Ptr<ObjectPtr> ListObject::load_member(const string &name)
         auto func = num_func.second;
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>(num_func.first,
-                [this, func](vector<ObjectPtr> &objs) -> ObjectPtr
+                [this, func](vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
                 {
                     return func(this, objs);
                 }
