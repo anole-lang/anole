@@ -29,6 +29,7 @@ Search `Ice-Lang`
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine.
 
++ [ ] Prompt undefined symbol, plan to use safe pop instead of pop at some operations
 + [ ] Complete use statement and try to design a package system
 + [ ] Support type convertion
 + [ ] Support threads and processes
@@ -38,7 +39,6 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 ## Change Log
 
 + [X] Support tail call optimization
-+ [X] Prompt undefined symbol
 + [X] Allow nested delay expression
 + [X] Support the built-in class and method
 + [X] Allow multi code objects when using eval
