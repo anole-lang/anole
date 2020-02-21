@@ -406,12 +406,14 @@ void ContinueStmt::codegen(Code &code)
 void ReturnStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Opcode::Return>();
-
-    auto &ins = code.get_instructions()[code.size() - 2];
+    auto &ins = code.get_instructions()[code.size() - 1];
     if (ins.opcode == Opcode::Call)
     {
         ins.opcode = Opcode::CallTail;
+    }
+    else
+    {
+        code.add_ins<Opcode::Return>();
     }
 }
 
