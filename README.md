@@ -38,7 +38,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
-+ [X] Prompt undefined symbol but without the name loaded by
++ [X] Prompt undefined symbol but without its name loaded by
 + [X] Support new operator `is`
 + [X] Add new built-in function id
 + [X] Fix bug in tail call optimization when meeting `return cond ? true_expr, false_expr`
