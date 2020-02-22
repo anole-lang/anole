@@ -363,17 +363,10 @@ void ExprStmt::codegen(Code &code)
 // completed
 void VariableDeclarationStmt::codegen(Code &code)
 {
-    if (expr)
-    {
-        expr->codegen(code);
-        code.add_ins<Opcode::Create>(id->name);
-        id->codegen(code);
-        code.add_ins<Opcode::Store>();
-    }
-    else
-    {
-        code.add_ins<Opcode::Create>(id->name);
-    }
+    expr->codegen(code);
+    code.add_ins<Opcode::Create>(id->name);
+    id->codegen(code);
+    code.add_ins<Opcode::Store>();
 }
 
 // completed
@@ -406,15 +399,20 @@ void ContinueStmt::codegen(Code &code)
 void ReturnStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    auto &ins = code.get_instructions()[code.size() - 1];
+    code.add_ins<Opcode::Return>();
+
+    auto &ins = code.get_instructions()[code.size() - 2];
     if (ins.opcode == Opcode::Call)
     {
         ins.opcode = Opcode::CallTail;
     }
-    else
-    {
-        code.add_ins<Opcode::Return>();
-    }
+
+    /**
+     * Instruction Return cannot be deleted
+     * because if return cond ? true_expr, false_expr,
+     * it will not return if false_expr is a tail call
+     * while true_expr is not
+    */
 }
 
 // completed

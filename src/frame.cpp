@@ -217,7 +217,8 @@ void calltail_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
 
         frame->stack().swap(temp);
         frame->set_scope(make_shared<Scope>(func->scope()));
-        code = func->code(); pc = func->base();
+        // TODO: do something if code is different
+        pc = func->base();
     }
     else if (dynamic_pointer_cast<BuiltInFunctionObject>(frame->top()))
     {

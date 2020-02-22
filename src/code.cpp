@@ -169,7 +169,10 @@ void Code::print(ostream &out)
             break;
 
         case Opcode::Call:
-            out << i << "\tCall" << std::endl;
+            out << i << "\tCall\t\t" << OPRAND(size_t) << std::endl;
+            break;
+        case Opcode::CallTail:
+            out << i << "\tCallTail\t" << OPRAND(size_t) << std::endl;
             break;
         case Opcode::Return:
             out << i << "\tReturn" << std::endl;

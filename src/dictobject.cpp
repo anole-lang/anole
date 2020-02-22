@@ -1,3 +1,4 @@
+#include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "dictobject.hpp"
 #include "integerobject.hpp"
@@ -7,46 +8,46 @@ using namespace std;
 
 namespace ice_language
 {
-static map<string, pair<size_t, function<ObjectPtr(DictObject *, vector<Ptr<ObjectPtr>>&)>>>
+static map<string, pair<size_t, function<ObjectPtr(DictObject *, vector<ObjectPtr>&)>>>
 built_in_methods_for_dict
 {
     {"empty", {0,
-        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
             return obj->data().empty() ? theTrue : theFalse;
         }}
     },
     {"size", {0,
-        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
             return make_shared<IntegerObject>(static_cast<int64_t>(obj->data().size()));
         }}
     },
     {"at", {1,
-        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
-            return *(obj->index(*objs[0]));
+            return *(obj->index(objs[0]));
         }}
     },
     {"insert", {2,
-        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
-            obj->insert(*objs[0], *objs[1]);
-            return nullptr;
+            obj->insert(objs[0], objs[1]);
+            return theNone;
         }}
     },
     {"erase", {1,
-        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
-            obj->data().erase(*objs[0]);
-            return nullptr;
+            obj->data().erase(objs[0]);
+            return theNone;
         }}
     },
     {"clear", {0,
-        [](DictObject *obj, vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
+        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
         {
             obj->data().clear();
-            return nullptr;
+            return theNone;
         }}
     }
 };
@@ -91,7 +92,7 @@ Ptr<ObjectPtr> DictObject::load_member(const string &name)
         auto func = num_func.second;
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>(num_func.first,
-                [this, func](vector<Ptr<ObjectPtr>> &objs) -> ObjectPtr
+                [this, func](vector<ObjectPtr> &objs) -> ObjectPtr
                 {
                     return func(this, objs);
                 }
