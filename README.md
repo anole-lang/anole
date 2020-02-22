@@ -29,7 +29,8 @@ Search `Ice-Lang`
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine.
 
-+ [ ] Prompt undefined symbol with the symbol's name, plan to implement it by backtracking in code
++ [ ] Prompt undefined symbol with the symbol's name
++ [ ] Useful error info when meeting runtime error
 + [ ] Complete use statement and try to design a package system
 + [ ] Support type convertion
 + [ ] Support threads and processes

@@ -4,6 +4,7 @@
 #include <stack>
 #include <string>
 #include <exception>
+#include <stdexcept>
 #include "helper.hpp"
 #include "code.hpp"
 #include "scope.hpp"

@@ -1,4 +1,3 @@
-#include <exception>
 #include "frame.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -205,7 +204,7 @@ void call_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
     }
     else
     {
-        throw runtime_error("error call because no such function");
+        throw runtime_error("failed call with the given non-function");
     }
     ++pc;
 }
@@ -234,7 +233,7 @@ void calltail_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
     }
     else
     {
-        throw runtime_error("error call because no such function");
+        throw runtime_error("failed call with the given non-function");
     }
 }
 

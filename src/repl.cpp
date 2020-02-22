@@ -55,7 +55,7 @@ void ReadEvalPrintLoop::run()
                 cout << frame->pop()->to_str() << endl;
             }
         }
-        catch (const runtime_error &e)
+        catch (const exception &e)
         {
             cerr << e.what() << endl;
         }
