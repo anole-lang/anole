@@ -26,6 +26,11 @@ REGISTER_BUILTIN(eval, 1,
     return theCurrentFrame->pop();
 });
 
+REGISTER_BUILTIN(id, 1,
+{
+    return make_shared<IntegerObject>(reinterpret_cast<int64_t>(args[0].get()));
+})
+
 REGISTER_BUILTIN(print, 1,
 {
     cout << args[0]->to_str();

@@ -38,6 +38,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Add new built-in function id
 + [X] Fix bug in tail call optimization when meeting `return cond ? true_expr, false_expr`
 + [X] Change the type of the internal value of the integer from long to int64_t
 + [X] Support tail call optimization
