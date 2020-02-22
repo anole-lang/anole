@@ -59,6 +59,10 @@ class Frame : public std::enable_shared_from_this<Frame>
     template <typename R = Object>
     Ptr<R> top()
     {
+        if (*stack_.top() == nullptr)
+        {
+            throw std::runtime_error("no such var");
+        }
         return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
 

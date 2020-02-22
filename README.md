@@ -29,7 +29,7 @@ Search `Ice-Lang`
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine.
 
-+ [ ] Prompt undefined symbol, plan to use safe pop instead of pop at some operations
++ [ ] Prompt undefined symbol with the symbol's name, plan to implement it by backtracking in code
 + [ ] Complete use statement and try to design a package system
 + [ ] Support type convertion
 + [ ] Support threads and processes
@@ -38,6 +38,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Prompt undefined symbol but without the name loaded by
 + [X] Support new operator `is`
 + [X] Add new built-in function id
 + [X] Fix bug in tail call optimization when meeting `return cond ? true_expr, false_expr`
