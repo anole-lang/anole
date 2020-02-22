@@ -369,10 +369,17 @@ void ExprStmt::codegen(Code &code)
 // completed
 void VariableDeclarationStmt::codegen(Code &code)
 {
-    expr->codegen(code);
-    code.add_ins<Opcode::Create>(id->name);
-    id->codegen(code);
-    code.add_ins<Opcode::Store>();
+    if (expr)
+    {
+        expr->codegen(code);
+        code.add_ins<Opcode::Create>(id->name);
+        code.add_ins<Opcode::Load>(id->name);
+        code.add_ins<Opcode::Store>();
+    }
+    else
+    {
+        code.add_ins<Opcode::Create>(id->name);
+    }
 }
 
 // completed

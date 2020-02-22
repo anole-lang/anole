@@ -297,7 +297,7 @@ Ptr<Stmt> Parser::gen_declaration()
     }
     return make_shared<VariableDeclarationStmt>(
         reinterpret_pointer_cast<IdentifierExpr>(node),
-        make_shared<NoneExpr>()
+        nullptr
     );
 }
 
