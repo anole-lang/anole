@@ -453,7 +453,7 @@ static const vector<set<TokenId>> &get_operators()
         { TokenId::And },
         { TokenId::CEQ, TokenId::CNE, TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
         { TokenId::Add, TokenId::Sub },
-        { TokenId::Mul, TokenId::Div, TokenId::Mod },
+        { TokenId::Is,  TokenId::Mul, TokenId::Div, TokenId::Mod },
         { TokenId::Not, TokenId::Sub }
     };
     return operators;

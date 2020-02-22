@@ -68,6 +68,7 @@ enum class TokenId
     Or,        // or
     Not,       // not !
 
+    Is,        // is
     CEQ,       // =
     CNE,       // !=
     CLT,       // <

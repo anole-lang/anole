@@ -27,6 +27,7 @@ enum Opcode
     Div,          // done
     Mod,          // done
 
+    Is,           // done
     CEQ,          // done
     CNE,          // done
     CLT,          // done

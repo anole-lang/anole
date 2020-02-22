@@ -178,6 +178,12 @@ void BinaryOperatorExpr::codegen(Code &code)
     }
         break;
 
+    case TokenId::Is:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Opcode::Is>();
+        break;
+
     case TokenId::CEQ:
         lhs->codegen(code);
         rhs->codegen(code);

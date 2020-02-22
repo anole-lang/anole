@@ -68,6 +68,7 @@ Token::Token(std::string value) : value(value)
     case "and"_hash:        token_id = TokenId::And;      break;
     case "or"_hash:         token_id = TokenId::Or;       break;
     case "not"_hash:        token_id = TokenId::Not;      break;
+    case "is"_hash:         token_id = TokenId::Is;       break;
 
     default:                token_id = TokenId::Identifier; break;
     }

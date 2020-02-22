@@ -121,6 +121,13 @@ void mod_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
     ++pc;
 }
 
+void is_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
+{
+    auto rhs = frame->pop();
+    frame->set_top(frame->top().get() == rhs.get() ? theTrue : theFalse);
+    ++pc;
+}
+
 void ceq_handle(Ptr<Frame> frame, Ptr<Code> code, size_t &pc)
 {
     auto rhs = frame->pop();
@@ -341,6 +348,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::div_handle,
     &op_handles::mod_handle,
 
+    &op_handles::is_handle,
     &op_handles::ceq_handle,
     &op_handles::cne_handle,
     &op_handles::clt_handle,
