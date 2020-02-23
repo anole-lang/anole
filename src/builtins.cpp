@@ -6,6 +6,8 @@
 #include "parser.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
+#include "funcobject.hpp"
+#include "contobject.hpp"
 #include "stringobject.hpp"
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
@@ -23,6 +25,17 @@ REGISTER_BUILTIN(eval, 1,
     auto code = make_shared<Code>();
     Parser(ss).gen_statement()->codegen(*code);
     new_frame->execute_code(code);
+    return theCurrentFrame->pop();
+});
+
+REGISTER_BUILTIN(call_with_current_continuation, 1,
+{
+    auto func = dynamic_pointer_cast<FunctionObject>(args[0]);
+    auto cont_obj = make_shared<ContObject>(theCurrentFrame);
+    auto new_frame = make_shared<Frame>(
+        theCurrentFrame, func->scope());
+    new_frame->push(cont_obj);
+    new_frame->execute_code(func->code(), func->base());
     return theCurrentFrame->pop();
 });
 

@@ -29,7 +29,6 @@ Search `Ice-Lang`
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine.
 
-+ [ ] Support continuation
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error
 + [ ] Complete use statement and try to design a package system
@@ -40,6 +39,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Add built-in function call_with_current_continuation easily with some limitations such as caller must exist;
 + [X] Prompt undefined symbol but without its name loaded by
 + [X] Support new operator `is`
 + [X] Add new built-in function id

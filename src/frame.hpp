@@ -23,10 +23,9 @@ class Frame : public std::enable_shared_from_this<Frame>
 
     void execute_code(Ptr<Code> code, std::size_t base = 0);
 
-    void set_return_to(Ptr<Frame> return_to)
+    Ptr<Frame> &return_to()
     {
-        // assert return_to_ is not nullptr
-        return_to_ = return_to;
+        return return_to_;
     }
 
     void set_return()
@@ -35,6 +34,11 @@ class Frame : public std::enable_shared_from_this<Frame>
         // assert return_to_ is not nullptr
         return_to_->push(pop());
         has_return_ = true;
+    }
+
+    bool &has_return()
+    {
+        return has_return_;
     }
 
     Ptr<Scope> scope()
