@@ -1,5 +1,6 @@
 #include <map>
 #include <utility>
+#include "frame.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "listobject.hpp"
@@ -10,54 +11,47 @@ using namespace std;
 
 namespace ice_language
 {
-static map<string, pair<size_t, function<ObjectPtr(ListObject *, vector<ObjectPtr>&)>>>
+static map<string, function<void(ListObject *)>>
 built_in_methods_for_list
 {
-    {"empty", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"empty", [](ListObject *obj)
         {
-            return obj->objects().empty() ? theTrue : theFalse;
-        }}
+            theCurrentFrame->push(obj->objects().empty() ? theTrue : theFalse);
+        }
     },
-    {"size", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"size", [](ListObject *obj)
         {
-            return make_shared<IntegerObject>(static_cast<int64_t>(obj->objects().size()));
-        }}
+            theCurrentFrame->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->objects().size())));
+        }
     },
-    {"push", {1,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"push", [](ListObject *obj)
         {
-            obj->append(objs[0]);
-            return theNone;
-        }}
+            obj->append(theCurrentFrame->pop());
+            theCurrentFrame->push(theNone);
+        }
     },
-    {"pop", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"pop", [](ListObject *obj)
         {
             auto res = obj->objects().back();
             obj->objects().pop_back();
-            return *res;
-        }}
+            theCurrentFrame->push(*res);
+        }
     },
-    {"front", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"front", [](ListObject *obj)
         {
-            return *obj->objects().front();
-        }}
+            theCurrentFrame->push(*obj->objects().front());
+        }
     },
-    {"back", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"back", [](ListObject *obj)
         {
-            return *obj->objects().back();
-        }}
+            theCurrentFrame->push(*obj->objects().back());
+        }
     },
-    {"clear", {0,
-        [](ListObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"clear", [](ListObject *obj)
         {
             obj->objects().clear();
-            return theNone;
-        }}
+            theCurrentFrame->push(theNone);
+        }
     }
 };
 
@@ -100,13 +94,11 @@ Ptr<ObjectPtr> ListObject::load_member(const string &name)
 {
     if (built_in_methods_for_list.count(name))
     {
-        auto &num_func = built_in_methods_for_list[name];
-        auto func = num_func.second;
+        auto &func = built_in_methods_for_list[name];
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>(num_func.first,
-                [this, func](vector<ObjectPtr> &objs) -> ObjectPtr
+            make_shared<BuiltInFunctionObject>([this, func]
                 {
-                    return func(this, objs);
+                    func(this);
                 }
             )
         );

@@ -5,11 +5,11 @@
 #include <functional>
 #include "object.hpp"
 
-#define REGISTER_BUILTIN(NAME, ARGS_NUM, FUNC) \
+#define REGISTER_BUILTIN(NAME, FUNC) \
     __attribute__((constructor)) static void F_##NAME () \
     { \
-        BuiltInFunctionObject::register_built_in_function(#NAME, ARGS_NUM, \
-            [](vector<ObjectPtr> args) -> ObjectPtr \
+        BuiltInFunctionObject::register_built_in_function(#NAME, \
+            [] \
                 FUNC \
         ); \
     }
@@ -19,20 +19,16 @@ namespace ice_language
 class BuiltInFunctionObject : public Object
 {
   public:
-    BuiltInFunctionObject(std::size_t args_num,
-        std::function<ObjectPtr(std::vector<ObjectPtr>&)> func)
-      : args_num_(args_num),
-        func_(std::move(func)) {}
+    BuiltInFunctionObject(std::function<void()> func)
+      : func_(std::move(func)) {}
 
     static ObjectPtr load_built_in_function(const std::string &);
-    static void register_built_in_function(
-        const std::string &, std::size_t,
-        std::function<ObjectPtr(std::vector<ObjectPtr>&)>);
+    static void register_built_in_function(const std::string &,
+        std::function<void()>);
 
-    void operator()(std::shared_ptr<class Frame> frame);
+    void operator()();
 
   private:
-    std::size_t args_num_;
-    std::function<ObjectPtr(std::vector<ObjectPtr>&)> func_;
+    std::function<void()> func_;
 };
 }

@@ -1,3 +1,6 @@
+#ifdef _DEBUG
+#include <iostream>
+#endif
 #include "frame.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -9,7 +12,7 @@
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
-#define OPRAND(T) (any_cast<T>(code->get_instructions()[pc].oprand))
+#define OPRAND(T) (any_cast<T>(theCurrentFrame->code()->get_instructions()[theCurrentFrame->pc()].oprand))
 
 using namespace std;
 
@@ -17,242 +20,208 @@ namespace ice_language
 {
 namespace op_handles
 {
-void pop_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void pop_handle()
 {
-    frame->pop();
-    ++pc;
+    theCurrentFrame->pop();
 }
 
-void create_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void create_handle()
 {
-    frame->scope()->create_symbol(OPRAND(string));
-    ++pc;
+    theCurrentFrame->scope()->create_symbol(OPRAND(string));
 }
 
-void load_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void load_handle()
 {
     auto name = OPRAND(string);
-    auto obj = frame->scope()->load_symbol(name);
+    auto obj = theCurrentFrame->scope()->load_symbol(name);
 
     if (!obj)
     {
-        obj = frame->scope()->create_symbol(name);
+        obj = theCurrentFrame->scope()->create_symbol(name);
     }
     if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
     {
-        do {
-            auto new_frame = make_shared<Frame>(
-                frame, thunk->scope());
-            new_frame->execute_code(thunk->code(), thunk->base());
-        } while ((thunk = dynamic_pointer_cast<ThunkObject>(frame->top())) != nullptr);
-        *obj = frame->top();
+        theCurrentFrame->push_straight(obj);
+        theCurrentFrame = make_shared<Frame>(
+            theCurrentFrame, thunk->scope(), thunk->code(), thunk->base() - 1);
     }
     else
     {
-        frame->push_straight(obj);
+        theCurrentFrame->push_straight(obj);
     }
-    ++pc;
 }
 
-void loadconst_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void loadconst_handle()
 {
-    frame->push(code->load_const(OPRAND(size_t)));
-    ++pc;
+    theCurrentFrame->push(theCurrentFrame->code()->load_const(OPRAND(size_t)));
 }
 
-void loadmember_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void loadmember_handle()
 {
     auto name = OPRAND(string);
-    frame->push_straight(frame->pop()->load_member(name));
-    ++pc;
+    theCurrentFrame->push_straight(theCurrentFrame->pop()->load_member(name));
 }
 
-void store_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void store_handle()
 {
-    auto p = frame->pop_straight();
-    *p = frame->pop();
-    frame->push_straight(p);
-    ++pc;
+    auto p = theCurrentFrame->pop_straight();
+    *p = theCurrentFrame->pop();
+    theCurrentFrame->push_straight(p);
 }
 
-void neg_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void neg_handle()
 {
-    frame->push(frame->pop()->neg());
-    ++pc;
+    theCurrentFrame->push(theCurrentFrame->pop()->neg());
 }
 
-void add_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void add_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->add(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->add(rhs));
 }
 
-void sub_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void sub_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->sub(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->sub(rhs));
 }
 
-void mul_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void mul_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->mul(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->mul(rhs));
 }
 
-void div_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void div_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->div(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->div(rhs));
 }
 
-void mod_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void mod_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->mod(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->mod(rhs));
 }
 
-void is_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void is_handle()
 {
-    auto rhs = frame->pop();
-    frame->set_top(frame->top().get() == rhs.get() ? theTrue : theFalse);
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    theCurrentFrame->set_top(theCurrentFrame->top().get() == rhs.get() ? theTrue : theFalse);
 }
 
-void ceq_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void ceq_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->ceq(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->ceq(rhs));
 }
 
-void cne_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void cne_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->cne(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->cne(rhs));
 }
 
-void clt_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void clt_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->clt(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->clt(rhs));
 }
 
-void cle_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void cle_handle()
 {
-    auto rhs = frame->pop();
-    auto lhs = frame->top();
-    frame->set_top(lhs->cle(rhs));
-    ++pc;
+    auto rhs = theCurrentFrame->pop();
+    auto lhs = theCurrentFrame->top();
+    theCurrentFrame->set_top(lhs->cle(rhs));
 }
 
-void index_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void index_handle()
 {
-    auto obj = frame->pop();
-    auto index = frame->pop();
-    frame->push_straight(obj->index(index));
-    ++pc;
+    auto obj = theCurrentFrame->pop();
+    auto index = theCurrentFrame->pop();
+    theCurrentFrame->push_straight(obj->index(index));
 }
 
-void scopebegin_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void scopebegin_handle()
 {
-    frame->set_scope(make_shared<Scope>(frame->scope()));
-    ++pc;
+    theCurrentFrame->scope() = make_shared<Scope>(theCurrentFrame->scope());
 }
 
-void scopeend_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void scopeend_handle()
 {
-    frame->set_scope(frame->scope()->pre());
-    ++pc;
+    theCurrentFrame->scope() = theCurrentFrame->scope()->pre();
 }
 
-void call_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void call_handle()
 {
-    if (dynamic_pointer_cast<FunctionObject>(frame->top()))
+    if (dynamic_pointer_cast<FunctionObject>(theCurrentFrame->top()))
     {
-        auto func = frame->pop<FunctionObject>();
-        auto new_frame = make_shared<Frame>(
-            frame, func->scope());
+        auto func = theCurrentFrame->pop<FunctionObject>();
         auto call_agrs_size = OPRAND(size_t);
+        auto pre_frame = theCurrentFrame;
+        theCurrentFrame = make_shared<Frame>(
+            theCurrentFrame, func->scope(), func->code(), func->base() - 1);
         for (size_t i = call_agrs_size;
             i < func->args_size(); ++i)
         {
-            new_frame->push(theNone);
+            theCurrentFrame->push(theNone);
         }
         for (size_t i = 0; i < call_agrs_size; ++i)
         {
-            new_frame->push(frame->pop());
+            theCurrentFrame->push(pre_frame->pop());
         }
-        new_frame->execute_code(func->code(), func->base());
+        pre_frame->push(nullptr);
     }
-    else if (dynamic_pointer_cast<BuiltInFunctionObject>(frame->top()))
+    else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentFrame->top()))
     {
-        frame->pop<BuiltInFunctionObject>()->operator()(frame);
+        theCurrentFrame->pop<BuiltInFunctionObject>()->operator()();
     }
-    else if (dynamic_pointer_cast<ContObject>(frame->top()))
+    else if (dynamic_pointer_cast<ContObject>(theCurrentFrame->top()))
     {
-        auto resume_to = frame->pop<ContObject>()->resume_to();
-        resume_to->push(frame->pop());
-        auto temp = frame;
-        while (temp != resume_to)
-        {
-            temp->has_return() = true;
-            temp = temp->return_to();
-        }
+        auto resume_to = theCurrentFrame->pop<ContObject>()->resume_to();
+        resume_to->push(theCurrentFrame->pop());
+        theCurrentFrame = resume_to;
     }
     else
     {
         throw runtime_error("failed call with the given non-function");
     }
-    ++pc;
 }
 
-void calltail_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void calltail_handle()
 {
-    if (dynamic_pointer_cast<FunctionObject>(frame->top()))
+    if (dynamic_pointer_cast<FunctionObject>(theCurrentFrame->top()))
     {
-        auto func = frame->pop<FunctionObject>();
+        auto func = theCurrentFrame->pop<FunctionObject>();
 
         stack<Ptr<ObjectPtr>> temp;
         for (size_t i = 0; i < OPRAND(size_t); ++i)
         {
-            temp.push(frame->pop_straight());
+            temp.push(theCurrentFrame->pop_straight());
         }
 
-        frame->stack().swap(temp);
-        frame->set_scope(make_shared<Scope>(func->scope()));
-        code = func->code();
-        pc = func->base();
+        theCurrentFrame->stack().swap(temp);
+        theCurrentFrame->scope() = make_shared<Scope>(func->scope());
+        theCurrentFrame->code() = func->code();
+        theCurrentFrame->pc() = func->base() - 1;
     }
-    else if (dynamic_pointer_cast<BuiltInFunctionObject>(frame->top()))
+    else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentFrame->top()))
     {
-        frame->pop<BuiltInFunctionObject>()->operator()(frame);
-        ++pc;
+        theCurrentFrame->pop<BuiltInFunctionObject>()->operator()();
     }
-    else if (dynamic_pointer_cast<ContObject>(frame->top()))
+    else if (dynamic_pointer_cast<ContObject>(theCurrentFrame->top()))
     {
-        auto resume_to = frame->pop<ContObject>()->resume_to();
-        resume_to->push(frame->pop());
-        auto temp = frame;
-        while (temp != resume_to)
-        {
-            temp->has_return() = true;
-            temp = temp->return_to();
-        }
+        auto resume_to = theCurrentFrame->pop<ContObject>()->resume_to();
+        resume_to->push(theCurrentFrame->pop());
+        theCurrentFrame = resume_to;
     }
     else
     {
@@ -260,96 +229,83 @@ void calltail_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
     }
 }
 
-void return_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void return_handle()
 {
-    frame->set_return();
+    *theCurrentFrame->return_to()->top_straight() = theCurrentFrame->pop();
+    theCurrentFrame = theCurrentFrame->return_to();
 }
 
-void jump_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void jump_handle()
 {
-    pc = OPRAND(size_t);
+    theCurrentFrame->pc() = OPRAND(size_t) - 1;
 }
 
-void jumpif_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void jumpif_handle()
 {
-    if (frame->pop()->to_bool())
+    if (theCurrentFrame->pop()->to_bool())
     {
-        pc = OPRAND(size_t);
-    }
-    else
-    {
-        ++pc;
+        theCurrentFrame->pc() = OPRAND(size_t) - 1;
     }
 }
 
-void jumpifnot_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void jumpifnot_handle()
 {
-    if (!frame->pop()->to_bool())
+    if (!theCurrentFrame->pop()->to_bool())
     {
-        pc = OPRAND(size_t);
-    }
-    else
-    {
-        ++pc;
+        theCurrentFrame->pc() = OPRAND(size_t) - 1;
     }
 }
 
-void match_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void match_handle()
 {
-    auto key = frame->pop();
-    if (frame->top()->ceq(key)->to_bool())
+    auto key = theCurrentFrame->pop();
+    if (theCurrentFrame->top()->ceq(key)->to_bool())
     {
-        frame->pop();
-        pc = OPRAND(size_t);
-    }
-    else
-    {
-        ++pc;
+        theCurrentFrame->pop();
+        theCurrentFrame->pc() = OPRAND(size_t) - 1;
     }
 }
 
-void lambdadecl_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void lambdadecl_handle()
 {
     auto args_size = OPRAND(size_t);
-    frame->push(make_shared<FunctionObject>(
-        frame->scope(), code, ++pc + 1, args_size));
-    pc = OPRAND(size_t);
+    theCurrentFrame->push(make_shared<FunctionObject>(
+        theCurrentFrame->scope(), theCurrentFrame->code(), ++theCurrentFrame->pc() + 1, args_size));
+    theCurrentFrame->pc() = OPRAND(size_t) - 1;
 }
 
-void thunkdecl_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void thunkdecl_handle()
 {
-    frame->push(make_shared<ThunkObject>(
-        frame->scope(), code, pc + 1));
-    pc = OPRAND(size_t);
+    theCurrentFrame->push(make_shared<ThunkObject>(
+        theCurrentFrame->scope(), theCurrentFrame->code(), theCurrentFrame->pc() + 1));
+    theCurrentFrame->pc() = OPRAND(size_t) - 1;
 }
 
-void buildlist_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void buildlist_handle()
 {
     auto list = make_shared<ListObject>();
     auto size = OPRAND(size_t);
     while (size--)
     {
-        list->append(frame->pop());
+        list->append(theCurrentFrame->pop());
     }
-    frame->push(list);
-    ++pc;
+    theCurrentFrame->push(list);
 }
 
-void builddict_handle(Ptr<Frame> frame, Ptr<Code> &code, size_t &pc)
+void builddict_handle()
 {
     auto dict = make_shared<DictObject>();
     auto size = OPRAND(size_t);
     while (size--)
     {
-        auto key = frame->pop();
-        dict->insert(key, frame->pop());
+        auto key = theCurrentFrame->pop();
+        dict->insert(key, theCurrentFrame->pop());
     }
-    frame->push(dict);
-    ++pc;
+    theCurrentFrame->push(dict);
 }
 }
 
-using OpHandle = void (*)(Ptr<Frame>, Ptr<Code> &code, std::size_t &);
+using OpHandle = void (*)();
 
 constexpr OpHandle theOpHandles[] =
 {
@@ -395,17 +351,16 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::builddict_handle,
 };
 
-void Frame::execute_code(Ptr<Code> code, size_t base)
+void Frame::execute()
 {
-    theCurrentFrame = shared_from_this();
-
-    auto pc = base;
-    while (pc < code->size() && !has_return_)
+    while (theCurrentFrame->pc() < theCurrentFrame->code()->size())
     {
-        theOpHandles[code->get_instructions()[pc].opcode](
-            theCurrentFrame, code, pc);
-    }
+        #ifdef _DEBUG
+        cout << theCurrentFrame->pc() << endl;
+        #endif
 
-    theCurrentFrame = return_to_;
+        theOpHandles[theCurrentFrame->code()->get_instructions()[theCurrentFrame->pc()].opcode]();
+        ++theCurrentFrame->pc();
+    }
 }
 }

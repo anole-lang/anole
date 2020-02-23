@@ -16,62 +16,76 @@ using namespace std;
 
 namespace ice_language
 {
-REGISTER_BUILTIN(eval, 1,
+REGISTER_BUILTIN(eval,
 {
-    auto str = dynamic_pointer_cast<StringObject>(args[0]);
+    auto str = dynamic_pointer_cast<StringObject>(theCurrentFrame->pop());
     istringstream ss{"return " + str->to_str() + ";"};
-    auto new_frame = make_shared<Frame>(theCurrentFrame,
-        theCurrentFrame->scope());
     auto code = make_shared<Code>();
     Parser(ss).gen_statement()->codegen(*code);
-    new_frame->execute_code(code);
-    return theCurrentFrame->pop();
+    auto preFrame = theCurrentFrame;
+    theCurrentFrame = make_shared<Frame>(theCurrentFrame,
+        theCurrentFrame->scope(), code, 1);
+    Frame::execute();
+    *preFrame->top_straight() = theCurrentFrame->pop();
+    theCurrentFrame = preFrame;
 });
 
-REGISTER_BUILTIN(call_with_current_continuation, 1,
+REGISTER_BUILTIN(call_with_current_continuation,
 {
-    auto func = dynamic_pointer_cast<FunctionObject>(args[0]);
-    auto cont_obj = make_shared<ContObject>(theCurrentFrame);
-    auto new_frame = make_shared<Frame>(
-        theCurrentFrame, func->scope());
-    new_frame->push(cont_obj);
-    new_frame->execute_code(func->code(), func->base());
-    return theCurrentFrame->pop();
+    if (dynamic_pointer_cast<FunctionObject>(theCurrentFrame->top()))
+    {
+        auto func = theCurrentFrame->pop<FunctionObject>();
+        auto cont_obj = make_shared<ContObject>(theCurrentFrame);
+        theCurrentFrame = make_shared<Frame>(
+            theCurrentFrame, func->scope(), func->code(), func->base() - 1);
+        theCurrentFrame->push(cont_obj);
+    }
+    else if (dynamic_pointer_cast<ContObject>(theCurrentFrame->top()))
+    {
+        auto resume_to = theCurrentFrame->pop<ContObject>()->resume_to();
+        auto cont_obj = make_shared<ContObject>(theCurrentFrame);
+        resume_to->push(cont_obj);
+        theCurrentFrame = resume_to;
+    }
+    else
+    {
+        throw runtime_error("err type as the argument for call/cc");
+    }
 });
 
-REGISTER_BUILTIN(id, 1,
+REGISTER_BUILTIN(id,
 {
-    return make_shared<IntegerObject>(reinterpret_cast<int64_t>(args[0].get()));
+    theCurrentFrame->push(make_shared<IntegerObject>(reinterpret_cast<int64_t>(theCurrentFrame->pop().get())));
 })
 
-REGISTER_BUILTIN(print, 1,
+REGISTER_BUILTIN(print,
 {
-    cout << args[0]->to_str();
-    return theNone;
+    cout << theCurrentFrame->pop()->to_str();
+    theCurrentFrame->push(theNone);
 });
 
-REGISTER_BUILTIN(println, 1,
+REGISTER_BUILTIN(println,
 {
-    cout << args[0]->to_str() << endl;
-    return theNone;
+    cout << theCurrentFrame->pop()->to_str() << endl;
+    theCurrentFrame->push(theNone);
 });
 
-REGISTER_BUILTIN(input, 0,
+REGISTER_BUILTIN(input,
 {
     string line;
     std::getline(cin, line);
-    return make_shared<StringObject>(line);
+    theCurrentFrame->push(make_shared<StringObject>(line));
 });
 
-REGISTER_BUILTIN(exit, 0,
+REGISTER_BUILTIN(exit,
 {
     exit(0);
-    return theNone;
+    theCurrentFrame->push(theNone);
 });
 
-REGISTER_BUILTIN(time, 0,
+REGISTER_BUILTIN(time,
 {
     time_t result = time(nullptr);
-    return make_shared<IntegerObject>(result);
+    theCurrentFrame->push(make_shared<IntegerObject>(result));
 });
 }

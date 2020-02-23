@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
     if (argc == 1)
     {
-        ReadEvalPrintLoop().run();
+        replrun::run();
     }
     else
     {
@@ -18,13 +18,13 @@ int main(int argc, char *argv[])
         parser.parse(argc, argv);
         auto fin = ifstream(parser.get("file"));
 
-        auto frame = make_shared<Frame>();
         auto code = make_shared<Code>();
         Parser(fin).gen_statements()->codegen(*code);
         auto fout = ofstream("test.out");
         code->print(fout);
 
-        frame->execute_code(code);
+        theCurrentFrame = make_shared<Frame>(code);
+        Frame::execute();
     }
     return 0;
 }

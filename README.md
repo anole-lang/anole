@@ -39,6 +39,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Refactor the run-way to support complete call/cc
 + [X] Add built-in function call_with_current_continuation easily with some limitations such as caller must exist;
 + [X] Prompt undefined symbol but without its name loaded by
 + [X] Support new operator `is`
@@ -46,7 +47,6 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 + [X] Fix bug in tail call optimization when meeting `return cond ? true_expr, false_expr`
 + [X] Change the type of the internal value of the integer from long to int64_t
 + [X] Support tail call optimization
-+ [X] Allow nested delay expression
 + [X] Support the built-in class and method
 + [X] Allow multi code objects when using eval
 + [X] Support eval function

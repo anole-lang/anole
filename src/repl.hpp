@@ -6,10 +6,8 @@
 
 namespace ice_language
 {
-class ReadEvalPrintLoop
+namespace replrun
 {
-  public:
-    ReadEvalPrintLoop() = default;
-    void run();
-};
+void run();
+}
 }

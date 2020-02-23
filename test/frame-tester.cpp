@@ -6,12 +6,19 @@
 using namespace std;
 using namespace ice_language;
 
+#ifdef _DEBUG
+#define PRINT code->print()
+#else
+#define PRINT
+#endif
+
 #define PRE AST::interpretive() = true; \
-            auto frame = make_shared<Frame>();\
             auto code = make_shared<Code>(); \
+            theCurrentFrame = make_shared<Frame>(code);\
             auto ast = Parser(ss).gen_statements();\
             ast->codegen(*code);\
-            frame->execute_code(code);
+            PRINT; \
+            Frame::execute();
 
 TEST_CLASS(Frame)
     TEST_METHOD(SimpleRun)
@@ -22,7 +29,7 @@ b: a : 3;
 a + b;
         )");
         PRE;
-        ASSERT(frame->pop()->to_str() == "6");
+        ASSERT(theCurrentFrame->pop()->to_str() == "6");
     TEST_END
 
     TEST_METHOD(SimpleFunc)
@@ -31,7 +38,7 @@ a + b;
 adddd(1)(2)(3)(4);
         )");
         PRE;
-        ASSERT(frame->pop()->to_str() == "10");
+        ASSERT(theCurrentFrame->pop()->to_str() == "10");
     TEST_END
 
     TEST_METHOD(SimpleIfElseStmt)
@@ -53,8 +60,8 @@ foo(1);
 foo(0);
         )");
         PRE;
-        ASSERT(frame->pop()->to_str() == "3");
-        ASSERT(frame->pop()->to_str() == "2");
+        ASSERT(theCurrentFrame->pop()->to_str() == "3");
+        ASSERT(theCurrentFrame->pop()->to_str() == "2");
     TEST_END
 
     TEST_METHOD(Y)
@@ -70,7 +77,7 @@ foo(0);
         )");
         PRE;
         // code.print();
-        ASSERT(frame->pop()->to_str() == "120");
+        ASSERT(theCurrentFrame->pop()->to_str() == "120");
     TEST_END
 
     TEST_METHOD(Chunck)
@@ -111,8 +118,8 @@ Equal(Two, Add(Two, Two)) = True;
 Equal(Two, Add2(One, One)) = True;
             )");
         PRE;
-        ASSERT(frame->pop() == theTrue);
-        ASSERT(frame->pop() == theFalse);
-        ASSERT(frame->pop() == theTrue);
+        ASSERT(theCurrentFrame->pop() == theTrue);
+        ASSERT(theCurrentFrame->pop() == theFalse);
+        ASSERT(theCurrentFrame->pop() == theTrue);
     TEST_END
 TEST_END

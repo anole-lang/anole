@@ -24,22 +24,13 @@ BuiltInFunctionObject::load_built_in_function(const string &name)
 }
 
 void BuiltInFunctionObject::register_built_in_function(
-    const string &name, size_t args_num,
-    function<ObjectPtr(vector<ObjectPtr>&)> func)
+    const string &name, function<void()> func)
 {
-    get_built_in_functions()[name] = make_shared<BuiltInFunctionObject>(
-        args_num, func
-    );
+    get_built_in_functions()[name] = make_shared<BuiltInFunctionObject>(func);
 }
 
-void BuiltInFunctionObject::operator()(Ptr<Frame> frame)
+void BuiltInFunctionObject::operator()()
 {
-    std::vector<ObjectPtr> args;
-    for (size_t i = 0; i < args_num_; ++i)
-    {
-        args.push_back(frame->pop());
-    }
-    reverse(args.begin(), args.end());
-    frame->push(func_(args));
+    func_();
 }
 }

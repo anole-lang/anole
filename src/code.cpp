@@ -16,7 +16,8 @@ Code::Code()
         theNone,
         theTrue,
         theFalse
-    }
+    },
+    instructions_({ Instruction{Opcode::PlaceHolder, any()} })
 {
     // ...
 }

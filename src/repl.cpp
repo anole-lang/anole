@@ -8,7 +8,7 @@ using namespace std;
 
 namespace ice_language
 {
-void ReadEvalPrintLoop::run()
+void replrun::run()
 {
     cout <<
 "    _____________________\n"
@@ -28,8 +28,8 @@ void ReadEvalPrintLoop::run()
     istringstream ss(line += '\n');
 
     Parser parser{ss};
-    auto frame = make_shared<Frame>();
     auto code = make_shared<Code>();
+    theCurrentFrame = make_shared<Frame>(code);
 
     parser.set_continue_action([&ss, &line, &parser]
     {
@@ -39,20 +39,20 @@ void ReadEvalPrintLoop::run()
         parser.cont();
     });
 
-    size_t base = 0;
-
     while (true)
     {
         try
         {
             auto stmt = parser.gen_statement();
             stmt->codegen(*code);
-            frame->execute_code(code, base);
-            base = code->size();
+            #ifdef _DEBUG
+            code->print();
+            #endif
+            Frame::execute();
             if (dynamic_pointer_cast<ExprStmt>(stmt)
-                and frame->top() != theNone)
+                and theCurrentFrame->top() != theNone)
             {
-                cout << frame->pop()->to_str() << endl;
+                cout << theCurrentFrame->pop()->to_str() << endl;
             }
         }
         catch (const exception &e)

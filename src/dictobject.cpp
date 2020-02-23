@@ -1,3 +1,4 @@
+#include "frame.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "dictobject.hpp"
@@ -8,47 +9,43 @@ using namespace std;
 
 namespace ice_language
 {
-static map<string, pair<size_t, function<ObjectPtr(DictObject *, vector<ObjectPtr>&)>>>
+static map<string, function<void(DictObject *)>>
 built_in_methods_for_dict
 {
-    {"empty", {0,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"empty", [](DictObject *obj)
         {
-            return obj->data().empty() ? theTrue : theFalse;
-        }}
+            theCurrentFrame->push(obj->data().empty() ? theTrue : theFalse);
+        }
     },
-    {"size", {0,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"size", [](DictObject *obj)
         {
-            return make_shared<IntegerObject>(static_cast<int64_t>(obj->data().size()));
-        }}
+            theCurrentFrame->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->data().size())));
+        }
     },
-    {"at", {1,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"at", [](DictObject *obj)
         {
-            return *(obj->index(objs[0]));
-        }}
+            theCurrentFrame->push(*(obj->index(theCurrentFrame->pop())));
+        }
     },
-    {"insert", {2,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"insert", [](DictObject *obj)
         {
-            obj->insert(objs[0], objs[1]);
-            return theNone;
-        }}
+            auto p2 = theCurrentFrame->pop();
+            auto p1 = theCurrentFrame->pop();
+            obj->insert(p1, p2);
+            theCurrentFrame->push(theNone);
+        }
     },
-    {"erase", {1,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"erase", [](DictObject *obj)
         {
-            obj->data().erase(objs[0]);
-            return theNone;
-        }}
+            obj->data().erase(theCurrentFrame->pop());
+            theCurrentFrame->push(theNone);
+        }
     },
-    {"clear", {0,
-        [](DictObject *obj, vector<ObjectPtr> &objs) -> ObjectPtr
+    {"clear", [](DictObject *obj)
         {
             obj->data().clear();
-            return theNone;
-        }}
+            theCurrentFrame->push(theNone);
+        }
     }
 };
 
@@ -88,13 +85,11 @@ Ptr<ObjectPtr> DictObject::load_member(const string &name)
 {
     if (built_in_methods_for_dict.count(name))
     {
-        auto &num_func = built_in_methods_for_dict[name];
-        auto func = num_func.second;
+        auto &func = built_in_methods_for_dict[name];
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>(num_func.first,
-                [this, func](vector<ObjectPtr> &objs) -> ObjectPtr
+            make_shared<BuiltInFunctionObject>([this, func]()
                 {
-                    return func(this, objs);
+                    func(this);
                 }
             )
         );

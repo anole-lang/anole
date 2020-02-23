@@ -15,40 +15,33 @@ namespace ice_language
 class Frame : public std::enable_shared_from_this<Frame>
 {
   public:
-    Frame() : Frame(nullptr) {}
-    Frame(Ptr<Scope> scope) : Frame(nullptr, scope) {}
-    Frame(Ptr<Frame> return_to, Ptr<Scope> scope)
-      : has_return_(false), return_to_(return_to),
-        scope_(std::make_shared<Scope>(scope)) {}
+    Frame(Ptr<Code> code) : Frame(nullptr, code) {}
+    Frame(Ptr<Scope> scope, Ptr<Code> code)
+      : Frame(nullptr, scope, code, 1) {}
+    Frame(Ptr<Frame> return_to, Ptr<Scope> scope, Ptr<Code> code, std::size_t pc)
+      : return_to_(return_to), scope_(std::make_shared<Scope>(scope)),
+        code_(code), pc_(pc) {}
 
-    void execute_code(Ptr<Code> code, std::size_t base = 0);
+    static void execute();
 
-    Ptr<Frame> &return_to()
+    Ptr<Frame> return_to()
     {
         return return_to_;
     }
 
-    void set_return()
-    {
-        // assert stack_ is not empty
-        // assert return_to_ is not nullptr
-        return_to_->push(pop());
-        has_return_ = true;
-    }
-
-    bool &has_return()
-    {
-        return has_return_;
-    }
-
-    Ptr<Scope> scope()
+    Ptr<Scope> &scope()
     {
         return scope_;
     }
 
-    void set_scope(Ptr<Scope> scope)
+    Ptr<Code> &code()
     {
-        scope_ = scope;
+        return code_;
+    }
+
+    std::size_t &pc()
+    {
+        return pc_;
     }
 
     void push(ObjectPtr value)
@@ -71,7 +64,7 @@ class Frame : public std::enable_shared_from_this<Frame>
         return std::reinterpret_pointer_cast<R>(*stack_.top());
     }
 
-    Ptr<ObjectPtr> top_straight()
+    Ptr<ObjectPtr> &top_straight()
     {
         return stack_.top();
     }
@@ -112,9 +105,10 @@ class Frame : public std::enable_shared_from_this<Frame>
     }
 
   private:
-    bool has_return_;
     Ptr<Frame> return_to_;
     Ptr<Scope> scope_;
+    Ptr<Code> code_;
+    std::size_t pc_;
     std::stack<Ptr<ObjectPtr>> stack_;
 };
 
