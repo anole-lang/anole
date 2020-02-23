@@ -39,6 +39,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Fix bug in updating pc when meeting error in REPL
 + [X] Refactor the run-way to support complete call/cc
 + [X] Add built-in function call_with_current_continuation easily with some limitations such as caller must exist;
 + [X] Prompt undefined symbol but without its name loaded by

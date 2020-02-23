@@ -88,10 +88,9 @@ Ptr<ObjectPtr> DictObject::load_member(const string &name)
         auto &func = built_in_methods_for_dict[name];
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([this, func]()
-                {
-                    func(this);
-                }
-            )
+            {
+                func(this);
+            })
         );
     }
     return Object::load_member(name);

@@ -43,11 +43,15 @@ void replrun::run()
     {
         try
         {
+            theCurrentFrame->pc() = code->size();
+
             auto stmt = parser.gen_statement();
             stmt->codegen(*code);
+
             #ifdef _DEBUG
             code->print();
             #endif
+
             Frame::execute();
             if (dynamic_pointer_cast<ExprStmt>(stmt)
                 and theCurrentFrame->top() != theNone)
