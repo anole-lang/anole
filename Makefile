@@ -54,15 +54,15 @@ tmp/tokenizer-tester: test/tokenizer-tester.cpp ${OBJ} | ./tmp
 tmp/parser-tester: test/parser-tester.cpp ${OBJ}
 	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
-tmp/frame-tester: test/frame-tester.cpp ${OBJ}
+tmp/sample-tester: test/sample-tester.cpp ${OBJ}
 	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
 test: tmp/tokenizer-tester \
 	  tmp/parser-tester \
-	  tmp/frame-tester
+	  tmp/sample-tester
 	tmp/tokenizer-tester
 	tmp/parser-tester
-	tmp/frame-tester
+	tmp/sample-tester
 
 ${DIR_BIN}:
 	mkdir $@

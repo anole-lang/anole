@@ -2,6 +2,9 @@
 #include "../src/frame.hpp"
 #include "../src/boolobject.hpp"
 #include "tester.hpp"
+#include <cstdio>
+#include <sstream>
+#include <iostream>
 
 using namespace std;
 using namespace ice_language;
@@ -14,13 +17,18 @@ using namespace ice_language;
 
 #define PRE AST::interpretive() = true; \
             auto code = make_shared<Code>(); \
-            theCurrentFrame = make_shared<Frame>(code);\
-            auto ast = Parser(ss).gen_statements();\
-            ast->codegen(*code);\
+            theCurrentFrame = make_shared<Frame>(code); \
+            auto ast = Parser(ss).gen_statements(); \
+            ast->codegen(*code); \
             PRINT; \
-            Frame::execute();
+            ostringstream out; \
+            auto backup = cout.rdbuf(); \
+            cout.rdbuf(out.rdbuf()); \
+            Frame::execute(); \
+            cout.rdbuf(backup)
 
-TEST_CLASS(Frame)
+
+TEST_CLASS(Sample)
     TEST_METHOD(SimpleRun)
         istringstream ss(R"(
 a: 1;
@@ -76,7 +84,6 @@ foo(0);
 @result: Y(fact)(5);
         )");
         PRE;
-        // code.print();
         ASSERT(theCurrentFrame->pop()->to_str() == "120");
     TEST_END
 
@@ -116,10 +123,36 @@ Two: Add(One, One);
 Equal(Two, Add(One, One)) = True;
 Equal(Two, Add(Two, Two)) = True;
 Equal(Two, Add2(One, One)) = True;
-            )");
+        )");
         PRE;
         ASSERT(theCurrentFrame->pop() == theTrue);
         ASSERT(theCurrentFrame->pop() == theFalse);
         ASSERT(theCurrentFrame->pop() == theTrue);
+    TEST_END
+
+    TEST_METHOD(Continuation)
+        istringstream ss(R"code(
+Xb: @() {
+    println("Hi! My name is Xu Bo.");
+    cont: call_with_current_continuation(Lyx);
+    println("Do you love me?");
+    call_with_current_continuation(cont);
+}
+
+Lyx: @(cont) {
+    println("Hello! I'm Luo yuexuan.");
+    cont: call_with_current_continuation(cont);
+    println("Yes! I love you very very much!");
+    cont(none);
+}
+
+Xb();
+        )code");
+        PRE;
+        ASSERT(out.str() == R"(Hi! My name is Xu Bo.
+Hello! I'm Luo yuexuan.
+Do you love me?
+Yes! I love you very very much!
+)");
     TEST_END
 TEST_END
