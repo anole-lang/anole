@@ -21,13 +21,15 @@
 ~> ice
 ```
 
+You can see some examples in `example/` or the `test/sample-tester.cpp`
+
 ### Extension in VSCode
 
 Search `Ice-Lang`
 
 ## To Do
 
-Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine.
+Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error
