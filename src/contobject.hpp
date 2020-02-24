@@ -11,6 +11,9 @@ class ContObject : public Object
     ContObject(Ptr<Frame> resume_to)
       : resume_to_(resume_to) {}
 
+    ObjectPtr ceq(ObjectPtr) override;
+    ObjectPtr cne(ObjectPtr) override;
+
     Ptr<Frame> resume_to()
     {
         return resume_to_;

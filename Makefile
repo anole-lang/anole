@@ -31,10 +31,12 @@ obj/code.so: src/codegen.cpp \
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 obj/objects.so: src/object.cpp \
+				src/noneobject.cpp \
 				src/boolobject.cpp \
 				src/listobject.cpp \
 				src/dictobject.cpp \
 				src/funcobject.cpp \
+				src/contobject.cpp \
 				src/floatobject.cpp \
 				src/stringobject.cpp \
 				src/integerobject.cpp \
