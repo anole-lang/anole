@@ -12,7 +12,7 @@
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
-#define OPRAND(T) (any_cast<T>(theCurrentFrame->code()->get_instructions()[theCurrentFrame->pc()].oprand))
+#define OPRAND(T) (any_cast<T>(theCurrentFrame->oprand()))
 
 using namespace std;
 
@@ -270,14 +270,16 @@ void lambdadecl_handle()
 {
     auto args_size = OPRAND(size_t);
     theCurrentFrame->push(make_shared<FunctionObject>(
-        theCurrentFrame->scope(), theCurrentFrame->code(), ++theCurrentFrame->pc() + 1, args_size));
+        theCurrentFrame->scope(), theCurrentFrame->code(),
+        ++theCurrentFrame->pc() + 1, args_size));
     theCurrentFrame->pc() = OPRAND(size_t) - 1;
 }
 
 void thunkdecl_handle()
 {
     theCurrentFrame->push(make_shared<ThunkObject>(
-        theCurrentFrame->scope(), theCurrentFrame->code(), theCurrentFrame->pc() + 1));
+        theCurrentFrame->scope(), theCurrentFrame->code(),
+        theCurrentFrame->pc() + 1));
     theCurrentFrame->pc() = OPRAND(size_t) - 1;
 }
 
@@ -359,7 +361,7 @@ void Frame::execute()
         cout << theCurrentFrame->pc() << endl;
         #endif
 
-        theOpHandles[theCurrentFrame->code()->get_instructions()[theCurrentFrame->pc()].opcode]();
+        theOpHandles[theCurrentFrame->ins().opcode]();
         ++theCurrentFrame->pc();
     }
 }

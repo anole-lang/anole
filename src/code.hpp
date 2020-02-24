@@ -16,6 +16,11 @@ class Code
   public:
     Code();
 
+    std::any &oprand_at(std::size_t i)
+    {
+        return instructions_[i].oprand;
+    }
+
     template <Opcode op = Opcode::PlaceHolder>
     std::size_t add_ins()
     {

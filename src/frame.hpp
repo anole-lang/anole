@@ -17,8 +17,8 @@ class Frame : public std::enable_shared_from_this<Frame>
   public:
     Frame(Ptr<Code> code) : Frame(nullptr, code) {}
     Frame(Ptr<Scope> scope, Ptr<Code> code)
-      : Frame(nullptr, scope, code, 1) {}
-    Frame(Ptr<Frame> return_to, Ptr<Scope> scope, Ptr<Code> code, std::size_t pc)
+      : Frame(nullptr, scope, code) {}
+    Frame(Ptr<Frame> return_to, Ptr<Scope> scope, Ptr<Code> code, std::size_t pc = 1)
       : return_to_(return_to), scope_(std::make_shared<Scope>(scope)),
         code_(code), pc_(pc) {}
 
@@ -42,6 +42,16 @@ class Frame : public std::enable_shared_from_this<Frame>
     std::size_t &pc()
     {
         return pc_;
+    }
+
+    Instruction &ins()
+    {
+        return code_->get_instructions()[pc_];
+    }
+
+    std::any &oprand()
+    {
+        return code_->oprand_at(pc_);
     }
 
     void push(ObjectPtr value)

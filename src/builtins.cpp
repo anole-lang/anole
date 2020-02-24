@@ -22,12 +22,9 @@ REGISTER_BUILTIN(eval,
     istringstream ss{"return " + str->to_str() + ";"};
     auto code = make_shared<Code>();
     Parser(ss).gen_statement()->codegen(*code);
-    auto preFrame = theCurrentFrame;
+    theCurrentFrame->push(nullptr);
     theCurrentFrame = make_shared<Frame>(theCurrentFrame,
-        theCurrentFrame->scope(), code, 1);
-    Frame::execute();
-    *preFrame->top_straight() = theCurrentFrame->pop();
-    theCurrentFrame = preFrame;
+        theCurrentFrame->scope(), code, 0);
 });
 
 REGISTER_BUILTIN(call_with_current_continuation,
