@@ -229,7 +229,6 @@ void BinaryOperatorExpr::codegen(Code &code)
 void LambdaExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
-    auto o2 = code.add_ins();
     for (auto arg_decl : arg_decls)
     {
         code.add_ins<Opcode::Create>(arg_decl->id->name);
@@ -240,8 +239,7 @@ void LambdaExpr::codegen(Code &code)
     block->codegen(code);
     code.add_ins<Opcode::LoadConst, size_t>(0);
     code.add_ins<Opcode::Return>();
-    code.set_ins<Opcode::LambdaDecl>(o1, arg_decls.size());
-    code.set_ins<Opcode::LambdaDecl>(o2, code.size());
+    code.set_ins<Opcode::LambdaDecl>(o1, code.size());
 }
 
 // [AFTER] [CLASS]

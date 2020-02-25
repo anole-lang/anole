@@ -41,6 +41,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Reduce redundant instruction LambdaDecl
 + [X] Fix bug in REPL mode
 + [X] Remove the spending of nested stack at before versions.
 + [X] Fix bug in eval function

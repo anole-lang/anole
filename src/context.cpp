@@ -246,10 +246,9 @@ void match_handle()
 
 void lambdadecl_handle()
 {
-    auto args_size = OPRAND(size_t);
     theCurrentContext->push(make_shared<FunctionObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
-        ++theCurrentContext->pc() + 1, args_size));
+        theCurrentContext->pc() + 1));
     theCurrentContext->pc() = OPRAND(size_t) - 1;
 }
 
