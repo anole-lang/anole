@@ -46,6 +46,13 @@ void replrun::run()
             theCurrentContext->pc() = code->size();
 
             auto stmt = parser.gen_statement();
+            if (dynamic_pointer_cast<ExprStmt>(stmt))
+            {
+                stmt = make_shared<ParenOperatorExpr>(
+                    make_shared<IdentifierExpr>("println"),
+                    ExprList{ reinterpret_pointer_cast<ExprStmt>(stmt)->expr }
+                );
+            }
             stmt->codegen(*code);
 
             #ifdef _DEBUG
@@ -53,16 +60,6 @@ void replrun::run()
             #endif
 
             Context::execute();
-            if (dynamic_pointer_cast<ExprStmt>(stmt)
-                and theCurrentContext->top() != theNone)
-            {
-                cout << theCurrentContext->pop()->to_str() << endl;
-            }
-
-            while (!theStack.empty())
-            {
-                theStack.pop();
-            }
         }
         catch (const exception &e)
         {

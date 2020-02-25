@@ -360,10 +360,7 @@ void UseStmt::codegen(Code &code)
 void ExprStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    if (!interpretive())
-    {
-        code.add_ins<Opcode::Pop>();
-    }
+    code.add_ins<Opcode::Pop>();
 }
 
 // completed

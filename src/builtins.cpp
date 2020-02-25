@@ -54,13 +54,19 @@ REGISTER_BUILTIN(id,
 
 REGISTER_BUILTIN(print,
 {
-    cout << theCurrentContext->pop()->to_str();
+    if (theCurrentContext->top() != theNone)
+    {
+        cout << theCurrentContext->pop()->to_str();
+    }
     theCurrentContext->push(theNone);
 });
 
 REGISTER_BUILTIN(println,
 {
-    cout << theCurrentContext->pop()->to_str() << endl;
+    if (theCurrentContext->top() != theNone)
+    {
+        cout << theCurrentContext->pop()->to_str() << endl;
+    }
     theCurrentContext->push(theNone);
 });
 
