@@ -1,5 +1,5 @@
 (@(yang): @(yin): yin(yang))
-    ((@(cc) { print("*"); return cc; })
+    ((@(cont) { print("*"); return cont; })
         (call_with_current_continuation(@(cont): cont)))
-    ((@(cc) { print("@"); return cc; })
+    ((@(cont) { print("@"); return cont; })
         (call_with_current_continuation(@(cont): cont)));
