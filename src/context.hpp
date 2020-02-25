@@ -11,28 +11,37 @@
 
 namespace ice_language
 {
-inline std::stack<Ptr<ObjectPtr>> theStack;
-
 // Context should be contructed by make_shared
 class Context : public std::enable_shared_from_this<Context>
 {
+  private:
+    using StackType = std::stack<Ptr<ObjectPtr>>;
+
   public:
     // this for resume from ContObject
     Context(Ptr<Context> resume)
       : pre_context_(resume->pre_context_),
         scope_(std::make_shared<Scope>(resume->scope_)),
-        code_(resume->code_), pc_(resume->pc_) {}
+        code_(resume->code_), pc_(resume->pc_),
+        stack_(std::make_shared<StackType>(*resume->stack_)) {}
 
     // copy ctor
     Context(const Context &context)
       : pre_context_(context.pre_context_),
         scope_(context.scope_),
-        code_(context.code_), pc_(context.pc_) {}
+        code_(context.code_), pc_(context.pc_),
+        stack_(std::make_shared<StackType>(*context.stack_)) {}
 
-    Context(Ptr<Code> code) : Context(nullptr, nullptr, code) {}
-    Context(Ptr<Context> pre, Ptr<Scope> scope, Ptr<Code> code, std::size_t pc = 1)
+    Context(Ptr<Code> code)
+      : pre_context_(nullptr),
+        scope_(std::make_shared<Scope>(nullptr)),
+        code_(code), pc_(1),
+        stack_(std::make_shared<StackType>()) {}
+
+    Context(Ptr<Context> pre, Ptr<Scope> scope,
+        Ptr<Code> code, std::size_t pc = 1)
       : pre_context_(pre), scope_(std::make_shared<Scope>(scope)),
-        code_(code), pc_(pc) {}
+        code_(code), pc_(pc), stack_(pre->stack_) {}
 
     static void execute();
 
@@ -68,52 +77,52 @@ class Context : public std::enable_shared_from_this<Context>
 
     void push(ObjectPtr value)
     {
-        theStack.push(std::make_shared<ObjectPtr>(value));
+        stack_->push(std::make_shared<ObjectPtr>(value));
     }
 
     void push_straight(Ptr<ObjectPtr> ptr)
     {
-        theStack.push(ptr);
+        stack_->push(ptr);
     }
 
     template <typename R = Object>
     Ptr<R> top()
     {
-        if (*theStack.top() == nullptr)
+        if (*stack_->top() == nullptr)
         {
             throw std::runtime_error("no such var");
         }
-        return std::reinterpret_pointer_cast<R>(*theStack.top());
+        return std::reinterpret_pointer_cast<R>(*stack_->top());
     }
 
     Ptr<ObjectPtr> &top_straight()
     {
-        return theStack.top();
+        return stack_->top();
     }
 
     void set_top(ObjectPtr ptr)
     {
-        theStack.top() = std::make_shared<ObjectPtr>(ptr);
+        stack_->top() = std::make_shared<ObjectPtr>(ptr);
     }
 
     template <typename R = Object>
     Ptr<R> pop()
     {
         auto res = top<R>();
-        theStack.pop();
+        stack_->pop();
         return res;
     }
 
     Ptr<ObjectPtr> pop_straight()
     {
         auto res = top_straight();
-        theStack.pop();
+        stack_->pop();
         return res;
     }
 
     std::size_t size()
     {
-        return theStack.size();
+        return stack_->size();
     }
 
   private:
@@ -121,6 +130,7 @@ class Context : public std::enable_shared_from_this<Context>
     Ptr<Scope> scope_;
     Ptr<Code> code_;
     std::size_t pc_;
+    Ptr<StackType> stack_;
 };
 
 inline Ptr<Context> theCurrentContext = nullptr;

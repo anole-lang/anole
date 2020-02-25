@@ -31,15 +31,17 @@ REGISTER_BUILTIN(call_with_current_continuation,
     if (dynamic_pointer_cast<FunctionObject>(theCurrentContext->top()))
     {
         auto func = theCurrentContext->pop<FunctionObject>();
-        theCurrentContext->push(make_shared<ContObject>(theCurrentContext));
+        auto cont_obj = make_shared<ContObject>(theCurrentContext);
         theCurrentContext = make_shared<Context>(
             theCurrentContext, func->scope(), func->code(), func->base() - 1);
+        theCurrentContext->push(cont_obj);
     }
     else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
     {
-        auto resume = theCurrentContext->pop<ContObject>()->resume_to();
-        theCurrentContext->push(make_shared<ContObject>(theCurrentContext));
+        auto resume = theCurrentContext->pop<ContObject>()->resume();
+        auto cont_obj = make_shared<ContObject>(theCurrentContext);
         theCurrentContext = make_shared<Context>(resume);
+        theCurrentContext->push(cont_obj);
     }
     else
     {

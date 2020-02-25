@@ -174,8 +174,10 @@ void call_handle()
     }
     else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
     {
-        auto resume = theCurrentContext->pop<ContObject>()->resume_to();
+        auto resume = theCurrentContext->pop<ContObject>()->resume();
+        auto retval = theCurrentContext->pop();
         theCurrentContext = make_shared<Context>(resume);
+        theCurrentContext->push(retval);
     }
     else
     {
@@ -198,8 +200,10 @@ void calltail_handle()
     }
     else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
     {
-        auto resume = theCurrentContext->pop<ContObject>()->resume_to();
+        auto resume = theCurrentContext->pop<ContObject>()->resume();
+        auto retval = theCurrentContext->pop();
         theCurrentContext = make_shared<Context>(resume);
+        theCurrentContext->push(retval);
     }
     else
     {
@@ -209,8 +213,9 @@ void calltail_handle()
 
 void return_handle()
 {
-    theCurrentContext->set_top(theCurrentContext->top());
-    theCurrentContext = theCurrentContext->pre_context();
+    auto pre_context = theCurrentContext->pre_context();
+    pre_context->push(theCurrentContext->pop());
+    theCurrentContext = pre_context;
 }
 
 void jump_handle()
