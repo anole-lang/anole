@@ -21,7 +21,16 @@
 ~> ice
 ```
 
-You can see some examples in `example/` or the `test/sample-tester.cpp`
+You can see some examples in `example/` or the `test/sample-tester.cpp`, this is the yin-yang puzzle for fun
+
+```
+(@(yang): @(yin): yin(yang))
+    ((@(cc) { print("*"); return cc; })
+        (call_with_current_continuation(@(cont): cont)))
+    ((@(cc) { print("@"); return cc; })
+        (call_with_current_continuation(@(cont): cont)));
+
+```
 
 ### Extension in VSCode
 
