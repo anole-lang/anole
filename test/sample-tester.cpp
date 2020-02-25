@@ -1,5 +1,5 @@
 #include "../src/parser.hpp"
-#include "../src/frame.hpp"
+#include "../src/context.hpp"
 #include "../src/boolobject.hpp"
 #include "tester.hpp"
 #include <cstdio>
@@ -15,16 +15,15 @@ using namespace ice_language;
 #define PRINT
 #endif
 
-#define PRE AST::interpretive() = true; \
-            auto code = make_shared<Code>(); \
-            theCurrentFrame = make_shared<Frame>(code); \
+#define PRE auto code = make_shared<Code>(); \
+            theCurrentContext = make_shared<Context>(code); \
             auto ast = Parser(ss).gen_statements(); \
             ast->codegen(*code); \
             PRINT; \
             ostringstream out; \
             auto backup = cout.rdbuf(); \
             cout.rdbuf(out.rdbuf()); \
-            Frame::execute(); \
+            Context::execute(); \
             cout.rdbuf(backup)
 
 
@@ -34,19 +33,19 @@ TEST_CLASS(Sample)
 a: 1;
 b: 2;
 b: a : 3;
-a + b;
+print(a + b);
         )");
         PRE;
-        ASSERT(theCurrentFrame->pop()->to_str() == "6");
+        ASSERT(out.str() == R"(6)");
     TEST_END
 
     TEST_METHOD(SimpleFunc)
         istringstream ss(R"(
 @adddd: @(a): @(b): @(c): @(d): a + b + c + d;
-adddd(1)(2)(3)(4);
+print(adddd(1)(2)(3)(4));
         )");
         PRE;
-        ASSERT(theCurrentFrame->pop()->to_str() == "10");
+        ASSERT(out.str() == R"(10)");
     TEST_END
 
     TEST_METHOD(SimpleIfElseStmt)
@@ -64,12 +63,11 @@ a: 1;
         return a: 3;
     };
 };
-foo(1);
-foo(0);
+print(foo(1));
+print(foo(0));
         )");
         PRE;
-        ASSERT(theCurrentFrame->pop()->to_str() == "3");
-        ASSERT(theCurrentFrame->pop()->to_str() == "2");
+        ASSERT(out.str() == R"(23)");
     TEST_END
 
     TEST_METHOD(Y)
@@ -81,13 +79,13 @@ foo(0);
 @fact(f):
   @(n): n ? (n * f(n-1)) , 1;
 
-@result: Y(fact)(5);
+print(Y(fact)(5));
         )");
         PRE;
-        ASSERT(theCurrentFrame->pop()->to_str() == "120");
+        ASSERT(out.str() == R"(120)");
     TEST_END
 
-    TEST_METHOD(Chunck)
+    TEST_METHOD(Chunch)
         istringstream ss(R"(
 Zero: @(f): @(x): x;
 Succ: @(n): @(f): @(x): f(n(f)(x));
@@ -120,14 +118,15 @@ Equal: @(x, y):
 One: Succ(Zero);
 Two: Add(One, One);
 
-Equal(Two, Add(One, One)) = True;
-Equal(Two, Add(Two, Two)) = True;
-Equal(Two, Add2(One, One)) = True;
+println(Equal(Two, Add(One, One)) = True);
+println(Equal(Two, Add(Two, Two)) = True);
+println(Equal(Two, Add2(One, One)) = True);
         )");
         PRE;
-        ASSERT(theCurrentFrame->pop() == theTrue);
-        ASSERT(theCurrentFrame->pop() == theFalse);
-        ASSERT(theCurrentFrame->pop() == theTrue);
+        ASSERT(out.str() == R"(true
+false
+true
+)");
     TEST_END
 
     TEST_METHOD(Continuation)

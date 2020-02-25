@@ -1,7 +1,7 @@
 #pragma once
 
 #include "code.hpp"
-#include "frame.hpp"
+#include "context.hpp"
 #include "parser.hpp"
 
 namespace ice_language

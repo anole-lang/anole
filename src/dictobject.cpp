@@ -1,4 +1,4 @@
-#include "frame.hpp"
+#include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "dictobject.hpp"
@@ -14,37 +14,37 @@ built_in_methods_for_dict
 {
     {"empty", [](DictObject *obj)
         {
-            theCurrentFrame->push(obj->data().empty() ? theTrue : theFalse);
+            theCurrentContext->push(obj->data().empty() ? theTrue : theFalse);
         }
     },
     {"size", [](DictObject *obj)
         {
-            theCurrentFrame->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->data().size())));
+            theCurrentContext->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->data().size())));
         }
     },
     {"at", [](DictObject *obj)
         {
-            theCurrentFrame->push(*(obj->index(theCurrentFrame->pop())));
+            theCurrentContext->push(*(obj->index(theCurrentContext->pop())));
         }
     },
     {"insert", [](DictObject *obj)
         {
-            auto p2 = theCurrentFrame->pop();
-            auto p1 = theCurrentFrame->pop();
+            auto p1 = theCurrentContext->pop();
+            auto p2 = theCurrentContext->pop();
             obj->insert(p1, p2);
-            theCurrentFrame->push(theNone);
+            theCurrentContext->push(theNone);
         }
     },
     {"erase", [](DictObject *obj)
         {
-            obj->data().erase(theCurrentFrame->pop());
-            theCurrentFrame->push(theNone);
+            obj->data().erase(theCurrentContext->pop());
+            theCurrentContext->push(theNone);
         }
     },
     {"clear", [](DictObject *obj)
         {
             obj->data().clear();
-            theCurrentFrame->push(theNone);
+            theCurrentContext->push(theNone);
         }
     }
 };

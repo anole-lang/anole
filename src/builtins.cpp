@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include "code.hpp"
-#include "frame.hpp"
+#include "context.hpp"
 #include "parser.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -18,31 +18,28 @@ namespace ice_language
 {
 REGISTER_BUILTIN(eval,
 {
-    auto str = dynamic_pointer_cast<StringObject>(theCurrentFrame->pop());
+    auto str = dynamic_pointer_cast<StringObject>(theCurrentContext->pop());
     istringstream ss{"return " + str->to_str() + ";"};
     auto code = make_shared<Code>();
     Parser(ss).gen_statement()->codegen(*code);
-    theCurrentFrame->push(nullptr);
-    theCurrentFrame = make_shared<Frame>(theCurrentFrame,
-        theCurrentFrame->scope(), code, 0);
+    theCurrentContext = make_shared<Context>(theCurrentContext,
+        theCurrentContext->scope(), code, 0);
 });
 
 REGISTER_BUILTIN(call_with_current_continuation,
 {
-    if (dynamic_pointer_cast<FunctionObject>(theCurrentFrame->top()))
+    if (dynamic_pointer_cast<FunctionObject>(theCurrentContext->top()))
     {
-        auto func = theCurrentFrame->pop<FunctionObject>();
-        auto cont_obj = make_shared<ContObject>(theCurrentFrame);
-        theCurrentFrame = make_shared<Frame>(
-            theCurrentFrame, func->scope(), func->code(), func->base() - 1);
-        theCurrentFrame->push(cont_obj);
+        auto func = theCurrentContext->pop<FunctionObject>();
+        theCurrentContext->push(make_shared<ContObject>(theCurrentContext));
+        theCurrentContext = make_shared<Context>(
+            theCurrentContext, func->scope(), func->code(), func->base() - 1);
     }
-    else if (dynamic_pointer_cast<ContObject>(theCurrentFrame->top()))
+    else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
     {
-        auto resume_to = theCurrentFrame->pop<ContObject>()->resume_to();
-        auto cont_obj = make_shared<ContObject>(theCurrentFrame);
-        resume_to->push(cont_obj);
-        theCurrentFrame = resume_to;
+        auto resume = theCurrentContext->pop<ContObject>()->resume_to();
+        theCurrentContext->push(make_shared<ContObject>(theCurrentContext));
+        theCurrentContext = make_shared<Context>(resume);
     }
     else
     {
@@ -52,37 +49,37 @@ REGISTER_BUILTIN(call_with_current_continuation,
 
 REGISTER_BUILTIN(id,
 {
-    theCurrentFrame->push(make_shared<IntegerObject>(reinterpret_cast<int64_t>(theCurrentFrame->pop().get())));
+    theCurrentContext->push(make_shared<IntegerObject>(reinterpret_cast<int64_t>(theCurrentContext->pop().get())));
 })
 
 REGISTER_BUILTIN(print,
 {
-    cout << theCurrentFrame->pop()->to_str();
-    theCurrentFrame->push(theNone);
+    cout << theCurrentContext->pop()->to_str();
+    theCurrentContext->push(theNone);
 });
 
 REGISTER_BUILTIN(println,
 {
-    cout << theCurrentFrame->pop()->to_str() << endl;
-    theCurrentFrame->push(theNone);
+    cout << theCurrentContext->pop()->to_str() << endl;
+    theCurrentContext->push(theNone);
 });
 
 REGISTER_BUILTIN(input,
 {
     string line;
     std::getline(cin, line);
-    theCurrentFrame->push(make_shared<StringObject>(line));
+    theCurrentContext->push(make_shared<StringObject>(line));
 });
 
 REGISTER_BUILTIN(exit,
 {
     exit(0);
-    theCurrentFrame->push(theNone);
+    theCurrentContext->push(theNone);
 });
 
 REGISTER_BUILTIN(time,
 {
     time_t result = time(nullptr);
-    theCurrentFrame->push(make_shared<IntegerObject>(result));
+    theCurrentContext->push(make_shared<IntegerObject>(result));
 });
 }

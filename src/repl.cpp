@@ -29,7 +29,7 @@ void replrun::run()
 
     Parser parser{ss};
     auto code = make_shared<Code>();
-    theCurrentFrame = make_shared<Frame>(code);
+    theCurrentContext = make_shared<Context>(code);
 
     parser.set_continue_action([&ss, &line, &parser]
     {
@@ -43,7 +43,7 @@ void replrun::run()
     {
         try
         {
-            theCurrentFrame->pc() = code->size();
+            theCurrentContext->pc() = code->size();
 
             auto stmt = parser.gen_statement();
             stmt->codegen(*code);
@@ -52,11 +52,16 @@ void replrun::run()
             code->print();
             #endif
 
-            Frame::execute();
+            Context::execute();
             if (dynamic_pointer_cast<ExprStmt>(stmt)
-                and theCurrentFrame->top() != theNone)
+                and theCurrentContext->top() != theNone)
             {
-                cout << theCurrentFrame->pop()->to_str() << endl;
+                cout << theCurrentContext->pop()->to_str() << endl;
+            }
+
+            while (!theStack.empty())
+            {
+                theStack.pop();
             }
         }
         catch (const exception &e)

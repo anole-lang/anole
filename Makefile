@@ -8,7 +8,7 @@ FLAGS = -O3 -std=c++17 -stdlib=libstdc++ ${ADD}
 DIR_OBJ = obj
 DIR_BIN = bin
 
-OBJ = obj/tokenizer.so obj/parser.so obj/code.so obj/objects.so obj/frame.so obj/repl.so
+OBJ = obj/tokenizer.so obj/parser.so obj/code.so obj/objects.so obj/context.so obj/repl.so
 FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 
 BIN_TARGET = $(DIR_BIN)/$(TARGET)
@@ -43,8 +43,8 @@ obj/objects.so: src/object.cpp \
 				src/builtinfuncobject.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-obj/frame.so: src/frame.cpp \
-			  src/builtins.cpp
+obj/context.so: src/context.cpp \
+				src/builtins.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 obj/repl.so: src/repl.cpp

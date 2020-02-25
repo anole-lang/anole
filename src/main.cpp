@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
         auto fout = ofstream("test.out");
         code->print(fout);
 
-        theCurrentFrame = make_shared<Frame>(code);
-        Frame::execute();
+        theCurrentContext = make_shared<Context>(code);
+        Context::execute();
     }
     return 0;
 }

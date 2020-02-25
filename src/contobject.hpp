@@ -1,6 +1,6 @@
 #pragma once
 
-#include "frame.hpp"
+#include "context.hpp"
 #include "object.hpp"
 
 namespace ice_language
@@ -8,18 +8,18 @@ namespace ice_language
 class ContObject : public Object
 {
   public:
-    ContObject(Ptr<Frame> resume_to)
-      : resume_to_(resume_to) {}
+    ContObject(Ptr<Context> resume_to)
+      : resume_to_(std::make_shared<Context>(*resume_to)) {}
 
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
 
-    Ptr<Frame> resume_to()
+    Ptr<Context> resume_to()
     {
         return resume_to_;
     }
 
   private:
-    Ptr<Frame> resume_to_;
+    Ptr<Context> resume_to_;
 };
 }

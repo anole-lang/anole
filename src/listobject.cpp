@@ -1,6 +1,6 @@
 #include <map>
 #include <utility>
-#include "frame.hpp"
+#include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "listobject.hpp"
@@ -16,41 +16,41 @@ built_in_methods_for_list
 {
     {"empty", [](ListObject *obj)
         {
-            theCurrentFrame->push(obj->objects().empty() ? theTrue : theFalse);
+            theCurrentContext->push(obj->objects().empty() ? theTrue : theFalse);
         }
     },
     {"size", [](ListObject *obj)
         {
-            theCurrentFrame->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->objects().size())));
+            theCurrentContext->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->objects().size())));
         }
     },
     {"push", [](ListObject *obj)
         {
-            obj->append(theCurrentFrame->pop());
-            theCurrentFrame->push(theNone);
+            obj->append(theCurrentContext->pop());
+            theCurrentContext->push(theNone);
         }
     },
     {"pop", [](ListObject *obj)
         {
             auto res = obj->objects().back();
             obj->objects().pop_back();
-            theCurrentFrame->push(*res);
+            theCurrentContext->push(*res);
         }
     },
     {"front", [](ListObject *obj)
         {
-            theCurrentFrame->push(*obj->objects().front());
+            theCurrentContext->push(*obj->objects().front());
         }
     },
     {"back", [](ListObject *obj)
         {
-            theCurrentFrame->push(*obj->objects().back());
+            theCurrentContext->push(*obj->objects().back());
         }
     },
     {"clear", [](ListObject *obj)
         {
             obj->objects().clear();
-            theCurrentFrame->push(theNone);
+            theCurrentContext->push(theNone);
         }
     }
 };

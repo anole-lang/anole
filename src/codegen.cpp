@@ -74,12 +74,12 @@ void IdentifierExpr::codegen(Code &code)
 // completed
 void ParenOperatorExpr::codegen(Code &code)
 {
-    for (auto arg : args)
+    for (auto it = args.rbegin(); it != args.rend(); ++it)
     {
-        arg->codegen(code);
+        (*it)->codegen(code);
     }
     expr->codegen(code);
-    code.add_ins<Opcode::Call>(args.size());
+    code.add_ins<Opcode::Call>();
 }
 
 // completed
