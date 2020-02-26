@@ -16,7 +16,13 @@ int main(int argc, char *argv[])
         ArgumentParser parser("ice");
         parser.add_argument("file");
         parser.parse(argc, argv);
-        auto fin = ifstream(parser.get("file"));
+
+        auto filename = parser.get("file");
+        auto fin = ifstream(filename);
+        if (!fin.good())
+        {
+            cout << "ice: can't open file '" << filename << "': No such file" << endl;
+        }
 
         auto code = make_shared<Code>();
         Parser(fin).gen_statements()->codegen(*code);
