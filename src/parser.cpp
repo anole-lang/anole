@@ -587,6 +587,7 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 
 Ptr<IdentifierExpr> Parser::gen_ident()
 {
+    check<TokenId::Identifier>("expect an identifier here");
     auto ident_expr = make_shared<IdentifierExpr>(current_token_.value);
     get_next_token();
     return ident_expr;

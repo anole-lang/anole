@@ -22,7 +22,7 @@ void replrun::run()
     string line;
     while (line.empty())
     {
-        cout << ">> ";
+        cout << "\033[1m>>\033[0m ";
         std::getline(cin, line);
     }
     istringstream ss(line += '\n');
@@ -33,7 +33,7 @@ void replrun::run()
 
     parser.set_continue_action([&ss, &line, &parser]
     {
-        cout << ".. ";
+        cout << "\033[1m..\033[0m ";
         std::getline(cin, line);
         ss.clear(); ss.str(line.empty() ? line : (line += '\n'));
         parser.cont();
@@ -68,7 +68,7 @@ void replrun::run()
 
         do
         {
-            cout << ">> ";
+            cout << "\033[1m>>\033[0m ";
             std::getline(cin, line);
         } while (line.empty());
         ss.clear(); ss.str(line += '\n');

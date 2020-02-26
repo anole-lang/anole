@@ -50,7 +50,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
-+ [X] Allow call/cc copy the current stack
++ [X] Call/cc will copy the current stack
 + [X] Reduce redundant instruction LambdaDecl
 + [X] Fix bug in REPL mode
 + [X] Remove the spending of nested stack at before versions.
