@@ -1,9 +1,9 @@
 # Ice Programming Language
 
-[![](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/ice-lang/ice/issues/new)
+[![New Issue](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/ice-lang/ice/issues/new)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/ice-lang/ice/compare)
 [![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/ice-lang)
-[![license](https://img.shields.io/github/license/MU001999/ice.svg)](https://github.com/ice-lang/ice)
+[![License](https://img.shields.io/github/license/MU001999/ice.svg)](https://github.com/ice-lang/ice)
 
 ## Quick Usage
 
