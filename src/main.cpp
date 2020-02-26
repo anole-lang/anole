@@ -26,7 +26,9 @@ int main(int argc, char *argv[])
 
         auto code = make_shared<Code>();
         Parser(fin).gen_statements()->codegen(*code);
-        auto fout = ofstream("test.out");
+
+        filename = filename.substr(0, filename.size() - 1);
+        auto fout = ofstream(filename);
         code->print(fout);
 
         theCurrentContext = make_shared<Context>(code);
