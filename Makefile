@@ -3,10 +3,9 @@ ADD =
 CC = clang++
 FLAGS = -std=c++17 -stdlib=libstdc++ ${ADD}
 
-DIR_OBJ = obj
-DIR_BIN = bin
+DIR_TMP = tmp
 
-OBJ = obj/tokenizer.so obj/parser.so obj/code.so obj/objects.so obj/context.so obj/repl.so
+OBJ = tmp/tokenizer.so tmp/parser.so tmp/code.so tmp/objects.so tmp/context.so tmp/repl.so
 FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 
 test: tmp/tokenizer-tester \
@@ -16,18 +15,18 @@ test: tmp/tokenizer-tester \
 	tmp/parser-tester
 	tmp/sample-tester
 
-obj/tokenizer.so: src/token.cpp \
-				  src/tokenizer.cpp | ${DIR_OBJ}
+tmp/tokenizer.so: src/token.cpp \
+				  src/tokenizer.cpp | ${DIR_TMP}
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-obj/parser.so: src/parser.cpp
+tmp/parser.so: src/parser.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-obj/code.so: src/codegen.cpp \
+tmp/code.so: src/codegen.cpp \
 			 src/code.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-obj/objects.so: src/object.cpp \
+tmp/objects.so: src/object.cpp \
 				src/noneobject.cpp \
 				src/boolobject.cpp \
 				src/listobject.cpp \
@@ -40,14 +39,14 @@ obj/objects.so: src/object.cpp \
 				src/builtinfuncobject.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-obj/context.so: src/context.cpp \
+tmp/context.so: src/context.cpp \
 				src/builtins.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-obj/repl.so: src/repl.cpp
+tmp/repl.so: src/repl.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/tokenizer-tester: test/tokenizer-tester.cpp ${OBJ} | ./tmp
+tmp/tokenizer-tester: test/tokenizer-tester.cpp ${OBJ} | ${DIR_TMP}
 	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
 tmp/parser-tester: test/parser-tester.cpp ${OBJ}
@@ -56,13 +55,9 @@ tmp/parser-tester: test/parser-tester.cpp ${OBJ}
 tmp/sample-tester: test/sample-tester.cpp ${OBJ}
 	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
-${DIR_OBJ}:
+${DIR_TMP}:
 	mkdir $@
-
-./tmp:
-	mkdir tmp
 
 .PHONY: clean
 clean:
-	rm -rf ${DIR_OBJ}
-	rm -rf ./tmp
+	rm -rf ${DIR_TMP}
