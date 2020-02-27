@@ -12,8 +12,14 @@
 ```bash
 ~> git clone https://github.com/ice-lang/ice-lang.git
 ~> cd ice-lang
-~/ice-lang> make install
+~/ice-lang> mkdir build
+~/ice-lang> cd build
+~/build> cmake ..
+~/build> make
+~/build> sudo make install
 ```
+
+If you want to remove ice, you can execute `cat install_manifest.txt | sudo xargs rm` in build/
 
 ### Usage
 
@@ -40,7 +46,6 @@ Search `Ice-Lang`
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
-+ [ ] Use cmake to build
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error
 + [ ] Complete use statement and try to design a package system
@@ -51,6 +56,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Use cmake to build but hold the makefile for the old tests
 + [X] Call/cc will copy the current stack
 + [X] Reduce redundant instruction LambdaDecl
 + [X] Fix bug in REPL mode

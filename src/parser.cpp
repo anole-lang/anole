@@ -475,7 +475,7 @@ Ptr<Expr> Parser::gen_expr(int priority)
         return expr;
     }
 
-    if (priority == get_operators().size() - 1)
+    if (static_cast<size_t>(priority + 1) == get_operators().size())
     {
         if (get_operators()[priority].count(current_token_.token_id))
         {

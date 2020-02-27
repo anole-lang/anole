@@ -21,8 +21,8 @@ class Tokenizer
     void get_next_input();
 
     std::size_t cur_line_num_;
-    std::size_t cur_char_at_line_;
     std::size_t last_line_num_;
+    std::size_t cur_char_at_line_;
     std::size_t last_char_at_line_;
     std::string cur_line_;
     std::string pre_line_;

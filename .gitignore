@@ -1,6 +1,6 @@
 .vscode/
-bin/
 obj/
 tmp/
 *.out
 *.ic
+build/

@@ -91,7 +91,7 @@ class ArgumentParser
             program_ = argv[0];
         }
 
-        int i = 1, pi = 0;
+        int i = 1;
         auto pit = positional_arguments_.begin();
         while (i < argc)
         {
