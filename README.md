@@ -39,7 +39,7 @@ You can see some examples in `example/` or the `test/sample-tester.cpp`, this is
 
 ### Extension in Visual Studio Code
 
-Search `Ice-Lang`, only provides highlight
+Search `Ice-Lang`, only provides highlight now
 
 ## To Do
 
