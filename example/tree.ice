@@ -5,7 +5,7 @@ tree: @(left, val, right):
     f(left, val, right);
 
 tree_init: @(val):
-  tree(tip, val, tip)
+  tree(tip, val, tip);
 
 bst_insert: @(bst, val):
   (bst = tip) ?
