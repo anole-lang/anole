@@ -1,4 +1,4 @@
-pair: @(x, y): @(z): z(x, y);
+pair: @(x, y): @(f): f(x, y);
 fst: @(p): p(@(x, y): x);
 snd: @(p): p(@(x, y): y);
 
