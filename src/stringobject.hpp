@@ -16,6 +16,8 @@ class StringObject : public Object
     std::string to_str() override;
 
     ObjectPtr add(ObjectPtr) override;
+    ObjectPtr ceq(ObjectPtr) override;
+    ObjectPtr cne(ObjectPtr) override;
 
   private:
     std::string value_;
