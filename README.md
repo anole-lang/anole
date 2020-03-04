@@ -45,7 +45,6 @@ Search `Ice-Lang`, only provides highlight now
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
-+ [ ] Support try-catch by call/cc
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error
 + [ ] Complete use statement and try to design a package system
@@ -56,6 +55,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Support simple try-catch, as example/try-catch.ice
 + [X] Use cmake to build but hold the makefile for the old tests
 + [X] Call/cc will copy the current stack
 + [X] Reduce redundant instruction LambdaDecl
