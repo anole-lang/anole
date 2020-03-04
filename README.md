@@ -45,6 +45,7 @@ Search `Ice-Lang`, only provides highlight now
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
++ [ ] Support try-catch by call/cc
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error
 + [ ] Complete use statement and try to design a package system
