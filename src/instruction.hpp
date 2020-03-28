@@ -45,6 +45,8 @@ enum Opcode
     JumpIf,       // done
     JumpIfNot,    // done
     Match,        // done
+
+    MakeClosure,  // done
     LambdaDecl,   // done
     ThunkDecl,    // done
 

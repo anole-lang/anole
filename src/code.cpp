@@ -1,3 +1,4 @@
+#include <set>
 #include "code.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -184,6 +185,18 @@ void Code::print(ostream &out)
             break;
         case Opcode::Match:
             out << i << "\tMatch\t\t" << OPRAND(size_t) << std::endl;
+            break;
+
+        case Opcode::MakeClosure:
+            out << i << "\tMakeClosure\t";
+            {
+                auto frees = OPRAND(set<string>);
+                for (auto &name : frees)
+                {
+                    out << name << " ";
+                }
+                out << endl;
+            }
             break;
         case Opcode::LambdaDecl:
             out << i << "\tLambdaDecl\t" << OPRAND(size_t) << std::endl;

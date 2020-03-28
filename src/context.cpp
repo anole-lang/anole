@@ -250,54 +250,42 @@ void match_handle()
     }
 }
 
-void lambdadecl_handle()
+void makeclosure_handle()
 {
-    auto target = OPRAND(size_t) - 1;
+    auto frees = OPRAND(set<string>);
+    ++theCurrentContext->pc();
 
     auto new_scope = make_shared<Scope>();
-    set<string> bounds;
-    for (size_t i = theCurrentContext->pc(); i <= target; ++i) {
-        auto &ins = theCurrentContext->ins_at(i);
-        if (ins.opcode == Opcode::Create) {
-            bounds.insert(any_cast<string>(ins.oprand));
-            i += 3;
-        } else if (ins.opcode == Opcode::Load) {
-            auto name = any_cast<string>(ins.oprand);
-            if (!bounds.count(name)) {
-                new_scope->create_symbol(name, theCurrentContext->scope()->load_symbol(name));
-            }
-        }
+    for (auto &name : frees)
+    {
+        new_scope->create_symbol(name,
+            theCurrentContext->scope()->load_symbol(name));
     }
 
-    theCurrentContext->push(make_shared<FunctionObject>(
-        new_scope, theCurrentContext->code(),
-        theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = target;
+    if (theCurrentContext->ins().opcode == Opcode::LambdaDecl)
+    {
+        theCurrentContext->push(make_shared<FunctionObject>(
+            new_scope, theCurrentContext->code(),
+            theCurrentContext->pc() + 1));
+    }
+    else
+    {
+        theCurrentContext->push(make_shared<ThunkObject>(
+            new_scope, theCurrentContext->code(),
+            theCurrentContext->pc() + 1));
+    }
+
+    theCurrentContext->pc() = OPRAND(size_t) - 1;
+}
+
+void lambdadecl_handle()
+{
+    // do nothing
 }
 
 void thunkdecl_handle()
 {
-    auto target = OPRAND(size_t) - 1;
-
-    auto new_scope = make_shared<Scope>();
-    set<string> bounds;
-    for (size_t i = theCurrentContext->pc(); i <= target; ++i) {
-        auto &ins = theCurrentContext->ins_at(i);
-        if (ins.opcode == Opcode::Create) {
-            bounds.insert(any_cast<string>(ins.oprand));
-            i += 3;
-        } else if (ins.opcode == Opcode::Load) {
-            auto name = any_cast<string>(ins.oprand);
-            if (!bounds.count(name)) {
-                new_scope->create_symbol(name, theCurrentContext->scope()->load_symbol(name));
-            }
-        }
-    }
-
-    theCurrentContext->push(make_shared<ThunkObject>(
-        new_scope, theCurrentContext->code(),
-        theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = target;
+    // do nothing
 }
 
 void buildlist_handle()
@@ -363,6 +351,8 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::jumpif_handle,
     &op_handles::jumpifnot_handle,
     &op_handles::match_handle,
+
+    &op_handles::makeclosure_handle,
     &op_handles::lambdadecl_handle,
     &op_handles::thunkdecl_handle,
 
