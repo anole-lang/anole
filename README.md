@@ -56,6 +56,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Support closure capture
 + [X] Support simple try-catch, as example/try-catch.ice
 + [X] Use cmake to build but hold the makefile for the old tests
 + [X] Call/cc will copy the current stack
