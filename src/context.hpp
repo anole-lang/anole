@@ -70,6 +70,10 @@ class Context : public std::enable_shared_from_this<Context>
         return code_->get_instructions()[pc_];
     }
 
+    Instruction &ins_at(std::size_t index) {
+        return code_->get_instructions()[index];
+    }
+
     std::any &oprand()
     {
         return code_->oprand_at(pc_);

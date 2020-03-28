@@ -1,6 +1,7 @@
 #ifdef _DEBUG
 #include <iostream>
 #endif
+#include <set>
 #include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -251,18 +252,52 @@ void match_handle()
 
 void lambdadecl_handle()
 {
+    auto target = OPRAND(size_t) - 1;
+
+    auto new_scope = make_shared<Scope>();
+    set<string> bounds;
+    for (size_t i = theCurrentContext->pc(); i <= target; ++i) {
+        auto &ins = theCurrentContext->ins_at(i);
+        if (ins.opcode == Opcode::Create) {
+            bounds.insert(any_cast<string>(ins.oprand));
+            i += 3;
+        } else if (ins.opcode == Opcode::Load) {
+            auto name = any_cast<string>(ins.oprand);
+            if (!bounds.count(name)) {
+                new_scope->create_symbol(name, theCurrentContext->scope()->load_symbol(name));
+            }
+        }
+    }
+
     theCurrentContext->push(make_shared<FunctionObject>(
-        theCurrentContext->scope(), theCurrentContext->code(),
+        new_scope, theCurrentContext->code(),
         theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = OPRAND(size_t) - 1;
+    theCurrentContext->pc() = target;
 }
 
 void thunkdecl_handle()
 {
+    auto target = OPRAND(size_t) - 1;
+
+    auto new_scope = make_shared<Scope>();
+    set<string> bounds;
+    for (size_t i = theCurrentContext->pc(); i <= target; ++i) {
+        auto &ins = theCurrentContext->ins_at(i);
+        if (ins.opcode == Opcode::Create) {
+            bounds.insert(any_cast<string>(ins.oprand));
+            i += 3;
+        } else if (ins.opcode == Opcode::Load) {
+            auto name = any_cast<string>(ins.oprand);
+            if (!bounds.count(name)) {
+                *new_scope->create_symbol(name) = *theCurrentContext->scope()->load_symbol(name);
+            }
+        }
+    }
+
     theCurrentContext->push(make_shared<ThunkObject>(
-        theCurrentContext->scope(), theCurrentContext->code(),
+        new_scope, theCurrentContext->code(),
         theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = OPRAND(size_t) - 1;
+    theCurrentContext->pc() = target;
 }
 
 void buildlist_handle()
