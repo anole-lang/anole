@@ -249,15 +249,16 @@ void BinaryOperatorExpr::codegen(Code &code)
     }
 }
 
-// not support default argumnets now
+// complete
 void LambdaExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
     auto o2 = code.add_ins();
-    for (auto arg_decl : arg_decls)
+
+    for (auto &arg : args)
     {
-        code.add_ins<Opcode::Create>(arg_decl->id->name);
-        code.add_ins<Opcode::Load>(arg_decl->id->name);
+        code.add_ins<Opcode::Create>(arg->name);
+        code.add_ins<Opcode::Load>(arg->name);
         code.add_ins<Opcode::Store>();
         code.add_ins<Opcode::Pop>();
     }
