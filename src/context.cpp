@@ -289,7 +289,7 @@ void thunkdecl_handle()
         } else if (ins.opcode == Opcode::Load) {
             auto name = any_cast<string>(ins.oprand);
             if (!bounds.count(name)) {
-                *new_scope->create_symbol(name) = *theCurrentContext->scope()->load_symbol(name);
+                new_scope->create_symbol(name, theCurrentContext->scope()->load_symbol(name));
             }
         }
     }
