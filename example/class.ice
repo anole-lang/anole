@@ -1,13 +1,13 @@
 @Animal() {
     @yep(), println("I can't yep!");
 
-    return @() {};
+    return @() {
+        yep;
+    };
 }
 
 @Cat() {
     @this: Animal();
-
-    this.yep: @(), println("Mew!");
 
     return this;
 }

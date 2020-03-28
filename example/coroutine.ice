@@ -41,7 +41,9 @@ coroutine: (@() {
         deletes.push(id);
     }
 
-    return @() {};
+    return @() {
+        create; resume; yield; destroy;
+    };
 })();
 
 @foo() {
