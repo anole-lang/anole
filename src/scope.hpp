@@ -11,6 +11,7 @@ namespace ice_language
 class Scope
 {
   public:
+    Scope() : pre_scope_(nullptr) {}
     Scope(Ptr<Scope> pre_scope)
       : pre_scope_(pre_scope) {}
 
@@ -26,6 +27,11 @@ class Scope
             symbols_[name] = std::make_shared<ObjectPtr>(nullptr);
         }
         return symbols_[name];
+    }
+
+    void create_symbol(const std::string &name, Ptr<ObjectPtr> value)
+    {
+        symbols_[name] = value;
     }
 
     Ptr<ObjectPtr> load_symbol(const std::string &name)
