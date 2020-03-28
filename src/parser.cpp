@@ -89,31 +89,22 @@ ExprList Parser::gen_arguments()
     return args;
 }
 
-VarDeclList Parser::gen_decl_arguments()
+IdentList Parser::gen_idents()
 {
-    VarDeclList args;
-    get_next_token(); // eat '('
+    IdentList idents;
     while (current_token_.token_id != TokenId::RParen)
     {
-        auto id = gen_ident();
-        Ptr<Expr> expression = make_shared<NoneExpr>();
-        if (current_token_.token_id == TokenId::Colon)
-        {
-            get_next_token();
-            expression = gen_expr();
-        }
-        args.push_back(make_shared<VariableDeclarationStmt>(id, expression));
+        idents.push_back(gen_ident());
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
         }
         else
         {
-            check<TokenId::RParen>("miss ')'");
+            check<TokenId::RParen>("missing ')' here");
         }
     }
-    get_next_token(); // eat ')'
-    return args;
+    return idents;
 }
 
 // usually use when interacting
@@ -273,9 +264,13 @@ Ptr<Stmt> Parser::gen_declaration()
 
     case TokenId::LParen:
     {
-        auto args = gen_decl_arguments();
+        get_next_token();
+        auto args = gen_idents();
+        get_next_token();
+
         try_continue();
         Ptr<BlockExpr> block = nullptr;
+
         if (current_token_.token_id == TokenId::Colon)
         {
             get_next_token();
@@ -307,23 +302,11 @@ Ptr<Stmt> Parser::gen_class_decl()
 
     auto id = gen_ident();
 
-    IdentList bases;
     check<TokenId::LParen>("missing symbol '('");
     get_next_token();
 
-    while (current_token_.token_id != TokenId::RParen)
-    {
-        bases.push_back(gen_ident());
-        if (current_token_.token_id == TokenId::Comma)
-        {
-            get_next_token();
-        }
-        else
-        {
-            check<TokenId::RParen>("miss ')'");
-        }
-    }
-    get_next_token();
+    auto bases = gen_idents();
+    eat<TokenId::RParen>("missing ')' here");
 
     auto block = gen_block();
 
@@ -715,7 +698,10 @@ Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
 // generate lambda expr as @(): expr, @(){} and also @(){}()..
 Ptr<Expr> Parser::gen_lambda_expr()
 {
-    auto args = gen_decl_arguments();
+    get_next_token();
+    auto args = gen_idents();
+    get_next_token();
+
     try_continue();
     Ptr<BlockExpr> block = nullptr;
 

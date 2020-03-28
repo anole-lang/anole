@@ -51,7 +51,7 @@ class Parser
     std::string get_err_info(const std::string &message);
 
     ExprList gen_arguments();
-    VarDeclList gen_decl_arguments();
+    IdentList gen_idents();
 
     Ptr<BlockExpr> gen_stmts();
     Ptr<BlockExpr> gen_block();
