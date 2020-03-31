@@ -14,6 +14,7 @@ class Code;
 using StmtList     = std::vector<Ptr<struct Stmt>>;
 using ExprList     = std::vector<Ptr<struct Expr>>;
 using IdentList    = std::vector<Ptr<struct IdentifierExpr>>;
+using DeclList     = std::vector<Ptr<struct VariableDeclarationStmt>>;
 
 struct AST
 {
@@ -118,10 +119,10 @@ struct BinaryOperatorExpr : Expr
 
 struct LambdaExpr : Expr
 {
-    IdentList args;
+    DeclList decls;
     Ptr<BlockExpr> block;
-    LambdaExpr(IdentList args, Ptr<BlockExpr> block)
-      : args(std::move(args)), block(block) {}
+    LambdaExpr(DeclList decls, Ptr<BlockExpr> block)
+      : decls(std::move(decls)), block(block) {}
     void codegen(Code &) override;
 };
 
