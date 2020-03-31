@@ -12,8 +12,7 @@ using namespace std;
 namespace ice_language
 {
 Code::Code()
-  : instructions_({ Instruction{Opcode::PlaceHolder, any()} }),
-    constants_{ theNone, theTrue, theFalse }
+  : constants_{ theNone, theTrue, theFalse }
 {
     // ...
 }

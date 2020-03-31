@@ -24,6 +24,7 @@ namespace op_handles
 void pop_handle()
 {
     theCurrentContext->pop();
+    ++theCurrentContext->pc();
 }
 
 void load_handle()
@@ -45,17 +46,20 @@ void load_handle()
     {
         theCurrentContext->push_straight(obj);
     }
+    ++theCurrentContext->pc();
 }
 
 void loadconst_handle()
 {
     theCurrentContext->push(theCurrentContext->code()->load_const(OPRAND(size_t)));
+    ++theCurrentContext->pc();
 }
 
 void loadmember_handle()
 {
     auto name = OPRAND(string);
     theCurrentContext->push_straight(theCurrentContext->pop()->load_member(name));
+    ++theCurrentContext->pc();
 }
 
 void store_handle()
@@ -63,17 +67,20 @@ void store_handle()
     auto p = theCurrentContext->pop_straight();
     *p = theCurrentContext->pop();
     theCurrentContext->push_straight(p);
+    ++theCurrentContext->pc();
 }
 
 void storelocal_handle()
 {
     *theCurrentContext->scope()->create_symbol(OPRAND(string))
         = theCurrentContext->pop();
+    ++theCurrentContext->pc();
 }
 
 void neg_handle()
 {
     theCurrentContext->push(theCurrentContext->pop()->neg());
+    ++theCurrentContext->pc();
 }
 
 void add_handle()
@@ -81,6 +88,7 @@ void add_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->add(rhs));
+    ++theCurrentContext->pc();
 }
 
 void sub_handle()
@@ -88,6 +96,7 @@ void sub_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->sub(rhs));
+    ++theCurrentContext->pc();
 }
 
 void mul_handle()
@@ -95,6 +104,7 @@ void mul_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->mul(rhs));
+    ++theCurrentContext->pc();
 }
 
 void div_handle()
@@ -102,6 +112,7 @@ void div_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->div(rhs));
+    ++theCurrentContext->pc();
 }
 
 void mod_handle()
@@ -109,12 +120,14 @@ void mod_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->mod(rhs));
+    ++theCurrentContext->pc();
 }
 
 void is_handle()
 {
     auto rhs = theCurrentContext->pop();
     theCurrentContext->set_top(theCurrentContext->top().get() == rhs.get() ? theTrue : theFalse);
+    ++theCurrentContext->pc();
 }
 
 void ceq_handle()
@@ -122,6 +135,7 @@ void ceq_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->ceq(rhs));
+    ++theCurrentContext->pc();
 }
 
 void cne_handle()
@@ -129,6 +143,7 @@ void cne_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->cne(rhs));
+    ++theCurrentContext->pc();
 }
 
 void clt_handle()
@@ -136,6 +151,7 @@ void clt_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->clt(rhs));
+    ++theCurrentContext->pc();
 }
 
 void cle_handle()
@@ -143,6 +159,7 @@ void cle_handle()
     auto rhs = theCurrentContext->pop();
     auto lhs = theCurrentContext->top();
     theCurrentContext->set_top(lhs->cle(rhs));
+    ++theCurrentContext->pc();
 }
 
 void index_handle()
@@ -150,16 +167,19 @@ void index_handle()
     auto obj = theCurrentContext->pop();
     auto index = theCurrentContext->pop();
     theCurrentContext->push_straight(obj->index(index));
+    ++theCurrentContext->pc();
 }
 
 void scopebegin_handle()
 {
     theCurrentContext->scope() = make_shared<Scope>(theCurrentContext->scope());
+    ++theCurrentContext->pc();
 }
 
 void scopeend_handle()
 {
     theCurrentContext->scope() = theCurrentContext->scope()->pre();
+    ++theCurrentContext->pc();
 }
 
 void call_handle()
@@ -186,13 +206,12 @@ void call_handle()
                 throw runtime_error("much arguments");
             }
         }
-
-        --pc;
     }
     // builtins don't support default arguments
     else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentContext->top()))
     {
         theCurrentContext->pop<BuiltInFunctionObject>()->operator()();
+        ++theCurrentContext->pc();
     }
     else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
     {
@@ -200,6 +219,7 @@ void call_handle()
         auto retval = theCurrentContext->pop();
         theCurrentContext = make_shared<Context>(resume);
         theCurrentContext->push(retval);
+        ++theCurrentContext->pc();
     }
     else
     {
@@ -232,13 +252,12 @@ void calltail_handle()
                 throw runtime_error("much arguments");
             }
         }
-
-        --pc;
     }
     // builtins don't support default arguments
     else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentContext->top()))
     {
         theCurrentContext->pop<BuiltInFunctionObject>()->operator()();
+        ++theCurrentContext->pc();
     }
     else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
     {
@@ -246,6 +265,7 @@ void calltail_handle()
         auto retval = theCurrentContext->pop();
         theCurrentContext = make_shared<Context>(resume);
         theCurrentContext->push(retval);
+        ++theCurrentContext->pc();
     }
     else
     {
@@ -258,18 +278,23 @@ void return_handle()
     auto pre_context = theCurrentContext->pre_context();
     pre_context->push(theCurrentContext->pop());
     theCurrentContext = pre_context;
+    ++theCurrentContext->pc();
 }
 
 void jump_handle()
 {
-    theCurrentContext->pc() = OPRAND(size_t) - 1;
+    theCurrentContext->pc() = OPRAND(size_t);
 }
 
 void jumpif_handle()
 {
     if (theCurrentContext->pop()->to_bool())
     {
-        theCurrentContext->pc() = OPRAND(size_t) - 1;
+        theCurrentContext->pc() = OPRAND(size_t);
+    }
+    else
+    {
+        ++theCurrentContext->pc();
     }
 }
 
@@ -277,7 +302,11 @@ void jumpifnot_handle()
 {
     if (!theCurrentContext->pop()->to_bool())
     {
-        theCurrentContext->pc() = OPRAND(size_t) - 1;
+        theCurrentContext->pc() = OPRAND(size_t);
+    }
+    else
+    {
+        ++theCurrentContext->pc();
     }
 }
 
@@ -287,7 +316,11 @@ void match_handle()
     if (theCurrentContext->top()->ceq(key)->to_bool())
     {
         theCurrentContext->pop();
-        theCurrentContext->pc() = OPRAND(size_t) - 1;
+        theCurrentContext->pc() = OPRAND(size_t);
+    }
+    else
+    {
+        ++theCurrentContext->pc();
     }
 }
 
@@ -296,7 +329,7 @@ void lambdadecl_handle()
     theCurrentContext->push(make_shared<FunctionObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
         theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = OPRAND(size_t) - 1;
+    theCurrentContext->pc() = OPRAND(size_t);
 }
 
 void thunkdecl_handle()
@@ -304,7 +337,7 @@ void thunkdecl_handle()
     theCurrentContext->push(make_shared<ThunkObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
         theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = OPRAND(size_t) - 1;
+    theCurrentContext->pc() = OPRAND(size_t);
 }
 
 void buildlist_handle()
@@ -316,6 +349,7 @@ void buildlist_handle()
         list->append(theCurrentContext->pop());
     }
     theCurrentContext->push(list);
+    ++theCurrentContext->pc();
 }
 
 void builddict_handle()
@@ -328,6 +362,7 @@ void builddict_handle()
         dict->insert(key, theCurrentContext->pop());
     }
     theCurrentContext->push(dict);
+    ++theCurrentContext->pc();
 }
 }
 
@@ -387,7 +422,6 @@ void Context::execute()
         #endif
 
         theOpHandles[theCurrentContext->ins().opcode]();
-        ++theCurrentContext->pc();
     }
 }
 }

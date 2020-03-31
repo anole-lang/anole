@@ -35,12 +35,11 @@ class Context : public std::enable_shared_from_this<Context>
     Context(Ptr<Code> code)
       : pre_context_(nullptr),
         scope_(std::make_shared<Scope>(nullptr)),
-        code_(code), pc_(1),
+        code_(code), pc_(0),
         stack_(std::make_shared<StackType>()) {}
 
-    // the default value of pc is 1 because first ins is PlaceHolder
     Context(Ptr<Context> pre, Ptr<Scope> scope,
-        Ptr<Code> code, std::size_t pc = 1)
+        Ptr<Code> code, std::size_t pc = 0)
       : pre_context_(pre), scope_(std::make_shared<Scope>(scope)),
         code_(code), pc_(pc), stack_(pre->stack_) {}
 
