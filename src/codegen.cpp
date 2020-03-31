@@ -11,29 +11,6 @@ using namespace std;
 
 namespace ice_language
 {
-static set<string> analyze_frees(Code &code, size_t begin, size_t end)
-{
-    set<string> bounds;
-    set<string> frees;
-    for (size_t i = begin; i < end; ++i) {
-        auto &ins = code.get_instructions()[i];
-        if (ins.opcode == Opcode::Create or
-            ins.opcode == Opcode::StoreLocal)
-        {
-            bounds.insert(any_cast<string>(ins.oprand));
-        }
-        else if (ins.opcode == Opcode::Load)
-        {
-            auto name = any_cast<string>(ins.oprand);
-            if (!bounds.count(name))
-            {
-                frees.insert(name);
-            }
-        }
-    }
-    return frees;
-}
-
 AST::~AST() = default;
 Stmt::~Stmt() = default;
 Expr::~Expr() = default;
@@ -103,7 +80,7 @@ void ParenOperatorExpr::codegen(Code &code)
         (*it)->codegen(code);
     }
     expr->codegen(code);
-    code.add_ins<Opcode::Call>();
+    code.add_ins<Opcode::Call>(args.size());
 }
 
 // completed
@@ -253,20 +230,17 @@ void BinaryOperatorExpr::codegen(Code &code)
 void LambdaExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
-    auto o2 = code.add_ins();
 
-    for (auto &arg : args)
+    for (auto &decl : decls)
     {
-        code.add_ins<Opcode::StoreLocal>(arg->name);
+        decl->expr->codegen(code);
+        code.add_ins<Opcode::StoreLocal>(decl->id->name);
     }
     block->codegen(code);
 
     code.add_ins<Opcode::LoadConst, size_t>(0);
     code.add_ins<Opcode::Return>();
-
-    auto frees = analyze_frees(code, o2 + 1, code.size() - 1);
-    code.set_ins<Opcode::MakeClosure>(o1, frees);
-    code.set_ins<Opcode::LambdaDecl>(o2, code.size());
+    code.set_ins<Opcode::LambdaDecl>(o1, code.size());
 }
 
 // [AFTER] [CLASS]
@@ -359,12 +333,9 @@ void DictExpr::codegen(Code &code)
 void DelayExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
-    auto o2 = code.add_ins();
     expr->codegen(code);
     code.add_ins<Opcode::Return>();
-    code.set_ins<Opcode::MakeClosure>(o1,
-        analyze_frees(code, o2 + 1, code.size()));
-    code.set_ins<Opcode::ThunkDecl>(o2, code.size());
+    code.set_ins<Opcode::ThunkDecl>(o1, code.size());
 }
 
 // completed
@@ -397,18 +368,17 @@ void VariableDeclarationStmt::codegen(Code &code)
     if (expr)
     {
         expr->codegen(code);
-        code.add_ins<Opcode::StoreLocal>(id->name);
     }
     else
     {
-        code.add_ins<Opcode::Create>(id->name);
+        NoneExpr().codegen(code);
     }
+    code.add_ins<Opcode::StoreLocal>(id->name);
 }
 
 // completed
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::Create>(id->name);
     lambda->codegen(code);
     code.add_ins<Opcode::StoreLocal>(id->name);
 }
