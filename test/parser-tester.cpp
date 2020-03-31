@@ -56,7 +56,7 @@ TEST_CLASS(ParseTerm)
     TEST_METHOD(ParseEmptyLambdaExpr)
         istringstream ss(R"(@(){})");
         auto lambdaExpr = cast<LambdaExpr>(cast<ExprStmt>(Parser(ss).gen_statement())->expr);
-        ASSERT(lambdaExpr->args.empty());
+        ASSERT(lambdaExpr->decls.empty());
         ASSERT(lambdaExpr->block->statements.empty());
     TEST_END
 
@@ -65,7 +65,7 @@ TEST_CLASS(ParseTerm)
         auto lambdaExpr = cast<LambdaExpr>(cast<ExprStmt>(Parser(ss).gen_statement())->expr);
         lambdaExpr = cast<LambdaExpr>(cast<ReturnStmt>(lambdaExpr->block->statements[0])->expr);
         lambdaExpr = cast<LambdaExpr>(cast<ReturnStmt>(lambdaExpr->block->statements[0])->expr);
-        ASSERT(lambdaExpr->args.empty());
+        ASSERT(lambdaExpr->decls.empty());
         ASSERT(lambdaExpr->block->statements.empty());
     TEST_END
 
