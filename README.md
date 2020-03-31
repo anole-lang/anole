@@ -45,7 +45,6 @@ Search `Ice-Lang`, only provides highlight now
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
-+ [ ] Support simple constant optimization
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error, such as traceback like python
 + [ ] Complete use statement and try to design a package system
@@ -56,6 +55,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Support simple constant optimization
 + [X] Fix bug in break statements when meeting nested scopes in while/do-while
 + [X] Add instruction StoreLocal for arguments' declarations
 + [X] Free variable checking at compile time

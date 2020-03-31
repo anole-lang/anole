@@ -480,7 +480,79 @@ Ptr<Expr> Parser::gen_expr(int priority)
     if (get_operators()[priority].count(op))
     {
         get_next_token();
-        lhs = make_shared<BinaryOperatorExpr>(lhs, op, gen_expr(priority));
+        auto rhs = gen_expr(priority);
+        if (dynamic_pointer_cast<IntegerExpr>(lhs) and
+            dynamic_pointer_cast<IntegerExpr>(rhs))
+        {
+            auto alias = reinterpret_pointer_cast<IntegerExpr>(lhs);
+            auto rv = reinterpret_pointer_cast<IntegerExpr>(rhs)->value;
+            switch (op)
+            {
+            case TokenId::Add:
+                alias->value += rv;
+                break;
+
+            case TokenId::Sub:
+                alias->value -= rv;
+                break;
+
+            case TokenId::Mul:
+                alias->value *= rv;
+                break;
+
+            case TokenId::Div:
+                alias->value /= rv;
+                break;
+
+            case TokenId::Mod:
+                alias->value %= rv;
+                break;
+
+            case TokenId::And:
+                lhs = make_shared<BoolExpr>(alias->value and rv);
+                break;
+
+            case TokenId::Or:
+                lhs = make_shared<BoolExpr>(alias->value or rv);
+                break;
+
+            case TokenId::Is:
+                lhs = make_shared<BoolExpr>(alias->value == rv);
+                break;
+
+            case TokenId::CEQ:
+                lhs = make_shared<BoolExpr>(alias->value == rv);
+                break;
+
+            case TokenId::CNE:
+                lhs = make_shared<BoolExpr>(alias->value != rv);
+                break;
+
+            case TokenId::CLT:
+                lhs = make_shared<BoolExpr>(alias->value < rv);
+                break;
+
+            case TokenId::CLE:
+                lhs = make_shared<BoolExpr>(alias->value <= rv);
+                break;
+
+            case TokenId::CGT:
+                lhs = make_shared<BoolExpr>(alias->value > rv);
+                break;
+
+            case TokenId::CGE:
+                lhs = make_shared<BoolExpr>(alias->value >= rv);
+                break;
+
+            default:
+                lhs = make_shared<BinaryOperatorExpr>(lhs, op, rhs);
+                break;
+            }
+        }
+        else
+        {
+            lhs = make_shared<BinaryOperatorExpr>(lhs, op, rhs);
+        }
     }
     return lhs;
 }
