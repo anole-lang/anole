@@ -55,11 +55,12 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Support default arguments
++ [X] Remove instruction Create
 + [X] Support simple constant optimization
 + [X] Fix bug in break statements when meeting nested scopes in while/do-while
 + [X] Add instruction StoreLocal for arguments' declarations
 + [X] Free variable checking at compile time
-+ [X] Support closure capture
 + [X] Use cmake to build but hold the makefile for the old tests
 + [X] Call/cc will copy the current stack
 + [X] Reduce redundant instruction LambdaDecl
