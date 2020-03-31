@@ -1,4 +1,4 @@
-tip: @() {}
+tip: @() {};
 
 tree: @(left, val, right):
   @(f):
@@ -14,12 +14,13 @@ bst_insert: @(bst, val):
       tree(l, v, bst_insert(r, val)),
       tree(bst_insert(l, val), v, r)));
 
-tree_infix: @(bst): bst(@(l, v, r) {
-    tree_infix(l);
-    print(v);
-    print(" ");
-    tree_infix(r);
-})
+tree_infix: @(bst):
+  (bst = tip) ? none,
+    bst(@(l, v, r) {
+      tree_infix(l);
+      print(v);
+      print(" ");
+      tree_infix(r);});
 
 t: tip;
 a: 1;
