@@ -408,6 +408,7 @@ void VariableDeclarationStmt::codegen(Code &code)
 // completed
 void FunctionDeclarationStmt::codegen(Code &code)
 {
+    code.add_ins<Opcode::Create>(id->name);
     lambda->codegen(code);
     code.add_ins<Opcode::StoreLocal>(id->name);
 }

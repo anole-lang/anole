@@ -72,9 +72,8 @@ void store_handle()
 
 void storelocal_handle()
 {
-    theCurrentContext->scope()->create_symbol(
-        OPRAND(string),
-        make_shared<ObjectPtr>(theCurrentContext->pop()));
+    *theCurrentContext->scope()->create_symbol(OPRAND(string))
+        = theCurrentContext->pop();
 }
 
 void neg_handle()
