@@ -52,6 +52,7 @@ class Parser
 
     ExprList gen_arguments();
     IdentList gen_idents();
+    DeclList gen_arg_decls();
 
     Ptr<BlockExpr> gen_stmts();
     Ptr<BlockExpr> gen_block();

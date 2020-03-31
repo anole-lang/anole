@@ -107,6 +107,36 @@ IdentList Parser::gen_idents()
     return idents;
 }
 
+DeclList Parser::gen_arg_decls()
+{
+    DeclList decls;
+    while (current_token_.token_id != TokenId::RParen)
+    {
+        auto ident = gen_ident();
+        if (current_token_.token_id == TokenId::Colon)
+        {
+            get_next_token();
+            decls.push_back(make_shared<VariableDeclarationStmt>(
+                ident, gen_expr()));
+        }
+        else
+        {
+            decls.push_back(make_shared<VariableDeclarationStmt>(
+                ident, make_shared<NoneExpr>()));
+        }
+
+        if (current_token_.token_id == TokenId::Comma)
+        {
+            get_next_token();
+        }
+        else
+        {
+            check<TokenId::RParen>("missing ')' here");
+        }
+    }
+    return decls;
+}
+
 // usually use when interacting
 Ptr<BlockExpr> Parser::gen_stmts()
 {
@@ -265,7 +295,7 @@ Ptr<Stmt> Parser::gen_declaration()
     case TokenId::LParen:
     {
         get_next_token();
-        auto args = gen_idents();
+        auto args = gen_arg_decls();
         get_next_token();
 
         try_continue();
@@ -770,8 +800,10 @@ Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
 // generate lambda expr as @(): expr, @(){} and also @(){}()..
 Ptr<Expr> Parser::gen_lambda_expr()
 {
+    // eat '('
     get_next_token();
-    auto args = gen_idents();
+    auto args = gen_arg_decls();
+    // eat ')'
     get_next_token();
 
     try_continue();
