@@ -28,6 +28,12 @@ vector<Instruction> &Code::get_instructions()
     return instructions_;
 }
 
+size_t &Code::nested_scopes()
+{
+    static size_t value = 0;
+    return value;
+}
+
 void Code::push_break(size_t ind)
 {
     breaks_.push_back(ind);
