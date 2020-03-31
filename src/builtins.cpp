@@ -33,8 +33,9 @@ REGISTER_BUILTIN(call_with_current_continuation,
         auto func = theCurrentContext->pop<FunctionObject>();
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
         theCurrentContext = make_shared<Context>(
-            theCurrentContext, func->scope(), func->code(), func->base() - 1);
-        theCurrentContext->push(cont_obj);
+            theCurrentContext, func->scope(), func->code(), func->base() + 1);
+        *theCurrentContext->scope()->create_symbol(any_cast<string>(theCurrentContext->oprand()))
+            = cont_obj;
     }
     else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
     {
