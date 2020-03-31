@@ -16,6 +16,11 @@ class Code
   public:
     Code();
 
+    Opcode opcode_at(std::size_t i)
+    {
+        return instructions_[i].opcode;
+    }
+
     std::any &oprand_at(std::size_t i)
     {
         return instructions_[i].oprand;

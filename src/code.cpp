@@ -61,7 +61,7 @@ void Code::push_continue(size_t ind)
     continues_.push_back(ind);
 }
 
-void Code::set_continue_to(std::size_t ind, std::size_t base)
+void Code::set_continue_to(size_t ind, size_t base)
 {
     decltype(continues_) continues;
     for (auto i : continues_)
@@ -110,112 +110,101 @@ void Code::print(ostream &out)
         switch (ins.opcode)
         {
         case Opcode::Pop:
-            out << i << "\tPop" << std::endl;
-            break;
-        case Opcode::Create:
-            out << i << "\tCreate\t\t" << OPRAND(string) << std::endl;
+            out << i << "\tPop" << endl;
             break;
         case Opcode::Load:
-            out << i << "\tLoad\t\t" << OPRAND(string) << std::endl;
+            out << i << "\tLoad\t\t" << OPRAND(string) << endl;
             break;
         case Opcode::LoadConst:
-            out << i << "\tLoadConst\t" << OPRAND(std::size_t) << std::endl;
+            out << i << "\tLoadConst\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::LoadMember:
-            out << i << "\tLoadMember\t" << OPRAND(std::string) << std::endl;
+            out << i << "\tLoadMember\t" << OPRAND(string) << endl;
             break;
         case Opcode::Store:
-            out << i << "\tStore" << std::endl;
+            out << i << "\tStore" << endl;
+            break;
+        case Opcode::StoreLocal:
+            out << i << "\tStoreLocal\t" << OPRAND(string) << endl;
             break;
 
         case Opcode::Neg:
-            out << i << "\tNeg" << std::endl;
+            out << i << "\tNeg" << endl;
             break;
         case Opcode::Add:
-            out << i << "\tAdd" << std::endl;
+            out << i << "\tAdd" << endl;
             break;
         case Opcode::Sub:
-            out << i << "\tSub" << std::endl;
+            out << i << "\tSub" << endl;
             break;
         case Opcode::Mul:
-            out << i << "\tMul" << std::endl;
+            out << i << "\tMul" << endl;
             break;
         case Opcode::Div:
-            out << i << "\tDiv" << std::endl;
+            out << i << "\tDiv" << endl;
             break;
         case Opcode::Mod:
-            out << i << "\tMod" << std::endl;
+            out << i << "\tMod" << endl;
             break;
 
         case Opcode::CEQ:
-            out << i << "\tCEQ" << std::endl;
+            out << i << "\tCEQ" << endl;
             break;
         case Opcode::CNE:
-            out << i << "\tCNE" << std::endl;
+            out << i << "\tCNE" << endl;
             break;
         case Opcode::CLT:
-            out << i << "\tCLT" << std::endl;
+            out << i << "\tCLT" << endl;
             break;
         case Opcode::CLE:
-            out << i << "\tCLE" << std::endl;
+            out << i << "\tCLE" << endl;
             break;
 
         case Opcode::Index:
-            out << i << "\tIndex" << std::endl;
+            out << i << "\tIndex" << endl;
             break;
 
         case Opcode::ScopeBegin:
-            out << i << "\tScopeBegin" << std::endl;
+            out << i << "\tScopeBegin" << endl;
             break;
         case Opcode::ScopeEnd:
-            out << i << "\tScopeEnd" << std::endl;
+            out << i << "\tScopeEnd" << endl;
             break;
 
         case Opcode::Call:
-            out << i << "\tCall" << std::endl;
+            out << i << "\tCall\t\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::CallTail:
-            out << i << "\tCallTail" << std::endl;
+            out << i << "\tCallTail\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::Return:
-            out << i << "\tReturn" << std::endl;
+            out << i << "\tReturn" << endl;
             break;
         case Opcode::Jump:
-            out << i << "\tJump\t\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tJump\t\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::JumpIf:
-            out << i << "\tJumpIf\t\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tJumpIf\t\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::JumpIfNot:
-            out << i << "\tJumpIfNot\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tJumpIfNot\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::Match:
-            out << i << "\tMatch\t\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tMatch\t\t" << OPRAND(size_t) << endl;
             break;
 
-        case Opcode::MakeClosure:
-            out << i << "\tMakeClosure\t";
-            {
-                auto frees = OPRAND(set<string>);
-                for (auto &name : frees)
-                {
-                    out << name << " ";
-                }
-                out << endl;
-            }
-            break;
         case Opcode::LambdaDecl:
-            out << i << "\tLambdaDecl\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tLambdaDecl\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::ThunkDecl:
-            out << i << "\tThunkDecl\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tThunkDecl\t" << OPRAND(size_t) << endl;
             break;
 
         case Opcode::BuildList:
-            out << i << "\tBuildList\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tBuildList\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::BuildDict:
-            out << i << "\tBuildDict\t" << OPRAND(size_t) << std::endl;
+            out << i << "\tBuildDict\t" << OPRAND(size_t) << endl;
             break;
 
         default:
