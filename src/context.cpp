@@ -26,11 +26,6 @@ void pop_handle()
     theCurrentContext->pop();
 }
 
-void create_handle()
-{
-    theCurrentContext->scope()->create_symbol(OPRAND(string));
-}
-
 void load_handle()
 {
     auto name = OPRAND(string);
@@ -171,10 +166,30 @@ void call_handle()
 {
     if (dynamic_pointer_cast<FunctionObject>(theCurrentContext->top()))
     {
+        auto num = OPRAND(size_t);
         auto func = theCurrentContext->pop<FunctionObject>();
+
         theCurrentContext = make_shared<Context>(
-            theCurrentContext, func->scope(), func->code(), func->base() - 1);
+            theCurrentContext, func->scope(), func->code(), func->base());
+
+        auto &pc = theCurrentContext->pc();
+        while (num--)
+        {
+            while (theCurrentContext->opcode() != Opcode::StoreLocal)
+            {
+                ++pc;
+            }
+            *theCurrentContext->scope()->create_symbol(OPRAND(string))
+                = theCurrentContext->pop();
+            if (++pc > theCurrentContext->code()->size())
+            {
+                throw runtime_error("much arguments");
+            }
+        }
+
+        --pc;
     }
+    // builtins don't support default arguments
     else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentContext->top()))
     {
         theCurrentContext->pop<BuiltInFunctionObject>()->operator()();
@@ -196,11 +211,31 @@ void calltail_handle()
 {
     if (dynamic_pointer_cast<FunctionObject>(theCurrentContext->top()))
     {
+        auto num = OPRAND(size_t);
         auto func = theCurrentContext->pop<FunctionObject>();
+
         theCurrentContext->scope() = make_shared<Scope>(func->scope());
         theCurrentContext->code() = func->code();
-        theCurrentContext->pc() = func->base() - 1;
+        theCurrentContext->pc() = func->base();
+
+        auto &pc = theCurrentContext->pc();
+        while (num--)
+        {
+            while (theCurrentContext->opcode() != Opcode::StoreLocal)
+            {
+                ++pc;
+            }
+            *theCurrentContext->scope()->create_symbol(OPRAND(string))
+                = theCurrentContext->pop();
+            if (++pc > theCurrentContext->code()->size())
+            {
+                throw runtime_error("much arguments");
+            }
+        }
+
+        --pc;
     }
+    // builtins don't support default arguments
     else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentContext->top()))
     {
         theCurrentContext->pop<BuiltInFunctionObject>()->operator()();
@@ -256,42 +291,20 @@ void match_handle()
     }
 }
 
-void makeclosure_handle()
-{
-    auto frees = OPRAND(set<string>);
-    ++theCurrentContext->pc();
-
-    auto new_scope = make_shared<Scope>();
-    for (auto &name : frees)
-    {
-        new_scope->create_symbol(name,
-            theCurrentContext->scope()->load_symbol(name));
-    }
-
-    if (theCurrentContext->ins().opcode == Opcode::LambdaDecl)
-    {
-        theCurrentContext->push(make_shared<FunctionObject>(
-            new_scope, theCurrentContext->code(),
-            theCurrentContext->pc() + 1));
-    }
-    else
-    {
-        theCurrentContext->push(make_shared<ThunkObject>(
-            new_scope, theCurrentContext->code(),
-            theCurrentContext->pc() + 1));
-    }
-
-    theCurrentContext->pc() = OPRAND(size_t) - 1;
-}
-
 void lambdadecl_handle()
 {
-    // do nothing
+    theCurrentContext->push(make_shared<FunctionObject>(
+        theCurrentContext->scope(), theCurrentContext->code(),
+        theCurrentContext->pc() + 1));
+    theCurrentContext->pc() = OPRAND(size_t) - 1;
 }
 
 void thunkdecl_handle()
 {
-    // do nothing
+    theCurrentContext->push(make_shared<ThunkObject>(
+        theCurrentContext->scope(), theCurrentContext->code(),
+        theCurrentContext->pc() + 1));
+    theCurrentContext->pc() = OPRAND(size_t) - 1;
 }
 
 void buildlist_handle()
@@ -326,7 +339,6 @@ constexpr OpHandle theOpHandles[] =
 
     &op_handles::pop_handle,
 
-    &op_handles::create_handle,
     &op_handles::load_handle,
     &op_handles::loadconst_handle,
     &op_handles::loadmember_handle,
@@ -359,7 +371,6 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::jumpifnot_handle,
     &op_handles::match_handle,
 
-    &op_handles::makeclosure_handle,
     &op_handles::lambdadecl_handle,
     &op_handles::thunkdecl_handle,
 

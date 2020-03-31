@@ -38,6 +38,7 @@ class Context : public std::enable_shared_from_this<Context>
         code_(code), pc_(1),
         stack_(std::make_shared<StackType>()) {}
 
+    // the default value of pc is 1 because first ins is PlaceHolder
     Context(Ptr<Context> pre, Ptr<Scope> scope,
         Ptr<Code> code, std::size_t pc = 1)
       : pre_context_(pre), scope_(std::make_shared<Scope>(scope)),
@@ -72,6 +73,11 @@ class Context : public std::enable_shared_from_this<Context>
 
     Instruction &ins_at(std::size_t index) {
         return code_->get_instructions()[index];
+    }
+
+    Opcode opcode()
+    {
+        return code_->opcode_at(pc_);
     }
 
     std::any &oprand()
