@@ -19,7 +19,7 @@ print(time() - start);
 println("s");
 
 start: time();
-Y(fib2)(30);
+Y(fib2)(25);
 print(time() - start);
 println("s");
 

@@ -1,9 +1,7 @@
 @Animal() {
     @yep(), println("I can't yep!");
 
-    return @() {
-        yep;
-    };
+    return @() {};
 }
 
 @Cat() {

@@ -19,9 +19,7 @@ Except: (@() {
         if !(e is none), catch(e);
     }
 
-    return @() {
-        throw; try;
-    };
+    return @() {};
 })();
 
 div: @(a, b) {

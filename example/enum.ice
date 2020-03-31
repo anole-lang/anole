@@ -2,9 +2,7 @@ State: (@() {
     @Start(){};
     @Running(){};
     @End(){};
-    return @() {
-        Start; Running; End;
-    };
+    return @() {};
 })();
 
 state: State.Start;
