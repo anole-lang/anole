@@ -197,7 +197,16 @@ void call_handle()
         {
             while (theCurrentContext->opcode() != Opcode::StoreLocal)
             {
-                ++pc;
+                auto &ins = theCurrentContext->ins();
+                if (ins.opcode == Opcode::LambdaDecl or
+                    ins.opcode == Opcode::ThunkDecl)
+                {
+                    pc = OPRAND(size_t);
+                }
+                else if (++pc > theCurrentContext->code()->size())
+                {
+                    throw runtime_error("much arguments");
+                }
             }
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();
@@ -243,7 +252,16 @@ void calltail_handle()
         {
             while (theCurrentContext->opcode() != Opcode::StoreLocal)
             {
-                ++pc;
+                auto &ins = theCurrentContext->ins();
+                if (ins.opcode == Opcode::LambdaDecl or
+                    ins.opcode == Opcode::ThunkDecl)
+                {
+                    pc = OPRAND(size_t);
+                }
+                else if (++pc > theCurrentContext->code()->size())
+                {
+                    throw runtime_error("much arguments");
+                }
             }
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();

@@ -55,6 +55,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Default arguments can be lambda expression
 + [X] Support default arguments
 + [X] Remove instruction Create
 + [X] Support simple constant optimization

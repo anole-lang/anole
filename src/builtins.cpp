@@ -32,6 +32,7 @@ REGISTER_BUILTIN(call_with_current_continuation,
     {
         auto func = theCurrentContext->pop<FunctionObject>();
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
+        // base => LoadConst 0, so start with base + 1
         theCurrentContext = make_shared<Context>(
             theCurrentContext, func->scope(), func->code(), func->base() + 1);
         *theCurrentContext->scope()->create_symbol(any_cast<string>(theCurrentContext->oprand()))
