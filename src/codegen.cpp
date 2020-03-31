@@ -421,6 +421,11 @@ void ClassDeclarationStmt::codegen(Code &code)
 // completed
 void BreakStmt::codegen(Code &code)
 {
+    for (size_t i = 0; i < code.nested_scopes(); ++i)
+    {
+        code.add_ins<Opcode::ScopeEnd>();
+    }
+
     code.push_break(code.add_ins());
 }
 
@@ -454,6 +459,8 @@ void ReturnStmt::codegen(Code &code)
 void IfElseStmt::codegen(Code &code)
 {
     code.add_ins<Opcode::ScopeBegin>();
+    ++code.nested_scopes();
+
     cond->codegen(code);
     auto o1 = code.add_ins();
     block_true->codegen(code);
@@ -468,6 +475,8 @@ void IfElseStmt::codegen(Code &code)
     {
         code.set_ins<Opcode::JumpIfNot>(o1, code.size());
     }
+
+    --code.nested_scopes();
     code.add_ins<Opcode::ScopeEnd>();
 }
 
@@ -475,6 +484,9 @@ void IfElseStmt::codegen(Code &code)
 void WhileStmt::codegen(Code &code)
 {
     code.add_ins<Opcode::ScopeBegin>();
+    auto backup = code.nested_scopes();
+    code.nested_scopes() = 0;
+
     auto o1 = code.size();
     cond->codegen(code);
     auto o2 = code.add_ins();
@@ -483,6 +495,8 @@ void WhileStmt::codegen(Code &code)
     code.set_ins<Opcode::JumpIfNot>(o2, code.size());
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o1, o1);
+
+    code.nested_scopes() = backup;
     code.add_ins<Opcode::ScopeEnd>();
 }
 
@@ -490,6 +504,9 @@ void WhileStmt::codegen(Code &code)
 void DoWhileStmt::codegen(Code &code)
 {
     code.add_ins<Opcode::ScopeBegin>();
+    auto backup = code.nested_scopes();
+    code.nested_scopes() = 0;
+
     auto o1 = code.size();
     block->codegen(code);
     auto o2 = code.size();
@@ -497,6 +514,8 @@ void DoWhileStmt::codegen(Code &code)
     code.add_ins<Opcode::JumpIf>(o1);
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o2, o1);
+
+    code.nested_scopes() = backup;
     code.add_ins<Opcode::ScopeEnd>();
 }
 
