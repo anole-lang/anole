@@ -12,46 +12,47 @@ enum Opcode
 {
     PlaceHolder,
 
-    Pop,          // done
+    Pop,          // Pop
 
-    Create,       // done
-    Load,         // done
-    LoadConst,    // done
-    LoadMember,   // done
-    Store,        // done
+    Create,       // Create name
+    Load,         // Load name
+    LoadConst,    // LoadConst index
+    LoadMember,   // LoadMember name
+    Store,        // Store
+    StoreLocal,   // StoreLocal name
 
-    Neg,          // done
-    Add,          // done
-    Sub,          // done
-    Mul,          // done
-    Div,          // done
-    Mod,          // done
+    Neg,          // Neg
+    Add,          // Add
+    Sub,          // Sub
+    Mul,          // Mul
+    Div,          // Div
+    Mod,          // Mod
 
-    Is,           // done
-    CEQ,          // done
-    CNE,          // done
-    CLT,          // done
-    CLE,          // done
+    Is,           // Is
+    CEQ,          // CEQ
+    CNE,          // CNE
+    CLT,          // CLT
+    CLE,          // CLE
 
-    Index,        // done
+    Index,        // Index
 
-    ScopeBegin,   // done
-    ScopeEnd,     // done
+    ScopeBegin,   // ScopeBegin
+    ScopeEnd,     // ScopeEnd
 
-    Call,         // done
-    CallTail,     // done
-    Return,       // done
-    Jump,         // done
-    JumpIf,       // done
-    JumpIfNot,    // done
-    Match,        // done
+    Call,         // Call
+    CallTail,     // CallTail
+    Return,       // Return
+    Jump,         // Jump target
+    JumpIf,       // JumpIf target
+    JumpIfNot,    // JumpIfNot target
+    Match,        // Match target
 
-    MakeClosure,  // done
-    LambdaDecl,   // done
-    ThunkDecl,    // done
+    MakeClosure,  // MakeClosure {names...}
+    LambdaDecl,   // LambdaDecl target
+    ThunkDecl,    // ThunkDecl target
 
-    BuildList,    // done
-    BuildDict,    // done
+    BuildList,    // BuildList nums
+    BuildDict,    // BuildDict nums
 };
 
 struct Instruction
