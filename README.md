@@ -56,6 +56,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Fix bug in break statements when meeting nested scopes in while/do-while
 + [X] Add instruction StoreLocal for arguments' declarations
 + [X] Free variable checking at compile time
 + [X] Support closure capture
