@@ -14,7 +14,6 @@ enum Opcode
 
     Pop,          // Pop
 
-    Create,       // Create name
     Load,         // Load name
     LoadConst,    // LoadConst index
     LoadMember,   // LoadMember name
@@ -39,20 +38,19 @@ enum Opcode
     ScopeBegin,   // ScopeBegin
     ScopeEnd,     // ScopeEnd
 
-    Call,         // Call
-    CallTail,     // CallTail
+    Call,         // Call num
+    CallTail,     // CallTail num
     Return,       // Return
     Jump,         // Jump target
     JumpIf,       // JumpIf target
     JumpIfNot,    // JumpIfNot target
     Match,        // Match target
 
-    MakeClosure,  // MakeClosure {names...}
     LambdaDecl,   // LambdaDecl target
     ThunkDecl,    // ThunkDecl target
 
-    BuildList,    // BuildList nums
-    BuildDict,    // BuildDict nums
+    BuildList,    // BuildList num
+    BuildDict,    // BuildDict num
 };
 
 struct Instruction
