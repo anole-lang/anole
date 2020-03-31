@@ -56,6 +56,7 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 ## Change Log
 
++ [X] Add instruction StoreLocal for arguments' declarations
 + [X] Free variable checking at compile time
 + [X] Support closure capture
 + [X] Use cmake to build but hold the makefile for the old tests
