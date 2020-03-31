@@ -70,6 +70,13 @@ void store_handle()
     theCurrentContext->push_straight(p);
 }
 
+void storelocal_handle()
+{
+    theCurrentContext->scope()->create_symbol(
+        OPRAND(string),
+        make_shared<ObjectPtr>(theCurrentContext->pop()));
+}
+
 void neg_handle()
 {
     theCurrentContext->push(theCurrentContext->pop()->neg());
@@ -325,6 +332,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::loadconst_handle,
     &op_handles::loadmember_handle,
     &op_handles::store_handle,
+    &op_handles::storelocal_handle,
 
     &op_handles::neg_handle,
     &op_handles::add_handle,

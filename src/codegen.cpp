@@ -17,10 +17,10 @@ static set<string> analyze_frees(Code &code, size_t begin, size_t end)
     set<string> frees;
     for (size_t i = begin; i < end; ++i) {
         auto &ins = code.get_instructions()[i];
-        if (ins.opcode == Opcode::Create)
+        if (ins.opcode == Opcode::Create or
+            ins.opcode == Opcode::StoreLocal)
         {
             bounds.insert(any_cast<string>(ins.oprand));
-            i += 3;
         }
         else if (ins.opcode == Opcode::Load)
         {
@@ -257,10 +257,7 @@ void LambdaExpr::codegen(Code &code)
 
     for (auto &arg : args)
     {
-        code.add_ins<Opcode::Create>(arg->name);
-        code.add_ins<Opcode::Load>(arg->name);
-        code.add_ins<Opcode::Store>();
-        code.add_ins<Opcode::Pop>();
+        code.add_ins<Opcode::StoreLocal>(arg->name);
     }
     block->codegen(code);
 
@@ -400,9 +397,7 @@ void VariableDeclarationStmt::codegen(Code &code)
     if (expr)
     {
         expr->codegen(code);
-        code.add_ins<Opcode::Create>(id->name);
-        code.add_ins<Opcode::Load>(id->name);
-        code.add_ins<Opcode::Store>();
+        code.add_ins<Opcode::StoreLocal>(id->name);
     }
     else
     {
@@ -413,10 +408,8 @@ void VariableDeclarationStmt::codegen(Code &code)
 // completed
 void FunctionDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::Create>(id->name);
     lambda->codegen(code);
-    id->codegen(code);
-    code.add_ins<Opcode::Store>();
+    code.add_ins<Opcode::StoreLocal>(id->name);
 }
 
 void ClassDeclarationStmt::codegen(Code &code)
