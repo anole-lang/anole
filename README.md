@@ -41,49 +41,19 @@ You can see some examples in `example/` or the `test/sample-tester.cpp`, this is
 
 Search `Ice-Lang`, only provides highlight now
 
+## ChangeLog
+
+See [ChangeLog.md](ChangeLog.md)
+
 ## To Do
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error, such as traceback like python
++ [ ] Support load moudles from .so files
 + [ ] Complete use statement and try to design a package system
 + [ ] Support type convertion
 + [ ] Support threads and processes
 + [ ] Complete all codegens
 + [ ] Read from file and complie IR to file
-
-## Change Log
-
-+ [X] Default arguments can be lambda expression
-+ [X] Support default arguments
-+ [X] Remove instruction Create
-+ [X] Support simple constant optimization
-+ [X] Fix bug in break statements when meeting nested scopes in while/do-while
-+ [X] Add instruction StoreLocal for arguments' declarations
-+ [X] Free variable checking at compile time
-+ [X] Use cmake to build but hold the makefile for the old tests
-+ [X] Call/cc will copy the current stack
-+ [X] Reduce redundant instruction LambdaDecl
-+ [X] Fix bug in REPL mode
-+ [X] Remove the spending of nested stack at before versions.
-+ [X] Fix bug in eval function
-+ [X] Fix bug in updating pc when meeting error in REPL
-+ [X] Refactor the run-way to support complete call/cc
-+ [X] Add built-in function call_with_current_continuation easily with some limitations such as caller must exist;
-+ [X] Prompt undefined symbol but without its name loaded by
-+ [X] Support new operator `is`
-+ [X] Add new built-in function id
-+ [X] Fix bug in tail call optimization when meeting `return cond ? true_expr, false_expr`
-+ [X] Change the type of the internal value of the integer from long to int64_t
-+ [X] Support tail call optimization
-+ [X] Support the built-in class and method
-+ [X] Allow multi code objects when using eval
-+ [X] Support eval function
-+ [X] Reduce the switch-time
-+ [X] Support call-by-need
-+ [X] Better implementation of REPL without try-throw
-+ [X] Simple REPL with try-throw
-+ [X] Complete basic things in vm such as function, control flow and some operators
-+ [X] Report errors with line info in detail in front
-+ [X] Implementation of the front end but without reporting errors with line info in detail
