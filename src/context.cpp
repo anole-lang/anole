@@ -2,6 +2,8 @@
 #include <iostream>
 #endif
 #include <set>
+#include <fstream>
+#include "parser.hpp"
 #include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -10,6 +12,7 @@
 #include "funcobject.hpp"
 #include "contobject.hpp"
 #include "thunkobject.hpp"
+#include "moduleobject.hpp"
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
@@ -24,6 +27,25 @@ namespace op_handles
 void pop_handle()
 {
     theCurrentContext->pop();
+    ++theCurrentContext->pc();
+}
+
+void use_handle()
+{
+    const auto name = OPRAND(string);
+    ifstream fin{name + ".ice"};
+    if (!fin.good())
+    {
+        throw runtime_error("no module named " + name);
+    }
+    auto code = make_shared<Code>();
+    Parser(fin).gen_statements()->codegen(*code);
+    auto origin = theCurrentContext;
+    theCurrentContext = make_shared<Context>(code);
+    Context::execute();
+    *origin->scope()->create_symbol(name)
+        = make_shared<ModuleObject>(theCurrentContext->scope());
+    theCurrentContext = origin;
     ++theCurrentContext->pc();
 }
 
@@ -391,6 +413,8 @@ constexpr OpHandle theOpHandles[] =
     nullptr,
 
     &op_handles::pop_handle,
+
+    &op_handles::use_handle,
 
     &op_handles::load_handle,
     &op_handles::loadconst_handle,
