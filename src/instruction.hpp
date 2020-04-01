@@ -20,6 +20,20 @@ enum Opcode
     Store,        // Store
     StoreLocal,   // StoreLocal name
 
+    ScopeBegin,   // ScopeBegin
+    ScopeEnd,     // ScopeEnd
+
+    Call,         // Call num
+    CallTail,     // CallTail num
+    Return,       // Return
+    Jump,         // Jump target
+    JumpIf,       // JumpIf target
+    JumpIfNot,    // JumpIfNot target
+    Match,        // Match target
+
+    LambdaDecl,   // LambdaDecl target
+    ThunkDecl,    // ThunkDecl target
+
     Neg,          // Neg
     Add,          // Add
     Sub,          // Sub
@@ -34,20 +48,6 @@ enum Opcode
     CLE,          // CLE
 
     Index,        // Index
-
-    ScopeBegin,   // ScopeBegin
-    ScopeEnd,     // ScopeEnd
-
-    Call,         // Call num
-    CallTail,     // CallTail num
-    Return,       // Return
-    Jump,         // Jump target
-    JumpIf,       // JumpIf target
-    JumpIfNot,    // JumpIfNot target
-    Match,        // Match target
-
-    LambdaDecl,   // LambdaDecl target
-    ThunkDecl,    // ThunkDecl target
 
     BuildList,    // BuildList num
     BuildDict,    // BuildDict num

@@ -77,99 +77,6 @@ void storelocal_handle()
     ++theCurrentContext->pc();
 }
 
-void neg_handle()
-{
-    theCurrentContext->push(theCurrentContext->pop()->neg());
-    ++theCurrentContext->pc();
-}
-
-void add_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->add(rhs));
-    ++theCurrentContext->pc();
-}
-
-void sub_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->sub(rhs));
-    ++theCurrentContext->pc();
-}
-
-void mul_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->mul(rhs));
-    ++theCurrentContext->pc();
-}
-
-void div_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->div(rhs));
-    ++theCurrentContext->pc();
-}
-
-void mod_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->mod(rhs));
-    ++theCurrentContext->pc();
-}
-
-void is_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    theCurrentContext->set_top(theCurrentContext->top().get() == rhs.get() ? theTrue : theFalse);
-    ++theCurrentContext->pc();
-}
-
-void ceq_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->ceq(rhs));
-    ++theCurrentContext->pc();
-}
-
-void cne_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->cne(rhs));
-    ++theCurrentContext->pc();
-}
-
-void clt_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->clt(rhs));
-    ++theCurrentContext->pc();
-}
-
-void cle_handle()
-{
-    auto rhs = theCurrentContext->pop();
-    auto lhs = theCurrentContext->top();
-    theCurrentContext->set_top(lhs->cle(rhs));
-    ++theCurrentContext->pc();
-}
-
-void index_handle()
-{
-    auto obj = theCurrentContext->pop();
-    auto index = theCurrentContext->pop();
-    theCurrentContext->push_straight(obj->index(index));
-    ++theCurrentContext->pc();
-}
-
 void scopebegin_handle()
 {
     theCurrentContext->scope() = make_shared<Scope>(theCurrentContext->scope());
@@ -358,6 +265,99 @@ void thunkdecl_handle()
     theCurrentContext->pc() = OPRAND(size_t);
 }
 
+void neg_handle()
+{
+    theCurrentContext->push(theCurrentContext->pop()->neg());
+    ++theCurrentContext->pc();
+}
+
+void add_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->add(rhs));
+    ++theCurrentContext->pc();
+}
+
+void sub_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->sub(rhs));
+    ++theCurrentContext->pc();
+}
+
+void mul_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->mul(rhs));
+    ++theCurrentContext->pc();
+}
+
+void div_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->div(rhs));
+    ++theCurrentContext->pc();
+}
+
+void mod_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->mod(rhs));
+    ++theCurrentContext->pc();
+}
+
+void is_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    theCurrentContext->set_top(theCurrentContext->top().get() == rhs.get() ? theTrue : theFalse);
+    ++theCurrentContext->pc();
+}
+
+void ceq_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->ceq(rhs));
+    ++theCurrentContext->pc();
+}
+
+void cne_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->cne(rhs));
+    ++theCurrentContext->pc();
+}
+
+void clt_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->clt(rhs));
+    ++theCurrentContext->pc();
+}
+
+void cle_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->cle(rhs));
+    ++theCurrentContext->pc();
+}
+
+void index_handle()
+{
+    auto obj = theCurrentContext->pop();
+    auto index = theCurrentContext->pop();
+    theCurrentContext->push_straight(obj->index(index));
+    ++theCurrentContext->pc();
+}
+
 void buildlist_handle()
 {
     auto list = make_shared<ListObject>();
@@ -398,6 +398,20 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::store_handle,
     &op_handles::storelocal_handle,
 
+    &op_handles::scopebegin_handle,
+    &op_handles::scopeend_handle,
+
+    &op_handles::call_handle,
+    &op_handles::calltail_handle,
+    &op_handles::return_handle,
+    &op_handles::jump_handle,
+    &op_handles::jumpif_handle,
+    &op_handles::jumpifnot_handle,
+    &op_handles::match_handle,
+
+    &op_handles::lambdadecl_handle,
+    &op_handles::thunkdecl_handle,
+
     &op_handles::neg_handle,
     &op_handles::add_handle,
     &op_handles::sub_handle,
@@ -412,20 +426,6 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::cle_handle,
 
     &op_handles::index_handle,
-
-    &op_handles::scopebegin_handle,
-    &op_handles::scopeend_handle,
-
-    &op_handles::call_handle,
-    &op_handles::calltail_handle,
-    &op_handles::return_handle,
-    &op_handles::jump_handle,
-    &op_handles::jumpif_handle,
-    &op_handles::jumpifnot_handle,
-    &op_handles::match_handle,
-
-    &op_handles::lambdadecl_handle,
-    &op_handles::thunkdecl_handle,
 
     &op_handles::buildlist_handle,
     &op_handles::builddict_handle,
