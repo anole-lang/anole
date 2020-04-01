@@ -1,6 +1,6 @@
 # ChangeLog for Ice
 
-## Ice 0.0.1 - 2020/04/01
+## 0.0.1 - 2020/04/01
 
 ### Added
 
@@ -11,7 +11,7 @@
 - The origin ChangeLog in README.md
 - The Samples.md, because I plan to write some docs later and you can learn something about how to use Ice by examples in [example/](example/)
 
-## Ice 0.0.0
+## 0.0.0
 
 ### Others
 
