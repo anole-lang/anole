@@ -346,7 +346,7 @@ Ptr<Stmt> Parser::gen_class_decl()
 Ptr<Stmt> Parser::gen_use_stmt()
 {
     get_next_token();
-    check<TokenId::Identifier>("missing an identifier after 'using'");
+    check<TokenId::Identifier>("missing an identifier after 'use'");
     auto use_stmt = make_shared<UseStmt>(current_token_.value);
     get_next_token();
     return use_stmt;
