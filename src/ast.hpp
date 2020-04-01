@@ -202,9 +202,9 @@ struct QuesExpr : Expr
 
 struct UseStmt : Stmt
 {
-    std::string path;
-    UseStmt(std::string path)
-      : path(std::move(path)) {}
+    std::string name;
+    UseStmt(std::string name)
+      : name(std::move(name)) {}
     void codegen(Code &) override;
 };
 
