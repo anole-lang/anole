@@ -352,7 +352,7 @@ void QuesExpr::codegen(Code &code)
 
 void UseStmt::codegen(Code &code)
 {
-
+    code.add_ins<Opcode::Use>(name);
 }
 
 // completed
