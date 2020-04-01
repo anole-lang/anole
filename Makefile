@@ -34,6 +34,7 @@ tmp/objects.so: src/object.cpp \
 				src/funcobject.cpp \
 				src/contobject.cpp \
 				src/floatobject.cpp \
+				src/moduleobject.cpp \
 				src/stringobject.cpp \
 				src/integerobject.cpp \
 				src/builtinfuncobject.cpp
