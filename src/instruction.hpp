@@ -14,6 +14,8 @@ enum Opcode
 
     Pop,          // Pop
 
+    Use,          // Use name
+
     Load,         // Load name
     LoadConst,    // LoadConst index
     LoadMember,   // LoadMember name
