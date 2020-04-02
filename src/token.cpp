@@ -44,6 +44,7 @@ Token::Token(std::string value) : value(value)
     switch (operator""_hash(value.c_str(), value.size() + 1))
     {
     case "use"_hash:        token_id = TokenId::Use;      break;
+    case "from"_hash:       token_id = TokenId::From;     break;
     case "if"_hash:         token_id = TokenId::If;       break;
     case "elif"_hash:       token_id = TokenId::Elif;     break;
     case "else"_hash:       token_id = TokenId::Else;     break;
