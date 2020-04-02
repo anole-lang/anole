@@ -34,17 +34,25 @@ void import_handle()
 {
     const auto name = OPRAND(string);
     ifstream fin{name + ".ice"};
-    if (!fin.good())
+    if (fin.good())
     {
-        throw runtime_error("no module named " + name);
+        auto code = make_shared<Code>();
+        Parser(fin).gen_statements()->codegen(*code);
+        auto origin = theCurrentContext;
+        theCurrentContext = make_shared<Context>(code);
+        Context::execute();
+        origin->push(make_shared<IceModuleObject>(theCurrentContext->scope()));
+        theCurrentContext = origin;
     }
-    auto code = make_shared<Code>();
-    Parser(fin).gen_statements()->codegen(*code);
-    auto origin = theCurrentContext;
-    theCurrentContext = make_shared<Context>(code);
-    Context::execute();
-    origin->push(make_shared<ModuleObject>(theCurrentContext->scope()));
-    theCurrentContext = origin;
+    else
+    {
+        auto mod = make_shared<CppModuleObject>("./" + name + ".so");
+        if (!mod->good())
+        {
+            throw runtime_error("no module named " + name);
+        }
+        theCurrentContext->push(mod);
+    }
     ++theCurrentContext->pc();
 }
 
@@ -52,7 +60,7 @@ void importpart_handle()
 {
     const auto name = OPRAND(string);
     theCurrentContext->push_straight(
-        theCurrentContext->top<ModuleObject>()->load_member(name));
+        theCurrentContext->top<IceModuleObject>()->load_member(name));
     ++theCurrentContext->pc();
 }
 
@@ -64,6 +72,7 @@ void importall_handle()
     {
         throw runtime_error("no module named " + name);
     }
+
     auto code = make_shared<Code>();
     Parser(fin).gen_statements()->codegen(*code);
     auto origin = theCurrentContext;
@@ -76,25 +85,6 @@ void importall_handle()
         theCurrentContext->scope()->create_symbol(
             name_ptr.first, name_ptr.second);
     }
-    ++theCurrentContext->pc();
-}
-
-void use_handle()
-{
-    const auto name = OPRAND(string);
-    ifstream fin{name + ".ice"};
-    if (!fin.good())
-    {
-        throw runtime_error("no module named " + name);
-    }
-    auto code = make_shared<Code>();
-    Parser(fin).gen_statements()->codegen(*code);
-    auto origin = theCurrentContext;
-    theCurrentContext = make_shared<Context>(code);
-    Context::execute();
-    *origin->scope()->create_symbol(name)
-        = make_shared<ModuleObject>(theCurrentContext->scope());
-    theCurrentContext = origin;
     ++theCurrentContext->pc();
 }
 
