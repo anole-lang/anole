@@ -345,11 +345,62 @@ Ptr<Stmt> Parser::gen_class_decl()
 
 Ptr<Stmt> Parser::gen_use_stmt()
 {
+    vector<pair<string, string>> names;
+    string from;
+
     get_next_token();
-    check<TokenId::Identifier>("missing an identifier after 'use'");
-    auto use_stmt = make_shared<UseStmt>(current_token_.value);
+    if (current_token_.token_id == TokenId::Mul)
+    {
+        get_next_token();
+        eat<TokenId::From>("need from ident here");
+        check<TokenId::Identifier>("need identifier after from");
+        from = current_token_.value;
+        get_next_token();
+        return make_shared<UseStmt>(names, move(from));
+    }
+    check<TokenId::Identifier>("need identifier here");
+    auto name = current_token_.value;
     get_next_token();
-    return use_stmt;
+    if (current_token_.token_id == TokenId::As)
+    {
+        get_next_token();
+        check<TokenId::Identifier>("need the alias here");
+        names.push_back({name, current_token_.value});
+        get_next_token();
+    }
+    else
+    {
+        names.push_back({name, name});
+    }
+
+    while (current_token_.token_id == TokenId::Comma)
+    {
+        get_next_token();
+        check<TokenId::Identifier>("need identifier here");
+        auto name = current_token_.value;
+        get_next_token();
+        if (current_token_.token_id == TokenId::As)
+        {
+            get_next_token();
+            check<TokenId::Identifier>("need the alias here");
+            names.push_back({name, current_token_.value});
+            get_next_token();
+        }
+        else
+        {
+            names.push_back({name, name});
+        }
+    }
+
+    if (current_token_.token_id == TokenId::From)
+    {
+        get_next_token();
+        check<TokenId::Identifier>("need Module name here");
+        from = current_token_.value;
+        get_next_token();
+    }
+
+    return make_shared<UseStmt>(move(names), move(from));
 }
 
 Ptr<Stmt> Parser::gen_if_else()
