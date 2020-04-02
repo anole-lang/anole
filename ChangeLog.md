@@ -10,6 +10,7 @@
 ### Changed
 
 - Update `use ident` to `use (ident [as ident]) [, ident [as ident]]* [from (ident)]` or `use * from (ident)`
+- Use statement can import module from .so files
 
 ### Removed
 
