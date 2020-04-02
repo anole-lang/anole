@@ -352,7 +352,31 @@ void QuesExpr::codegen(Code &code)
 
 void UseStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::Use>(name);
+    if (from.empty())
+    {
+        for (auto &name_as : names)
+        {
+            code.add_ins<Opcode::Import>(name_as.first);
+            code.add_ins<Opcode::StoreLocal>(name_as.second);
+        }
+    }
+    else
+    {
+        if (names.empty())
+        {
+            code.add_ins<Opcode::ImportAll>(from);
+        }
+        else
+        {
+            code.add_ins<Opcode::Import>(from);
+            for (auto &name_as : names)
+            {
+                code.add_ins<Opcode::ImportPart>(name_as.first);
+                code.add_ins<Opcode::StoreLocal>(name_as.second);
+            }
+            code.add_ins<Opcode::Pop>();
+        }
+    }
 }
 
 // completed
