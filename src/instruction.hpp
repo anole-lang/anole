@@ -14,7 +14,9 @@ enum Opcode
 
     Pop,          // Pop
 
-    Use,          // Use name
+    Import,       // Import name
+    ImportPart,   // ImportPart name
+    ImportAll,    // ImportAll name
 
     Load,         // Load name
     LoadConst,    // LoadConst index
