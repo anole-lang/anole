@@ -30,6 +30,55 @@ void pop_handle()
     ++theCurrentContext->pc();
 }
 
+void import_handle()
+{
+    const auto name = OPRAND(string);
+    ifstream fin{name + ".ice"};
+    if (!fin.good())
+    {
+        throw runtime_error("no module named " + name);
+    }
+    auto code = make_shared<Code>();
+    Parser(fin).gen_statements()->codegen(*code);
+    auto origin = theCurrentContext;
+    theCurrentContext = make_shared<Context>(code);
+    Context::execute();
+    origin->push(make_shared<ModuleObject>(theCurrentContext->scope()));
+    theCurrentContext = origin;
+    ++theCurrentContext->pc();
+}
+
+void importpart_handle()
+{
+    const auto name = OPRAND(string);
+    theCurrentContext->push_straight(
+        theCurrentContext->top<ModuleObject>()->load_member(name));
+    ++theCurrentContext->pc();
+}
+
+void importall_handle()
+{
+    const auto name = OPRAND(string);
+    ifstream fin{name + ".ice"};
+    if (!fin.good())
+    {
+        throw runtime_error("no module named " + name);
+    }
+    auto code = make_shared<Code>();
+    Parser(fin).gen_statements()->codegen(*code);
+    auto origin = theCurrentContext;
+    theCurrentContext = make_shared<Context>(code);
+    Context::execute();
+    auto scope = theCurrentContext->scope();
+    theCurrentContext = origin;
+    for (const auto &name_ptr : scope->symbols())
+    {
+        theCurrentContext->scope()->create_symbol(
+            name_ptr.first, name_ptr.second);
+    }
+    ++theCurrentContext->pc();
+}
+
 void use_handle()
 {
     const auto name = OPRAND(string);
@@ -414,7 +463,9 @@ constexpr OpHandle theOpHandles[] =
 
     &op_handles::pop_handle,
 
-    &op_handles::use_handle,
+    &op_handles::import_handle,
+    &op_handles::importpart_handle,
+    &op_handles::importall_handle,
 
     &op_handles::load_handle,
     &op_handles::loadconst_handle,
