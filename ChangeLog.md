@@ -1,5 +1,20 @@
 # ChangeLog for Ice
 
+## Unreleased
+
+### Added
+
+- Keyword `from` to use in `use` stmt
+- Instruction `Import`, `ImportPart` and `ImportAll` to support use statement
+
+### Changed
+
+- Update `use ident` to `use (ident [as ident]) [, ident [as ident]]* [from (ident)]` or `use * from (ident)`
+
+### Removed
+
+- Instruction `Use`
+
 ## 0.0.1 - 2020/04/01
 
 ### Added
