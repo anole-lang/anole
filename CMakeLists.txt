@@ -65,8 +65,17 @@ ELSE()
             objects
             context
             repl
+            dl
     )
 
     set_target_properties(ice PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
     install (TARGETS ice DESTINATION bin)
+
+    file(GLOB HEADERS "src/*.hpp")
+
+    install (
+        FILES
+        ${HEADERS}
+        DESTINATION "../include/ice-lang"
+    )
 ENDIF()
