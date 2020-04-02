@@ -19,7 +19,7 @@
 ~/build> sudo make install
 ```
 
-If you want to remove ice, you can execute `cat install_manifest.txt | sudo xargs rm` in build/
+If you want to remove ice, you can execute `cat install_manifest.txt | sudo xargs rm` in `build/`
 
 ### Usage
 
