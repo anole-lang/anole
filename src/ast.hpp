@@ -202,9 +202,11 @@ struct QuesExpr : Expr
 
 struct UseStmt : Stmt
 {
-    std::string name;
-    UseStmt(std::string name)
-      : name(std::move(name)) {}
+    std::vector<std::pair<std::string, std::string>> names;
+    std::string from;
+    UseStmt(std::vector<std::pair<std::string, std::string>> names,
+        std::string from)
+      : names(std::move(names)), from(std::move(from)) {}
     void codegen(Code &) override;
 };
 
