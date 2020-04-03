@@ -1,5 +1,7 @@
 #include <dlfcn.h>
-#include <iostream>
+#include <fstream>
+#include "parser.hpp"
+#include "context.hpp"
 #include "moduleobject.hpp"
 #include "builtinfuncobject.hpp"
 
@@ -8,6 +10,25 @@ using namespace std;
 namespace ice_language
 {
 ModuleObject::~ModuleObject() = default;
+
+IceModuleObject::IceModuleObject(const string &name)
+{
+    ifstream fin{name + ".ice"};
+    if (fin.good())
+    {
+        auto code = make_shared<Code>();
+        Parser(fin).gen_statements()->codegen(*code);
+        auto origin = theCurrentContext;
+        theCurrentContext = make_shared<Context>(code);
+        Context::execute();
+        scope_ = theCurrentContext->scope();
+        theCurrentContext = origin;
+    }
+    else
+    {
+        good_ = false;
+    }
+}
 
 Ptr<ObjectPtr> IceModuleObject::load_member(const string &name)
 {
@@ -18,8 +39,9 @@ Ptr<ObjectPtr> IceModuleObject::load_member(const string &name)
     return Object::load_member(name);
 }
 
-CppModuleObject::CppModuleObject(const string &path)
+CppModuleObject::CppModuleObject(const string &name)
 {
+    auto path = "./" + name + ".so";
     handle_ = dlopen(path.c_str(), RTLD_NOW);
     good_ = handle_;
     names_ = good_
