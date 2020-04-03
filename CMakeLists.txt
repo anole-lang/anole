@@ -51,10 +51,10 @@ ELSE()
             objects
             context
             repl
-        DESTINATION lib
+        DESTINATION "lib/ice-lang"
     )
 
-    link_directories(${CMAKE_INSTALL_PREFIX}/lib)
+    link_directories(${CMAKE_INSTALL_PREFIX}/lib/ice-lang)
 
     add_executable(ice src/main.cpp)
     target_link_libraries(ice
@@ -76,6 +76,6 @@ ELSE()
     install (
         FILES
         ${HEADERS}
-        DESTINATION "../include/ice-lang"
+        DESTINATION "include/ice-lang"
     )
 ENDIF()
