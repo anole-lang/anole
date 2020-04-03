@@ -3,7 +3,6 @@
 #endif
 #include <set>
 #include <fstream>
-#include "parser.hpp"
 #include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -33,25 +32,19 @@ void pop_handle()
 void import_handle()
 {
     const auto name = OPRAND(string);
-    ifstream fin{name + ".ice"};
-    if (fin.good())
+    Ptr<ModuleObject> mod = make_shared<IceModuleObject>(name);
+    if (!mod->good())
     {
-        auto code = make_shared<Code>();
-        Parser(fin).gen_statements()->codegen(*code);
-        auto origin = theCurrentContext;
-        theCurrentContext = make_shared<Context>(code);
-        Context::execute();
-        origin->push(make_shared<IceModuleObject>(theCurrentContext->scope()));
-        theCurrentContext = origin;
+        mod = make_shared<CppModuleObject>(name);
+    }
+
+    if (mod->good())
+    {
+        theCurrentContext->push(mod);
     }
     else
     {
-        auto mod = make_shared<CppModuleObject>("./" + name + ".so");
-        if (!mod->good())
-        {
-            throw runtime_error("no module named " + name);
-        }
-        theCurrentContext->push(mod);
+        throw runtime_error("no module named " + name);
     }
     ++theCurrentContext->pc();
 }
@@ -60,24 +53,17 @@ void importpart_handle()
 {
     const auto name = OPRAND(string);
     theCurrentContext->push_straight(
-        theCurrentContext->top<IceModuleObject>()->load_member(name));
+        theCurrentContext->top<ModuleObject>()->load_member(name));
     ++theCurrentContext->pc();
 }
 
 void importall_handle()
 {
     const auto name = OPRAND(string);
-    ifstream fin{name + ".ice"};
-    if (fin.good())
+    auto ice_mod = make_shared<IceModuleObject>(name);
+    if (ice_mod->good())
     {
-        auto code = make_shared<Code>();
-        Parser(fin).gen_statements()->codegen(*code);
-        auto origin = theCurrentContext;
-        theCurrentContext = make_shared<Context>(code);
-        Context::execute();
-        auto scope = theCurrentContext->scope();
-        theCurrentContext = origin;
-        for (const auto &name_ptr : scope->symbols())
+        for (const auto &name_ptr : ice_mod->scope()->symbols())
         {
             theCurrentContext->scope()->create_symbol(
                 name_ptr.first, name_ptr.second);
@@ -85,12 +71,12 @@ void importall_handle()
     }
     else
     {
-        auto mod = make_shared<CppModuleObject>("./" + name + ".so");
-        if (!mod->good())
+        auto cpp_mod = make_shared<CppModuleObject>(name);
+        if (!cpp_mod->good())
         {
             throw runtime_error("no module named " + name);
         }
-        auto names = mod->names();
+        auto names = cpp_mod->names();
         if (!names)
         {
             throw runtime_error("no defined _FUNCTIONS in C++ source");
@@ -98,7 +84,7 @@ void importall_handle()
         for (const auto &name : *names)
         {
             theCurrentContext->scope()->create_symbol(
-                name, mod->load_member(name));
+                name, cpp_mod->load_member(name));
         }
     }
     ++theCurrentContext->pc();
