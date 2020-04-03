@@ -24,7 +24,9 @@ class IceModuleObject : public ModuleObject
     Ptr<Scope> scope_;
 };
 
-class CppModuleObject : public ModuleObject
+class CppModuleObject
+  : public ModuleObject,
+    public std::enable_shared_from_this<CppModuleObject>
 {
   public:
     CppModuleObject(const std::string &path);
@@ -36,8 +38,14 @@ class CppModuleObject : public ModuleObject
         return good_;
     }
 
+    const std::vector<std::string> *names()
+    {
+        return names_;
+    }
+
   private:
     bool good_;
     void *handle_;
+    std::vector<std::string> *names_;
 };
 }

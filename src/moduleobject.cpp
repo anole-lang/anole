@@ -1,4 +1,5 @@
 #include <dlfcn.h>
+#include <iostream>
 #include "moduleobject.hpp"
 #include "builtinfuncobject.hpp"
 
@@ -20,12 +21,18 @@ Ptr<ObjectPtr> IceModuleObject::load_member(const string &name)
 CppModuleObject::CppModuleObject(const string &path)
 {
     handle_ = dlopen(path.c_str(), RTLD_NOW);
-    good_ = (handle_ != NULL);
+    good_ = handle_;
+    names_ = good_
+        ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
+        : nullptr;
 }
 
 CppModuleObject::~CppModuleObject()
 {
-    dlclose(handle_);
+    if (good_)
+    {
+        dlclose(handle_);
+    }
 }
 
 Ptr<ObjectPtr> CppModuleObject::load_member(const string &name)
@@ -36,7 +43,8 @@ Ptr<ObjectPtr> CppModuleObject::load_member(const string &name)
     {
         throw runtime_error(dlerror());
     }
-    auto result = make_shared<BuiltInFunctionObject>(func);
+    auto result = make_shared<BuiltInFunctionObject>(
+        [mod = shared_from_this(), func] { func(); });
     return make_shared<ObjectPtr>(result);
 }
 }
