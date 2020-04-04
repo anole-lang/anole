@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+Nothing now
+
+## 0.0.2 - 2020/04/04
+
 ### Added
 
 - Keyword `from` to use in `use` stmt
