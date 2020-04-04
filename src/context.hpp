@@ -5,6 +5,7 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
+#include <filesystem>
 #include "helper.hpp"
 #include "code.hpp"
 #include "scope.hpp"
@@ -23,25 +24,29 @@ class Context : public std::enable_shared_from_this<Context>
       : pre_context_(resume->pre_context_),
         scope_(std::make_shared<Scope>(resume->scope_)),
         code_(resume->code_), pc_(resume->pc_),
-        stack_(std::make_shared<StackType>(*resume->stack_)) {}
+        stack_(std::make_shared<StackType>(*resume->stack_)),
+        current_path_(resume->current_path_) {}
 
     // copy ctor
     Context(const Context &context)
       : pre_context_(context.pre_context_),
         scope_(context.scope_),
         code_(context.code_), pc_(context.pc_),
-        stack_(std::make_shared<StackType>(*context.stack_)) {}
+        stack_(std::make_shared<StackType>(*context.stack_)),
+        current_path_(context.current_path_) {}
 
-    Context(Ptr<Code> code)
+    Context(Ptr<Code> code, std::filesystem::path path = std::filesystem::current_path())
       : pre_context_(nullptr),
         scope_(std::make_shared<Scope>(nullptr)),
         code_(code), pc_(0),
-        stack_(std::make_shared<StackType>()) {}
+        stack_(std::make_shared<StackType>()),
+        current_path_(std::move(path)) {}
 
     Context(Ptr<Context> pre, Ptr<Scope> scope,
         Ptr<Code> code, std::size_t pc = 0)
       : pre_context_(pre), scope_(std::make_shared<Scope>(scope)),
-        code_(code), pc_(pc), stack_(pre->stack_) {}
+        code_(code), pc_(pc), stack_(pre->stack_),
+        current_path_(pre->current_path_) {}
 
     static void execute();
 
@@ -134,12 +139,18 @@ class Context : public std::enable_shared_from_this<Context>
         return stack_->size();
     }
 
+    std::filesystem::path &current_path()
+    {
+        return current_path_;
+    }
+
   private:
     Ptr<Context> pre_context_;
     Ptr<Scope> scope_;
     Ptr<Code> code_;
     std::size_t pc_;
     Ptr<StackType> stack_;
+    std::filesystem::path current_path_;
 };
 
 inline Ptr<Context> theCurrentContext = nullptr;

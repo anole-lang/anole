@@ -32,20 +32,13 @@ void pop_handle()
 void import_handle()
 {
     const auto name = OPRAND(string);
-    Ptr<ModuleObject> mod = make_shared<IceModuleObject>(name);
+    auto mod = ModuleObject::generate(name);
     if (!mod->good())
-    {
-        mod = make_shared<CppModuleObject>(name);
-    }
-
-    if (mod->good())
-    {
-        theCurrentContext->push(mod);
-    }
-    else
     {
         throw runtime_error("no module named " + name);
     }
+
+    theCurrentContext->push(mod);
     ++theCurrentContext->pc();
 }
 
@@ -60,6 +53,7 @@ void importpart_handle()
 void importall_handle()
 {
     const auto name = OPRAND(string);
+
     auto ice_mod = make_shared<IceModuleObject>(name);
     if (ice_mod->good())
     {
@@ -68,24 +62,24 @@ void importall_handle()
             theCurrentContext->scope()->create_symbol(
                 name_ptr.first, name_ptr.second);
         }
+        ++theCurrentContext->pc();
+        return;
     }
-    else
+
+    auto cpp_mod = make_shared<CppModuleObject>(name);
+    if (!cpp_mod->good())
     {
-        auto cpp_mod = make_shared<CppModuleObject>(name);
-        if (!cpp_mod->good())
-        {
-            throw runtime_error("no module named " + name);
-        }
-        auto names = cpp_mod->names();
-        if (!names)
-        {
-            throw runtime_error("no defined _FUNCTIONS in C++ source");
-        }
-        for (const auto &name : *names)
-        {
-            theCurrentContext->scope()->create_symbol(
-                name, cpp_mod->load_member(name));
-        }
+        throw runtime_error("no module named " + name);
+    }
+    auto names = cpp_mod->names();
+    if (!names)
+    {
+        throw runtime_error("no defined _FUNCTIONS in C++ source");
+    }
+    for (const auto &name : *names)
+    {
+        theCurrentContext->scope()->create_symbol(
+            name, cpp_mod->load_member(name));
     }
     ++theCurrentContext->pc();
 }
