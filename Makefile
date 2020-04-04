@@ -1,7 +1,7 @@
 ADD =
 
 CC = clang++
-FLAGS = -std=c++17 -stdlib=libstdc++ -ldl ${ADD}
+FLAGS = -std=c++17 -stdlib=libstdc++ -ldl -lstdc++fs ${ADD}
 
 DIR_TMP = tmp
 
