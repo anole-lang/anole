@@ -53,7 +53,6 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error, such as traceback like python
 + [ ] Support load moudles from .so files
-+ [ ] Complete use statement and try to design a package system
 + [ ] Support type convertion
 + [ ] Support threads and processes
 + [ ] Complete all codegens
