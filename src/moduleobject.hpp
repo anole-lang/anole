@@ -17,6 +17,8 @@ class ModuleObject : public Object
         return good_;
     }
 
+    static Ptr<ModuleObject> generate(const std::string &name);
+
   protected:
     bool good_;
 };
@@ -35,6 +37,8 @@ class IceModuleObject : public ModuleObject
     }
 
   private:
+    void init(const std::filesystem::path &path);
+
     Ptr<Scope> scope_;
 };
 

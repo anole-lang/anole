@@ -6,23 +6,41 @@
 #include "builtinfuncobject.hpp"
 
 using namespace std;
+using namespace filesystem;
 
 namespace ice_language
 {
 ModuleObject::~ModuleObject() = default;
 
+Ptr<ModuleObject> ModuleObject::generate(const string &name)
+{
+    Ptr<ModuleObject> mod = make_shared<IceModuleObject>(name);
+    if (!mod->good())
+    {
+        mod = make_shared<CppModuleObject>(name);
+    }
+
+    return mod;
+}
+
 IceModuleObject::IceModuleObject(const string &name)
 {
-    ifstream fin{name + ".ice"};
-    if (fin.good())
+    good_ = true;
+    if (is_directory(theCurrentContext->current_path() / name))
     {
-        auto code = make_shared<Code>();
-        Parser(fin).gen_statements()->codegen(*code);
-        auto origin = theCurrentContext;
-        theCurrentContext = make_shared<Context>(code);
-        Context::execute();
-        scope_ = theCurrentContext->scope();
-        theCurrentContext = origin;
+        init(theCurrentContext->current_path() / name / "__init__.ice");
+    }
+    else if (is_regular_file(theCurrentContext->current_path() / (name + ".ice")))
+    {
+        init(theCurrentContext->current_path() / (name + ".ice"));
+    }
+    else if (is_directory(filesystem::path("/usr/local/lib/ice-lang") / name))
+    {
+        init(filesystem::path("/usr/local/lib/ice-lang") / name);
+    }
+    else if (is_regular_file(filesystem::path("/usr/local/lib/ice-lang") / name / "__init__.ice"))
+    {
+        init(filesystem::path("/usr/local/lib/ice-lang") / name / "__init__.ice");
     }
     else
     {
@@ -39,10 +57,32 @@ Ptr<ObjectPtr> IceModuleObject::load_member(const string &name)
     return Object::load_member(name);
 }
 
+void IceModuleObject::init(const filesystem::path &path)
+{
+    auto dir = path.parent_path();
+    ifstream fin{path};
+    if (!fin.good())
+    {
+        throw runtime_error("cannot open file " + path.string());
+    }
+    auto code = make_shared<Code>();
+    Parser(fin).gen_statements()->codegen(*code);
+    auto origin = theCurrentContext;
+    theCurrentContext = make_shared<Context>(code, dir);
+    Context::execute();
+    scope_ = theCurrentContext->scope();
+    theCurrentContext = origin;
+}
+
 CppModuleObject::CppModuleObject(const string &name)
 {
-    auto path = "./" + name + ".so";
+    auto path = theCurrentContext->current_path() / (name + ".so");
     handle_ = dlopen(path.c_str(), RTLD_NOW);
+    if (!handle_)
+    {
+        auto path = "/usr/local/lib/ice-lang/" + name + ".so";
+        handle_ = dlopen(path.c_str(), RTLD_NOW);
+    }
     good_ = handle_;
     names_ = good_
         ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
