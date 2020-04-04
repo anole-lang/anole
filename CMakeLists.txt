@@ -66,6 +66,7 @@ ELSE()
             context
             repl
             dl
+            stdc++fs
     )
 
     set_target_properties(ice PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
