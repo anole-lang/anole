@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: apt-get install readline
-        run: sudo apt-get install readline
+        run: sudo apt-get install libreadline6-dev
       - name: make and make test
         run: |
           make
