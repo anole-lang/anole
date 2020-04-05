@@ -11,6 +11,9 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v1
+      - name: apt-get install readline
+        run: |
+          apt-get install readline
       - name: make and make test
         run: |
           make
