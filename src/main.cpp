@@ -1,5 +1,8 @@
 #include <fstream>
+#include "code.hpp"
 #include "repl.hpp"
+#include "parser.hpp"
+#include "context.hpp"
 #include "argparse.hpp"
 
 using namespace std;
