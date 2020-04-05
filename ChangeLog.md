@@ -10,6 +10,10 @@
 
 - Console will wait for new input after inputing `Ctrl ^ C`
 
+### Fixed
+
+- Exit rather than infinite loop when receiving `Ctrl ^ D`
+
 ## 0.0.2 - 2020/04/04
 
 ### Added
