@@ -49,10 +49,8 @@ See [ChangeLog.md](ChangeLog.md)
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
-+ [ ] Hook the keyboard events, provides history in REPL mode
 + [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error, such as traceback like python
-+ [ ] Support load moudles from .so files
 + [ ] Support type convertion
 + [ ] Support threads and processes
 + [ ] Complete all codegens
