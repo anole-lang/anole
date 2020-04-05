@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-Nothing now
+### Added
+
+- Support history at REPL mode
+
+### Changed
+
+- Console will wait for new input after inputing `Ctrl ^ C`
 
 ## 0.0.2 - 2020/04/04
 
