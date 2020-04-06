@@ -50,6 +50,14 @@ class Context : public std::enable_shared_from_this<Context>
 
     static void execute();
 
+    static void
+    add_not_defined_symbol(const std::string &name,
+        Ptr<ObjectPtr> ptr);
+    static void
+    rm_not_defined_symbol(Ptr<ObjectPtr> ptr);
+    static const std::string
+    &get_not_defined_symbol(Ptr<ObjectPtr> ptr);
+
     Ptr<Context> pre_context()
     {
         return pre_context_;
@@ -104,7 +112,9 @@ class Context : public std::enable_shared_from_this<Context>
     {
         if (*stack_->top() == nullptr)
         {
-            throw std::runtime_error("no such var");
+            throw std::runtime_error(
+                "no such var named " +
+                get_not_defined_symbol(stack_->top()));
         }
         return std::reinterpret_pointer_cast<R>(*stack_->top());
     }
