@@ -5,6 +5,7 @@
 ### Added
 
 - Support history at REPL mode
+- Prompt undefined symbol with its name
 
 ### Changed
 
