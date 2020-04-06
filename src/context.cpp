@@ -21,6 +21,29 @@ using namespace std;
 
 namespace ice_language
 {
+static map<Ptr<ObjectPtr>, string> not_defineds;
+
+void Context::add_not_defined_symbol(
+    const string &name, Ptr<ObjectPtr> ptr)
+{
+    not_defineds[ptr] = name;
+}
+
+void Context::rm_not_defined_symbol(
+    Ptr<ObjectPtr> ptr)
+{
+    if (not_defineds.count(ptr))
+    {
+        not_defineds.erase(ptr);
+    }
+}
+
+const string &Context::get_not_defined_symbol(
+    Ptr<ObjectPtr> ptr)
+{
+    return not_defineds[ptr];
+}
+
 namespace op_handles
 {
 void pop_handle()
@@ -89,11 +112,6 @@ void load_handle()
     auto name = OPRAND(string);
     auto obj = theCurrentContext->scope()->load_symbol(name);
 
-    if (!obj)
-    {
-        obj = theCurrentContext->scope()->create_symbol(name);
-    }
-
     if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
     {
         theCurrentContext = make_shared<Context>(
@@ -101,6 +119,10 @@ void load_handle()
     }
     else
     {
+        if (!*obj)
+        {
+            Context::add_not_defined_symbol(name, obj);
+        }
         theCurrentContext->push_straight(obj);
     }
     ++theCurrentContext->pc();
@@ -124,6 +146,7 @@ void store_handle()
     auto p = theCurrentContext->pop_straight();
     *p = theCurrentContext->pop();
     theCurrentContext->push_straight(p);
+    Context::rm_not_defined_symbol(p);
     ++theCurrentContext->pc();
 }
 
