@@ -22,6 +22,8 @@ class BuiltInFunctionObject : public Object
     BuiltInFunctionObject(std::function<void()> func)
       : func_(std::move(func)) {}
 
+    std::string to_str() override;
+
     static ObjectPtr load_built_in_function(const std::string &);
     static void register_built_in_function(const std::string &,
         std::function<void()>);

@@ -7,6 +7,11 @@ using namespace std;
 
 namespace ice_language
 {
+string BuiltInFunctionObject::to_str()
+{
+    return "<builtin-function>"s;
+}
+
 static map<string, Ptr<BuiltInFunctionObject>> &get_built_in_functions()
 {
     static map<string, Ptr<BuiltInFunctionObject>> built_in_functions;
