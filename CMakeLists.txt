@@ -80,4 +80,20 @@ ELSE()
         ${HEADERS}
         DESTINATION "include/ice-lang"
     )
+
+    add_library(fileobject SHARED
+        lib/file/fileobject.cpp
+    )
+
+    install (
+        FILES
+        "lib/file/__init__.ice"
+        DESTINATION "lib/ice-lang/file"
+    )
+
+    install (
+        TARGETS
+            fileobject
+        DESTINATION "lib/ice-lang/file"
+    )
 ENDIF()
