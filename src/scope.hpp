@@ -37,7 +37,7 @@ class Scope
     Ptr<ObjectPtr> load_symbol(const std::string &name)
     {
         auto ptr = find_symbol(name);
-        auto res =  ptr ? ptr : load_builtin(name);
+        auto res = ptr ? ptr : load_builtin(name);
         return res ? res : create_symbol(name);
     }
 
