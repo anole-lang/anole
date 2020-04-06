@@ -1,3 +1,4 @@
+#include "context.hpp"
 #include "funcobject.hpp"
 #include "boolobject.hpp"
 
@@ -22,6 +23,11 @@ ObjectPtr FunctionObject::cne(ObjectPtr obj)
 
 Ptr<ObjectPtr> FunctionObject::load_member(const string &name)
 {
-    return scope_->load_symbol(name);
+    auto ptr = scope_->load_symbol(name);
+    if (!*ptr)
+    {
+        Context::add_not_defined_symbol(name, ptr);
+    }
+    return ptr;
 }
 }
