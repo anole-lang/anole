@@ -49,7 +49,6 @@ See [ChangeLog.md](ChangeLog.md)
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
-+ [ ] Prompt undefined symbol with the symbol's name
 + [ ] Useful error info when meeting runtime error, such as traceback like python
 + [ ] Support type convertion
 + [ ] Support threads and processes
