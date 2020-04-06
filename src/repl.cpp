@@ -42,7 +42,7 @@ void replrun::run()
 {
     signal(SIGINT, handle_sigint);
     rl_bind_key('\t', rl_insert);
-    read_history(NULL);
+    // read_history(NULL);
 
     cout <<
 "    _____________________\n"
@@ -65,7 +65,7 @@ void replrun::run()
         if (!line.empty())
         {
             add_history(line.c_str());
-            write_history(line.c_str());
+            // write_history(line.c_str());
         }
         ss.clear();
         ss.str(line += '\n');
@@ -79,7 +79,7 @@ void replrun::run()
             line = read_line(">> ");
         } while (line.empty());
         add_history(line.c_str());
-        write_history(line.c_str());
+        // write_history(line.c_str());
         ss.clear();
         ss.str(line + '\n');
         parser.reset();
