@@ -15,6 +15,7 @@
 ### Fixed
 
 - Exit rather than infinite loop when receiving `Ctrl ^ D`
+- Fix bug in modules finding
 
 ## 0.0.2 - 2020/04/04
 

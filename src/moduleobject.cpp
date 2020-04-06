@@ -36,11 +36,11 @@ IceModuleObject::IceModuleObject(const string &name)
     }
     else if (is_directory(filesystem::path("/usr/local/lib/ice-lang") / name))
     {
-        init(filesystem::path("/usr/local/lib/ice-lang") / name);
-    }
-    else if (is_regular_file(filesystem::path("/usr/local/lib/ice-lang") / name / "__init__.ice"))
-    {
         init(filesystem::path("/usr/local/lib/ice-lang") / name / "__init__.ice");
+    }
+    else if (is_regular_file(filesystem::path("/usr/local/lib/ice-lang") / (name + ".ice")))
+    {
+        init(filesystem::path("/usr/local/lib/ice-lang") / (name + ".ice"));
     }
     else
     {
