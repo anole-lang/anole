@@ -2,6 +2,7 @@
 #include "fileobject.hpp"
 #include "../../src/context.hpp"
 #include "../../src/stringobject.hpp"
+#include "../../src/integerobject.hpp"
 
 using namespace std;
 using namespace ice_language;
@@ -9,9 +10,9 @@ using namespace ice_language;
 void _open()
 {
     auto path = theCurrentContext->pop<StringObject>();
-    auto mode = theCurrentContext->pop<StringObject>();
+    auto mode = theCurrentContext->pop<IntegerObject>();
 
-    theCurrentContext->push(make_shared<FileObject>(path->to_str(), mode->to_str()));
+    theCurrentContext->push(make_shared<FileObject>(path->to_str(), mode->value()));
 }
 
 static map<string, function<void(FileObject *)>>
@@ -51,16 +52,37 @@ built_in_methods_for_file
     }
 };
 
-FileObject::FileObject(const string &path, const string &mode)
+FileObject::FileObject(const string &path, int64_t mode)
 {
-    if (mode == "r")
+    static ios_base::openmode mapping[6]
     {
-        file_.open(path, ios_base::in);
-    }
-    else
+        ios_base::app,
+        ios_base::binary,
+        ios_base::in,
+        ios_base::out,
+        ios_base::trunc,
+        ios_base::ate
+    };
+
+    ios_base::openmode mod;
+    bool assigned = false;
+    for (int i = 0; i < 6; ++i)
     {
-        file_.open(path, ios_base::out);
+        if ((mode & (1 << i)))
+        {
+            if (assigned)
+            {
+                mod |= mapping[i];
+            }
+            else
+            {
+                mod = mapping[i];
+                assigned = true;
+            }
+        }
     }
+
+    file_.open(path, mod);
 }
 
 Ptr<ObjectPtr> FileObject::load_member(const string &name)
