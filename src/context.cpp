@@ -7,6 +7,7 @@
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "listobject.hpp"
+#include "enumobject.hpp"
 #include "dictobject.hpp"
 #include "funcobject.hpp"
 #include "contobject.hpp"
@@ -484,6 +485,13 @@ void index_handle()
     ++theCurrentContext->pc();
 }
 
+void buildenum_handle()
+{
+    theCurrentContext->push(make_shared<EnumObject>(theCurrentContext->scope()));
+    theCurrentContext->scope() = theCurrentContext->scope()->pre();
+    ++theCurrentContext->pc();
+}
+
 void buildlist_handle()
 {
     auto list = make_shared<ListObject>();
@@ -564,6 +572,7 @@ constexpr OpHandle theOpHandles[] =
 
     &op_handles::index_handle,
 
+    &op_handles::buildenum_handle,
     &op_handles::buildlist_handle,
     &op_handles::builddict_handle,
 };
