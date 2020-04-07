@@ -4,7 +4,8 @@
 
 ### Added
 
-- methods tellg/tellp, seekg/seekp, good and eof for fileobject
+- Methods tellg/tellp, seekg/seekp, good and eof for fileobject
+- Support enum { \[ident \[: integer\]\]* }
 
 ### Changed
 
