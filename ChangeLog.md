@@ -7,6 +7,7 @@
 - Support history at REPL mode
 - Prompt undefined symbol with its name
 - Directory `lib/` for standard libraries
+- Add standard library `file`
 
 ### Changed
 
