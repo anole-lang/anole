@@ -23,6 +23,12 @@ class IntegerObject : public Object
     ObjectPtr cne(ObjectPtr) override;
     ObjectPtr clt(ObjectPtr) override;
     ObjectPtr cle(ObjectPtr) override;
+    ObjectPtr bneg() override;
+    ObjectPtr bor(ObjectPtr) override;
+    ObjectPtr bxor(ObjectPtr) override;
+    ObjectPtr band(ObjectPtr) override;
+    ObjectPtr bls(ObjectPtr) override;
+    ObjectPtr brs(ObjectPtr) override;
 
     int64_t value() const { return value_; }
 
