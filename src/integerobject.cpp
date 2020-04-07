@@ -132,4 +132,69 @@ ObjectPtr IntegerObject::cle(ObjectPtr obj)
         throw runtime_error("no match method");
     }
 }
+
+ObjectPtr IntegerObject::bneg()
+{
+    return make_shared<IntegerObject>(~value_);
+}
+
+ObjectPtr IntegerObject::bor(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return make_shared<IntegerObject>(value_ | p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
+ObjectPtr IntegerObject::bxor(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return make_shared<IntegerObject>(value_ ^ p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
+ObjectPtr IntegerObject::band(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return make_shared<IntegerObject>(value_ & p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
+ObjectPtr IntegerObject::bls(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return make_shared<IntegerObject>(value_ << p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
+
+ObjectPtr IntegerObject::brs(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(obj))
+    {
+        return make_shared<IntegerObject>(value_ >> p->value_);
+    }
+    else
+    {
+        throw runtime_error("no match method");
+    }
+}
 }
