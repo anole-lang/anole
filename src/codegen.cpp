@@ -290,10 +290,16 @@ void DotExpr::codegen(Code &code)
     code.add_ins<Opcode::LoadMember>(id->name);
 }
 
-// [AFTER] [CLASS]
+// completed
 void EnumExpr::codegen(Code &code)
 {
-
+    code.add_ins<Opcode::ScopeBegin>();
+    for (auto &decl : decls)
+    {
+        decl->expr->codegen(code);
+        code.add_ins<Opcode::StoreLocal>(decl->id->name);
+    }
+    code.add_ins<Opcode::BuildEnum>();
 }
 
 // completed
