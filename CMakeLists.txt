@@ -96,4 +96,10 @@ ELSE()
             fileobject
         DESTINATION "lib/ice-lang/file"
     )
+
+    install (
+        FILES
+        "lib/coroutine/__init__.ice"
+        DESTINATION "lib/ice-lang/coroutine"
+    )
 ENDIF()
