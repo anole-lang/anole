@@ -6,6 +6,10 @@
 
 - methods tellg/tellp, seekg/seekp, good and eof for fileobject
 
+### Changed
+
+- Coroutine as a library now rather than the example
+
 ## 0.0.3 - 2020/04/07
 
 ### Added
