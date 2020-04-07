@@ -146,7 +146,7 @@ struct DotExpr : Expr
 
 struct EnumExpr : Expr
 {
-    IdentList idents;
+    DeclList decls;
     EnumExpr() = default;
     void codegen(Code &) override;
 };
