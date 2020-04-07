@@ -28,19 +28,19 @@ IceModuleObject::IceModuleObject(const string &name)
     good_ = true;
     if (is_directory(theCurrentContext->current_path() / name))
     {
-        init(theCurrentContext->current_path() / name / "__init__.ice");
+        init(theCurrentContext->current_path() / name / "__init__.icec");
     }
-    else if (is_regular_file(theCurrentContext->current_path() / (name + ".ice")))
+    else if (is_regular_file(theCurrentContext->current_path() / (name + ".icec")))
     {
-        init(theCurrentContext->current_path() / (name + ".ice"));
+        init(theCurrentContext->current_path() / (name + ".icec"));
     }
     else if (is_directory(filesystem::path("/usr/local/lib/ice-lang") / name))
     {
-        init(filesystem::path("/usr/local/lib/ice-lang") / name / "__init__.ice");
+        init(filesystem::path("/usr/local/lib/ice-lang") / name / "__init__.icec");
     }
-    else if (is_regular_file(filesystem::path("/usr/local/lib/ice-lang") / (name + ".ice")))
+    else if (is_regular_file(filesystem::path("/usr/local/lib/ice-lang") / (name + ".icec")))
     {
-        init(filesystem::path("/usr/local/lib/ice-lang") / (name + ".ice"));
+        init(filesystem::path("/usr/local/lib/ice-lang") / (name + ".icec"));
     }
     else
     {

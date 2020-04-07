@@ -87,7 +87,7 @@ ELSE()
 
     install (
         FILES
-        "lib/file/__init__.ice"
+        "lib/file/__init__.icec"
         DESTINATION "lib/ice-lang/file"
     )
 
@@ -99,7 +99,7 @@ ELSE()
 
     install (
         FILES
-        "lib/coroutine/__init__.ice"
+        "lib/coroutine/__init__.icec"
         DESTINATION "lib/ice-lang/coroutine"
     )
 ENDIF()

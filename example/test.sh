@@ -1,5 +1,5 @@
 #!/bin/bash
-for file in `find ./*.ice`
+for file in `find ./*.icec`
 do
     ice $file
 done
