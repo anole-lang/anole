@@ -265,6 +265,7 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenId::String:
     case TokenId::LParen:
     case TokenId::New:
+    case TokenId::Enum:
     case TokenId::Match:
     case TokenId::LBracket:
     case TokenId::LBrace:
@@ -685,8 +686,11 @@ Ptr<Expr> Parser::gen_term()
     case TokenId::LBracket:
         return gen_list_expr();
 
+    case TokenId::Enum:
+        return gen_enum_expr();
+
     case TokenId::LBrace:
-        return gen_enum_or_dict();
+        return gen_dict_expr();
 
     default:
         throw_err("miss an expr behind here");
@@ -777,64 +781,46 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
     return make_shared<DotExpr>(left, gen_ident());
 }
 
-// generate enum as { NAME1, NAME2, ..., NAMEN }
-// or dict as {KEY1 => VAL1, KEY2 => VAL2, ..., KEYN => VALN}
-Ptr<Expr> Parser::gen_enum_or_dict()
+Ptr<Expr> Parser::gen_enum_expr()
 {
     get_next_token();
-
-    if (current_token_.token_id == TokenId::RBrace)
-    {
-        get_next_token();
-        return make_shared<DictExpr>();
-    }
-    auto node = gen_expr();
-    if (current_token_.token_id == TokenId::Ret)
-    {
-        node = gen_dict_expr(node);
-    }
-    else
-    {
-        node = gen_enum_expr(node);
-    }
-    eat<TokenId::RBrace>("missing '}' here");
-    return node;
-}
-
-Ptr<Expr> Parser::gen_enum_expr(Ptr<Expr> first)
-{
     auto enum_expr = make_shared<EnumExpr>();
-    enum_expr->idents.push_back(dynamic_pointer_cast<IdentifierExpr>(first));
-    if (current_token_.token_id == TokenId::RBrace)
+    eat<TokenId::LBrace>("missing { here");
+
+    int64_t base = 0;
+    while (current_token_.token_id != TokenId::RBrace)
     {
-        return enum_expr;
-    }
-    get_next_token();
-    while (current_token_.token_id == TokenId::Identifier)
-    {
-        enum_expr->idents.push_back(gen_ident());
+        auto ident = gen_ident();
+        if (current_token_.token_id == TokenId::Colon)
+        {
+            get_next_token();
+            check<TokenId::Integer>("only support integer here");
+            base = stoll(current_token_.value);
+            get_next_token();
+        }
+        enum_expr->decls.push_back(
+            make_shared<VariableDeclarationStmt>(ident,
+                make_shared<IntegerExpr>(base++)));
+
         if (current_token_.token_id == TokenId::Comma)
         {
             get_next_token();
-            check<TokenId::Identifier>("miss identifier here");
         }
         else
         {
-            check<TokenId::RBrace>("miss '}' here");
+            check<TokenId::RBrace>("miss '}'");
         }
     }
+    get_next_token();
+
     return enum_expr;
 }
 
-Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
+Ptr<Expr> Parser::gen_dict_expr()
 {
-    eat<TokenId::Ret>("missing symbol '=>'");
+    get_next_token();
     auto dict_expr = make_shared<DictExpr>();
 
-    dict_expr->keys.push_back(first);
-    dict_expr->values.push_back(gen_expr());
-
-    if (current_token_.token_id == TokenId::Comma) get_next_token();
     while (current_token_.token_id != TokenId::RBrace)
     {
         dict_expr->keys.push_back(gen_expr());
@@ -850,6 +836,7 @@ Ptr<Expr> Parser::gen_dict_expr(Ptr<Expr> first)
             check<TokenId::RBrace>("miss '}'");
         }
     }
+    get_next_token();
     return dict_expr;
 }
 

@@ -82,9 +82,8 @@ class Parser
     Ptr<Expr> gen_string();
     Ptr<Expr> gen_dot_expr(Ptr<Expr> left);
     Ptr<Expr> gen_index_expr(Ptr<Expr> expr);
-    Ptr<Expr> gen_enum_or_dict();
-    Ptr<Expr> gen_enum_expr(Ptr<Expr> first);
-    Ptr<Expr> gen_dict_expr(Ptr<Expr> first);
+    Ptr<Expr> gen_enum_expr();
+    Ptr<Expr> gen_dict_expr();
     Ptr<Expr> gen_lambda_expr();
     Ptr<Expr> gen_new_expr();
     Ptr<Expr> gen_match_expr();
