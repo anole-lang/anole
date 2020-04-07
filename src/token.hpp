@@ -30,6 +30,7 @@ enum class TokenId
     Delay,     // delay
 
     New,       // new
+    Enum,      // enum
 
     None,      // none
     True,      // true

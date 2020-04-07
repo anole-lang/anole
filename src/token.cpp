@@ -61,6 +61,7 @@ Token::Token(std::string value) : value(value)
     case "delay"_hash:      token_id = TokenId::Delay;    break;
 
     case "new"_hash:        token_id = TokenId::New;      break;
+    case "enum"_hash:       token_id = TokenId::Enum;     break;
 
     case "none"_hash:       token_id = TokenId::None;     break;
     case "true"_hash:       token_id = TokenId::True;     break;
