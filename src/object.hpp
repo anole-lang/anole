@@ -24,6 +24,12 @@ class Object
     virtual ObjectPtr cne(ObjectPtr);
     virtual ObjectPtr clt(ObjectPtr);
     virtual ObjectPtr cle(ObjectPtr);
+    virtual ObjectPtr bneg();
+    virtual ObjectPtr bor(ObjectPtr);
+    virtual ObjectPtr bxor(ObjectPtr);
+    virtual ObjectPtr band(ObjectPtr);
+    virtual ObjectPtr bls(ObjectPtr);
+    virtual ObjectPtr brs(ObjectPtr);
     virtual Ptr<ObjectPtr> index(ObjectPtr);
     virtual Ptr<ObjectPtr> load_member(const std::string &name);
 };

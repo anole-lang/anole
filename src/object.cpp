@@ -73,6 +73,36 @@ ObjectPtr Object::cle(ObjectPtr)
     throw runtime_error("no cle method");
 }
 
+ObjectPtr Object::bneg()
+{
+    throw runtime_error("no bneg method");
+}
+
+ObjectPtr Object::bor(ObjectPtr)
+{
+    throw runtime_error("no bor method");
+}
+
+ObjectPtr Object::bxor(ObjectPtr)
+{
+    throw runtime_error("no bxor method");
+}
+
+ObjectPtr Object::band(ObjectPtr)
+{
+    throw runtime_error("no band method");
+}
+
+ObjectPtr Object::bls(ObjectPtr)
+{
+    throw runtime_error("no bls method");
+}
+
+ObjectPtr Object::brs(ObjectPtr)
+{
+    throw runtime_error("no brs method");
+}
+
 Ptr<ObjectPtr> Object::index(ObjectPtr)
 {
     throw runtime_error("not support index");
