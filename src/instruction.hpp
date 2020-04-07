@@ -51,6 +51,13 @@ enum Opcode
     CLT,          // CLT
     CLE,          // CLE
 
+    BNeg,         // BNeg
+    BOr,          // BOr
+    BXor,         // BXor
+    BAnd,         // BAnd
+    BLS,          // BLS
+    BRS,          // BRS
+
     Index,        // Index
 
     BuildList,    // BuildList num
