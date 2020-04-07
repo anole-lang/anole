@@ -1,6 +1,7 @@
 #include <fstream>
 #include "fileobject.hpp"
 #include "../../src/context.hpp"
+#include "../../src/boolobject.hpp"
 #include "../../src/stringobject.hpp"
 #include "../../src/integerobject.hpp"
 
@@ -18,6 +19,16 @@ void _open()
 static map<string, function<void(FileObject *)>>
 built_in_methods_for_file
 {
+    {"good", [](FileObject *obj)
+        {
+            theCurrentContext->push(obj->file().good() ? theTrue : theFalse);
+        }
+    },
+    {"eof", [](FileObject *obj)
+        {
+            theCurrentContext->push(obj->file().eof() ? theTrue : theFalse);
+        }
+    },
     {"close", [](FileObject *obj)
         {
             obj->file().close();
@@ -48,6 +59,26 @@ built_in_methods_for_file
             const auto &str
                 = theCurrentContext->pop<StringObject>()->to_str();
             obj->file().write(str.c_str(), str.size());
+        }
+    },
+    {"tellg", [](FileObject *obj)
+        {
+            theCurrentContext->push(make_shared<IntegerObject>(obj->file().tellg()));
+        }
+    },
+    {"tellp", [](FileObject *obj)
+        {
+            theCurrentContext->push(make_shared<IntegerObject>(obj->file().tellp()));
+        }
+    },
+    {"seekg", [](FileObject *obj)
+        {
+            obj->file().seekg(theCurrentContext->pop<IntegerObject>()->value());
+        }
+    },
+    {"seekp", [](FileObject *obj)
+        {
+            obj->file().seekp(theCurrentContext->pop<IntegerObject>()->value());
         }
     }
 };
