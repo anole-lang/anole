@@ -93,18 +93,6 @@ TEST_CLASS(ParseTerm)
         cast<NewExpr>(listExpr->exprs[7]);
     TEST_END
 
-    TEST_METHOD(ParseEnumExpr)
-        istringstream ss(R"({ ONE } { ONE, TWO })");
-        Parser parser{ss};
-        auto enumExpr = cast<EnumExpr>(cast<ExprStmt>(parser.gen_statement())->expr);
-        ASSERT(enumExpr->idents.size() == 1);
-        ASSERT(enumExpr->idents[0]->name == "ONE");
-        enumExpr = cast<EnumExpr>(cast<ExprStmt>(parser.gen_statement())->expr);
-        ASSERT(enumExpr->idents.size() == 2);
-        ASSERT(enumExpr->idents[0]->name == "ONE");
-        ASSERT(enumExpr->idents[1]->name == "TWO");
-    TEST_END
-
     TEST_METHOD(ParseDictExpr)
         istringstream ss(R"({} {1 => 2} {3 => 4, 5 => 6})");
         Parser parser{ss};
