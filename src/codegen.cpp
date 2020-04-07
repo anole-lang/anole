@@ -104,6 +104,10 @@ void UnaryOperatorExpr::codegen(Code &code)
     }
         break;
 
+    case TokenId::BNeg:
+        code.add_ins<Opcode::BNeg>();
+        break;
+
     default:
         break;
     }
@@ -147,6 +151,36 @@ void BinaryOperatorExpr::codegen(Code &code)
         lhs->codegen(code);
         rhs->codegen(code);
         code.add_ins<Opcode::Mod>();
+        break;
+
+    case TokenId::BAnd:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Opcode::BAnd>();
+        break;
+
+    case TokenId::BOr:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Opcode::BOr>();
+        break;
+
+    case TokenId::BXor:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Opcode::BXor>();
+        break;
+
+    case TokenId::BLS:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Opcode::BLS>();
+        break;
+
+    case TokenId::BRS:
+        lhs->codegen(code);
+        rhs->codegen(code);
+        code.add_ins<Opcode::BRS>();
         break;
 
     case TokenId::And:
