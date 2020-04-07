@@ -60,6 +60,7 @@ enum Opcode
 
     Index,        // Index
 
+    BuildEnum,    // BuildEnum
     BuildList,    // BuildList num
     BuildDict,    // BuildDict num
 };
