@@ -8,6 +8,11 @@
 - Prompt undefined symbol with its name
 - Directory `lib/` for standard libraries
 - Add standard library `file`
+- Instructions to support binary operations now
+
+### Updated
+
+- Parser could parse binary operations now
 
 ### Changed
 
