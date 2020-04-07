@@ -430,6 +430,52 @@ void cle_handle()
     ++theCurrentContext->pc();
 }
 
+void bneg_handle()
+{
+    theCurrentContext->push(theCurrentContext->pop()->bneg());
+    ++theCurrentContext->pc();
+}
+
+void bor_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->bor(rhs));
+    ++theCurrentContext->pc();
+}
+
+void bxor_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->bxor(rhs));
+    ++theCurrentContext->pc();
+}
+
+void band_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->band(rhs));
+    ++theCurrentContext->pc();
+}
+
+void bls_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->bls(rhs));
+    ++theCurrentContext->pc();
+}
+
+void brs_handle()
+{
+    auto rhs = theCurrentContext->pop();
+    auto lhs = theCurrentContext->top();
+    theCurrentContext->set_top(lhs->brs(rhs));
+    ++theCurrentContext->pc();
+}
+
 void index_handle()
 {
     auto obj = theCurrentContext->pop();
@@ -508,6 +554,13 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::cne_handle,
     &op_handles::clt_handle,
     &op_handles::cle_handle,
+
+    &op_handles::bneg_handle,
+    &op_handles::bor_handle,
+    &op_handles::bxor_handle,
+    &op_handles::band_handle,
+    &op_handles::bls_handle,
+    &op_handles::brs_handle,
 
     &op_handles::index_handle,
 
