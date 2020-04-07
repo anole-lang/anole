@@ -10,6 +10,7 @@
 ### Changed
 
 - Coroutine as a library now rather than the example
+- Suffix from .ice to .icec
 
 ## 0.0.3 - 2020/04/07
 
