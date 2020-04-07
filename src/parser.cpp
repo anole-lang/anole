@@ -515,10 +515,15 @@ static const vector<set<TokenId>> &get_operators()
     {
         { TokenId::Or },
         { TokenId::And },
-        { TokenId::CEQ, TokenId::CNE, TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
+        { TokenId::BOr },
+        { TokenId::BXor },
+        { TokenId::BAnd },
+        { TokenId::CEQ, TokenId::CNE },
+        { TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
+        { TokenId::BLS, TokenId::BRS },
         { TokenId::Add, TokenId::Sub },
         { TokenId::Is,  TokenId::Mul, TokenId::Div, TokenId::Mod },
-        { TokenId::Not, TokenId::Sub }
+        { TokenId::Not, TokenId::Sub, TokenId::BNeg }
     };
     return operators;
 }
