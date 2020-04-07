@@ -30,6 +30,7 @@ tmp/objects.so: src/object.cpp \
 				src/noneobject.cpp \
 				src/boolobject.cpp \
 				src/listobject.cpp \
+				src/enumobject.cpp \
 				src/dictobject.cpp \
 				src/funcobject.cpp \
 				src/contobject.cpp \
