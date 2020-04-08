@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         }
 
         auto code = make_shared<Code>();
-        Parser(fin).gen_statements()->codegen(*code);
+        Parser(fin, filename).gen_statements()->codegen(*code);
 
         filename.back() = 'i';
         auto fout = ofstream(filename);

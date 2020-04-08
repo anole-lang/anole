@@ -66,7 +66,7 @@ void IceModuleObject::init(const filesystem::path &path)
         throw runtime_error("cannot open file " + path.string());
     }
     auto code = make_shared<Code>();
-    Parser(fin).gen_statements()->codegen(*code);
+    Parser(fin, path.filename().string()).gen_statements()->codegen(*code);
     auto origin = theCurrentContext;
     theCurrentContext = make_shared<Context>(code, dir);
     Context::execute();
