@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
             cout << "ice: can't open file '" << filename << "': No such file" << endl;
         }
 
-        auto code = make_shared<Code>();
+        auto code = make_shared<Code>(filename);
         Parser(fin, filename).gen_statements()->codegen(*code);
 
         filename.back() = 'i';
@@ -35,7 +35,25 @@ int main(int argc, char *argv[])
         code->print(fout);
 
         theCurrentContext = make_shared<Context>(code);
-        Context::execute();
+        try
+        {
+            Context::execute();
+        }
+        catch (const CompileError &e)
+        {
+            cerr << e.what() << endl;
+        }
+        catch (const RuntimeError& e)
+        {
+            cerr << "\033[1mrunning at " << theCurrentContext->code()->from();
+            auto &mapping = theCurrentContext->code()->mapping();
+            if (mapping.count(theCurrentContext->pc()))
+            {
+                auto pos = mapping[theCurrentContext->pc()];
+                cerr << ":" << pos.first << ":" << pos.second << ": \033[31merror: ";
+            }
+            cerr << e.what() << "\033[0m" << endl;
+        }
     }
     return 0;
 }

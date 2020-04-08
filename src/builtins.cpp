@@ -2,8 +2,9 @@
 #include <sstream>
 #include <iostream>
 #include "code.hpp"
-#include "context.hpp"
+#include "error.hpp"
 #include "parser.hpp"
+#include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "funcobject.hpp"
@@ -20,8 +21,8 @@ REGISTER_BUILTIN(eval,
 {
     auto str = dynamic_pointer_cast<StringObject>(theCurrentContext->pop());
     istringstream ss{"return " + str->to_str() + ";"};
-    auto code = make_shared<Code>();
-    Parser(ss).gen_statement()->codegen(*code);
+    auto code = make_shared<Code>("<eval>");
+    Parser(ss, "<eval>").gen_statement()->codegen(*code);
     theCurrentContext = make_shared<Context>(theCurrentContext,
         theCurrentContext->scope(), code, 0);
 });
@@ -47,7 +48,7 @@ REGISTER_BUILTIN(call_with_current_continuation,
     }
     else
     {
-        throw runtime_error("err type as the argument for call/cc");
+        throw RuntimeError("err type as the argument for call/cc");
     }
 });
 

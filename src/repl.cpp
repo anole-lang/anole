@@ -56,7 +56,7 @@ void replrun::run()
     string line;
     istringstream ss;
     Parser parser{ss};
-    auto code = make_shared<Code>();
+    auto code = make_shared<Code>("<stdin>");
     theCurrentContext = make_shared<Context>(code);
 
     parser.set_continue_action([&ss, &parser]
@@ -104,8 +104,19 @@ void replrun::run()
 
             Context::execute();
         }
-        catch (const exception &e)
+        catch (const CompileError &e)
         {
+            cerr << e.what() << endl;
+        }
+        catch (const RuntimeError &e)
+        {
+            cerr << "\033[1mrunning at " << theCurrentContext->code()->from();
+            auto &mapping = theCurrentContext->code()->mapping();
+            if (mapping.count(theCurrentContext->pc()))
+            {
+                auto pos = mapping[theCurrentContext->pc()];
+                cerr << ":" << pos.first << ":" << pos.second << ": \033[31merror:\033[0m ";
+            }
             cerr << e.what() << endl;
         }
     }
