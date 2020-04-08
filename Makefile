@@ -5,7 +5,7 @@ FLAGS = -std=c++17 -stdlib=libstdc++ -ldl -lstdc++fs -lreadline ${ADD}
 
 DIR_TMP = tmp
 
-OBJ = tmp/tokenizer.so tmp/parser.so tmp/code.so tmp/objects.so tmp/context.so tmp/repl.so
+OBJ = tmp/error.so tmp/tokenizer.so tmp/parser.so tmp/code.so tmp/objects.so tmp/context.so tmp/repl.so
 FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 
 test: tmp/tokenizer-tester \
@@ -15,8 +15,11 @@ test: tmp/tokenizer-tester \
 	tmp/parser-tester
 	tmp/sample-tester
 
+tmp/error.so: src/error.cpp | ${DIR_TMP}
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
+
 tmp/tokenizer.so: src/token.cpp \
-				  src/tokenizer.cpp | ${DIR_TMP}
+				  src/tokenizer.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 tmp/parser.so: src/parser.cpp
