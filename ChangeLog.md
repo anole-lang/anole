@@ -1,6 +1,6 @@
 # ChangeLog for Ice
 
-## Unreleased
+## 0.0.4 - 2020/04/08
 
 ### Added
 
