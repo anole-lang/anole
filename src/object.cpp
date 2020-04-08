@@ -15,12 +15,12 @@ bool Object::to_bool()
 
 string Object::to_str()
 {
-    return "";
+    return "<no definition of to_str>";
 }
 
 string Object::to_key()
 {
-    return "";
+    return 'p' + to_string(reinterpret_cast<uintptr_t>(this));
 }
 
 ObjectPtr Object::neg()
