@@ -6,9 +6,10 @@
 #include <exception>
 #include <stdexcept>
 #include <filesystem>
-#include "helper.hpp"
 #include "code.hpp"
+#include "error.hpp"
 #include "scope.hpp"
+#include "helper.hpp"
 
 namespace ice_language
 {
@@ -112,7 +113,7 @@ class Context : public std::enable_shared_from_this<Context>
     {
         if (*stack_->top() == nullptr)
         {
-            throw std::runtime_error(
+            throw RuntimeError(
                 "no such var named " +
                 get_not_defined_symbol(stack_->top()));
         }

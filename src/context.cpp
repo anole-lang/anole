@@ -3,6 +3,7 @@
 #endif
 #include <set>
 #include <fstream>
+#include "error.hpp"
 #include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -59,7 +60,7 @@ void import_handle()
     auto mod = ModuleObject::generate(name);
     if (!mod->good())
     {
-        throw runtime_error("no module named " + name);
+        throw RuntimeError("no module named " + name);
     }
 
     theCurrentContext->push(mod);
@@ -93,12 +94,12 @@ void importall_handle()
     auto cpp_mod = make_shared<CppModuleObject>(name);
     if (!cpp_mod->good())
     {
-        throw runtime_error("no module named " + name);
+        throw RuntimeError("no module named " + name);
     }
     auto names = cpp_mod->names();
     if (!names)
     {
-        throw runtime_error("no defined _FUNCTIONS in C++ source");
+        throw RuntimeError("no defined _FUNCTIONS in C++ source");
     }
     for (const auto &name : *names)
     {
@@ -193,14 +194,16 @@ void call_handle()
                 }
                 else if (++pc > theCurrentContext->code()->size())
                 {
-                    throw runtime_error("much arguments");
+                    theCurrentContext = theCurrentContext->pre_context();
+                    throw RuntimeError("much arguments");
                 }
             }
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();
             if (++pc > theCurrentContext->code()->size())
             {
-                throw runtime_error("much arguments");
+                theCurrentContext = theCurrentContext->pre_context();
+                throw RuntimeError("much arguments");
             }
         }
     }
@@ -220,7 +223,7 @@ void call_handle()
     }
     else
     {
-        throw runtime_error("failed call with the given non-function");
+        throw RuntimeError("failed call with the given non-function");
     }
 }
 
@@ -248,14 +251,16 @@ void calltail_handle()
                 }
                 else if (++pc > theCurrentContext->code()->size())
                 {
-                    throw runtime_error("much arguments");
+                    theCurrentContext = theCurrentContext->pre_context();
+                    throw RuntimeError("much arguments");
                 }
             }
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();
             if (++pc > theCurrentContext->code()->size())
             {
-                throw runtime_error("much arguments");
+                theCurrentContext = theCurrentContext->pre_context();
+                throw RuntimeError("much arguments");
             }
         }
     }
@@ -275,7 +280,7 @@ void calltail_handle()
     }
     else
     {
-        throw runtime_error("failed call with the given non-function");
+        throw RuntimeError("failed call with the given non-function");
     }
 }
 
