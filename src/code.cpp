@@ -11,8 +11,9 @@ using namespace std;
 
 namespace ice_language
 {
-Code::Code()
-  : constants_{ theNone, theTrue, theFalse }
+Code::Code(string from)
+  : from_(move(from)),
+    constants_{ theNone, theTrue, theFalse }
 {
     // ...
 }

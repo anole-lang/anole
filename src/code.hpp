@@ -14,7 +14,18 @@ namespace ice_language
 class Code
 {
   public:
-    Code();
+    Code(std::string from = "<stdin>");
+
+    const std::string &from()
+    {
+        return from_;
+    }
+
+    std::map<std::size_t, std::pair<std::size_t, std::size_t>>
+    &mapping()
+    {
+        return mapping_;
+    }
 
     Opcode opcode_at(std::size_t i)
     {
@@ -88,6 +99,9 @@ class Code
     void to_file(std::ostream &out);
 
   private:
+    std::string from_;
+    std::map<std::size_t, std::pair<std::size_t, std::size_t>> mapping_;
+
     std::vector<Instruction> instructions_;
     // these two should be checked is empty or not
     std::vector<std::size_t> breaks_, continues_;
