@@ -1,7 +1,6 @@
 #include <set>
-#include <exception>
-#include <stdexcept>
 #include "ast.hpp"
+#include "error.hpp"
 #include "parser.hpp"
 
 using namespace std;
@@ -46,7 +45,7 @@ Ptr<AST> Parser::gen_statements()
 
 void Parser::throw_err(const string &err_info)
 {
-    throw runtime_error(get_err_info(err_info));
+    throw CompileError(get_err_info(err_info));
 }
 
 // update current token when cannot find the next token
@@ -196,6 +195,7 @@ Ptr<BlockExpr> Parser::gen_block()
 
 Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
 {
+    auto pos = tokenizer_.last_pos();
     get_next_token();
 
     auto node = gen_expr();
@@ -203,7 +203,9 @@ Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
     check<TokenId::RBracket>("expected ']'");
     get_next_token();
 
-    return make_shared<IndexExpr>(expression, node);
+    auto index = make_shared<IndexExpr>(expression, node);
+    index->pos = pos;
+    return index;
 }
 
 // generate normal statement
@@ -407,7 +409,9 @@ Ptr<Stmt> Parser::gen_use_stmt()
 Ptr<Stmt> Parser::gen_if_else()
 {
     get_next_token();
+    auto pos = tokenizer_.last_pos();
     auto cond = gen_expr();
+    cond->pos = pos;
     auto block_true = gen_block();
     auto else_stmt = gen_if_else_tail();
     return make_shared<IfElseStmt>(cond, block_true, else_stmt);
@@ -435,8 +439,9 @@ Ptr<Stmt> Parser::gen_if_else_tail()
 Ptr<Stmt> Parser::gen_while_stmt()
 {
     get_next_token();
-
+    auto pos = tokenizer_.last_pos();
     auto cond = gen_expr();
+    cond->pos = pos;
     auto block = gen_block();
     return make_shared<WhileStmt>(cond, block);
 }
@@ -450,7 +455,9 @@ Ptr<Stmt> Parser::gen_do_while_stmt()
     check<TokenId::While>("expected keyword 'while' after 'do'");
     get_next_token();
 
+    auto pos = tokenizer_.last_pos();
     auto cond = gen_expr();
+    cond->pos = pos;
     return make_shared<DoWhileStmt>(cond, block);
 }
 
@@ -536,11 +543,13 @@ Ptr<Expr> Parser::gen_expr(int priority)
         auto expr = gen_expr(0);
         if (current_token_.token_id == TokenId::Ques)
         {
+            auto pos = tokenizer_.last_pos();
             get_next_token();
             auto true_expr = gen_expr();
             eat<TokenId::Comma>("expected ',' here");
             auto false_expr = gen_expr();
             expr = make_shared<QuesExpr>(expr, true_expr, false_expr);
+            expr->pos = pos;
         }
         return expr;
     }
@@ -549,12 +558,15 @@ Ptr<Expr> Parser::gen_expr(int priority)
     {
         if (get_operators()[priority].count(current_token_.token_id))
         {
+            auto pos = tokenizer_.last_pos();
             auto op = current_token_.token_id;
             get_next_token();
             try_continue();
-            return make_shared<UnaryOperatorExpr>(
+            auto expr = make_shared<UnaryOperatorExpr>(
                 op, gen_expr(priority)
             );
+            expr->pos = pos;
+            return expr;
         }
         else
         {
@@ -566,6 +578,7 @@ Ptr<Expr> Parser::gen_expr(int priority)
     auto op = current_token_.token_id;
     if (get_operators()[priority].count(op))
     {
+        auto pos = tokenizer_.last_pos();
         get_next_token();
         auto rhs = gen_expr(priority);
         if (dynamic_pointer_cast<IntegerExpr>(lhs) and
@@ -639,6 +652,7 @@ Ptr<Expr> Parser::gen_expr(int priority)
         else
         {
             lhs = make_shared<BinaryOperatorExpr>(lhs, op, rhs);
+            lhs->pos = pos;
         }
     }
     return lhs;
@@ -711,7 +725,9 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
         }
         else if (current_token_.token_id == TokenId::LParen)
         {
+            auto pos = tokenizer_.last_pos();
             expr = make_shared<ParenOperatorExpr>(expr, gen_arguments());
+            expr->pos = pos;
         }
         else // if Token is LBracket
         {
@@ -777,8 +793,11 @@ Ptr<Expr> Parser::gen_string()
 
 Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
+    auto pos = tokenizer_.last_pos();
     get_next_token();
-    return make_shared<DotExpr>(left, gen_ident());
+    auto dot_expr = make_shared<DotExpr>(left, gen_ident());
+    dot_expr->pos = pos;
+    return dot_expr;
 }
 
 Ptr<Expr> Parser::gen_enum_expr()
@@ -867,7 +886,9 @@ Ptr<Expr> Parser::gen_lambda_expr()
     try_continue();
     while (current_token_.token_id == TokenId::LParen)
     {
+        auto pos = tokenizer_.last_pos();
         node = make_shared<ParenOperatorExpr>(node, gen_arguments());
+        node->pos = pos;
         try_continue();
     }
 
@@ -902,11 +923,13 @@ Ptr<Expr> Parser::gen_match_expr()
     {
         match_expr->keylists.push_back({});
         match_expr->keylists.back().push_back(gen_expr());
+        match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
         while (current_token_.token_id == TokenId::Comma)
         {
             try_continue();
             get_next_token();
             match_expr->keylists.back().push_back(gen_expr());
+            match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
         }
 
         eat<TokenId::Ret>("expected symbol '=>'");
