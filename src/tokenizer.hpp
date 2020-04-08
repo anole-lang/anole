@@ -15,6 +15,11 @@ class Tokenizer
     Token next();
     void cont();
     void reset();
+
+    std::pair<std::size_t, std::size_t> last_pos()
+    {
+        return { last_line_num_, last_char_at_line_ };
+    }
     std::string get_err_info(const std::string &message);
 
   private:
