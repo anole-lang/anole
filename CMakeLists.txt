@@ -14,6 +14,10 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
 ELSE()
     set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
+    add_library(error SHARED
+        src/error.cpp
+    )
+
     add_library(tokenizer SHARED
         src/token.cpp
         src/tokenizer.cpp
@@ -45,6 +49,7 @@ ELSE()
 
     install (
         TARGETS
+            error
             tokenizer
             parser
             code
@@ -59,6 +64,7 @@ ELSE()
     add_executable(ice src/main.cpp)
     target_link_libraries(ice
         PRIVATE
+            error
             tokenizer
             parser
             code
