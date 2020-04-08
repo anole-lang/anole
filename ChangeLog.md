@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+- CompileError/RuntimeError to distinguish the two exceptions
+
+### Updated
+
+- Runtime error will show the running position
+
 ### Changed
 
 ## 0.0.4 - 2020/04/08
