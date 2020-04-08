@@ -23,7 +23,7 @@ ObjectPtr StringObject::add(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 

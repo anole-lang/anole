@@ -63,9 +63,9 @@ void IceModuleObject::init(const filesystem::path &path)
     ifstream fin{path};
     if (!fin.good())
     {
-        throw runtime_error("cannot open file " + path.string());
+        throw RuntimeError("cannot open file " + path.string());
     }
-    auto code = make_shared<Code>();
+    auto code = make_shared<Code>(path.filename().string());
     Parser(fin, path.filename().string()).gen_statements()->codegen(*code);
     auto origin = theCurrentContext;
     theCurrentContext = make_shared<Context>(code, dir);
@@ -103,7 +103,7 @@ Ptr<ObjectPtr> CppModuleObject::load_member(const string &name)
     auto func = reinterpret_cast<FuncType>(dlsym(handle_, name.c_str()));
     if (!func)
     {
-        throw runtime_error(dlerror());
+        throw RuntimeError(dlerror());
     }
     auto result = make_shared<BuiltInFunctionObject>(
         [mod = shared_from_this(), func] { func(); });

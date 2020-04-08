@@ -33,7 +33,7 @@ ObjectPtr FloatObject::add(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -45,7 +45,7 @@ ObjectPtr FloatObject::sub(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -57,7 +57,7 @@ ObjectPtr FloatObject::mul(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -69,7 +69,7 @@ ObjectPtr FloatObject::div(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -81,7 +81,7 @@ ObjectPtr FloatObject::ceq(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -93,7 +93,7 @@ ObjectPtr FloatObject::cne(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -105,7 +105,7 @@ ObjectPtr FloatObject::clt(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -117,7 +117,7 @@ ObjectPtr FloatObject::cle(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 }

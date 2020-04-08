@@ -86,7 +86,7 @@ Ptr<ObjectPtr> ListObject::index(ObjectPtr index)
     }
     else
     {
-        throw runtime_error("index should be integer");
+        throw RuntimeError("index should be integer");
     }
 }
 

@@ -33,7 +33,7 @@ ObjectPtr IntegerObject::add(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -45,7 +45,7 @@ ObjectPtr IntegerObject::sub(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -57,7 +57,7 @@ ObjectPtr IntegerObject::mul(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -69,7 +69,7 @@ ObjectPtr IntegerObject::div(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -81,7 +81,7 @@ ObjectPtr IntegerObject::mod(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -93,7 +93,7 @@ ObjectPtr IntegerObject::ceq(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -105,7 +105,7 @@ ObjectPtr IntegerObject::cne(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -117,7 +117,7 @@ ObjectPtr IntegerObject::clt(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -129,7 +129,7 @@ ObjectPtr IntegerObject::cle(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -146,7 +146,7 @@ ObjectPtr IntegerObject::bor(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -158,7 +158,7 @@ ObjectPtr IntegerObject::bxor(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -170,7 +170,7 @@ ObjectPtr IntegerObject::band(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -182,7 +182,7 @@ ObjectPtr IntegerObject::bls(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 
@@ -194,7 +194,7 @@ ObjectPtr IntegerObject::brs(ObjectPtr obj)
     }
     else
     {
-        throw runtime_error("no match method");
+        throw RuntimeError("no match method");
     }
 }
 }
