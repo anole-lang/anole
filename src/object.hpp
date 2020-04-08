@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "error.hpp"
 #include "helper.hpp"
 
 namespace ice_language

@@ -10,7 +10,7 @@ Object::~Object() = default;
 
 bool Object::to_bool()
 {
-    throw runtime_error("cannot translate to bool");
+    throw RuntimeError("cannot translate to bool");
 }
 
 string Object::to_str()
@@ -25,91 +25,91 @@ string Object::to_key()
 
 ObjectPtr Object::neg()
 {
-    throw runtime_error("no neg method");
+    throw RuntimeError("no neg method");
 }
 
 ObjectPtr Object::add(ObjectPtr)
 {
-    throw runtime_error("no add method");
+    throw RuntimeError("no add method");
 }
 
 ObjectPtr Object::sub(ObjectPtr)
 {
-    throw runtime_error("no sub method");
+    throw RuntimeError("no sub method");
 }
 
 ObjectPtr Object::mul(ObjectPtr)
 {
-    throw runtime_error("no mul method");
+    throw RuntimeError("no mul method");
 }
 
 ObjectPtr Object::div(ObjectPtr)
 {
-    throw runtime_error("no div method");
+    throw RuntimeError("no div method");
 }
 
 ObjectPtr Object::mod(ObjectPtr)
 {
-    throw runtime_error("no mod method");
+    throw RuntimeError("no mod method");
 }
 
 ObjectPtr Object::ceq(ObjectPtr)
 {
-    throw runtime_error("no ceq method");
+    throw RuntimeError("no ceq method");
 }
 
 ObjectPtr Object::cne(ObjectPtr)
 {
-    throw runtime_error("no cne method");
+    throw RuntimeError("no cne method");
 }
 
 ObjectPtr Object::clt(ObjectPtr)
 {
-    throw runtime_error("no clt method");
+    throw RuntimeError("no clt method");
 }
 
 ObjectPtr Object::cle(ObjectPtr)
 {
-    throw runtime_error("no cle method");
+    throw RuntimeError("no cle method");
 }
 
 ObjectPtr Object::bneg()
 {
-    throw runtime_error("no bneg method");
+    throw RuntimeError("no bneg method");
 }
 
 ObjectPtr Object::bor(ObjectPtr)
 {
-    throw runtime_error("no bor method");
+    throw RuntimeError("no bor method");
 }
 
 ObjectPtr Object::bxor(ObjectPtr)
 {
-    throw runtime_error("no bxor method");
+    throw RuntimeError("no bxor method");
 }
 
 ObjectPtr Object::band(ObjectPtr)
 {
-    throw runtime_error("no band method");
+    throw RuntimeError("no band method");
 }
 
 ObjectPtr Object::bls(ObjectPtr)
 {
-    throw runtime_error("no bls method");
+    throw RuntimeError("no bls method");
 }
 
 ObjectPtr Object::brs(ObjectPtr)
 {
-    throw runtime_error("no brs method");
+    throw RuntimeError("no brs method");
 }
 
 Ptr<ObjectPtr> Object::index(ObjectPtr)
 {
-    throw runtime_error("not support index");
+    throw RuntimeError("not support index");
 }
 
 Ptr<ObjectPtr> Object::load_member(const string &name)
 {
-    throw runtime_error("no member named " + name);
+    throw RuntimeError("no member named " + name);
 }
 }
