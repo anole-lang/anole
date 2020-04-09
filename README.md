@@ -49,7 +49,6 @@ See [ChangeLog.md](ChangeLog.md)
 
 Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
 
-+ [ ] Useful error info when meeting runtime error, such as traceback like python
 + [ ] Support threads and processes
 + [ ] Complete all codegens
 + [ ] Read from file and complie IR to file
