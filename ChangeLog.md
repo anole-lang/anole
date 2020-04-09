@@ -4,6 +4,7 @@
 
 ### Added
 
+- Support traceback when meeting runtime error
 - CompileError/RuntimeError to distinguish the two exceptions
 
 ### Updated
