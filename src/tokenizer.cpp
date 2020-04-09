@@ -1,7 +1,8 @@
 #include <cctype>
 #include <memory>
-#include "tokenizer.hpp"
 #include "ast.hpp"
+#include "helper.hpp"
+#include "tokenizer.hpp"
 
 using namespace std;
 
@@ -426,12 +427,14 @@ std::string Tokenizer::get_err_info(const string &message)
 {
     auto line = (cur_line_num_ != last_line_num_)
         ? pre_line_ : cur_line_;
-    auto res = "\033[1m" + name_of_in_ + ":"
-        + to_string(last_line_num_) + ":"
-        + to_string(last_char_at_line_) + ": "
-        + "\033[31merror:\033[0m "s + message + "\n"s
-        + "\033[0m" + line + "\n"
-        + string(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ') + "\033[31m^\033[0m";
-    return res;
+
+    return
+        info::strong(name_of_in_ + ":"
+            + to_string(last_line_num_) + ":"
+            + to_string(last_char_at_line_) + ": ") +
+        info::warning("error: ") + message + "\n" +
+        line + "\n" +
+        string(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ')
+            + info::warning("^");
 }
 }
