@@ -1,6 +1,6 @@
 # ChangeLog for Ice
 
-## Unreleased
+## 0.0.5 - 2020/04/09
 
 ### Added
 
@@ -10,8 +10,6 @@
 ### Updated
 
 - Runtime error will show the running position
-
-### Changed
 
 ## 0.0.4 - 2020/04/08
 
