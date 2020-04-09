@@ -39,20 +39,9 @@ int main(int argc, char *argv[])
         {
             Context::execute();
         }
-        catch (const CompileError &e)
+        catch (const exception &e)
         {
             cerr << e.what() << endl;
-        }
-        catch (const RuntimeError& e)
-        {
-            cerr << "\033[1mrunning at " << theCurrentContext->code()->from();
-            auto &mapping = theCurrentContext->code()->mapping();
-            if (mapping.count(theCurrentContext->pc()))
-            {
-                auto pos = mapping[theCurrentContext->pc()];
-                cerr << ":" << pos.first << ":" << pos.second << ": \033[31merror: ";
-            }
-            cerr << e.what() << "\033[0m" << endl;
         }
     }
     return 0;
