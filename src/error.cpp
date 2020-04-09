@@ -1,4 +1,5 @@
 #include "error.hpp"
+#include "helper.hpp"
 #include "context.hpp"
 
 using namespace std;
@@ -22,17 +23,38 @@ const char *CompileError::what() const noexcept
 
 RuntimeError::RuntimeError(const string &err)
 {
-    err_ = "\033[1mrunning at "
-        + theCurrentContext->code()->from();
     auto &mapping = theCurrentContext->code()->mapping();
     if (mapping.count(theCurrentContext->pc()))
     {
         auto pos = mapping[theCurrentContext->pc()];
-        err_ += ":" + to_string(pos.first)
-            + ":" + to_string(pos.second)
-            + ": \033[31merror: ";
+        err_ = info::strong("  running at "
+            + theCurrentContext->code()->from()
+            + ":" + to_string(pos.first)
+            + ":" + to_string(pos.second) + ": ");
     }
-    err_ += err + "\033[0m";
+    err_ += info::warning("error: ") + err;
+
+    int trace_count = 0;
+    while (theCurrentContext->pre_context())
+    {
+        theCurrentContext = theCurrentContext->pre_context();
+
+        if (trace_count < 66)
+        {
+            auto &mapping = theCurrentContext->code()->mapping();
+            if (mapping.count(theCurrentContext->pc()))
+            {
+                auto pos = mapping[theCurrentContext->pc()];
+                err_ = "  running at "
+                    + theCurrentContext->code()->from()
+                    + ":" + to_string(pos.first)
+                    + ":" + to_string(pos.second) + "\n"
+                    + err_;
+            }
+        }
+    }
+
+    err_ = info::strong("Traceback:\n") + err_;
 }
 
 RuntimeError
