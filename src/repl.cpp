@@ -97,11 +97,6 @@ void replrun::run()
                 );
             }
             stmt->codegen(*code);
-
-            #ifdef _DEBUG
-            code->print();
-            #endif
-
             Context::execute();
         }
         catch (const exception &e)

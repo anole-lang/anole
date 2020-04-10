@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace filesystem;
+using namespace chrono_literals;
 
 namespace ice_language
 {
@@ -60,13 +61,27 @@ Ptr<ObjectPtr> IceModuleObject::load_member(const string &name)
 void IceModuleObject::init(const filesystem::path &path)
 {
     auto dir = path.parent_path();
-    ifstream fin{path};
-    if (!fin.good())
-    {
-        throw RuntimeError("cannot open file " + path.string());
-    }
+    auto icei_path = path.string();
+    icei_path.back() = 'i';
+
     auto code = make_shared<Code>(path.filename().string());
-    Parser(fin, path.filename().string()).gen_statements()->codegen(*code);
+
+    if (is_regular_file(icei_path)
+        and last_write_time(icei_path) >= last_write_time(path))
+    {
+        code->unserialize(icei_path);
+    }
+    else
+    {
+        ifstream fin{path};
+        if (!fin.good())
+        {
+            throw RuntimeError("cannot open file " + path.string());
+        }
+        Parser(fin, path.filename().string()).gen_statements()->codegen(*code);
+        code->serialize(icei_path);
+    }
+
     auto origin = theCurrentContext;
     theCurrentContext = make_shared<Context>(code, dir);
     theCurrentContext->pre_context() = origin;
