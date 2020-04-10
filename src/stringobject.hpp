@@ -19,6 +19,11 @@ class StringObject : public Object
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
 
+    std::string value() const
+    {
+        return value_;
+    }
+
   private:
     std::string value_;
 };

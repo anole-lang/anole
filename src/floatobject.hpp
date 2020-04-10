@@ -22,6 +22,11 @@ class FloatObject : public Object
     ObjectPtr clt(ObjectPtr) override;
     ObjectPtr cle(ObjectPtr) override;
 
+    double value() const
+    {
+        return value_;
+    }
+
   private:
     double value_;
 };
