@@ -213,7 +213,7 @@ void Code::print(ostream &out)
     }
 }
 
-void Code::to_file(ostream &out)
+void Code::serialize(ostream &out)
 {
     // ...
 }

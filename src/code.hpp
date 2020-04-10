@@ -96,7 +96,7 @@ class Code
     }
 
     void print(std::ostream &out = std::cout);
-    void to_file(std::ostream &out);
+    void serialize(std::ostream &out);
 
   private:
     std::string from_;

@@ -41,6 +41,8 @@ RuntimeError::RuntimeError(const string &err)
 
         if (trace_count < 66)
         {
+            ++trace_count;
+
             auto &mapping = theCurrentContext->code()->mapping();
             if (mapping.count(theCurrentContext->pc()))
             {

@@ -1,5 +1,11 @@
 # ChangeLog for Ice
 
+## Unreleased
+
+### Fixed
+
+- Fix bug that context cannot traceback when interpreting modules
+
 ## 0.0.5 - 2020/04/09
 
 ### Added

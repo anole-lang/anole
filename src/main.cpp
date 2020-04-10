@@ -30,9 +30,13 @@ int main(int argc, char *argv[])
         auto code = make_shared<Code>(filename);
         Parser(fin, filename).gen_statements()->codegen(*code);
 
+        filename.back() = 'r';
+        auto icer_out = ofstream(filename);
+        code->print(icer_out);
+
         filename.back() = 'i';
-        auto fout = ofstream(filename);
-        code->print(fout);
+        auto icei_out = ofstream(filename);
+        code->serialize(icei_out);
 
         theCurrentContext = make_shared<Context>(code);
         try

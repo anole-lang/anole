@@ -69,6 +69,7 @@ void IceModuleObject::init(const filesystem::path &path)
     Parser(fin, path.filename().string()).gen_statements()->codegen(*code);
     auto origin = theCurrentContext;
     theCurrentContext = make_shared<Context>(code, dir);
+    theCurrentContext->pre_context() = origin;
     Context::execute();
     scope_ = theCurrentContext->scope();
     theCurrentContext = origin;

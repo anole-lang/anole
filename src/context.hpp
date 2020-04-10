@@ -59,7 +59,7 @@ class Context : public std::enable_shared_from_this<Context>
     static const std::string
     &get_not_defined_symbol(Ptr<ObjectPtr> ptr);
 
-    Ptr<Context> pre_context()
+    Ptr<Context> &pre_context()
     {
         return pre_context_;
     }
