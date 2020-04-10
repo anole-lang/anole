@@ -51,4 +51,3 @@ Ice-lang is segrageted to about three parts, the front end, codegen and the virt
 
 + [ ] Support threads and processes
 + [ ] Complete all codegens
-+ [ ] Read from file and complie IR to file
