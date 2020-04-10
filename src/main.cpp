@@ -4,9 +4,12 @@
 #include "parser.hpp"
 #include "context.hpp"
 #include "argparse.hpp"
+#include "moduleobject.hpp"
 
 using namespace std;
 using namespace ice_language;
+
+namespace fs = std::filesystem;
 
 int main(int argc, char *argv[])
 {
@@ -20,25 +23,32 @@ int main(int argc, char *argv[])
         parser.add_argument("file");
         parser.parse(argc, argv);
 
-        auto filename = parser.get("file");
-        auto fin = ifstream(filename);
-        if (!fin.good())
+        auto path = parser.get("file");
+        auto icei_path = path;
+        icei_path.back() = 'i';
+
+        auto code = make_shared<Code>(path);
+
+        if (fs::is_regular_file(icei_path)
+            and fs::last_write_time(icei_path) >= fs::last_write_time(path))
         {
-            cout << "ice: can't open file '" << filename << "': No such file" << endl;
+            code->unserialize(icei_path);
+        }
+        else
+        {
+            auto fin = ifstream(path);
+            if (!fin.good())
+            {
+                cout << "ice: can't open file '" << path << "': No such file" << endl;
+            }
+            Parser(fin, path).gen_statements()->codegen(*code);
+            path.back() = 'r';
+            code->print(path);
+            path.back() = 'i';
+            code->serialize(path);
         }
 
-        auto code = make_shared<Code>(filename);
-        Parser(fin, filename).gen_statements()->codegen(*code);
-
-        filename.back() = 'r';
-        auto icer_out = ofstream(filename);
-        code->print(icer_out);
-
-        filename.back() = 'i';
-        auto icei_out = ofstream(filename);
-        code->serialize(icei_out);
-
-        theCurrentContext = make_shared<Context>(code);
+        theCurrentContext = make_shared<Context>(code, filesystem::path(path).parent_path());
         try
         {
             Context::execute();
