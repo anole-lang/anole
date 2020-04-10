@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+- IR will be stored as *.icei
+
+### Updated
+
+- Code will unserialize from the IR file if the IR file is newer than the corresponding source file
+
 ### Fixed
 
 - Fix bug that context cannot traceback when interpreting modules
