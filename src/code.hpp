@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <filesystem>
 #include <type_traits>
 #include "helper.hpp"
 #include "object.hpp"
@@ -95,8 +96,14 @@ class Code
         }
     }
 
+    void print(const std::filesystem::path &path);
     void print(std::ostream &out = std::cout);
+
+    void serialize(const std::filesystem::path &path);
     void serialize(std::ostream &out);
+
+    void unserialize(const std::filesystem::path &path);
+    void unserialize(std::ifstream &in);
 
   private:
     std::string from_;
