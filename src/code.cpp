@@ -70,7 +70,7 @@ template<typename T, typename ...Args>
 void typeins(istream &in, T &arg, Args &...args)
 {
     typein(in, arg);
-    if constexpr (sizeof...(Args))
+    if constexpr (sizeof...(Args) > 0)
     {
         typeins(in, args...);
     }
