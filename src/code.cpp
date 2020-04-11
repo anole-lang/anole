@@ -355,7 +355,7 @@ void Code::serialize(ostream &out)
             break;
 
         default:
-            throw runtime_error("wtf, here is a bug");
+            throw runtime_error("WTF, here is a bug!");
             break;
         }
     }
@@ -447,7 +447,7 @@ void Code::unserialize(ifstream &in)
             break;
 
         default:
-            throw runtime_error("wtf, the icei is wrong!");
+            throw runtime_error("WTF, you want me to eat shit?!");
             break;
         }
     }
