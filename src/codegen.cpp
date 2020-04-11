@@ -15,7 +15,6 @@ AST::~AST() = default;
 Stmt::~Stmt() = default;
 Expr::~Expr() = default;
 
-// completed
 void BlockExpr::codegen(Code &code)
 {
     for (auto statement : statements)
@@ -24,13 +23,11 @@ void BlockExpr::codegen(Code &code)
     }
 }
 
-// completed
 void NoneExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, size_t>(0);
 }
 
-// completed
 void IntegerExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst>(
@@ -40,7 +37,6 @@ void IntegerExpr::codegen(Code &code)
     );
 }
 
-// completed
 void FloatExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst>(
@@ -50,13 +46,11 @@ void FloatExpr::codegen(Code &code)
     );
 }
 
-// completed
 void BoolExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, size_t>(value ? 1 : 2);
 }
 
-// completed
 void StringExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst>(
@@ -66,13 +60,11 @@ void StringExpr::codegen(Code &code)
     );
 }
 
-// completed
 void IdentifierExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::Load>(name);
 }
 
-// completed
 void ParenOperatorExpr::codegen(Code &code)
 {
     for (auto it = args.rbegin(); it != args.rend(); ++it)
@@ -84,7 +76,6 @@ void ParenOperatorExpr::codegen(Code &code)
     code.add_ins<Opcode::Call>(args.size());
 }
 
-// completed
 void UnaryOperatorExpr::codegen(Code &code)
 {
     expr->codegen(code);
@@ -285,7 +276,6 @@ void BinaryOperatorExpr::codegen(Code &code)
     }
 }
 
-// complete
 void LambdaExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
@@ -308,7 +298,6 @@ void NewExpr::codegen(Code &code)
 
 }
 
-// completed
 void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
@@ -316,7 +305,6 @@ void DotExpr::codegen(Code &code)
     code.add_ins<Opcode::LoadMember>(id->name);
 }
 
-// completed
 void EnumExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::ScopeBegin>();
@@ -328,7 +316,6 @@ void EnumExpr::codegen(Code &code)
     code.add_ins<Opcode::BuildEnum>();
 }
 
-// completed
 void MatchExpr::codegen(Code &code)
 {
     expr->codegen(code);
@@ -365,7 +352,6 @@ void MatchExpr::codegen(Code &code)
     }
 }
 
-// completed
 void ListExpr::codegen(Code &code)
 {
     for (auto it = exprs.rbegin();
@@ -376,7 +362,6 @@ void ListExpr::codegen(Code &code)
     code.add_ins<Opcode::BuildList>(exprs.size());
 }
 
-// completed
 void IndexExpr::codegen(Code &code)
 {
     index->codegen(code);
@@ -386,7 +371,6 @@ void IndexExpr::codegen(Code &code)
     code.add_ins<Opcode::Index>();
 }
 
-// completed
 void DictExpr::codegen(Code &code)
 {
     auto num = keys.size();
@@ -398,7 +382,6 @@ void DictExpr::codegen(Code &code)
     code.add_ins<Opcode::BuildDict>(keys.size());
 }
 
-// completed
 void DelayExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
@@ -407,7 +390,6 @@ void DelayExpr::codegen(Code &code)
     code.set_ins<Opcode::ThunkDecl>(o1, code.size());
 }
 
-// completed
 void QuesExpr::codegen(Code &code)
 {
     cond->codegen(code);
@@ -449,14 +431,12 @@ void UseStmt::codegen(Code &code)
     }
 }
 
-// completed
 void ExprStmt::codegen(Code &code)
 {
     expr->codegen(code);
     code.add_ins<Opcode::Pop>();
 }
 
-// completed
 void VariableDeclarationStmt::codegen(Code &code)
 {
     if (expr)
@@ -470,7 +450,6 @@ void VariableDeclarationStmt::codegen(Code &code)
     code.add_ins<Opcode::StoreLocal>(id->name);
 }
 
-// completed
 void FunctionDeclarationStmt::codegen(Code &code)
 {
     lambda->codegen(code);
@@ -482,7 +461,6 @@ void ClassDeclarationStmt::codegen(Code &code)
 
 }
 
-// completed
 void BreakStmt::codegen(Code &code)
 {
     for (size_t i = 0; i < code.nested_scopes(); ++i)
@@ -493,13 +471,11 @@ void BreakStmt::codegen(Code &code)
     code.push_break(code.add_ins());
 }
 
-// completed
 void ContinueStmt::codegen(Code &code)
 {
     code.push_continue(code.add_ins());
 }
 
-// completed
 void ReturnStmt::codegen(Code &code)
 {
     expr->codegen(code);
@@ -519,7 +495,6 @@ void ReturnStmt::codegen(Code &code)
     */
 }
 
-// completed
 void IfElseStmt::codegen(Code &code)
 {
     code.add_ins<Opcode::ScopeBegin>();
@@ -545,7 +520,6 @@ void IfElseStmt::codegen(Code &code)
     code.add_ins<Opcode::ScopeEnd>();
 }
 
-// completed
 void WhileStmt::codegen(Code &code)
 {
     code.add_ins<Opcode::ScopeBegin>();
@@ -566,7 +540,6 @@ void WhileStmt::codegen(Code &code)
     code.add_ins<Opcode::ScopeEnd>();
 }
 
-// completed
 void DoWhileStmt::codegen(Code &code)
 {
     code.add_ins<Opcode::ScopeBegin>();
