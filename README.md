@@ -15,7 +15,6 @@
 ~/ice-lang> mkdir build
 ~/ice-lang> cd build
 ~/build> cmake ..
-~/build> make
 ~/build> sudo make install
 ```
 
@@ -47,7 +46,4 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-Ice-lang is segrageted to about three parts, the front end, codegen and the virtual machine
-
 + [ ] Support threads and processes
-+ [ ] Complete all codegens
