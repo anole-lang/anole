@@ -50,8 +50,6 @@ Token::Token(std::string value) : value(value)
     case "else"_hash:       token_id = TokenId::Else;     break;
     case "while"_hash:      token_id = TokenId::While;    break;
     case "do"_hash:         token_id = TokenId::Do;       break;
-    case "for"_hash:        token_id = TokenId::For;      break;
-    case "to"_hash:         token_id = TokenId::To;       break;
     case "foreach"_hash:    token_id = TokenId::Foreach;  break;
     case "as"_hash:         token_id = TokenId::As;       break;
     case "break"_hash:      token_id = TokenId::Break;    break;

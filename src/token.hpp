@@ -19,8 +19,6 @@ enum class TokenId
     Else,      // else
     While,     // while
     Do,        // do
-    For,       // for
-    To,        // to
     Foreach,   // foreach
     As,        // as
     Break,     // break
