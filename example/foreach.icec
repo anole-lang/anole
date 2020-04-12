@@ -1,0 +1,39 @@
+@IteratorForList(l) {
+    @_anchor: 0;
+    @_list: l;
+
+    @__has_next__(): _anchor < _list.size();
+    @__next__() {
+        @res: _list.at(_anchor);
+        _anchor: _anchor + 1;
+        return res;
+    }
+
+    return @() {};
+}
+
+@MyList(l: []) {
+    @this: @(){};
+
+    @_list: l;
+
+    @at(i): _list[i];
+    @size(): _list.size();
+    @push(v): _list.push(v);
+
+    @__iterator__(): IteratorForList(this);
+
+    return this;
+}
+
+@range(start, end, step: 1) {
+    @res: [];
+    while start < end {
+        res.push(start);
+        start: start + step;
+    }
+    return res;
+}
+
+l: MyList(range(0, 10));
+foreach l as item, print(item);
