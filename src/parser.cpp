@@ -240,9 +240,6 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenId::Do:
         return gen_do_while_stmt();
 
-    case TokenId::For:
-        return gen_for_stmt();
-
     case TokenId::Foreach:
         return gen_foreach_stmt();
 
@@ -461,39 +458,21 @@ Ptr<Stmt> Parser::gen_do_while_stmt()
     return make_shared<DoWhileStmt>(cond, block);
 }
 
-Ptr<Stmt> Parser::gen_for_stmt()
-{
-    get_next_token();
-
-    auto begin = gen_expr();
-
-    check<TokenId::To>("expected keyword 'to' in for");
-    get_next_token();
-
-    auto end = gen_expr();
-    shared_ptr<IdentifierExpr> id = nullptr;
-    if (current_token_.token_id == TokenId::As)
-    {
-        get_next_token();
-        id = gen_ident();
-    }
-    auto block = gen_block();
-
-    return make_shared<ForStmt>(begin, end, id, block);
-}
-
 Ptr<Stmt> Parser::gen_foreach_stmt()
 {
     get_next_token();
 
     auto expression = gen_expr();
+    Ptr<IdentifierExpr> id = nullptr;
 
-    check<TokenId::As>("expected keyword 'as' in foreach");
-    get_next_token();
+    if (current_token_.token_id == TokenId::As)
+    {
+        get_next_token();
+        check<TokenId::Identifier>("expected an identifier here");
+        id = gen_ident();
+    }
 
-    auto id = gen_ident();
     auto block = gen_block();
-
     return make_shared<ForeachStmt>(expression, id, block);
 }
 

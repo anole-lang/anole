@@ -67,7 +67,6 @@ class Parser
     Ptr<Stmt> gen_if_else_tail();
     Ptr<Stmt> gen_while_stmt();
     Ptr<Stmt> gen_do_while_stmt();
-    Ptr<Stmt> gen_for_stmt();
     Ptr<Stmt> gen_foreach_stmt();
     Ptr<Stmt> gen_return_stmt();
 
