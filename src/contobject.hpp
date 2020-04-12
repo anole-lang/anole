@@ -8,18 +8,18 @@ namespace ice_language
 class ContObject : public Object
 {
   public:
-    ContObject(Ptr<Context> resume)
+    ContObject(SPtr<Context> resume)
       : resume_(std::make_shared<Context>(*resume)) {}
 
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
 
-    Ptr<Context> resume()
+    SPtr<Context> resume()
     {
         return resume_;
     }
 
   private:
-    Ptr<Context> resume_;
+    SPtr<Context> resume_;
 };
 }

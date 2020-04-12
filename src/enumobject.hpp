@@ -8,12 +8,12 @@ namespace ice_language
 class EnumObject : public Object
 {
   public:
-    EnumObject(Ptr<Scope> scope)
+    EnumObject(SPtr<Scope> scope)
       : scope_(scope) {}
 
-    Ptr<ObjectPtr> load_member(const std::string &name) override;
+    SPtr<ObjectPtr> load_member(const std::string &name) override;
 
   private:
-    Ptr<Scope> scope_;
+    SPtr<Scope> scope_;
 };
 }

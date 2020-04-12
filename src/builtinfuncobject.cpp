@@ -12,9 +12,9 @@ string BuiltInFunctionObject::to_str()
     return "<builtin-function>"s;
 }
 
-static map<string, Ptr<BuiltInFunctionObject>> &get_built_in_functions()
+static map<string, SPtr<BuiltInFunctionObject>> &get_built_in_functions()
 {
-    static map<string, Ptr<BuiltInFunctionObject>> built_in_functions;
+    static map<string, SPtr<BuiltInFunctionObject>> built_in_functions;
     return built_in_functions;
 }
 

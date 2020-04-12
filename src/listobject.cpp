@@ -78,7 +78,7 @@ string ListObject::to_key()
     return 'l' + to_str();
 }
 
-Ptr<ObjectPtr> ListObject::index(ObjectPtr index)
+SPtr<ObjectPtr> ListObject::index(ObjectPtr index)
 {
     if (auto p = dynamic_pointer_cast<IntegerObject>(index))
     {
@@ -90,7 +90,7 @@ Ptr<ObjectPtr> ListObject::index(ObjectPtr index)
     }
 }
 
-Ptr<ObjectPtr> ListObject::load_member(const string &name)
+SPtr<ObjectPtr> ListObject::load_member(const string &name)
 {
     if (built_in_methods_for_list.count(name))
     {
@@ -105,7 +105,7 @@ Ptr<ObjectPtr> ListObject::load_member(const string &name)
     return Object::load_member(name);
 }
 
-vector<Ptr<ObjectPtr>> &ListObject::objects()
+vector<SPtr<ObjectPtr>> &ListObject::objects()
 {
     return objects_;
 }

@@ -17,7 +17,7 @@ Expr::~Expr() = default;
 
 void BlockExpr::codegen(Code &code)
 {
-    for (auto statement : statements)
+    for (auto &statement : statements)
     {
         statement->codegen(code);
     }
@@ -81,12 +81,12 @@ void UnaryOperatorExpr::codegen(Code &code)
     expr->codegen(code);
     switch (op)
     {
-    case TokenId::Sub:
+    case TokenType::Sub:
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::Neg>();
         break;
 
-    case TokenId::Not:
+    case TokenType::Not:
     {
         code.mapping()[code.size()] = pos;
         auto o1 = code.add_ins();
@@ -98,7 +98,7 @@ void UnaryOperatorExpr::codegen(Code &code)
     }
         break;
 
-    case TokenId::BNeg:
+    case TokenType::BNeg:
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::BNeg>();
         break;
@@ -112,83 +112,83 @@ void BinaryOperatorExpr::codegen(Code &code)
 {
     switch (op)
     {
-    case TokenId::Colon:
+    case TokenType::Colon:
         rhs->codegen(code);
         lhs->codegen(code);
         code.add_ins<Opcode::Store>();
         break;
 
-    case TokenId::Add:
+    case TokenType::Add:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::Add>();
         break;
 
-    case TokenId::Sub:
+    case TokenType::Sub:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::Sub>();
         break;
 
-    case TokenId::Mul:
+    case TokenType::Mul:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::Mul>();
         break;
 
-    case TokenId::Div:
+    case TokenType::Div:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::Div>();
         break;
 
-    case TokenId::Mod:
+    case TokenType::Mod:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::Mod>();
         break;
 
-    case TokenId::BAnd:
+    case TokenType::BAnd:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::BAnd>();
         break;
 
-    case TokenId::BOr:
+    case TokenType::BOr:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::BOr>();
         break;
 
-    case TokenId::BXor:
+    case TokenType::BXor:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::BXor>();
         break;
 
-    case TokenId::BLS:
+    case TokenType::BLS:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::BLS>();
         break;
 
-    case TokenId::BRS:
+    case TokenType::BRS:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::BRS>();
         break;
 
-    case TokenId::And:
+    case TokenType::And:
     {
         lhs->codegen(code);
         code.mapping()[code.size()] = pos;
@@ -205,7 +205,7 @@ void BinaryOperatorExpr::codegen(Code &code)
     }
         break;
 
-    case TokenId::Or:
+    case TokenType::Or:
     {
         lhs->codegen(code);
         code.mapping()[code.size()] = pos;
@@ -222,49 +222,49 @@ void BinaryOperatorExpr::codegen(Code &code)
     }
         break;
 
-    case TokenId::Is:
+    case TokenType::Is:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::Is>();
         break;
 
-    case TokenId::CEQ:
+    case TokenType::CEQ:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::CEQ>();
         break;
 
-    case TokenId::CNE:
+    case TokenType::CNE:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::CNE>();
         break;
 
-    case TokenId::CLT:
+    case TokenType::CLT:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::CLT>();
         break;
 
-    case TokenId::CLE:
+    case TokenType::CLE:
         lhs->codegen(code);
         rhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::CLE>();
         break;
 
-    case TokenId::CGT:
+    case TokenType::CGT:
         rhs->codegen(code);
         lhs->codegen(code);
         code.mapping()[code.size()] = pos;
         code.add_ins<Opcode::CLE>();
         break;
 
-    case TokenId::CGE:
+    case TokenType::CGE:
         rhs->codegen(code);
         lhs->codegen(code);
         code.mapping()[code.size()] = pos;
@@ -579,27 +579,27 @@ void ForeachStmt::codegen(Code &code)
     code.add_ins<Opcode::Call>(static_cast<size_t>(0));
     code.add_ins<Opcode::StoreLocal>(string("__it"));
 
-    auto it = make_shared<IdentifierExpr>("__it");
-    auto cond = make_shared<ParenOperatorExpr>(
-        make_shared<DotExpr>(it,
-            make_shared<IdentifierExpr>("__has_next__")),
+    auto cond = make_unique<ParenOperatorExpr>(
+        make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
+            make_unique<IdentifierExpr>("__has_next__")),
         ExprList());
 
     block->statements.insert(block->statements.begin(), nullptr);
-    auto next = make_shared<ParenOperatorExpr>(
-        make_shared<DotExpr>(it,
-            make_shared<IdentifierExpr>("__next__")),
+    auto next = make_unique<ParenOperatorExpr>(
+        make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
+            make_unique<IdentifierExpr>("__next__")),
         ExprList());
     if (id != nullptr)
     {
-        *block->statements.begin() = make_shared<VariableDeclarationStmt>(id, next);
+        *block->statements.begin()
+            = make_unique<VariableDeclarationStmt>(move(id), move(next));
     }
     else
     {
-        *block->statements.begin() = make_shared<ExprStmt>(next);
+        *block->statements.begin() = make_unique<ExprStmt>(move(next));
     }
 
-    WhileStmt(cond, block).codegen(code);
+    WhileStmt(move(cond), move(block)).codegen(code);
 
     code.add_ins<Opcode::ScopeEnd>();
 }

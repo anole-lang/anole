@@ -12,15 +12,15 @@ class Scope
 {
   public:
     Scope() : pre_scope_(nullptr) {}
-    Scope(Ptr<Scope> pre_scope)
+    Scope(SPtr<Scope> pre_scope)
       : pre_scope_(pre_scope) {}
 
-    Ptr<Scope> pre()
+    SPtr<Scope> pre()
     {
         return pre_scope_;
     }
 
-    Ptr<ObjectPtr> create_symbol(const std::string &name)
+    SPtr<ObjectPtr> create_symbol(const std::string &name)
     {
         if (!symbols_.count(name))
         {
@@ -29,19 +29,19 @@ class Scope
         return symbols_[name];
     }
 
-    void create_symbol(const std::string &name, Ptr<ObjectPtr> value)
+    void create_symbol(const std::string &name, SPtr<ObjectPtr> value)
     {
         symbols_[name] = value;
     }
 
-    Ptr<ObjectPtr> load_symbol(const std::string &name)
+    SPtr<ObjectPtr> load_symbol(const std::string &name)
     {
         auto ptr = find_symbol(name);
         auto res = ptr ? ptr : load_builtin(name);
         return res ? res : create_symbol(name);
     }
 
-    Ptr<ObjectPtr> load_builtin(const std::string &name)
+    SPtr<ObjectPtr> load_builtin(const std::string &name)
     {
         if (auto func = BuiltInFunctionObject::load_built_in_function(name))
         {
@@ -50,13 +50,13 @@ class Scope
         return nullptr;
     }
 
-    const std::map<std::string, Ptr<ObjectPtr>> &symbols()
+    const std::map<std::string, SPtr<ObjectPtr>> &symbols()
     {
         return symbols_;
     }
 
   private:
-    Ptr<ObjectPtr> find_symbol(const std::string &name)
+    SPtr<ObjectPtr> find_symbol(const std::string &name)
     {
         if (symbols_.count(name))
         {
@@ -72,7 +72,7 @@ class Scope
         }
     }
 
-    Ptr<Scope> pre_scope_;
-    std::map<std::string, Ptr<ObjectPtr>> symbols_;
+    SPtr<Scope> pre_scope_;
+    std::map<std::string, SPtr<ObjectPtr>> symbols_;
 };
 }

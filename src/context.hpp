@@ -17,11 +17,11 @@ namespace ice_language
 class Context : public std::enable_shared_from_this<Context>
 {
   private:
-    using StackType = std::stack<Ptr<ObjectPtr>>;
+    using StackType = std::stack<SPtr<ObjectPtr>>;
 
   public:
     // this for resume from ContObject
-    Context(Ptr<Context> resume)
+    Context(SPtr<Context> resume)
       : pre_context_(resume->pre_context_),
         scope_(std::make_shared<Scope>(resume->scope_)),
         code_(resume->code_), pc_(resume->pc_),
@@ -36,15 +36,15 @@ class Context : public std::enable_shared_from_this<Context>
         stack_(std::make_shared<StackType>(*context.stack_)),
         current_path_(context.current_path_) {}
 
-    Context(Ptr<Code> code, std::filesystem::path path = std::filesystem::current_path())
+    Context(SPtr<Code> code, std::filesystem::path path = std::filesystem::current_path())
       : pre_context_(nullptr),
         scope_(std::make_shared<Scope>(nullptr)),
         code_(code), pc_(0),
         stack_(std::make_shared<StackType>()),
         current_path_(std::move(path)) {}
 
-    Context(Ptr<Context> pre, Ptr<Scope> scope,
-        Ptr<Code> code, std::size_t pc = 0)
+    Context(SPtr<Context> pre, SPtr<Scope> scope,
+        SPtr<Code> code, std::size_t pc = 0)
       : pre_context_(pre), scope_(std::make_shared<Scope>(scope)),
         code_(code), pc_(pc), stack_(pre->stack_),
         current_path_(pre->current_path_) {}
@@ -53,23 +53,23 @@ class Context : public std::enable_shared_from_this<Context>
 
     static void
     add_not_defined_symbol(const std::string &name,
-        Ptr<ObjectPtr> ptr);
+        SPtr<ObjectPtr> ptr);
     static void
-    rm_not_defined_symbol(Ptr<ObjectPtr> ptr);
+    rm_not_defined_symbol(SPtr<ObjectPtr> ptr);
     static const std::string
-    &get_not_defined_symbol(Ptr<ObjectPtr> ptr);
+    &get_not_defined_symbol(SPtr<ObjectPtr> ptr);
 
-    Ptr<Context> &pre_context()
+    SPtr<Context> &pre_context()
     {
         return pre_context_;
     }
 
-    Ptr<Scope> &scope()
+    SPtr<Scope> &scope()
     {
         return scope_;
     }
 
-    Ptr<Code> &code()
+    SPtr<Code> &code()
     {
         return code_;
     }
@@ -103,13 +103,13 @@ class Context : public std::enable_shared_from_this<Context>
         stack_->push(std::make_shared<ObjectPtr>(value));
     }
 
-    void push_straight(Ptr<ObjectPtr> ptr)
+    void push_straight(SPtr<ObjectPtr> ptr)
     {
         stack_->push(ptr);
     }
 
     template <typename R = Object>
-    Ptr<R> top()
+    SPtr<R> top()
     {
         if (*stack_->top() == nullptr)
         {
@@ -120,7 +120,7 @@ class Context : public std::enable_shared_from_this<Context>
         return std::reinterpret_pointer_cast<R>(*stack_->top());
     }
 
-    Ptr<ObjectPtr> &top_straight()
+    SPtr<ObjectPtr> &top_straight()
     {
         return stack_->top();
     }
@@ -131,14 +131,14 @@ class Context : public std::enable_shared_from_this<Context>
     }
 
     template <typename R = Object>
-    Ptr<R> pop()
+    SPtr<R> pop()
     {
         auto res = top<R>();
         stack_->pop();
         return res;
     }
 
-    Ptr<ObjectPtr> pop_straight()
+    SPtr<ObjectPtr> pop_straight()
     {
         auto res = top_straight();
         stack_->pop();
@@ -156,13 +156,13 @@ class Context : public std::enable_shared_from_this<Context>
     }
 
   private:
-    Ptr<Context> pre_context_;
-    Ptr<Scope> scope_;
-    Ptr<Code> code_;
+    SPtr<Context> pre_context_;
+    SPtr<Scope> scope_;
+    SPtr<Code> code_;
     std::size_t pc_;
-    Ptr<StackType> stack_;
+    SPtr<StackType> stack_;
     std::filesystem::path current_path_;
 };
 
-inline Ptr<Context> theCurrentContext = nullptr;
+inline SPtr<Context> theCurrentContext = nullptr;
 }

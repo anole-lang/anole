@@ -49,14 +49,14 @@ void Parser::throw_err(const string &err_info)
 }
 
 // update current token when cannot find the next token
-Token Parser::get_next_token()
+Token &Parser::get_next_token()
 {
     return current_token_ = tokenizer_.next();
 }
 
 void Parser::try_continue()
 {
-    if (current_token_.token_id == TokenId::End
+    if (current_token_.type == TokenType::End
         and AST::interpretive())
     {
         continue_action_();
@@ -72,16 +72,16 @@ ExprList Parser::gen_arguments()
 {
     ExprList args;
     get_next_token(); // eat '('
-    while (current_token_.token_id != TokenId::RParen)
+    while (current_token_.type != TokenType::RParen)
     {
         args.push_back(gen_delay_expr());
-        if (current_token_.token_id == TokenId::Comma)
+        if (current_token_.type == TokenType::Comma)
         {
             get_next_token(); // eat ','
         }
         else
         {
-            check<TokenId::RParen>("expected ')'");
+            check<TokenType::RParen>("expected ')'");
         }
     }
     get_next_token(); // eat ')'
@@ -91,16 +91,16 @@ ExprList Parser::gen_arguments()
 IdentList Parser::gen_idents()
 {
     IdentList idents;
-    while (current_token_.token_id != TokenId::RParen)
+    while (current_token_.type != TokenType::RParen)
     {
         idents.push_back(gen_ident());
-        if (current_token_.token_id == TokenId::Comma)
+        if (current_token_.type == TokenType::Comma)
         {
             get_next_token();
         }
         else
         {
-            check<TokenId::RParen>("expected ')' here");
+            check<TokenType::RParen>("expected ')' here");
         }
     }
     return idents;
@@ -109,28 +109,28 @@ IdentList Parser::gen_idents()
 DeclList Parser::gen_arg_decls()
 {
     DeclList decls;
-    while (current_token_.token_id != TokenId::RParen)
+    while (current_token_.type != TokenType::RParen)
     {
         auto ident = gen_ident();
-        if (current_token_.token_id == TokenId::Colon)
+        if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
-            decls.push_back(make_shared<VariableDeclarationStmt>(
-                ident, gen_expr()));
+            decls.push_back(make_unique<VariableDeclarationStmt>(
+                move(ident), gen_expr()));
         }
         else
         {
-            decls.push_back(make_shared<VariableDeclarationStmt>(
-                ident, make_shared<NoneExpr>()));
+            decls.push_back(make_unique<VariableDeclarationStmt>(
+                move(ident), make_unique<NoneExpr>()));
         }
 
-        if (current_token_.token_id == TokenId::Comma)
+        if (current_token_.type == TokenType::Comma)
         {
             get_next_token();
         }
         else
         {
-            check<TokenId::RParen>("expected ')' here");
+            check<TokenType::RParen>("expected ')' here");
         }
     }
     return decls;
@@ -139,11 +139,11 @@ DeclList Parser::gen_arg_decls()
 // usually use when interacting
 Ptr<BlockExpr> Parser::gen_stmts()
 {
-    auto stmts = make_shared<BlockExpr>();
-    while (current_token_.token_id != TokenId::End)
+    auto stmts = make_unique<BlockExpr>();
+    while (current_token_.type != TokenType::End)
     {
         stmts->statements.push_back(gen_stmt());
-        while (current_token_.token_id == TokenId::Semicolon)
+        while (current_token_.type == TokenType::Semicolon)
         {
             get_next_token();
         }
@@ -156,17 +156,21 @@ Ptr<BlockExpr> Parser::gen_block()
 {
     Ptr<BlockExpr> block;
 
-    if (current_token_.token_id == TokenId::LBrace)
+    if (current_token_.type == TokenType::LBrace)
     {
         get_next_token(); // eat '{'
         try_continue();
-        block = make_shared<BlockExpr>();
+        block = make_unique<BlockExpr>();
         // '}' means the end of a block
-        while (current_token_.token_id != TokenId::RBrace)
+        while (current_token_.type != TokenType::RBrace)
         {
             auto stmt = gen_stmt();
-            if (stmt) block->statements.push_back(stmt);
-            if (current_token_.token_id == TokenId::Semicolon)
+            if (stmt)
+            {
+                block->statements.push_back(move(stmt));
+            }
+
+            if (current_token_.type == TokenType::Semicolon)
             {
                 get_next_token();
             }
@@ -174,13 +178,13 @@ Ptr<BlockExpr> Parser::gen_block()
         }
         get_next_token(); // eat '}'
     }
-    else if (current_token_.token_id == TokenId::Comma)
+    else if (current_token_.type == TokenType::Comma)
     {
         get_next_token();
         try_continue();
-        block = make_shared<BlockExpr>();
+        block = make_unique<BlockExpr>();
         block->statements.push_back(gen_stmt());
-        if (current_token_.token_id == TokenId::Semicolon)
+        if (current_token_.type == TokenType::Semicolon)
         {
             get_next_token();
         }
@@ -200,10 +204,10 @@ Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
 
     auto node = gen_expr();
 
-    check<TokenId::RBracket>("expected ']'");
+    check<TokenType::RBracket>("expected ']'");
     get_next_token();
 
-    auto index = make_shared<IndexExpr>(expression, node);
+    auto index = make_unique<IndexExpr>(move(expression), move(node));
     index->pos = pos;
     return index;
 }
@@ -211,65 +215,65 @@ Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
 // generate normal statement
 Ptr<Stmt> Parser::gen_stmt()
 {
-    switch (current_token_.token_id)
+    switch (current_token_.type)
     {
     // @ is special
-    case TokenId::At:
-        if (get_next_token().token_id == TokenId::LParen)
+    case TokenType::At:
+        if (get_next_token().type == TokenType::LParen)
         {
-            return make_shared<ExprStmt>(gen_lambda_expr());
+            return make_unique<ExprStmt>(gen_lambda_expr());
         }
-        else if (current_token_.token_id != TokenId::End)
+        else if (current_token_.type != TokenType::End)
         {
             return gen_declaration();
         }
         break;
 
-    case TokenId::AtAt:
+    case TokenType::AtAt:
         return gen_class_decl();
 
-    case TokenId::Use:
+    case TokenType::Use:
         return gen_use_stmt();
 
-    case TokenId::If:
+    case TokenType::If:
         return gen_if_else();
 
-    case TokenId::While:
+    case TokenType::While:
         return gen_while_stmt();
 
-    case TokenId::Do:
+    case TokenType::Do:
         return gen_do_while_stmt();
 
-    case TokenId::Foreach:
+    case TokenType::Foreach:
         return gen_foreach_stmt();
 
-    case TokenId::Break:
+    case TokenType::Break:
         get_next_token();
-        return make_shared<BreakStmt>();
+        return make_unique<BreakStmt>();
 
-    case TokenId::Continue:
+    case TokenType::Continue:
         get_next_token();
-        return make_shared<ContinueStmt>();
+        return make_unique<ContinueStmt>();
 
-    case TokenId::Return:
+    case TokenType::Return:
         return gen_return_stmt();
 
-    case TokenId::Identifier:
-    case TokenId::Sub:
-    case TokenId::Integer:
-    case TokenId::Double:
-    case TokenId::None:
-    case TokenId::True:
-    case TokenId::False:
-    case TokenId::String:
-    case TokenId::LParen:
-    case TokenId::New:
-    case TokenId::Enum:
-    case TokenId::Match:
-    case TokenId::LBracket:
-    case TokenId::LBrace:
-    case TokenId::Not:
-        return make_shared<ExprStmt>(gen_expr());
+    case TokenType::Identifier:
+    case TokenType::Sub:
+    case TokenType::Integer:
+    case TokenType::Double:
+    case TokenType::None:
+    case TokenType::True:
+    case TokenType::False:
+    case TokenType::String:
+    case TokenType::LParen:
+    case TokenType::New:
+    case TokenType::Enum:
+    case TokenType::Match:
+    case TokenType::LBracket:
+    case TokenType::LBrace:
+    case TokenType::Not:
+        return make_unique<ExprStmt>(gen_expr());
 
     default:
         break;
@@ -281,18 +285,15 @@ Ptr<Stmt> Parser::gen_stmt()
 // generate declaration or assignment (@var:)
 Ptr<Stmt> Parser::gen_declaration()
 {
-    Ptr<Expr> node = gen_ident();
-
-    switch (current_token_.token_id)
+    auto id = gen_ident();
+    switch (current_token_.type)
     {
-    case TokenId::Colon:
+    case TokenType::Colon:
         get_next_token();
-        return make_shared<VariableDeclarationStmt>(
-            reinterpret_pointer_cast<IdentifierExpr>(node),
-            gen_delay_expr()
-        );
+        return make_unique<VariableDeclarationStmt>(
+            move(id), gen_delay_expr());
 
-    case TokenId::LParen:
+    case TokenType::LParen:
     {
         get_next_token();
         auto args = gen_arg_decls();
@@ -301,29 +302,24 @@ Ptr<Stmt> Parser::gen_declaration()
         try_continue();
         Ptr<BlockExpr> block = nullptr;
 
-        if (current_token_.token_id == TokenId::Colon)
+        if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
-            block = make_shared<BlockExpr>();
-            block->statements.push_back(make_shared<ReturnStmt>(gen_expr()));
+            block = make_unique<BlockExpr>();
+            block->statements.push_back(make_unique<ReturnStmt>(gen_expr()));
         }
         else
         {
             block = gen_block();
         }
-        return make_shared<FunctionDeclarationStmt>(
-            reinterpret_pointer_cast<IdentifierExpr>(node),
-            make_shared<LambdaExpr>(move(args), block)
-        );
+        return make_unique<FunctionDeclarationStmt>(move(id),
+            make_unique<LambdaExpr>(move(args), move(block)));
     }
 
     default:
         break;
     }
-    return make_shared<VariableDeclarationStmt>(
-        reinterpret_pointer_cast<IdentifierExpr>(node),
-        nullptr
-    );
+    return make_unique<VariableDeclarationStmt>(move(id), nullptr);
 }
 
 Ptr<Stmt> Parser::gen_class_decl()
@@ -332,15 +328,15 @@ Ptr<Stmt> Parser::gen_class_decl()
 
     auto id = gen_ident();
 
-    check<TokenId::LParen>("expected '('");
+    check<TokenType::LParen>("expected '('");
     get_next_token();
 
     auto bases = gen_idents();
-    eat<TokenId::RParen>("expected ')' here");
+    eat<TokenType::RParen>("expected ')' here");
 
     auto block = gen_block();
 
-    return make_shared<ClassDeclarationStmt>(id, move(bases), block);
+    return make_unique<ClassDeclarationStmt>(move(id), move(bases), move(block));
 }
 
 Ptr<Stmt> Parser::gen_use_stmt()
@@ -349,22 +345,22 @@ Ptr<Stmt> Parser::gen_use_stmt()
     string from;
 
     get_next_token();
-    if (current_token_.token_id == TokenId::Mul)
+    if (current_token_.type == TokenType::Mul)
     {
         get_next_token();
-        eat<TokenId::From>("need from ident here");
-        check<TokenId::Identifier>("need identifier after from");
+        eat<TokenType::From>("need from ident here");
+        check<TokenType::Identifier>("need identifier after from");
         from = current_token_.value;
         get_next_token();
-        return make_shared<UseStmt>(names, move(from));
+        return make_unique<UseStmt>(move(names), move(from));
     }
-    check<TokenId::Identifier>("need identifier here");
+    check<TokenType::Identifier>("need identifier here");
     auto name = current_token_.value;
     get_next_token();
-    if (current_token_.token_id == TokenId::As)
+    if (current_token_.type == TokenType::As)
     {
         get_next_token();
-        check<TokenId::Identifier>("need the alias here");
+        check<TokenType::Identifier>("need the alias here");
         names.push_back({name, current_token_.value});
         get_next_token();
     }
@@ -373,16 +369,16 @@ Ptr<Stmt> Parser::gen_use_stmt()
         names.push_back({name, name});
     }
 
-    while (current_token_.token_id == TokenId::Comma)
+    while (current_token_.type == TokenType::Comma)
     {
         get_next_token();
-        check<TokenId::Identifier>("need identifier here");
+        check<TokenType::Identifier>("need identifier here");
         auto name = current_token_.value;
         get_next_token();
-        if (current_token_.token_id == TokenId::As)
+        if (current_token_.type == TokenType::As)
         {
             get_next_token();
-            check<TokenId::Identifier>("need the alias here");
+            check<TokenType::Identifier>("need the alias here");
             names.push_back({name, current_token_.value});
             get_next_token();
         }
@@ -392,15 +388,15 @@ Ptr<Stmt> Parser::gen_use_stmt()
         }
     }
 
-    if (current_token_.token_id == TokenId::From)
+    if (current_token_.type == TokenType::From)
     {
         get_next_token();
-        check<TokenId::Identifier>("need Module name here");
+        check<TokenType::Identifier>("need Module name here");
         from = current_token_.value;
         get_next_token();
     }
 
-    return make_shared<UseStmt>(move(names), move(from));
+    return make_unique<UseStmt>(move(names), move(from));
 }
 
 Ptr<Stmt> Parser::gen_if_else()
@@ -411,21 +407,22 @@ Ptr<Stmt> Parser::gen_if_else()
     cond->pos = pos;
     auto block_true = gen_block();
     auto else_stmt = gen_if_else_tail();
-    return make_shared<IfElseStmt>(cond, block_true, else_stmt);
+    return make_unique<IfElseStmt>(
+        move(cond), move(block_true), move(else_stmt));
 }
 
 Ptr<Stmt> Parser::gen_if_else_tail()
 {
-    if (current_token_.token_id == TokenId::Elif)
+    if (current_token_.type == TokenType::Elif)
     {
         return gen_if_else();
     }
-    else if (current_token_.token_id == TokenId::Else)
+    else if (current_token_.type == TokenType::Else)
     {
         get_next_token();
         auto block = gen_block();
-        return make_shared<IfElseStmt>(
-            make_shared<IntegerExpr>(1), block, nullptr);
+        return make_unique<IfElseStmt>(
+            make_unique<IntegerExpr>(1), move(block), nullptr);
     }
     else
     {
@@ -440,7 +437,7 @@ Ptr<Stmt> Parser::gen_while_stmt()
     auto cond = gen_expr();
     cond->pos = pos;
     auto block = gen_block();
-    return make_shared<WhileStmt>(cond, block);
+    return make_unique<WhileStmt>(move(cond), move(block));
 }
 
 Ptr<Stmt> Parser::gen_do_while_stmt()
@@ -449,13 +446,13 @@ Ptr<Stmt> Parser::gen_do_while_stmt()
 
     auto block = gen_block();
 
-    check<TokenId::While>("expected keyword 'while' after 'do'");
+    check<TokenType::While>("expected keyword 'while' after 'do'");
     get_next_token();
 
     auto pos = tokenizer_.last_pos();
     auto cond = gen_expr();
     cond->pos = pos;
-    return make_shared<DoWhileStmt>(cond, block);
+    return make_unique<DoWhileStmt>(move(cond), move(block));
 }
 
 Ptr<Stmt> Parser::gen_foreach_stmt()
@@ -465,30 +462,31 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
     auto expression = gen_expr();
     Ptr<IdentifierExpr> id = nullptr;
 
-    if (current_token_.token_id == TokenId::As)
+    if (current_token_.type == TokenType::As)
     {
         get_next_token();
-        check<TokenId::Identifier>("expected an identifier here");
+        check<TokenType::Identifier>("expected an identifier here");
         id = gen_ident();
     }
 
     auto block = gen_block();
-    return make_shared<ForeachStmt>(expression, id, block);
+    return make_unique<ForeachStmt>(
+        move(expression), move(id), move(block));
 }
 
 Ptr<Stmt> Parser::gen_return_stmt()
 {
     get_next_token();
-    return make_shared<ReturnStmt>(gen_expr());
+    return make_unique<ReturnStmt>(gen_expr());
 }
 
 Ptr<Expr> Parser::gen_delay_expr()
 {
     try_continue();
-    if (current_token_.token_id == TokenId::Delay)
+    if (current_token_.type == TokenType::Delay)
     {
         get_next_token();
-        return make_shared<DelayExpr>(gen_expr());
+        return make_unique<DelayExpr>(gen_expr());
     }
     else
     {
@@ -496,21 +494,21 @@ Ptr<Expr> Parser::gen_delay_expr()
     }
 }
 
-static const vector<set<TokenId>> &get_operators()
+static const vector<set<TokenType>> &get_operators()
 {
-    static const vector<set<TokenId>> operators
+    static const vector<set<TokenType>> operators
     {
-        { TokenId::Or },
-        { TokenId::And },
-        { TokenId::BOr },
-        { TokenId::BXor },
-        { TokenId::BAnd },
-        { TokenId::CEQ, TokenId::CNE },
-        { TokenId::CLT, TokenId::CLE, TokenId::CGT, TokenId::CGE },
-        { TokenId::BLS, TokenId::BRS },
-        { TokenId::Add, TokenId::Sub },
-        { TokenId::Is,  TokenId::Mul, TokenId::Div, TokenId::Mod },
-        { TokenId::Not, TokenId::Sub, TokenId::BNeg }
+        { TokenType::Or },
+        { TokenType::And },
+        { TokenType::BOr },
+        { TokenType::BXor },
+        { TokenType::BAnd },
+        { TokenType::CEQ, TokenType::CNE },
+        { TokenType::CLT, TokenType::CLE, TokenType::CGT, TokenType::CGE },
+        { TokenType::BLS, TokenType::BRS },
+        { TokenType::Add, TokenType::Sub },
+        { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod },
+        { TokenType::Not, TokenType::Sub, TokenType::BNeg }
     };
     return operators;
 }
@@ -520,14 +518,15 @@ Ptr<Expr> Parser::gen_expr(int priority)
     if (priority == -1)
     {
         auto expr = gen_expr(0);
-        if (current_token_.token_id == TokenId::Ques)
+        if (current_token_.type == TokenType::Ques)
         {
             auto pos = tokenizer_.last_pos();
             get_next_token();
             auto true_expr = gen_expr();
-            eat<TokenId::Comma>("expected ',' here");
+            eat<TokenType::Comma>("expected ',' here");
             auto false_expr = gen_expr();
-            expr = make_shared<QuesExpr>(expr, true_expr, false_expr);
+            expr = make_unique<QuesExpr>(
+                move(expr), move(true_expr), move(false_expr));
             expr->pos = pos;
         }
         return expr;
@@ -535,13 +534,13 @@ Ptr<Expr> Parser::gen_expr(int priority)
 
     if (static_cast<size_t>(priority + 1) == get_operators().size())
     {
-        if (get_operators()[priority].count(current_token_.token_id))
+        if (get_operators()[priority].count(current_token_.type))
         {
             auto pos = tokenizer_.last_pos();
-            auto op = current_token_.token_id;
+            auto op = current_token_.type;
             get_next_token();
             try_continue();
-            auto expr = make_shared<UnaryOperatorExpr>(
+            auto expr = make_unique<UnaryOperatorExpr>(
                 op, gen_expr(priority)
             );
             expr->pos = pos;
@@ -554,83 +553,83 @@ Ptr<Expr> Parser::gen_expr(int priority)
     }
 
     auto lhs = gen_expr(priority + 1);
-    auto op = current_token_.token_id;
+    auto op = current_token_.type;
     if (get_operators()[priority].count(op))
     {
         auto pos = tokenizer_.last_pos();
         get_next_token();
         auto rhs = gen_expr(priority);
-        if (dynamic_pointer_cast<IntegerExpr>(lhs) and
-            dynamic_pointer_cast<IntegerExpr>(rhs))
+        if (dynamic_cast<IntegerExpr *>(lhs.get()) and
+            dynamic_cast<IntegerExpr *>(rhs.get()))
         {
-            auto alias = reinterpret_pointer_cast<IntegerExpr>(lhs);
-            auto rv = reinterpret_pointer_cast<IntegerExpr>(rhs)->value;
+            auto alias = reinterpret_cast<IntegerExpr *>(lhs.get());
+            auto rv = reinterpret_cast<IntegerExpr *>(rhs.get())->value;
             switch (op)
             {
-            case TokenId::Add:
+            case TokenType::Add:
                 alias->value += rv;
                 break;
 
-            case TokenId::Sub:
+            case TokenType::Sub:
                 alias->value -= rv;
                 break;
 
-            case TokenId::Mul:
+            case TokenType::Mul:
                 alias->value *= rv;
                 break;
 
-            case TokenId::Div:
+            case TokenType::Div:
                 alias->value /= rv;
                 break;
 
-            case TokenId::Mod:
+            case TokenType::Mod:
                 alias->value %= rv;
                 break;
 
-            case TokenId::And:
-                lhs = make_shared<BoolExpr>(alias->value and rv);
+            case TokenType::And:
+                lhs = make_unique<BoolExpr>(alias->value and rv);
                 break;
 
-            case TokenId::Or:
-                lhs = make_shared<BoolExpr>(alias->value or rv);
+            case TokenType::Or:
+                lhs = make_unique<BoolExpr>(alias->value or rv);
                 break;
 
-            case TokenId::Is:
-                lhs = make_shared<BoolExpr>(alias->value == rv);
+            case TokenType::Is:
+                lhs = make_unique<BoolExpr>(alias->value == rv);
                 break;
 
-            case TokenId::CEQ:
-                lhs = make_shared<BoolExpr>(alias->value == rv);
+            case TokenType::CEQ:
+                lhs = make_unique<BoolExpr>(alias->value == rv);
                 break;
 
-            case TokenId::CNE:
-                lhs = make_shared<BoolExpr>(alias->value != rv);
+            case TokenType::CNE:
+                lhs = make_unique<BoolExpr>(alias->value != rv);
                 break;
 
-            case TokenId::CLT:
-                lhs = make_shared<BoolExpr>(alias->value < rv);
+            case TokenType::CLT:
+                lhs = make_unique<BoolExpr>(alias->value < rv);
                 break;
 
-            case TokenId::CLE:
-                lhs = make_shared<BoolExpr>(alias->value <= rv);
+            case TokenType::CLE:
+                lhs = make_unique<BoolExpr>(alias->value <= rv);
                 break;
 
-            case TokenId::CGT:
-                lhs = make_shared<BoolExpr>(alias->value > rv);
+            case TokenType::CGT:
+                lhs = make_unique<BoolExpr>(alias->value > rv);
                 break;
 
-            case TokenId::CGE:
-                lhs = make_shared<BoolExpr>(alias->value >= rv);
+            case TokenType::CGE:
+                lhs = make_unique<BoolExpr>(alias->value >= rv);
                 break;
 
             default:
-                lhs = make_shared<BinaryOperatorExpr>(lhs, op, rhs);
+                lhs = make_unique<BinaryOperatorExpr>(move(lhs), op, move(rhs));
                 break;
             }
         }
         else
         {
-            lhs = make_shared<BinaryOperatorExpr>(lhs, op, rhs);
+            lhs = make_unique<BinaryOperatorExpr>(move(lhs), op, move(rhs));
             lhs->pos = pos;
         }
     }
@@ -641,48 +640,48 @@ Ptr<Expr> Parser::gen_term()
 {
     try_continue();
     Ptr<Expr> node = nullptr;
-    switch (current_token_.token_id)
+    switch (current_token_.type)
     {
-    case TokenId::Identifier:
+    case TokenType::Identifier:
         return gen_ident();
 
-    case TokenId::Integer:
-    case TokenId::Double:
+    case TokenType::Integer:
+    case TokenType::Double:
         return gen_numeric();
 
-    case TokenId::None:
+    case TokenType::None:
         return gen_none();
 
-    case TokenId::True:
-    case TokenId::False:
+    case TokenType::True:
+    case TokenType::False:
         return gen_boolean();
 
-    case TokenId::String:
+    case TokenType::String:
         return gen_string();
 
-    case TokenId::LParen:
+    case TokenType::LParen:
         get_next_token();
         node = gen_expr();
-        eat<TokenId::RParen>("expected ')' here");
+        eat<TokenType::RParen>("expected ')' here");
         return node;
 
-    case TokenId::At:
+    case TokenType::At:
         get_next_token();
         return gen_lambda_expr();
 
-    case TokenId::New:
+    case TokenType::New:
         return gen_new_expr();
 
-    case TokenId::Match:
+    case TokenType::Match:
         return gen_match_expr();
 
-    case TokenId::LBracket:
+    case TokenType::LBracket:
         return gen_list_expr();
 
-    case TokenId::Enum:
+    case TokenType::Enum:
         return gen_enum_expr();
 
-    case TokenId::LBrace:
+    case TokenType::LBrace:
         return gen_dict_expr();
 
     default:
@@ -694,32 +693,32 @@ Ptr<Expr> Parser::gen_term()
 Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 {
     try_continue();
-    while (current_token_.token_id == TokenId::Dot
-      || current_token_.token_id == TokenId::LParen
-      || current_token_.token_id == TokenId::LBracket)
+    while (current_token_.type == TokenType::Dot
+      || current_token_.type == TokenType::LParen
+      || current_token_.type == TokenType::LBracket)
     {
-        if (current_token_.token_id == TokenId::Dot)
+        if (current_token_.type == TokenType::Dot)
         {
-            expr = gen_dot_expr(expr);
+            expr = gen_dot_expr(move(expr));
         }
-        else if (current_token_.token_id == TokenId::LParen)
+        else if (current_token_.type == TokenType::LParen)
         {
             auto pos = tokenizer_.last_pos();
-            expr = make_shared<ParenOperatorExpr>(expr, gen_arguments());
+            expr = make_unique<ParenOperatorExpr>(move(expr), gen_arguments());
             expr->pos = pos;
         }
         else // if Token is LBracket
         {
-            expr = gen_index_expr(expr);
+            expr = gen_index_expr(move(expr));
         }
         try_continue();
     }
 
-    if (current_token_.token_id == TokenId::Colon)
+    if (current_token_.type == TokenType::Colon)
     {
         get_next_token();
-        return make_shared<BinaryOperatorExpr>(
-            expr, TokenId::Colon, gen_delay_expr());
+        return make_unique<BinaryOperatorExpr>(
+            move(expr), TokenType::Colon, gen_delay_expr());
     }
 
     return expr;
@@ -727,8 +726,8 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 
 Ptr<IdentifierExpr> Parser::gen_ident()
 {
-    check<TokenId::Identifier>("expect an identifier here");
-    auto ident_expr = make_shared<IdentifierExpr>(current_token_.value);
+    check<TokenType::Identifier>("expect an identifier here");
+    auto ident_expr = make_unique<IdentifierExpr>(current_token_.value);
     get_next_token();
     return ident_expr;
 }
@@ -736,13 +735,13 @@ Ptr<IdentifierExpr> Parser::gen_ident()
 Ptr<Expr> Parser::gen_numeric()
 {
     Ptr<Expr> numeric_expr = nullptr;
-    if (current_token_.token_id == TokenId::Integer)
+    if (current_token_.type == TokenType::Integer)
     {
-        numeric_expr = make_shared<IntegerExpr>(stoll(current_token_.value));
+        numeric_expr = make_unique<IntegerExpr>(stoll(current_token_.value));
     }
     else
     {
-        numeric_expr = make_shared<FloatExpr>(stod(current_token_.value));
+        numeric_expr = make_unique<FloatExpr>(stod(current_token_.value));
     }
     get_next_token();
     return numeric_expr;
@@ -751,13 +750,13 @@ Ptr<Expr> Parser::gen_numeric()
 Ptr<Expr> Parser::gen_none()
 {
     get_next_token();
-    return make_shared<NoneExpr>();
+    return make_unique<NoneExpr>();
 }
 
 Ptr<Expr> Parser::gen_boolean()
 {
-    auto bool_expr = make_shared<BoolExpr>(
-        ((current_token_.token_id == TokenId::True)
+    auto bool_expr = make_unique<BoolExpr>(
+        ((current_token_.type == TokenType::True)
           ? true : false));
     get_next_token();
     return bool_expr;
@@ -765,7 +764,7 @@ Ptr<Expr> Parser::gen_boolean()
 
 Ptr<Expr> Parser::gen_string()
 {
-    auto string_expr = make_shared<StringExpr>(current_token_.value);
+    auto string_expr = make_unique<StringExpr>(current_token_.value);
     get_next_token();
     return string_expr;
 }
@@ -774,7 +773,7 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
     auto pos = tokenizer_.last_pos();
     get_next_token();
-    auto dot_expr = make_shared<DotExpr>(left, gen_ident());
+    auto dot_expr = make_unique<DotExpr>(move(left), gen_ident());
     dot_expr->pos = pos;
     return dot_expr;
 }
@@ -782,31 +781,31 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 Ptr<Expr> Parser::gen_enum_expr()
 {
     get_next_token();
-    auto enum_expr = make_shared<EnumExpr>();
-    eat<TokenId::LBrace>("expected '{' here");
+    auto enum_expr = make_unique<EnumExpr>();
+    eat<TokenType::LBrace>("expected '{' here");
 
     int64_t base = 0;
-    while (current_token_.token_id != TokenId::RBrace)
+    while (current_token_.type != TokenType::RBrace)
     {
         auto ident = gen_ident();
-        if (current_token_.token_id == TokenId::Colon)
+        if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
-            check<TokenId::Integer>("expected integer here");
+            check<TokenType::Integer>("expected integer here");
             base = stoll(current_token_.value);
             get_next_token();
         }
         enum_expr->decls.push_back(
-            make_shared<VariableDeclarationStmt>(ident,
-                make_shared<IntegerExpr>(base++)));
+            make_unique<VariableDeclarationStmt>(move(ident),
+                make_unique<IntegerExpr>(base++)));
 
-        if (current_token_.token_id == TokenId::Comma)
+        if (current_token_.type == TokenType::Comma)
         {
             get_next_token();
         }
         else
         {
-            check<TokenId::RBrace>("expected '}'");
+            check<TokenType::RBrace>("expected '}'");
         }
     }
     get_next_token();
@@ -817,21 +816,21 @@ Ptr<Expr> Parser::gen_enum_expr()
 Ptr<Expr> Parser::gen_dict_expr()
 {
     get_next_token();
-    auto dict_expr = make_shared<DictExpr>();
+    auto dict_expr = make_unique<DictExpr>();
 
-    while (current_token_.token_id != TokenId::RBrace)
+    while (current_token_.type != TokenType::RBrace)
     {
         dict_expr->keys.push_back(gen_expr());
-        eat<TokenId::Ret>("expected '=>'");
+        eat<TokenType::Ret>("expected '=>'");
 
         dict_expr->values.push_back(gen_expr());
-        if (current_token_.token_id == TokenId::Comma)
+        if (current_token_.type == TokenType::Comma)
         {
             get_next_token();
         }
         else
         {
-            check<TokenId::RBrace>("expected '}'");
+            check<TokenType::RBrace>("expected '}'");
         }
     }
     get_next_token();
@@ -850,23 +849,23 @@ Ptr<Expr> Parser::gen_lambda_expr()
     try_continue();
     Ptr<BlockExpr> block = nullptr;
 
-    if (current_token_.token_id == TokenId::Colon)
+    if (current_token_.type == TokenType::Colon)
     {
         get_next_token();
-        block = make_shared<BlockExpr>();
-        block->statements.push_back(make_shared<ReturnStmt>(gen_delay_expr()));
+        block = make_unique<BlockExpr>();
+        block->statements.push_back(make_unique<ReturnStmt>(gen_delay_expr()));
     }
     else
     {
         block = gen_block();
     }
 
-    Ptr<Expr> node = make_shared<LambdaExpr>(move(args), block);
+    Ptr<Expr> node = make_unique<LambdaExpr>(move(args), move(block));
     try_continue();
-    while (current_token_.token_id == TokenId::LParen)
+    while (current_token_.type == TokenType::LParen)
     {
         auto pos = tokenizer_.last_pos();
-        node = make_shared<ParenOperatorExpr>(node, gen_arguments());
+        node = make_unique<ParenOperatorExpr>(move(node), gen_arguments());
         node->pos = pos;
         try_continue();
     }
@@ -878,8 +877,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
 Ptr<Expr> Parser::gen_new_expr()
 {
     get_next_token();
-    auto id = gen_ident();
-    return make_shared<NewExpr>(id, gen_arguments());
+    return make_unique<NewExpr>(gen_ident(), gen_arguments());
 }
 
 /* Ptr<Expr> SyntaxAnalyzer::gen_match_expr()
@@ -891,19 +889,19 @@ generate match expr as follow:
 */
 Ptr<Expr> Parser::gen_match_expr()
 {
-    auto match_expr = make_shared<MatchExpr>();
+    auto match_expr = make_unique<MatchExpr>();
 
     get_next_token(); // eat 'match'
     match_expr->expr = gen_expr();
 
-    eat<TokenId::LBrace>("expected '{'");
+    eat<TokenType::LBrace>("expected '{'");
 
-    while (current_token_.token_id != TokenId::RBrace)
+    while (current_token_.type != TokenType::RBrace)
     {
         match_expr->keylists.push_back({});
         match_expr->keylists.back().push_back(gen_expr());
         match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
-        while (current_token_.token_id == TokenId::Comma)
+        while (current_token_.type == TokenType::Comma)
         {
             try_continue();
             get_next_token();
@@ -911,24 +909,24 @@ Ptr<Expr> Parser::gen_match_expr()
             match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
         }
 
-        eat<TokenId::Ret>("expected symbol '=>'");
+        eat<TokenType::Ret>("expected symbol '=>'");
 
         match_expr->values.push_back(gen_expr());
 
-        if (current_token_.token_id == TokenId::Comma)
+        if (current_token_.type == TokenType::Comma)
         {
             get_next_token();
         }
         else
         {
-            check<TokenId::RBrace>("expected '}'");
+            check<TokenType::RBrace>("expected '}'");
         }
     }
 
     get_next_token(); // eat '}'
 
     // check 'else' after 'match {}'
-    if (current_token_.token_id == TokenId::Else)
+    if (current_token_.type == TokenType::Else)
     {
         get_next_token();
         match_expr->else_expr = gen_expr();
@@ -944,12 +942,12 @@ Ptr<Expr> Parser::gen_match_expr()
 // generate list as [expr1, expr2, ..., exprN]
 Ptr<Expr> Parser::gen_list_expr()
 {
-    eat<TokenId::LBracket>(); // eat '['
-    auto list_expr = make_shared<ListExpr>();
-    while (current_token_.token_id != TokenId::RBracket)
+    eat<TokenType::LBracket>(); // eat '['
+    auto list_expr = make_unique<ListExpr>();
+    while (current_token_.type != TokenType::RBracket)
     {
         list_expr->exprs.push_back(gen_expr());
-        if (current_token_.token_id == TokenId::Comma)
+        if (current_token_.type == TokenType::Comma)
         {
             get_next_token();
         }

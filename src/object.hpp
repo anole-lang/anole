@@ -6,7 +6,7 @@
 
 namespace ice_language
 {
-using ObjectPtr = Ptr<class Object>;
+using ObjectPtr = SPtr<class Object>;
 
 class Object
 {
@@ -31,7 +31,7 @@ class Object
     virtual ObjectPtr band(ObjectPtr);
     virtual ObjectPtr bls(ObjectPtr);
     virtual ObjectPtr brs(ObjectPtr);
-    virtual Ptr<ObjectPtr> index(ObjectPtr);
-    virtual Ptr<ObjectPtr> load_member(const std::string &name);
+    virtual SPtr<ObjectPtr> index(ObjectPtr);
+    virtual SPtr<ObjectPtr> load_member(const std::string &name);
 };
 }

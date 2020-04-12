@@ -23,16 +23,16 @@ using namespace std;
 
 namespace ice_language
 {
-static map<Ptr<ObjectPtr>, string> not_defineds;
+static map<SPtr<ObjectPtr>, string> not_defineds;
 
 void Context::add_not_defined_symbol(
-    const string &name, Ptr<ObjectPtr> ptr)
+    const string &name, SPtr<ObjectPtr> ptr)
 {
     not_defineds[ptr] = name;
 }
 
 void Context::rm_not_defined_symbol(
-    Ptr<ObjectPtr> ptr)
+    SPtr<ObjectPtr> ptr)
 {
     if (not_defineds.count(ptr))
     {
@@ -41,7 +41,7 @@ void Context::rm_not_defined_symbol(
 }
 
 const string &Context::get_not_defined_symbol(
-    Ptr<ObjectPtr> ptr)
+    SPtr<ObjectPtr> ptr)
 {
     return not_defineds[ptr];
 }

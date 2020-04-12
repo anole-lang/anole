@@ -13,9 +13,9 @@ namespace ice_language
 {
 ModuleObject::~ModuleObject() = default;
 
-Ptr<ModuleObject> ModuleObject::generate(const string &name)
+SPtr<ModuleObject> ModuleObject::generate(const string &name)
 {
-    Ptr<ModuleObject> mod = make_shared<IceModuleObject>(name);
+    SPtr<ModuleObject> mod = make_shared<IceModuleObject>(name);
     if (!mod->good())
     {
         mod = make_shared<CppModuleObject>(name);
@@ -49,7 +49,7 @@ IceModuleObject::IceModuleObject(const string &name)
     }
 }
 
-Ptr<ObjectPtr> IceModuleObject::load_member(const string &name)
+SPtr<ObjectPtr> IceModuleObject::load_member(const string &name)
 {
     if (scope_->symbols().count(name))
     {
@@ -113,7 +113,7 @@ CppModuleObject::~CppModuleObject()
     }
 }
 
-Ptr<ObjectPtr> CppModuleObject::load_member(const string &name)
+SPtr<ObjectPtr> CppModuleObject::load_member(const string &name)
 {
     using FuncType = void (*)();
     auto func = reinterpret_cast<FuncType>(dlsym(handle_, name.c_str()));

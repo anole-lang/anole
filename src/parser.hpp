@@ -29,24 +29,24 @@ class Parser
 
     void throw_err(const std::string &err_info);
 
-    template <TokenId token_id>
+    template <TokenType type>
     void check(const std::string &err_info)
     {
         try_continue();
-        if (current_token_.token_id != token_id)
+        if (current_token_.type != type)
         {
             throw_err(err_info);
         }
     }
 
-    template <TokenId token_id>
+    template <TokenType type>
     void eat(const std::string &err_info = "")
     {
-        check<token_id>(err_info);
+        check<type>(err_info);
         get_next_token();
     }
 
-    Token get_next_token();
+    Token &get_next_token();
     void try_continue();
     std::string get_err_info(const std::string &message);
 

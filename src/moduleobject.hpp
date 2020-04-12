@@ -10,14 +10,14 @@ class ModuleObject : public Object
   public:
     ModuleObject() = default;
     virtual ~ModuleObject() = 0;
-    virtual Ptr<ObjectPtr> load_member(const std::string &name) = 0;
+    virtual SPtr<ObjectPtr> load_member(const std::string &name) = 0;
 
     bool good()
     {
         return good_;
     }
 
-    static Ptr<ModuleObject> generate(const std::string &name);
+    static SPtr<ModuleObject> generate(const std::string &name);
 
   protected:
     bool good_;
@@ -27,11 +27,11 @@ class IceModuleObject : public ModuleObject
 {
   public:
     IceModuleObject(const std::string &name);
-    IceModuleObject(Ptr<Scope> scope)
+    IceModuleObject(SPtr<Scope> scope)
       : scope_(scope) {}
-    Ptr<ObjectPtr> load_member(const std::string &name) override;
+    SPtr<ObjectPtr> load_member(const std::string &name) override;
 
-    const Ptr<Scope> &scope() const
+    const SPtr<Scope> &scope() const
     {
         return scope_;
     }
@@ -39,7 +39,7 @@ class IceModuleObject : public ModuleObject
   private:
     void init(const std::filesystem::path &path);
 
-    Ptr<Scope> scope_;
+    SPtr<Scope> scope_;
 };
 
 class CppModuleObject
@@ -49,7 +49,7 @@ class CppModuleObject
   public:
     CppModuleObject(const std::string &name);
     ~CppModuleObject();
-    Ptr<ObjectPtr> load_member(const std::string &name) override;
+    SPtr<ObjectPtr> load_member(const std::string &name) override;
 
     const std::vector<std::string> *names()
     {

@@ -116,7 +116,7 @@ FileObject::FileObject(const string &path, int64_t mode)
     file_.open(path, mod);
 }
 
-Ptr<ObjectPtr> FileObject::load_member(const string &name)
+SPtr<ObjectPtr> FileObject::load_member(const string &name)
 {
     if (built_in_methods_for_file.count(name))
     {

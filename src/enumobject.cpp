@@ -4,7 +4,7 @@ using namespace std;
 
 namespace ice_language
 {
-Ptr<ObjectPtr> EnumObject::load_member(const std::string &name)
+SPtr<ObjectPtr> EnumObject::load_member(const std::string &name)
 {
     if (scope_->symbols().count(name))
     {

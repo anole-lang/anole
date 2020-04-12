@@ -89,12 +89,13 @@ void replrun::run()
             theCurrentContext->pc() = code->size();
 
             auto stmt = parser.gen_statement();
-            if (dynamic_pointer_cast<ExprStmt>(stmt))
+            if (dynamic_cast<ExprStmt *>(stmt.get()))
             {
-                stmt = make_shared<ParenOperatorExpr>(
-                    make_shared<IdentifierExpr>("println"),
-                    ExprList{ reinterpret_pointer_cast<ExprStmt>(stmt)->expr }
-                );
+                ExprList args;
+                args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr));
+                stmt = make_unique<ParenOperatorExpr>(
+                    make_unique<IdentifierExpr>("println"),
+                    move(args));
             }
             stmt->codegen(*code);
             Context::execute();

@@ -13,7 +13,7 @@ class FileObject : public Object
 {
   public:
     FileObject(const std::string &, std::int64_t mode);
-    Ptr<ObjectPtr> load_member(const std::string &name) override;
+    SPtr<ObjectPtr> load_member(const std::string &name) override;
 
     std::fstream &file();
 

@@ -1,11 +1,10 @@
 #pragma once
 
 #include <string>
-#include <utility>
 
 namespace ice_language
 {
-enum class TokenId
+enum class TokenType
 {
     End,
 
@@ -84,13 +83,13 @@ enum class TokenId
 struct Token
 {
     Token() = default;
-    Token(TokenId token_id, std::string value = "");
+    Token(TokenType type, std::string value = "");
     Token(std::string value);
     Token(Token &&token) noexcept;
     Token(const Token &token);
     Token &operator=(const Token &token);
 
-    TokenId token_id;
+    TokenType type;
     std::string value;
 };
 }

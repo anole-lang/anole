@@ -21,7 +21,7 @@ ObjectPtr FunctionObject::cne(ObjectPtr obj)
     return (this != obj.get()) ? theTrue : theFalse;
 }
 
-Ptr<ObjectPtr> FunctionObject::load_member(const string &name)
+SPtr<ObjectPtr> FunctionObject::load_member(const string &name)
 {
     auto ptr = scope_->load_symbol(name);
     if (!*ptr)

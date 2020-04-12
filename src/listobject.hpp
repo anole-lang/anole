@@ -13,13 +13,13 @@ class ListObject : public Object
     bool to_bool() override;
     std::string to_str() override;
     std::string to_key() override;
-    Ptr<ObjectPtr> index(ObjectPtr) override;
-    Ptr<ObjectPtr> load_member(const std::string &name) override;
+    SPtr<ObjectPtr> index(ObjectPtr) override;
+    SPtr<ObjectPtr> load_member(const std::string &name) override;
 
-    std::vector<Ptr<ObjectPtr>> &objects();
+    std::vector<SPtr<ObjectPtr>> &objects();
     void append(ObjectPtr obj);
 
   private:
-    std::vector<Ptr<ObjectPtr>> objects_;
+    std::vector<SPtr<ObjectPtr>> objects_;
 };
 }
