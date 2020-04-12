@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Added
+
+- Complete the codegen of `foreach`
+- Add the example of using `foreach`
+
+### Removed
+
+- Remove the old support for `for stmt`
+
 ## 0.0.6 - 2020/04/10
 
 ### Added
