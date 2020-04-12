@@ -8,11 +8,7 @@ DIR_TMP = tmp
 OBJ = tmp/error.so tmp/tokenizer.so tmp/parser.so tmp/code.so tmp/objects.so tmp/context.so tmp/repl.so
 FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 
-test: tmp/tokenizer-tester \
-	  tmp/parser-tester \
-	  tmp/sample-tester
-	tmp/tokenizer-tester
-	tmp/parser-tester
+test: tmp/sample-tester
 	tmp/sample-tester
 
 tmp/error.so: src/error.cpp | ${DIR_TMP}
@@ -51,13 +47,7 @@ tmp/context.so: src/context.cpp \
 tmp/repl.so: src/repl.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/tokenizer-tester: test/tokenizer-tester.cpp ${OBJ} | ${DIR_TMP}
-	${CC} ${FLAGS} $< ${FPOBJ} -o $@
-
-tmp/parser-tester: test/parser-tester.cpp ${OBJ}
-	${CC} ${FLAGS} $< ${FPOBJ} -o $@
-
-tmp/sample-tester: test/sample-tester.cpp ${OBJ}
+tmp/sample-tester: test/sample-tester.cpp ${OBJ} | ${DIR_TMP}
 	${CC} ${FLAGS} $< ${FPOBJ} -o $@
 
 ${DIR_TMP}:
