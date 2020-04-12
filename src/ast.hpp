@@ -297,17 +297,6 @@ struct DoWhileStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct ForStmt : Stmt
-{
-    Ptr<Expr> begin, end;
-    Ptr<IdentifierExpr> id;
-    Ptr<BlockExpr> block;
-    ForStmt(Ptr<Expr> begin, Ptr<Expr> end,
-        Ptr<IdentifierExpr> id, Ptr<BlockExpr> block)
-      : begin(begin), end(end), id(id), block(block) {}
-    void codegen(Code &) override;
-};
-
 struct ForeachStmt : Stmt
 {
     Ptr<Expr> expr;
