@@ -17,7 +17,7 @@
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
-#define OPRAND(T) (any_cast<T>(theCurrentContext->oprand()))
+#define OPRAND(T) any_cast<T>(theCurrentContext->oprand())
 
 using namespace std;
 
@@ -56,7 +56,7 @@ void pop_handle()
 
 void import_handle()
 {
-    const auto name = OPRAND(string);
+    const auto &name = OPRAND(string);
     auto mod = ModuleObject::generate(name);
     if (!mod->good())
     {
@@ -69,7 +69,7 @@ void import_handle()
 
 void importpart_handle()
 {
-    const auto name = OPRAND(string);
+    const auto &name = OPRAND(string);
     theCurrentContext->push_straight(
         theCurrentContext->top<ModuleObject>()->load_member(name));
     ++theCurrentContext->pc();
@@ -77,7 +77,7 @@ void importpart_handle()
 
 void importall_handle()
 {
-    const auto name = OPRAND(string);
+    const auto &name = OPRAND(string);
 
     auto ice_mod = make_shared<IceModuleObject>(name);
     if (ice_mod->good())
@@ -111,7 +111,7 @@ void importall_handle()
 
 void load_handle()
 {
-    auto name = OPRAND(string);
+    const auto &name = OPRAND(string);
     auto obj = theCurrentContext->scope()->load_symbol(name);
 
     if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
@@ -138,7 +138,7 @@ void loadconst_handle()
 
 void loadmember_handle()
 {
-    auto name = OPRAND(string);
+    const auto &name = OPRAND(string);
     theCurrentContext->push_straight(theCurrentContext->pop()->load_member(name));
     ++theCurrentContext->pc();
 }
