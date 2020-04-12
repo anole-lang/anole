@@ -7,9 +7,14 @@
 - Complete the codegen of `foreach`
 - Add the example of using `foreach`
 
+### Changed
+
+- Use unique_ptr instead of shared_ptr in AST
+
 ### Removed
 
 - Remove the old support for `for stmt`
+- Remove old testers for tokenizer and parser
 
 ## 0.0.6 - 2020/04/10
 
