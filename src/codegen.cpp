@@ -559,13 +559,48 @@ void DoWhileStmt::codegen(Code &code)
     code.add_ins<Opcode::ScopeEnd>();
 }
 
-void ForStmt::codegen(Code &code)
-{
-
-}
-
+/** foreach expr as ident { stmts }
+ *    is equivalent to:
+ *
+ *  (@() {
+ *    @__it: expr.__iterator__();
+ *    while __it.__has_next__() {
+ *      @ident: __it.__next__();
+ *      ... stmts ...
+ *    }
+ *  })();
+*/
 void ForeachStmt::codegen(Code &code)
 {
+    code.add_ins<Opcode::ScopeBegin>();
 
+    expr->codegen(code);
+    code.add_ins<Opcode::LoadMember>(string("__iterator__"));
+    code.add_ins<Opcode::Call>(static_cast<size_t>(0));
+    code.add_ins<Opcode::StoreLocal>(string("__it"));
+
+    auto it = make_shared<IdentifierExpr>("__it");
+    auto cond = make_shared<ParenOperatorExpr>(
+        make_shared<DotExpr>(it,
+            make_shared<IdentifierExpr>("__has_next__")),
+        ExprList());
+
+    block->statements.insert(block->statements.begin(), nullptr);
+    auto next = make_shared<ParenOperatorExpr>(
+        make_shared<DotExpr>(it,
+            make_shared<IdentifierExpr>("__next__")),
+        ExprList());
+    if (id != nullptr)
+    {
+        *block->statements.begin() = make_shared<VariableDeclarationStmt>(id, next);
+    }
+    else
+    {
+        *block->statements.begin() = make_shared<ExprStmt>(next);
+    }
+
+    WhileStmt(cond, block).codegen(code);
+
+    code.add_ins<Opcode::ScopeEnd>();
 }
 }
