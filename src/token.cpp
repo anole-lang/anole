@@ -10,12 +10,12 @@ Token::Token(TokenType type, string value)
   : type(type), value(move(value)) {}
 
 Token::Token(Token &&token) noexcept
-  : type(token.type),
-    value(std::move(token.value)) {}
+  : type(token.type)
+  , value(std::move(token.value)) {}
 
 Token::Token(const Token &token)
-  : type(token.type),
-    value(token.value) {}
+  : type(token.type)
+  , value(token.value) {}
 
 Token &Token::operator=(const Token &token)
 {
@@ -57,6 +57,6 @@ static const map<string, TokenType> mapping
 Token::Token(std::string value)
   : type(mapping.count(value)
         ? mapping.at(value)
-        : TokenType::Identifier),
-    value(move(value)) {}
+        : TokenType::Identifier)
+  , value(move(value)) {}
 }

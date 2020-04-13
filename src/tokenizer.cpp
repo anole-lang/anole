@@ -9,11 +9,10 @@ using namespace std;
 namespace ice_language
 {
 Tokenizer::Tokenizer(istream &in, string name_of_in)
-  : cur_line_num_(1), last_line_num_(1),
-    cur_char_at_line_(0), last_char_at_line_(0),
-    input_stream_(in),
-    name_of_in_(move(name_of_in)),
-    last_input_(' ')
+  : cur_line_num_(1), last_line_num_(1)
+  , cur_char_at_line_(0), last_char_at_line_(0)
+  , input_stream_(in), name_of_in_(move(name_of_in))
+  , last_input_(' ')
 {
     // ...
 }

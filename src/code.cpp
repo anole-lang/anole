@@ -80,8 +80,8 @@ void typeins(istream &in, T &arg, Args &...args)
 namespace ice_language
 {
 Code::Code(string from)
-  : from_(move(from)),
-    constants_{ theNone, theTrue, theFalse }
+  : from_(move(from))
+  , constants_{ theNone, theTrue, theFalse }
 {
     // ...
 }
