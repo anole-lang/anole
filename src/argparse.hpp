@@ -8,7 +8,7 @@
 #include <exception>
 #include <functional>
 
-namespace ice_language
+namespace anole
 {
 class Argument
 {

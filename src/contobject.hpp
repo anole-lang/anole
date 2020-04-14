@@ -3,7 +3,7 @@
 #include "context.hpp"
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class ContObject : public Object
 {

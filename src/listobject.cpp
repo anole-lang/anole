@@ -9,7 +9,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 static map<string, function<void(ListObject *)>>
 built_in_methods_for_list

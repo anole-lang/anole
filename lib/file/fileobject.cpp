@@ -6,7 +6,7 @@
 #include "../../src/integerobject.hpp"
 
 using namespace std;
-using namespace ice_language;
+using namespace anole;
 
 void _open()
 {

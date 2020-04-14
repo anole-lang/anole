@@ -4,7 +4,7 @@
 #include <utility>
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class StringObject : public Object
 {

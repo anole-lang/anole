@@ -7,7 +7,7 @@
 #include <iostream>
 
 using namespace std;
-using namespace ice_language;
+using namespace anole;
 
 #ifdef _DEBUG
 #define PRINT code->print()

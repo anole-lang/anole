@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 Token::Token(TokenType type, string value)
   : type(type), value(move(value)) {}

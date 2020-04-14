@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 CompileError::CompileError(string err)
   : err_(err) {}

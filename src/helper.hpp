@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-namespace ice_language
+namespace anole
 {
 template <typename T>
 using SPtr = std::shared_ptr<T>;

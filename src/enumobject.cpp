@@ -2,7 +2,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 SPtr<ObjectPtr> EnumObject::load_member(const std::string &name)
 {

@@ -3,7 +3,7 @@
 #include <string>
 #include <exception>
 
-namespace ice_language
+namespace anole
 {
 class CompileError : public std::exception
 {

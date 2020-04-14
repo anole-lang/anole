@@ -1,29 +1,29 @@
-# Ice Programming Language
+# Anole Programming Language
 
-[![New Issue](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/ice-lang/ice/issues/new)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/ice-lang/ice/compare)
-[![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/ice-lang)
-[![License](https://img.shields.io/github/license/MU001999/ice.svg)](https://github.com/ice-lang/ice)
+[![New Issue](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/anole-lang/anole/issues/new)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/anole-lang/anole/compare)
+[![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/anole)
+[![License](https://img.shields.io/github/license/anole-lang/anole.svg)](https://github.com/anole-lang/anole)
 
 ## Quick Usage
 
 ### Install
 
 ```bash
-~> git clone https://github.com/ice-lang/ice-lang.git
-~> cd ice-lang
-~/ice-lang> mkdir build
-~/ice-lang> cd build
+~> git clone https://github.com/anole-lang/anole.git
+~> cd anole
+~/anole> mkdir build
+~/anole> cd build
 ~/build> cmake ..
 ~/build> sudo make install
 ```
 
-If you want to remove ice, you can execute `cat install_manifest.txt | sudo xargs rm` in `build/`
+If you want to remove anole, you can execute `cat install_manifest.txt | sudo xargs rm` in `build/`
 
 ### Usage
 
 ```bash
-~> ice
+~> anole
 ```
 
 You can see some examples in `example/` or the `test/sample-tester.cpp`, this is the yin-yang puzzle for fun
@@ -38,7 +38,7 @@ You can see some examples in `example/` or the `test/sample-tester.cpp`, this is
 
 ### Extension in Visual Studio Code
 
-Search `Ice-Lang`, only provides highlight now
+Search `Anole-Lang`, only provides highlight now
 
 ## ChangeLog
 

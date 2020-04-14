@@ -10,7 +10,7 @@
 #include "object.hpp"
 #include "instruction.hpp"
 
-namespace ice_language
+namespace anole
 {
 class Code
 {

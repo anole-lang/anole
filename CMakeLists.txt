@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(ice-lang VERSION 0.0.1)
+project(anole VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -10,7 +10,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
     ADD_DEFINITIONS(-D_DEBUG)
 
     file(GLOB SOURCES "src/*.cpp")
-    add_executable(ice ${SOURCES})
+    add_executable(anole ${SOURCES})
 ELSE()
     set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
@@ -56,13 +56,13 @@ ELSE()
             objects
             context
             repl
-        DESTINATION "lib/ice-lang"
+        DESTINATION "lib/anole"
     )
 
-    link_directories(${CMAKE_INSTALL_PREFIX}/lib/ice-lang)
+    link_directories(${CMAKE_INSTALL_PREFIX}/lib/anole)
 
-    add_executable(ice src/main.cpp)
-    target_link_libraries(ice
+    add_executable(anole src/main.cpp)
+    target_link_libraries(anole
         PRIVATE
             error
             tokenizer
@@ -76,15 +76,15 @@ ELSE()
             readline
     )
 
-    set_target_properties(ice PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-    install (TARGETS ice DESTINATION bin)
+    set_target_properties(anole PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+    install (TARGETS anole DESTINATION bin)
 
     file(GLOB HEADERS "src/*.hpp")
 
     install (
         FILES
         ${HEADERS}
-        DESTINATION "include/ice-lang"
+        DESTINATION "include/anole"
     )
 
     add_library(fileobject SHARED
@@ -93,19 +93,19 @@ ELSE()
 
     install (
         FILES
-        "lib/file/__init__.icec"
-        DESTINATION "lib/ice-lang/file"
+        "lib/file/__init__.anole"
+        DESTINATION "lib/anole/file"
     )
 
     install (
         TARGETS
             fileobject
-        DESTINATION "lib/ice-lang/file"
+        DESTINATION "lib/anole/file"
     )
 
     install (
         FILES
-        "lib/coroutine/__init__.icec"
-        DESTINATION "lib/ice-lang/coroutine"
+        "lib/coroutine/__init__.anole"
+        DESTINATION "lib/anole/coroutine"
     )
 ENDIF()

@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 bool IntegerObject::to_bool()
 {

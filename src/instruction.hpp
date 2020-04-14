@@ -6,7 +6,7 @@
 #include <utility>
 #include "helper.hpp"
 
-namespace ice_language
+namespace anole
 {
 enum Opcode
 {

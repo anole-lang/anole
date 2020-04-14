@@ -2,7 +2,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 bool BoolObject::to_bool()
 {

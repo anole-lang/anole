@@ -15,7 +15,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 REGISTER_BUILTIN(eval,
 {

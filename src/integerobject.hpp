@@ -2,7 +2,7 @@
 
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class IntegerObject : public Object
 {

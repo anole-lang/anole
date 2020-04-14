@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 Parser::Parser(istream &in, string name_of_in)
   : tokenizer_(in, name_of_in)

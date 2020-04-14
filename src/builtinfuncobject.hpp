@@ -14,7 +14,7 @@
         ); \
     }
 
-namespace ice_language
+namespace anole
 {
 class BuiltInFunctionObject : public Object
 {

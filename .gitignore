@@ -1,6 +1,5 @@
 .vscode/
 tmp/
 *.out
-*.icei
-*.icer
+*.anole.*
 build/

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 string BuiltInFunctionObject::to_str()
 {

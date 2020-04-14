@@ -77,7 +77,7 @@ void typeins(istream &in, T &arg, Args &...args)
 }
 }
 
-namespace ice_language
+namespace anole
 {
 Code::Code(string from)
   : from_(move(from))

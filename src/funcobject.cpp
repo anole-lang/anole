@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 string FunctionObject::to_str()
 {

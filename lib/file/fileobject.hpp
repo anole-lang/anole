@@ -7,7 +7,7 @@ extern "C"
 void _open();
 }
 
-namespace ice_language
+namespace anole
 {
 class FileObject : public Object
 {

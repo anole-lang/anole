@@ -3,7 +3,7 @@
 #include <map>
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class DictObject : public Object
 {

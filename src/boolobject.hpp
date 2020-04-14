@@ -3,7 +3,7 @@
 #include <memory>
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class BoolObject : public Object
 {

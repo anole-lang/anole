@@ -9,13 +9,13 @@ using namespace std;
 using namespace filesystem;
 using namespace chrono_literals;
 
-namespace ice_language
+namespace anole
 {
 ModuleObject::~ModuleObject() = default;
 
 SPtr<ModuleObject> ModuleObject::generate(const string &name)
 {
-    SPtr<ModuleObject> mod = make_shared<IceModuleObject>(name);
+    SPtr<ModuleObject> mod = make_shared<AnoleModuleObject>(name);
     if (!mod->good())
     {
         mod = make_shared<CppModuleObject>(name);
@@ -24,24 +24,24 @@ SPtr<ModuleObject> ModuleObject::generate(const string &name)
     return mod;
 }
 
-IceModuleObject::IceModuleObject(const string &name)
+AnoleModuleObject::AnoleModuleObject(const string &name)
 {
     good_ = true;
     if (is_directory(theCurrentContext->current_path() / name))
     {
-        init(theCurrentContext->current_path() / name / "__init__.icec");
+        init(theCurrentContext->current_path() / name / "__init__.anole");
     }
-    else if (is_regular_file(theCurrentContext->current_path() / (name + ".icec")))
+    else if (is_regular_file(theCurrentContext->current_path() / (name + ".anole")))
     {
-        init(theCurrentContext->current_path() / (name + ".icec"));
+        init(theCurrentContext->current_path() / (name + ".anole"));
     }
-    else if (is_directory(filesystem::path("/usr/local/lib/ice-lang") / name))
+    else if (is_directory(filesystem::path("/usr/local/lib/anole") / name))
     {
-        init(filesystem::path("/usr/local/lib/ice-lang") / name / "__init__.icec");
+        init(filesystem::path("/usr/local/lib/anole") / name / "__init__.anole");
     }
-    else if (is_regular_file(filesystem::path("/usr/local/lib/ice-lang") / (name + ".icec")))
+    else if (is_regular_file(filesystem::path("/usr/local/lib/anole") / (name + ".anole")))
     {
-        init(filesystem::path("/usr/local/lib/ice-lang") / (name + ".icec"));
+        init(filesystem::path("/usr/local/lib/anole") / (name + ".anole"));
     }
     else
     {
@@ -49,7 +49,7 @@ IceModuleObject::IceModuleObject(const string &name)
     }
 }
 
-SPtr<ObjectPtr> IceModuleObject::load_member(const string &name)
+SPtr<ObjectPtr> AnoleModuleObject::load_member(const string &name)
 {
     if (scope_->symbols().count(name))
     {
@@ -58,18 +58,17 @@ SPtr<ObjectPtr> IceModuleObject::load_member(const string &name)
     return Object::load_member(name);
 }
 
-void IceModuleObject::init(const filesystem::path &path)
+void AnoleModuleObject::init(const filesystem::path &path)
 {
     auto dir = path.parent_path();
-    auto icei_path = path.string();
-    icei_path.back() = 'i';
+    auto ir_path = path.string() + ".ir";
 
     auto code = make_shared<Code>(path.filename().string());
 
-    if (is_regular_file(icei_path)
-        and last_write_time(icei_path) >= last_write_time(path))
+    if (is_regular_file(ir_path)
+        and last_write_time(ir_path) >= last_write_time(path))
     {
-        code->unserialize(icei_path);
+        code->unserialize(ir_path);
     }
     else
     {
@@ -79,7 +78,7 @@ void IceModuleObject::init(const filesystem::path &path)
             throw RuntimeError("cannot open file " + path.string());
         }
         Parser(fin, path.filename().string()).gen_statements()->codegen(*code);
-        code->serialize(icei_path);
+        code->serialize(ir_path);
     }
 
     auto origin = theCurrentContext;
@@ -96,7 +95,7 @@ CppModuleObject::CppModuleObject(const string &name)
     handle_ = dlopen(path.c_str(), RTLD_NOW);
     if (!handle_)
     {
-        auto path = "/usr/local/lib/ice-lang/" + name + ".so";
+        auto path = "/usr/local/lib/anole/" + name + ".so";
         handle_ = dlopen(path.c_str(), RTLD_NOW);
     }
     good_ = handle_;

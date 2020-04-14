@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 Tokenizer::Tokenizer(istream &in, string name_of_in)
   : cur_line_num_(1), last_line_num_(1)

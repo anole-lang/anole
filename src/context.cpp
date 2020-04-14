@@ -21,7 +21,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 static map<SPtr<ObjectPtr>, string> not_defineds;
 
@@ -79,10 +79,10 @@ void importall_handle()
 {
     const auto &name = OPRAND(string);
 
-    auto ice_mod = make_shared<IceModuleObject>(name);
-    if (ice_mod->good())
+    auto anole_mod = make_shared<AnoleModuleObject>(name);
+    if (anole_mod->good())
     {
-        for (const auto &name_ptr : ice_mod->scope()->symbols())
+        for (const auto &name_ptr : anole_mod->scope()->symbols())
         {
             theCurrentContext->scope()->create_symbol(
                 name_ptr.first, name_ptr.second);

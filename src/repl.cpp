@@ -36,7 +36,7 @@ static void handle_sigint(int)
 }
 }
 
-namespace ice_language
+namespace anole
 {
 void replrun::run()
 {
@@ -45,12 +45,13 @@ void replrun::run()
     // read_history(NULL);
 
     cout <<
-"    _____________________\n"
-"   /_  ___/ _____/ _____/\n"
-"    / /  / /    / /____      Version 0.0.7 \n"
-" __/ /__/ /____/ /____\n"
-"/______/______/______/\n"
-    << endl;
+R"(    _                _
+   / \   _ __   ___ | | ___
+  / _ \ | '_ \ / _ \| |/ _ \
+ / ___ \| | | | (_) | |  __/    Version 0.0.8
+/_/   \_\_| |_|\___/|_|\___|
+)"  << endl;
+
     AST::interpretive() = true;
 
     string line;

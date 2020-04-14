@@ -11,7 +11,7 @@
 #include "scope.hpp"
 #include "helper.hpp"
 
-namespace ice_language
+namespace anole
 {
 // Context should be contructed by make_shared
 class Context : public std::enable_shared_from_this<Context>

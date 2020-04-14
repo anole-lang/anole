@@ -4,7 +4,7 @@
 #include "scope.hpp"
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class FunctionObject : public Object
 {

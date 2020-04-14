@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 static map<string, function<void(DictObject *)>>
 built_in_methods_for_dict

@@ -6,7 +6,7 @@
 #include <iostream>
 #include "token.hpp"
 
-namespace ice_language
+namespace anole
 {
 class Tokenizer
 {

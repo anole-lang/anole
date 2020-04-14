@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace ice_language
+namespace anole
 {
 ObjectPtr NoneObject::ceq(ObjectPtr obj)
 {

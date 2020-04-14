@@ -9,7 +9,7 @@
 #include "ast.hpp"
 #include "tokenizer.hpp"
 
-namespace ice_language
+namespace anole
 {
 class Parser
 {

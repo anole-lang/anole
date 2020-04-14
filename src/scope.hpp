@@ -6,7 +6,7 @@
 #include "object.hpp"
 #include "builtinfuncobject.hpp"
 
-namespace ice_language
+namespace anole
 {
 class Scope
 {

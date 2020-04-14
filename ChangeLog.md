@@ -1,4 +1,10 @@
-# ChangeLog for Ice
+# ChangeLog for Anole
+
+## 0.0.8 - 2020/04/14
+
+### Changed
+
+- Rename to Anole
 
 ## 0.0.7 - 2020/04/12
 
@@ -51,7 +57,7 @@
 ### Changed
 
 - Coroutine as a library now rather than the example
-- Suffix from .ice to .icec
+- Suffix from .anole to .icec
 
 ## 0.0.3 - 2020/04/07
 
@@ -97,12 +103,12 @@
 
 ### Added
 
-- This ChangeLog file to document changes of Ice
+- This ChangeLog file to document changes of Anole
 
 ### Removed
 
 - The origin ChangeLog in README.md
-- The Samples.md, because I plan to write some docs later and you can learn something about how to use Ice by examples in [example/](example/)
+- The Samples.md, because I plan to write some docs later and you can learn something about how to use Anole by examples in [example/](example/)
 
 ## 0.0.0
 

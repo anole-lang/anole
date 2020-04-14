@@ -7,7 +7,7 @@
 #include "helper.hpp"
 #include "token.hpp"
 
-namespace ice_language
+namespace anole
 {
 class Code;
 

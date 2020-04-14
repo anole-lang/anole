@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace ice_language
+namespace anole
 {
 enum class TokenType
 {

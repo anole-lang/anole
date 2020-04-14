@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ice_language
+namespace anole
 {
 namespace replrun
 {

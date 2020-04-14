@@ -4,7 +4,7 @@
 #include "error.hpp"
 #include "helper.hpp"
 
-namespace ice_language
+namespace anole
 {
 using ObjectPtr = SPtr<class Object>;
 

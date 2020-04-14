@@ -3,7 +3,7 @@
 #include <vector>
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class ListObject : public Object
 {

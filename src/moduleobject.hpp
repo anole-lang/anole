@@ -3,7 +3,7 @@
 #include "scope.hpp"
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class ModuleObject : public Object
 {
@@ -23,11 +23,11 @@ class ModuleObject : public Object
     bool good_;
 };
 
-class IceModuleObject : public ModuleObject
+class AnoleModuleObject : public ModuleObject
 {
   public:
-    IceModuleObject(const std::string &name);
-    IceModuleObject(SPtr<Scope> scope)
+    AnoleModuleObject(const std::string &name);
+    AnoleModuleObject(SPtr<Scope> scope)
       : scope_(scope) {}
     SPtr<ObjectPtr> load_member(const std::string &name) override;
 

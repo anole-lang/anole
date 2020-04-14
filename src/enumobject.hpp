@@ -3,7 +3,7 @@
 #include "scope.hpp"
 #include "object.hpp"
 
-namespace ice_language
+namespace anole
 {
 class EnumObject : public Object
 {
