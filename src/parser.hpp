@@ -21,7 +21,8 @@ class Parser
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();
 
-    static void add_infixop(const std::string &str);
+    static void add_infixop(const std::string &str,
+        std::size_t priority);
 
   private:
     Token current_token_;
@@ -73,7 +74,7 @@ class Parser
     Ptr<Stmt> gen_return_stmt();
 
     Ptr<Expr> gen_delay_expr();
-    Ptr<Expr> gen_expr(int priority = -1);
+    Ptr<Expr> gen_expr(int layer = -1);
     Ptr<Expr> gen_term();
     Ptr<Expr> gen_term_tail(Ptr<Expr> expr);
     Ptr<IdentifierExpr> gen_ident();

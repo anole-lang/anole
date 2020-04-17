@@ -43,6 +43,12 @@ void typeouts(ostream &out, T arg, Args... args)
     }
 }
 
+template<typename T1, typename T2>
+void typeout(ostream &out, pair<T1, T2> pir)
+{
+    typeouts(out, pir.first, pir.second);
+}
+
 template<typename T>
 void typein(istream &in, T &target)
 {
@@ -74,6 +80,12 @@ void typeins(istream &in, T &arg, Args &...args)
     {
         typeins(in, args...);
     }
+}
+
+template<typename T1, typename T2>
+void typein(istream &in, pair<T1, T2> &pir)
+{
+    typeins(in, pir.first, pir.second);
 }
 }
 
@@ -246,7 +258,11 @@ void Code::print(ostream &out)
             break;
 
         case Opcode::AddInfixOp:
-            out << i << "\tLambdaDecl\t" << OPRAND(string) << endl;
+        {
+            using type = pair<string, size_t>;
+            const auto &op_p = OPRAND(type);
+            out << i << "\tAddInfixOp\t" << op_p.first << " " << op_p.second << endl;
+        }
             break;
 
         case Opcode::LambdaDecl:
@@ -388,8 +404,12 @@ void Code::serialize(ostream &out)
         case Opcode::Load:
         case Opcode::LoadMember:
         case Opcode::StoreLocal:
-        case Opcode::AddInfixOp:
             typeout(out, OPRAND(string));
+            break;
+
+        case Opcode::AddInfixOp:
+            using type = pair<string, size_t>;
+            typeout(out, OPRAND(type));
             break;
 
         default:
@@ -485,9 +505,16 @@ void Code::unserialize(ifstream &in)
         case Opcode::Load:
         case Opcode::LoadMember:
         case Opcode::StoreLocal:
-        case Opcode::AddInfixOp:
         {
             string val;
+            typein(in, val);
+            oprand = val;
+        }
+            break;
+
+        case Opcode::AddInfixOp:
+        {
+            pair<string, size_t> val;
             typein(in, val);
             oprand = val;
         }

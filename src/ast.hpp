@@ -310,10 +310,12 @@ struct FunctionDeclarationStmt : Stmt
 
 struct InfixopDeclarationStmt : Stmt
 {
+    size_t priority;
     Ptr<IdentifierExpr> id;
 
-    InfixopDeclarationStmt(Ptr<IdentifierExpr> &&id)
-      : id(std::move(id)) {}
+    InfixopDeclarationStmt(Ptr<IdentifierExpr> &&id,
+        size_t priority)
+      : priority(priority), id(std::move(id)) {}
 
     void codegen(Code &) override;
 };

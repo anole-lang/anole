@@ -464,7 +464,7 @@ void FunctionDeclarationStmt::codegen(Code &code)
 
 void InfixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddInfixOp>(id->name);
+    code.add_ins<Opcode::AddInfixOp>(make_pair(id->name, priority));
 }
 
 void ClassDeclarationStmt::codegen(Code &code)

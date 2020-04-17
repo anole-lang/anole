@@ -1,4 +1,5 @@
 #include <set>
+#include <algorithm>
 #include "ast.hpp"
 #include "error.hpp"
 #include "parser.hpp"
@@ -43,36 +44,62 @@ Ptr<AST> Parser::gen_statements()
     return gen_stmts();
 }
 
-static vector<set<TokenType>> &get_operators()
+namespace operators
 {
-    static vector<set<TokenType>> operators
+static set<TokenType> unary_ops
+{
+    TokenType::Not, TokenType::Sub, TokenType::BNeg
+};
+
+static vector<size_t> bop_priorities
+{
+    100, 110, 120, 130, 140, 150, 160, 170, 180, 190
+};
+static map<size_t, set<TokenType>> bop_mapping
+{
+    { 100, { TokenType::Or } },
+    { 110, { TokenType::And } },
+    { 120, { TokenType::BOr } },
+    { 130, { TokenType::BXor } },
+    { 140, { TokenType::BAnd } },
+    { 150, { TokenType::CEQ, TokenType::CNE } },
+    { 160, { TokenType::CLT, TokenType::CLE, TokenType::CGT, TokenType::CGE } },
+    { 170, { TokenType::BLS, TokenType::BRS } },
+    { 180, { TokenType::Add, TokenType::Sub } },
+    { 190, { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod } }
+};
+
+static set<TokenType> &bops_at_priority(size_t priority)
+{
+    if (!bop_mapping.count(priority))
     {
-        { TokenType::Or },
-        { TokenType::And },
-        { TokenType::BOr },
-        { TokenType::BXor },
-        { TokenType::BAnd },
-        { TokenType::CEQ, TokenType::CNE },
-        { TokenType::CLT, TokenType::CLE, TokenType::CGT, TokenType::CGE },
-        { TokenType::BLS, TokenType::BRS },
-        { TokenType::Add, TokenType::Sub },
-        { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod },
-        // this layer is for custom operators
-        {  },
-        { TokenType::Not, TokenType::Sub, TokenType::BNeg }
-    };
-    return operators;
+        bop_mapping[priority] = {};
+    }
+    return bop_mapping[priority];
 }
 
-void Parser::add_infixop(const string &str)
+static set<TokenType> &bops_at_layer(size_t layer)
+{
+    return bop_mapping[bop_priorities[layer]];
+}
+}
+
+void Parser::add_infixop(const string &str, size_t priority)
 {
     auto type = Token::add_token_type(str);
     if (type <= TokenType::End)
     {
         throw RuntimeError("can't define predefined keywords or operators");
     }
-    auto &ops = get_operators();
-    ops[ops.size() - 2].insert(type);
+
+    auto lower = lower_bound(operators::bop_priorities.begin(),
+        operators::bop_priorities.end(), priority);
+    if (lower == operators::bop_priorities.end() or *lower != priority)
+    {
+        operators::bop_priorities.insert(lower, priority);
+    }
+
+    operators::bops_at_priority(priority).insert(type);
 }
 
 void Parser::throw_err(const string &err_info)
@@ -360,7 +387,14 @@ Ptr<Stmt> Parser::gen_declaration()
 Ptr<Stmt> Parser::gen_infixop_decl()
 {
     get_next_token();
-    return make_unique<InfixopDeclarationStmt>(gen_ident());
+    size_t priority = 50;
+    if (current_token_.type == TokenType::Integer)
+    {
+        priority = stoull(current_token_.value);
+        get_next_token();
+    }
+    check<TokenType::Identifier>("expected an identifier here");
+    return make_unique<InfixopDeclarationStmt>(gen_ident(), priority);
 }
 
 Ptr<Stmt> Parser::gen_class_decl()
@@ -535,9 +569,9 @@ Ptr<Expr> Parser::gen_delay_expr()
     }
 }
 
-Ptr<Expr> Parser::gen_expr(int priority)
+Ptr<Expr> Parser::gen_expr(int layer)
 {
-    if (priority == -1)
+    if (layer == -1)
     {
         auto expr = gen_expr(0);
         if (current_token_.type == TokenType::Ques)
@@ -554,17 +588,15 @@ Ptr<Expr> Parser::gen_expr(int priority)
         return expr;
     }
 
-    if (static_cast<size_t>(priority + 1) == get_operators().size())
+    if (static_cast<size_t>(layer) == operators::bop_priorities.size())
     {
-        if (get_operators()[priority].count(current_token_.type))
+        if (operators::unary_ops.count(current_token_.type))
         {
             auto pos = tokenizer_.last_pos();
             auto op = current_token_.type;
             get_next_token();
             try_continue();
-            auto expr = make_unique<UnaryOperatorExpr>(
-                op, gen_expr(priority)
-            );
+            auto expr = make_unique<UnaryOperatorExpr>(op, gen_expr(layer));
             expr->pos = pos;
             return expr;
         }
@@ -574,13 +606,13 @@ Ptr<Expr> Parser::gen_expr(int priority)
         }
     }
 
-    auto lhs = gen_expr(priority + 1);
+    auto lhs = gen_expr(layer + 1);
     auto op = current_token_;
-    if (get_operators()[priority].count(op.type))
+    if (operators::bops_at_layer(static_cast<size_t>(layer)).count(op.type))
     {
         auto pos = tokenizer_.last_pos();
         get_next_token();
-        auto rhs = gen_expr(priority);
+        auto rhs = gen_expr(layer);
         if (dynamic_cast<IntegerExpr *>(lhs.get()) and
             dynamic_cast<IntegerExpr *>(rhs.get()))
         {

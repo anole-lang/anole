@@ -340,7 +340,9 @@ void match_handle()
 
 void addinfixop_handle()
 {
-    Parser::add_infixop(OPRAND(string));
+    using type = pair<string, size_t>;
+    const auto &op_p = OPRAND(type);
+    Parser::add_infixop(op_p.first, op_p.second);
     ++theCurrentContext->pc();
 }
 
