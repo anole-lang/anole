@@ -5,7 +5,6 @@
 #include <iostream>
 #include <iterator>
 #include <functional>
-#include "helper.hpp"
 #include "ast.hpp"
 #include "tokenizer.hpp"
 
@@ -21,6 +20,8 @@ class Parser
     void set_continue_action(std::function<void()>);
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();
+
+    static void add_infixop(const std::string &str);
 
   private:
     Token current_token_;
@@ -60,6 +61,7 @@ class Parser
     Ptr<Stmt> gen_stmt();
     Ptr<Stmt> gen_declaration();
     Ptr<Stmt> gen_var_assign();
+    Ptr<Stmt> gen_infixop_decl();
     Ptr<Stmt> gen_class_decl();
     Ptr<Stmt> gen_use_stmt();
     // should be rewrited

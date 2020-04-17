@@ -43,6 +43,38 @@ Ptr<AST> Parser::gen_statements()
     return gen_stmts();
 }
 
+static vector<set<TokenType>> &get_operators()
+{
+    static vector<set<TokenType>> operators
+    {
+        { TokenType::Or },
+        { TokenType::And },
+        { TokenType::BOr },
+        { TokenType::BXor },
+        { TokenType::BAnd },
+        { TokenType::CEQ, TokenType::CNE },
+        { TokenType::CLT, TokenType::CLE, TokenType::CGT, TokenType::CGE },
+        { TokenType::BLS, TokenType::BRS },
+        { TokenType::Add, TokenType::Sub },
+        { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod },
+        // this layer is for custom operators
+        {  },
+        { TokenType::Not, TokenType::Sub, TokenType::BNeg }
+    };
+    return operators;
+}
+
+void Parser::add_infixop(const string &str)
+{
+    auto type = Token::add_token_type(str);
+    if (type <= TokenType::End)
+    {
+        throw RuntimeError("can't define predefined keywords or operators");
+    }
+    auto &ops = get_operators();
+    ops[ops.size() - 2].insert(type);
+}
+
 void Parser::throw_err(const string &err_info)
 {
     throw CompileError(get_err_info(err_info));
@@ -235,6 +267,9 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::Use:
         return gen_use_stmt();
 
+    case TokenType::Infixop:
+        return gen_infixop_decl();
+
     case TokenType::If:
         return gen_if_else();
 
@@ -320,6 +355,12 @@ Ptr<Stmt> Parser::gen_declaration()
         break;
     }
     return make_unique<VariableDeclarationStmt>(move(id), nullptr);
+}
+
+Ptr<Stmt> Parser::gen_infixop_decl()
+{
+    get_next_token();
+    return make_unique<InfixopDeclarationStmt>(gen_ident());
 }
 
 Ptr<Stmt> Parser::gen_class_decl()
@@ -494,25 +535,6 @@ Ptr<Expr> Parser::gen_delay_expr()
     }
 }
 
-static const vector<set<TokenType>> &get_operators()
-{
-    static const vector<set<TokenType>> operators
-    {
-        { TokenType::Or },
-        { TokenType::And },
-        { TokenType::BOr },
-        { TokenType::BXor },
-        { TokenType::BAnd },
-        { TokenType::CEQ, TokenType::CNE },
-        { TokenType::CLT, TokenType::CLE, TokenType::CGT, TokenType::CGE },
-        { TokenType::BLS, TokenType::BRS },
-        { TokenType::Add, TokenType::Sub },
-        { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod },
-        { TokenType::Not, TokenType::Sub, TokenType::BNeg }
-    };
-    return operators;
-}
-
 Ptr<Expr> Parser::gen_expr(int priority)
 {
     if (priority == -1)
@@ -553,8 +575,8 @@ Ptr<Expr> Parser::gen_expr(int priority)
     }
 
     auto lhs = gen_expr(priority + 1);
-    auto op = current_token_.type;
-    if (get_operators()[priority].count(op))
+    auto op = current_token_;
+    if (get_operators()[priority].count(op.type))
     {
         auto pos = tokenizer_.last_pos();
         get_next_token();
@@ -564,7 +586,7 @@ Ptr<Expr> Parser::gen_expr(int priority)
         {
             auto alias = reinterpret_cast<IntegerExpr *>(lhs.get());
             auto rv = reinterpret_cast<IntegerExpr *>(rhs.get())->value;
-            switch (op)
+            switch (op.type)
             {
             case TokenType::Add:
                 alias->value += rv;
