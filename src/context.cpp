@@ -4,6 +4,7 @@
 #include <set>
 #include <fstream>
 #include "error.hpp"
+#include "parser.hpp"
 #include "context.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -23,6 +24,8 @@ using namespace std;
 
 namespace anole
 {
+SPtr<Context> theCurrentContext = nullptr;
+
 static map<SPtr<ObjectPtr>, string> not_defineds;
 
 void Context::add_not_defined_symbol(
@@ -335,6 +338,12 @@ void match_handle()
     }
 }
 
+void addinfixop_handle()
+{
+    Parser::add_infixop(OPRAND(string));
+    ++theCurrentContext->pc();
+}
+
 void lambdadecl_handle()
 {
     theCurrentContext->push(make_shared<FunctionObject>(
@@ -551,6 +560,8 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::jumpif_handle,
     &op_handles::jumpifnot_handle,
     &op_handles::match_handle,
+
+    &op_handles::addinfixop_handle,
 
     &op_handles::lambdadecl_handle,
     &op_handles::thunkdecl_handle,

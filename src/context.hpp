@@ -165,5 +165,5 @@ class Context : public std::enable_shared_from_this<Context>
     std::filesystem::path current_path_;
 };
 
-inline SPtr<Context> theCurrentContext = nullptr;
+extern SPtr<Context> theCurrentContext;
 }
