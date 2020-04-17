@@ -1,5 +1,12 @@
 # ChangeLog for Anole
 
+## Unreleased
+
+### Added
+
+- Insturction AddInfixOp to make identifier as infix operator
+- Support custom operators
+
 ## 0.0.8 - 2020/04/14
 
 ### Changed
