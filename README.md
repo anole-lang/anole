@@ -46,5 +46,4 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-+ [ ] Enable users to define themselves' operators
 + [ ] Support threads and processes
