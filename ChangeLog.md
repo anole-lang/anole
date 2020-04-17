@@ -5,7 +5,7 @@
 ### Added
 
 - Insturction AddInfixOp to make identifier as infix operator
-- Support custom operators
+- Support custom operators and priorities
 
 ## 0.0.8 - 2020/04/14
 
