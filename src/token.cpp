@@ -24,10 +24,12 @@ Token &Token::operator=(const Token &token)
     return *this;
 }
 
-static const map<string, TokenType> mapping
+static int end_of_token_type = TokenType::End;
+static map<string, TokenType> mapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
+    { "infixop",    TokenType::Infixop  },
     { "if",         TokenType::If       },
     { "elif",       TokenType::Elif     },
     { "else",       TokenType::Else     },
@@ -51,7 +53,27 @@ static const map<string, TokenType> mapping
     { "and",        TokenType::And      },
     { "or",         TokenType::Or       },
     { "not",        TokenType::Not      },
-    { "is",         TokenType::Is       }
+    { "is",         TokenType::Is       },
+
+    { "+",          TokenType::Add      },
+    { "-",          TokenType::Sub      },
+    { "*",          TokenType::Mul      },
+    { "/",          TokenType::Div      },
+    { "%",          TokenType::Mod      },
+    { "&",          TokenType::BAnd     },
+    { "|",          TokenType::BOr      },
+    { "^",          TokenType::BXor     },
+    { "~",          TokenType::BNeg     },
+    { "!",          TokenType::Not      },
+    { "=",          TokenType::CEQ      },
+    { "!=",         TokenType::CNE      },
+    { "<",          TokenType::CLT      },
+    { "<=",         TokenType::CLE      },
+    { ">",          TokenType::CGT      },
+    { ">=",         TokenType::CGE      },
+    { "=>",         TokenType::Ret      },
+    { "<<",         TokenType::BLS      },
+    { ">>",         TokenType::BRS      },
 };
 
 Token::Token(std::string value)
@@ -59,4 +81,13 @@ Token::Token(std::string value)
         ? mapping.at(value)
         : TokenType::Identifier)
   , value(move(value)) {}
+
+TokenType Token::add_token_type(const string &str)
+{
+    if (!mapping.count(str))
+    {
+        mapping[str] = static_cast<TokenType>(++end_of_token_type);
+    }
+    return mapping[str];
+}
 }

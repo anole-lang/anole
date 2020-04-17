@@ -4,15 +4,16 @@
 
 namespace anole
 {
-enum class TokenType
+namespace token_type
 {
-    End,
-
+enum TokenType : int
+{
     At,        // @
     AtAt,      // @@
 
     Use,       // use
     From,      // from
+    Infixop,   // infixop
     If,        // if
     Elif,      // elif
     Else,      // else
@@ -33,7 +34,7 @@ enum class TokenType
     True,      // true
     False,     // false
 
-    Identifier, // [a-zA-Z_][a-zA-Z0-9_]*
+    Identifier, // [^ 0-9_#@.:;?\(\)\[\]\{\}"]+
     Integer,    // [0-9]+
     Double,     // [0-9]+\.[0-9]*
     String,     // "[^"\n]"
@@ -50,6 +51,7 @@ enum class TokenType
 
     Colon,     // :
     Semicolon, // ;
+
     Add,       // +
     Sub,       // -
     Mul,       // *
@@ -78,7 +80,11 @@ enum class TokenType
     Ret,       // =>
 
     Ques,      // ?
+
+    End,
 };
+}
+using token_type::TokenType;
 
 struct Token
 {
@@ -88,6 +94,8 @@ struct Token
     Token(Token &&token) noexcept;
     Token(const Token &token);
     Token &operator=(const Token &token);
+
+    static TokenType add_token_type(const std::string &str);
 
     TokenType type;
     std::string value;

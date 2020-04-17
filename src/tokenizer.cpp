@@ -1,3 +1,4 @@
+#include <set>
 #include <cctype>
 #include <memory>
 #include "ast.hpp"
@@ -52,6 +53,20 @@ void Tokenizer::get_next_input()
     }
 }
 
+static const set<char> illegal_idchrs
+{
+    '_', '#', '@', '.', ':', ';', '?', '(', ')', '[', ']', '{', '}', '"'
+};
+static bool is_legal_idchr(char chr)
+{
+    if (isspace(chr) or isdigit(chr) or isalpha(chr)
+        or illegal_idchrs.count(chr))
+    {
+        return false;
+    }
+    return true;
+}
+
 Token Tokenizer::next()
 {
     enum class State
@@ -59,15 +74,12 @@ Token Tokenizer::next()
         Begin,
 
         InAT,
-        InNot,
-        InCLT,
-        InCGT,
-        InRET,
 
         InComment,
         InInteger,
         InDouble,
-        InIdentifier,
+        InNormalIdentifier,
+        InAbnormalIdentifier,
         InString,
         InStringEscaping
     };
@@ -145,60 +157,8 @@ Token Tokenizer::next()
                 token = make_shared<Token>(TokenType::RBrace);
                 break;
 
-            case '+':
-                token = make_shared<Token>(TokenType::Add);
-                break;
-
-            case '-':
-                token = make_shared<Token>(TokenType::Sub);
-                break;
-
-            case '*':
-                token = make_shared<Token>(TokenType::Mul);
-                break;
-
-            case '/':
-                token = make_shared<Token>(TokenType::Div);
-                break;
-
-            case '%':
-                token = make_shared<Token>(TokenType::Mod);
-                break;
-
-            case '&':
-                token = make_shared<Token>(TokenType::BAnd);
-                break;
-
-            case '|':
-                token = make_shared<Token>(TokenType::BOr);
-                break;
-
-            case '^':
-                token = make_shared<Token>(TokenType::BXor);
-                break;
-
-            case '~':
-                token = make_shared<Token>(TokenType::BNeg);
-                break;
-
             case '?':
                 token = make_shared<Token>(TokenType::Ques);
-                break;
-
-            case '=':
-                state = State::InRET;
-                break;
-
-            case '!':
-                state = State::InNot;
-                break;
-
-            case '<':
-                state = State::InCLT;
-                break;
-
-            case '>':
-                state = State::InCGT;
                 break;
 
             default:
@@ -207,9 +167,14 @@ Token Tokenizer::next()
                     state = State::InInteger;
                     value += last_input_;
                 }
-                else if (last_input_ == '_' || isalpha(last_input_))
+                else if (isalpha(last_input_) || last_input_ == '_')
                 {
-                    state = State::InIdentifier;
+                    state = State::InNormalIdentifier;
+                    value += last_input_;
+                }
+                else if (is_legal_idchr(last_input_))
+                {
+                    state = State::InAbnormalIdentifier;
                     value += last_input_;
                 }
                 break;
@@ -225,62 +190,6 @@ Token Tokenizer::next()
 
             default:
                 return Token(TokenType::At);
-            }
-            break;
-
-        case State::InRET:
-            switch (last_input_)
-            {
-            case '>':
-                token = make_shared<Token>(TokenType::Ret);
-                break;
-
-            default:
-                return Token(TokenType::CEQ);
-            }
-            break;
-
-        case State::InNot:
-            switch (last_input_)
-            {
-            case '=':
-                token = make_shared<Token>(TokenType::CNE);
-                break;
-
-            default:
-                return Token(TokenType::Not);
-            }
-            break;
-
-        case State::InCLT:
-            switch (last_input_)
-            {
-            case '=':
-                token = make_shared<Token>(TokenType::CLE);
-                break;
-
-            case '<':
-                token = make_shared<Token>(TokenType::BLS);
-                break;
-
-            default:
-                return Token(TokenType::CLT);
-            }
-            break;
-
-        case State::InCGT:
-            switch (last_input_)
-            {
-            case '=':
-                token = make_shared<Token>(TokenType::CGE);
-                break;
-
-            case '>':
-                token = make_shared<Token>(TokenType::BRS);
-                break;
-
-            default:
-                return Token(TokenType::CGT);
             }
             break;
 
@@ -316,8 +225,21 @@ Token Tokenizer::next()
             }
             break;
 
-        case State::InIdentifier:
-            if (last_input_ == '_' || isalnum(last_input_))
+        case State::InNormalIdentifier:
+            if (isdigit(last_input_)
+                or isalpha(last_input_)
+                or last_input_ == '_')
+            {
+                value += last_input_;
+            }
+            else
+            {
+                return Token(value);
+            }
+            break;
+
+        case State::InAbnormalIdentifier:
+            if (is_legal_idchr(last_input_))
             {
                 value += last_input_;
             }
