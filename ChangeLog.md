@@ -6,6 +6,11 @@
 
 - Insturction AddInfixOp to make identifier as infix operator
 - Support custom operators and priorities
+- Demo to define custom operators
+
+### Changed
+
+- The non-REPL will interpret statement while it is parsed instead of execute after parsing all statements
 
 ## 0.0.8 - 2020/04/14
 

@@ -36,7 +36,12 @@ void Parser::set_continue_action(
 // use when interacting & return stmt node
 Ptr<AST> Parser::gen_statement()
 {
-    return gen_stmt();
+    auto stmt = gen_stmt();
+    if (current_token_.type == TokenType::Semicolon)
+    {
+        get_next_token();
+    }
+    return stmt;
 }
 
 Ptr<AST> Parser::gen_statements()
@@ -276,6 +281,9 @@ Ptr<Stmt> Parser::gen_stmt()
 {
     switch (current_token_.type)
     {
+    case TokenType::End:
+        return nullptr;
+
     // @ is special
     case TokenType::At:
         if (get_next_token().type == TokenType::LParen)
