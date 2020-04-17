@@ -245,6 +245,10 @@ void Code::print(ostream &out)
             out << i << "\tMatch\t\t" << OPRAND(size_t) << endl;
             break;
 
+        case Opcode::AddInfixOp:
+            out << i << "\tLambdaDecl\t" << OPRAND(string) << endl;
+            break;
+
         case Opcode::LambdaDecl:
             out << i << "\tLambdaDecl\t" << OPRAND(size_t) << endl;
             break;
@@ -384,6 +388,7 @@ void Code::serialize(ostream &out)
         case Opcode::Load:
         case Opcode::LoadMember:
         case Opcode::StoreLocal:
+        case Opcode::AddInfixOp:
             typeout(out, OPRAND(string));
             break;
 
@@ -480,6 +485,7 @@ void Code::unserialize(ifstream &in)
         case Opcode::Load:
         case Opcode::LoadMember:
         case Opcode::StoreLocal:
+        case Opcode::AddInfixOp:
         {
             string val;
             typein(in, val);
