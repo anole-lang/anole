@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include "helper.hpp"
 #include "token.hpp"
+#include "helper.hpp"
 
 namespace anole
 {
@@ -130,11 +130,11 @@ struct UnaryOperatorExpr : Expr
 
 struct BinaryOperatorExpr : Expr
 {
-    TokenType op;
+    Token op;
     Ptr<Expr> lhs, rhs;
 
     BinaryOperatorExpr(Ptr<Expr> &&lhs,
-        TokenType op, Ptr<Expr> &&rhs)
+        Token op, Ptr<Expr> &&rhs)
       : op(op), lhs(std::move(lhs))
       , rhs(std::move(rhs)) {}
 
@@ -304,6 +304,16 @@ struct FunctionDeclarationStmt : Stmt
         Ptr<LambdaExpr> &&lambda)
       : id(std::move(id))
       , lambda(std::move(lambda)) {}
+
+    void codegen(Code &) override;
+};
+
+struct InfixopDeclarationStmt : Stmt
+{
+    Ptr<IdentifierExpr> id;
+
+    InfixopDeclarationStmt(Ptr<IdentifierExpr> &&id)
+      : id(std::move(id)) {}
 
     void codegen(Code &) override;
 };
