@@ -3,6 +3,7 @@
 #include <memory>
 #include "ast.hpp"
 #include "code.hpp"
+#include "parser.hpp"
 #include "floatobject.hpp"
 #include "stringobject.hpp"
 #include "integerobject.hpp"
@@ -110,7 +111,7 @@ void UnaryOperatorExpr::codegen(Code &code)
 
 void BinaryOperatorExpr::codegen(Code &code)
 {
-    switch (op)
+    switch (op.type)
     {
     case TokenType::Colon:
         rhs->codegen(code);
@@ -272,6 +273,11 @@ void BinaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
+        rhs->codegen(code);
+        lhs->codegen(code);
+        code.add_ins<Opcode::Load>(op.value);
+        code.mapping()[code.size()] = pos;
+        code.add_ins<Opcode::Call>(static_cast<size_t>(2));
         break;
     }
 }
@@ -454,6 +460,11 @@ void FunctionDeclarationStmt::codegen(Code &code)
 {
     lambda->codegen(code);
     code.add_ins<Opcode::StoreLocal>(id->name);
+}
+
+void InfixopDeclarationStmt::codegen(Code &code)
+{
+    code.add_ins<Opcode::AddInfixOp>(id->name);
 }
 
 void ClassDeclarationStmt::codegen(Code &code)
