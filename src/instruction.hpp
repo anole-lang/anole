@@ -35,6 +35,8 @@ enum Opcode
     JumpIfNot,    // JumpIfNot target
     Match,        // Match target
 
+    AddInfixOp,   // AddInfixOp op
+
     LambdaDecl,   // LambdaDecl target
     ThunkDecl,    // ThunkDecl target
 
