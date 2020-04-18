@@ -18,7 +18,7 @@
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
-#define OPRAND(T) any_cast<T>(theCurrentContext->oprand())
+#define OPRAND(T) any_cast<const T &>(theCurrentContext->oprand())
 
 using namespace std;
 
