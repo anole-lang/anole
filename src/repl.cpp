@@ -1,6 +1,6 @@
-#include <csetjmp>
 #include <sstream>
 #include <iostream>
+#include <setjmp.h>
 #include <unistd.h>
 #include <signal.h>
 #include <readline/readline.h>
@@ -15,6 +15,8 @@ using namespace std;
 
 namespace
 {
+static sigjmp_buf env;
+
 static string read_line(const char * str)
 {
     char *temp = readline(str);
@@ -32,7 +34,7 @@ static void handle_sigint(int)
     cout << "\b \b\b \b\nKeyboard Interrupt\n";
     rl_on_new_line();
     rl_replace_line("", 0);
-    rl_redisplay();
+    siglongjmp(env, 1);
 }
 }
 
@@ -48,7 +50,7 @@ void replrun::run()
 R"(    _                _
    / \   _ __   ___ | | ___
   / _ \ | '_ \ / _ \| |/ _ \
- / ___ \| | | | (_) | |  __/    Version 0.0.9
+ / ___ \| | | | (_) | |  __/    Version 0.0.10
 /_/   \_\_| |_|\___/|_|\___|
 )"  << endl;
 
@@ -73,6 +75,7 @@ R"(    _                _
         parser.cont();
     });
 
+    sigsetjmp(env, 1);
     while (true)
     {
         do
