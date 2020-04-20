@@ -15,12 +15,12 @@ class Scope
     Scope(SPtr<Scope> pre_scope)
       : pre_scope_(pre_scope) {}
 
-    SPtr<Scope> pre()
+    SPtr<Scope> &pre()
     {
         return pre_scope_;
     }
 
-    SPtr<ObjectPtr> create_symbol(const std::string &name)
+    SPtr<ObjectPtr> &create_symbol(const std::string &name)
     {
         if (!symbols_.count(name))
         {
