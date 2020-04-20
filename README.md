@@ -46,5 +46,5 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-+ [ ] Provide debugger, mapping each instruction to the source code
++ [ ] Provide debugger
 + [ ] Support threads and processes
