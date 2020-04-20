@@ -22,6 +22,7 @@ enum Opcode
     LoadConst,    // LoadConst index
     LoadMember,   // LoadMember name
     Store,        // Store
+    StoreRef,     // StoreRef name
     StoreLocal,   // StoreLocal name
 
     ScopeBegin,   // ScopeBegin

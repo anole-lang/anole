@@ -175,17 +175,24 @@ DeclList Parser::gen_arg_decls()
     DeclList decls;
     while (current_token_.type != TokenType::RParen)
     {
+        bool is_ref = false;
+        if (current_token_.type == TokenType::BAnd)
+        {
+            is_ref = true;
+            get_next_token();
+        }
+
         auto ident = gen_ident();
         if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
             decls.push_back(make_unique<VariableDeclarationStmt>(
-                move(ident), gen_expr()));
+                move(ident), gen_expr(), is_ref));
         }
         else
         {
             decls.push_back(make_unique<VariableDeclarationStmt>(
-                move(ident), make_unique<NoneExpr>()));
+                move(ident), make_unique<NoneExpr>(), is_ref));
         }
 
         if (current_token_.type == TokenType::Comma)
@@ -355,16 +362,28 @@ Ptr<Stmt> Parser::gen_stmt()
 // generate declaration or assignment (@var:)
 Ptr<Stmt> Parser::gen_declaration()
 {
+    bool is_ref = false;
+    if (current_token_.type == TokenType::BAnd)
+    {
+        is_ref = true;
+        get_next_token();
+    }
+
     auto id = gen_ident();
     switch (current_token_.type)
     {
     case TokenType::Colon:
         get_next_token();
         return make_unique<VariableDeclarationStmt>(
-            move(id), gen_delay_expr());
+            move(id), gen_delay_expr(), is_ref);
 
     case TokenType::LParen:
     {
+        if (is_ref)
+        {
+            throw CompileError("& cannot be here");
+        }
+
         get_next_token();
         auto args = gen_arg_decls();
         get_next_token();
@@ -387,6 +406,10 @@ Ptr<Stmt> Parser::gen_declaration()
     }
 
     default:
+        if (is_ref)
+        {
+            throw CompileError("reference should be binded with other variable");
+        }
         break;
     }
     return make_unique<VariableDeclarationStmt>(move(id), nullptr);
@@ -778,9 +801,10 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 
     if (current_token_.type == TokenType::Colon)
     {
+        auto op = current_token_;
         get_next_token();
         return make_unique<BinaryOperatorExpr>(
-            move(expr), TokenType::Colon, gen_delay_expr());
+            move(expr), op, gen_delay_expr());
     }
 
     return expr;
@@ -859,7 +883,7 @@ Ptr<Expr> Parser::gen_enum_expr()
         }
         enum_expr->decls.push_back(
             make_unique<VariableDeclarationStmt>(move(ident),
-                make_unique<IntegerExpr>(base++)));
+                make_unique<IntegerExpr>(base++), true));
 
         if (current_token_.type == TokenType::Comma)
         {

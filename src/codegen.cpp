@@ -289,8 +289,7 @@ void LambdaExpr::codegen(Code &code)
 
     for (auto &decl : decls)
     {
-        decl->expr->codegen(code);
-        code.add_ins<Opcode::StoreLocal>(decl->id->name);
+        decl->codegen(code);
     }
     block->codegen(code);
 
@@ -318,7 +317,7 @@ void EnumExpr::codegen(Code &code)
     for (auto &decl : decls)
     {
         decl->expr->codegen(code);
-        code.add_ins<Opcode::StoreLocal>(decl->id->name);
+        code.add_ins<Opcode::StoreRef>(decl->id->name);
     }
     code.add_ins<Opcode::BuildEnum>();
 }
@@ -416,7 +415,7 @@ void UseStmt::codegen(Code &code)
         for (auto &name_as : names)
         {
             code.add_ins<Opcode::Import>(name_as.first);
-            code.add_ins<Opcode::StoreLocal>(name_as.second);
+            code.add_ins<Opcode::StoreRef>(name_as.second);
         }
     }
     else
@@ -431,7 +430,7 @@ void UseStmt::codegen(Code &code)
             for (auto &name_as : names)
             {
                 code.add_ins<Opcode::ImportPart>(name_as.first);
-                code.add_ins<Opcode::StoreLocal>(name_as.second);
+                code.add_ins<Opcode::StoreRef>(name_as.second);
             }
             code.add_ins<Opcode::Pop>();
         }
@@ -454,13 +453,21 @@ void VariableDeclarationStmt::codegen(Code &code)
     {
         NoneExpr().codegen(code);
     }
-    code.add_ins<Opcode::StoreLocal>(id->name);
+
+    if (is_ref)
+    {
+        code.add_ins<Opcode::StoreRef>(id->name);
+    }
+    else
+    {
+        code.add_ins<Opcode::StoreLocal>(id->name);
+    }
 }
 
 void FunctionDeclarationStmt::codegen(Code &code)
 {
     lambda->codegen(code);
-    code.add_ins<Opcode::StoreLocal>(id->name);
+    code.add_ins<Opcode::StoreRef>(id->name);
 }
 
 void InfixopDeclarationStmt::codegen(Code &code)
@@ -575,9 +582,9 @@ void DoWhileStmt::codegen(Code &code)
  *    is equivalent to:
  *
  *  (@() {
- *    @__it: expr.__iterator__();
+ *    @&__it: expr.__iterator__();
  *    while __it.__has_next__() {
- *      @ident: __it.__next__();
+ *      @&ident: __it.__next__();
  *      ... stmts ...
  *    }
  *  })();
@@ -589,7 +596,7 @@ void ForeachStmt::codegen(Code &code)
     expr->codegen(code);
     code.add_ins<Opcode::LoadMember>(string("__iterator__"));
     code.add_ins<Opcode::Call>(static_cast<size_t>(0));
-    code.add_ins<Opcode::StoreLocal>(string("__it"));
+    code.add_ins<Opcode::StoreRef>(string("__it"));
 
     auto cond = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
@@ -604,7 +611,7 @@ void ForeachStmt::codegen(Code &code)
     if (id != nullptr)
     {
         *block->statements.begin()
-            = make_unique<VariableDeclarationStmt>(move(id), move(next));
+            = make_unique<VariableDeclarationStmt>(move(id), move(next), true);
     }
     else
     {
