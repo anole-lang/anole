@@ -64,11 +64,15 @@ void AnoleModuleObject::init(const filesystem::path &path)
     auto ir_path = path.string() + ".ir";
 
     auto code = make_shared<Code>(path.filename().string());
+    auto origin = theCurrentContext;
+    theCurrentContext = make_shared<Context>(code, dir);
+    theCurrentContext->pre_context() = origin;
 
     if (is_regular_file(ir_path)
         and last_write_time(ir_path) >= last_write_time(path))
     {
         code->unserialize(ir_path);
+        Context::execute();
     }
     else
     {
@@ -77,14 +81,18 @@ void AnoleModuleObject::init(const filesystem::path &path)
         {
             throw RuntimeError("cannot open file " + path.string());
         }
-        Parser(fin, path.filename().string()).gen_statements()->codegen(*code);
+
+        Parser parser{fin, path};
+
+        while (auto stmt = parser.gen_statement())
+        {
+            stmt->codegen(*code);
+            Context::execute();
+        }
+
         code->serialize(ir_path);
     }
 
-    auto origin = theCurrentContext;
-    theCurrentContext = make_shared<Context>(code, dir);
-    theCurrentContext->pre_context() = origin;
-    Context::execute();
     scope_ = theCurrentContext->scope();
     theCurrentContext = origin;
 }

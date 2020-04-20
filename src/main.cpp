@@ -23,37 +23,17 @@ int main(int argc, char *argv[])
         parser.add_argument("file");
         parser.parse(argc, argv);
 
-        auto path = parser.get("file");
-        auto ir_path = path + ".ir";
-
-        auto code = make_shared<Code>(path);
-        theCurrentContext = make_shared<Context>(code, filesystem::path(path).parent_path());
-
-        if (fs::is_regular_file(ir_path)
-            and fs::last_write_time(ir_path) >= fs::last_write_time(path))
+        auto path = fs::path(parser.get("file"));
+        theCurrentContext = make_shared<Context>(nullptr,
+            path.parent_path());
+        auto filename = path.filename().string();
+        if (path.extension().string() != ".anole")
         {
-            code->unserialize(ir_path);
-            Context::execute();
+            cout << "anole: input file should end with .anole" << endl;
         }
-        else
+        else if (!AnoleModuleObject(filename.substr(0, filename.rfind('.'))).good())
         {
-            auto fin = ifstream(path);
-            if (!fin.good())
-            {
-                cout << "anole: can't open file '" << path << "': No such file" << endl;
-            }
-
-            Parser parser{fin, path};
-
-            while (auto stmt = parser.gen_statement())
-            {
-                stmt->codegen(*code);
-                Context::execute();
-            }
-
-            auto rd_path = path + ".rd";
-            code->print(rd_path);
-            code->serialize(ir_path);
+            cout << "anole: cannot open file " << path << endl;
         }
     }
     return 0;
