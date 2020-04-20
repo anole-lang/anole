@@ -28,6 +28,14 @@ class Code
         return mapping_;
     }
 
+    void mapping(std::pair<std::size_t, std::size_t> pos)
+    {
+        if (pos.first != 0)
+        {
+            mapping_[instructions_.size()] = pos;
+        }
+    }
+
     Opcode opcode_at(std::size_t i)
     {
         return instructions_[i].opcode;
