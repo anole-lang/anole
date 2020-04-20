@@ -282,13 +282,16 @@ struct ExprStmt : Stmt
 
 struct VariableDeclarationStmt : Stmt
 {
+    bool is_ref;
     Ptr<IdentifierExpr> id;
     Ptr<Expr> expr;
 
     VariableDeclarationStmt(
         Ptr<IdentifierExpr> &&id,
-        Ptr<Expr> &&expr)
-      : id(std::move(id))
+        Ptr<Expr> &&expr,
+        bool is_ref = false)
+      : is_ref(is_ref)
+      , id(std::move(id))
       , expr(std::move(expr)) {}
 
     void codegen(Code &) override;
