@@ -92,6 +92,11 @@ void AnoleModuleObject::init(const filesystem::path &path)
 
         code->serialize(ir_path);
     }
+    #ifdef _DEBUG
+    auto rd_path = path;
+    rd_path += ".rd";
+    code->print(rd_path);
+    #endif
 
     scope_ = theCurrentContext->scope();
     theCurrentContext = origin;

@@ -24,16 +24,24 @@ int main(int argc, char *argv[])
         parser.parse(argc, argv);
 
         auto path = fs::path(parser.get("file"));
-        theCurrentContext = make_shared<Context>(nullptr,
+        theCurrentContext = make_shared<Context>(make_shared<Code>(),
             path.parent_path());
         auto filename = path.filename().string();
         if (path.extension().string() != ".anole")
         {
             cout << "anole: input file should end with .anole" << endl;
         }
-        else if (!AnoleModuleObject(filename.substr(0, filename.rfind('.'))).good())
+        else try
         {
-            cout << "anole: cannot open file " << path << endl;
+            AnoleModuleObject mod{filename.substr(0, filename.rfind('.'))};
+            if (!mod.good())
+            {
+                cout << "anole: cannot open file " << path << endl;
+            }
+        }
+        catch(const exception& e)
+        {
+            cerr << e.what() << endl;
         }
     }
     return 0;

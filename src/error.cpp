@@ -9,7 +9,7 @@ namespace anole
 CompileError::CompileError(string err)
   : err_(err)
 {
-    while (theCurrentContext->pre_context())
+    while (theCurrentContext and theCurrentContext->pre_context())
     {
         theCurrentContext = theCurrentContext->pre_context();
     }
