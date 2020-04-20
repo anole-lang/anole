@@ -224,6 +224,9 @@ void Code::print(ostream &out)
         case Opcode::Store:
             out << i << "\tStore" << endl;
             break;
+        case Opcode::StoreRef:
+            out << i << "\tStoreRef\t" << OPRAND(string) << endl;
+            break;
         case Opcode::StoreLocal:
             out << i << "\tStoreLocal\t" << OPRAND(string) << endl;
             break;
@@ -403,6 +406,7 @@ void Code::serialize(ostream &out)
         case Opcode::ImportAll:
         case Opcode::Load:
         case Opcode::LoadMember:
+        case Opcode::StoreRef:
         case Opcode::StoreLocal:
             typeout(out, OPRAND(string));
             break;
@@ -504,6 +508,7 @@ void Code::unserialize(ifstream &in)
         case Opcode::ImportAll:
         case Opcode::Load:
         case Opcode::LoadMember:
+        case Opcode::StoreRef:
         case Opcode::StoreLocal:
         {
             string val;
