@@ -1,10 +1,21 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.10 - 2020/04/20
+
+### Added
+
+- Instruction `StoreRef`
+- Support pass-by-reference now with syntax `@(&parameter) { ... }`
+- Support declare a variable as reference
 
 ### Changed
 
-- Function will return the raw reference instead of rebinding the object to a temporary variable
+- Function will return the reference instead of rebinding the object to a temporary variable
+- Keyboard interrupt will cancel the inputing of current statement instead of current line
+
+### Fixed
+
+- Fix bug when module's code has definitions of custom operators, actions are interpreting each statement immediately after it is parsed instead of interpreting statements after all are parsed
 
 ## 0.0.9 - 2020/04/17
 
