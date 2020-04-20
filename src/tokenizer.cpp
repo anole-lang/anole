@@ -54,7 +54,7 @@ void Tokenizer::get_next_input()
 
 static const set<char> illegal_idchrs
 {
-    '_', '#', '@', '.', ':', ';', '?', '(', ')', '[', ']', '{', '}', '"'
+    '_', '#', '@', '.', ',', ':', ';', '?', '(', ')', '[', ']', '{', '}', '"'
 };
 static bool is_legal_idchr(char chr)
 {
