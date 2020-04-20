@@ -1,5 +1,4 @@
-#include <exception>
-#include <stdexcept>
+#include "error.hpp"
 #include "object.hpp"
 
 using namespace std;

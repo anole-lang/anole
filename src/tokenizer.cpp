@@ -1,7 +1,6 @@
 #include <set>
 #include <cctype>
-#include <memory>
-#include "ast.hpp"
+#include "error.hpp"
 #include "helper.hpp"
 #include "tokenizer.hpp"
 
@@ -253,8 +252,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '\n':
-                cout << "syntax error!" << endl;
-                exit(0);
+                throw CompileError("expected \"");
 
             case '\\':
                 state = State::InStringEscaping;
@@ -274,7 +272,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '\n':
-                cout << "syntax error!" << endl;
+                throw CompileError("expected \"");
                 exit(0);
 
             case 'n':

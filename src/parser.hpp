@@ -1,9 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <istream>
-#include <iostream>
-#include <iterator>
 #include <functional>
 #include "ast.hpp"
 #include "tokenizer.hpp"

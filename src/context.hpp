@@ -3,8 +3,6 @@
 #include <map>
 #include <stack>
 #include <string>
-#include <exception>
-#include <stdexcept>
 #include <filesystem>
 #include "code.hpp"
 #include "error.hpp"

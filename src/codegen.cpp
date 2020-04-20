@@ -1,6 +1,5 @@
 #include <set>
 #include <tuple>
-#include <memory>
 #include "ast.hpp"
 #include "code.hpp"
 #include "parser.hpp"

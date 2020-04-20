@@ -2,7 +2,6 @@
 
 #include <map>
 #include <string>
-#include "helper.hpp"
 #include "object.hpp"
 #include "builtinfuncobject.hpp"
 
