@@ -89,8 +89,8 @@ using token_type::TokenType;
 struct Token
 {
     Token() = default;
-    Token(TokenType type, std::string value = "");
-    Token(std::string value);
+    explicit Token(TokenType type, std::string value = "");
+    explicit Token(std::string value);
     Token(Token &&token) noexcept;
     Token(const Token &token);
     Token &operator=(const Token &token);

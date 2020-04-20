@@ -11,7 +11,9 @@ namespace anole
 class Tokenizer
 {
   public:
+    explicit
     Tokenizer(std::istream & = std::cin, std::string = "<stdint>");
+
     Token next();
     void cont();
     void reset();
