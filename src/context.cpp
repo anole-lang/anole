@@ -630,7 +630,7 @@ void Context::execute()
     while (theCurrentContext->pc() < theCurrentContext->code()->size())
     {
         #ifdef _DEBUG
-        cout << "run at: " << theCurrentContext->pc() << endl;
+        cout << "run at: " << theCurrentContext->code()->from() << ":" << theCurrentContext->pc() << endl;
         #endif
 
         theOpHandles[theCurrentContext->ins().opcode]();
