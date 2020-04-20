@@ -76,7 +76,7 @@ R"(    _                _
     });
 
     sigsetjmp(env, 1);
-    while (true)
+    for(;;) try
     {
         do
         {
@@ -88,26 +88,23 @@ R"(    _                _
         ss.str(line + '\n');
         parser.reset();
 
-        try
-        {
-            theCurrentContext->pc() = code->size();
+        theCurrentContext->pc() = code->size();
 
-            auto stmt = parser.gen_statement();
-            if (dynamic_cast<ExprStmt *>(stmt.get()))
-            {
-                ExprList args;
-                args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr));
-                stmt = make_unique<ParenOperatorExpr>(
-                    make_unique<IdentifierExpr>("println"),
-                    move(args));
-            }
-            stmt->codegen(*code);
-            Context::execute();
-        }
-        catch (const exception &e)
+        auto stmt = parser.gen_statement();
+        if (dynamic_cast<ExprStmt *>(stmt.get()))
         {
-            cerr << e.what() << endl;
+            ExprList args;
+            args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr));
+            stmt = make_unique<ParenOperatorExpr>(
+                make_unique<IdentifierExpr>("println"),
+                move(args));
         }
+        stmt->codegen(*code);
+        Context::execute();
+    }
+    catch (const exception &e)
+    {
+        cerr << e.what() << endl;
     }
 }
 }

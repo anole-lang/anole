@@ -7,7 +7,13 @@ using namespace std;
 namespace anole
 {
 CompileError::CompileError(string err)
-  : err_(err) {}
+  : err_(err)
+{
+    while (theCurrentContext->pre_context())
+    {
+        theCurrentContext = theCurrentContext->pre_context();
+    }
+}
 
 CompileError
 &CompileError::operator=(const CompileError &other) noexcept

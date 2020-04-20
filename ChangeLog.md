@@ -1,5 +1,11 @@
 # ChangeLog for Anole
 
+## Unreleased
+
+### Fixed
+
+- Context can traceback to the correct origin when meeting compile-error in REPL mode
+
 ## 0.0.10 - 2020/04/20
 
 ### Added
