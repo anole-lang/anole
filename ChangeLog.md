@@ -1,5 +1,11 @@
 # ChangeLog for Anole
 
+## Unreleased
+
+### Changed
+
+- Function will return the raw reference instead of rebinding the object to a temporary variable
+
 ## 0.0.9 - 2020/04/17
 
 ### Added
