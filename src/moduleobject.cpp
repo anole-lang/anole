@@ -63,15 +63,15 @@ void AnoleModuleObject::init(const filesystem::path &path)
     auto dir = path.parent_path();
     auto ir_path = path.string() + ".ir";
 
-    auto code = make_shared<Code>(path.filename().string());
+    code_ = make_shared<Code>(path.filename().string());
     auto origin = theCurrentContext;
-    theCurrentContext = make_shared<Context>(code, dir);
+    theCurrentContext = make_shared<Context>(code_, dir);
     theCurrentContext->pre_context() = origin;
 
     if (is_regular_file(ir_path)
         and last_write_time(ir_path) >= last_write_time(path))
     {
-        code->unserialize(ir_path);
+        code_->unserialize(ir_path);
         Context::execute();
     }
     else
@@ -86,11 +86,11 @@ void AnoleModuleObject::init(const filesystem::path &path)
 
         while (auto stmt = parser.gen_statement())
         {
-            stmt->codegen(*code);
+            stmt->codegen(*code_);
             Context::execute();
         }
 
-        code->serialize(ir_path);
+        code_->serialize(ir_path);
     }
     #ifdef _DEBUG
     auto rd_path = path;

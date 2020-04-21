@@ -36,11 +36,16 @@ class AnoleModuleObject : public ModuleObject
     {
         return scope_;
     }
+    const SPtr<Code> &code() const
+    {
+        return code_;
+    }
 
   private:
     void init(const std::filesystem::path &path);
 
     SPtr<Scope> scope_;
+    SPtr<Code> code_;
 };
 
 class CppModuleObject

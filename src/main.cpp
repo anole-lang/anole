@@ -21,6 +21,9 @@ int main(int argc, char *argv[])
     {
         ArgumentParser parser("anole");
         parser.add_argument("file");
+        parser.add_argument("-r")
+              .default_value(false)
+              .implict_value(true);
         parser.parse(argc, argv);
 
         auto path = fs::path(parser.get("file"));
@@ -38,8 +41,14 @@ int main(int argc, char *argv[])
             {
                 cout << "anole: cannot open file " << path << endl;
             }
+            else if (parser.get<bool>("r"))
+            {
+                auto rd_path = path;
+                rd_path += ".rd";
+                mod.code()->print(rd_path);
+            }
         }
-        catch(const exception& e)
+        catch (const exception& e)
         {
             cerr << e.what() << endl;
         }
