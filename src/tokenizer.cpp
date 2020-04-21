@@ -91,7 +91,7 @@ Token Tokenizer::next()
     last_char_at_line_ = cur_char_at_line_;
     last_line_num_ = cur_line_num_;
 
-    shared_ptr<Token> token = nullptr;
+    Ptr<Token> token = nullptr;
     string value;
     while (!token)
     {
@@ -101,7 +101,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '$':
-                token = make_shared<Token>(TokenType::End);
+                token = make_unique<Token>(TokenType::End);
                 break;
 
             case '#':
@@ -117,47 +117,47 @@ Token Tokenizer::next()
                 break;
 
             case ':':
-                token = make_shared<Token>(TokenType::Colon);
+                token = make_unique<Token>(TokenType::Colon);
                 break;
 
             case ';':
-                token = make_shared<Token>(TokenType::Semicolon);
+                token = make_unique<Token>(TokenType::Semicolon);
                 break;
 
             case ',':
-                token = make_shared<Token>(TokenType::Comma);
+                token = make_unique<Token>(TokenType::Comma);
                 break;
 
             case '.':
-                token = make_shared<Token>(TokenType::Dot);
+                token = make_unique<Token>(TokenType::Dot);
                 break;
 
             case '(':
-                token = make_shared<Token>(TokenType::LParen);
+                token = make_unique<Token>(TokenType::LParen);
                 break;
 
             case ')':
-                token = make_shared<Token>(TokenType::RParen);
+                token = make_unique<Token>(TokenType::RParen);
                 break;
 
             case '[':
-                token = make_shared<Token>(TokenType::LBracket);
+                token = make_unique<Token>(TokenType::LBracket);
                 break;
 
             case ']':
-                token = make_shared<Token>(TokenType::RBracket);
+                token = make_unique<Token>(TokenType::RBracket);
                 break;
 
             case '{':
-                token = make_shared<Token>(TokenType::LBrace);
+                token = make_unique<Token>(TokenType::LBrace);
                 break;
 
             case '}':
-                token = make_shared<Token>(TokenType::RBrace);
+                token = make_unique<Token>(TokenType::RBrace);
                 break;
 
             case '?':
-                token = make_shared<Token>(TokenType::Ques);
+                token = make_unique<Token>(TokenType::Ques);
                 break;
 
             default:
@@ -184,7 +184,7 @@ Token Tokenizer::next()
             switch (last_input_)
             {
             case '@':
-                token = make_shared<Token>(TokenType::AtAt);
+                token = make_unique<Token>(TokenType::AtAt);
                 break;
 
             default:
@@ -259,7 +259,7 @@ Token Tokenizer::next()
                 break;
 
             case '"':
-                token = make_shared<Token>(TokenType::String, value);
+                token = make_unique<Token>(TokenType::String, value);
                 break;
 
             default:
@@ -337,9 +337,9 @@ Token Tokenizer::next()
     }
     if (!token)
     {
-        token = make_shared<Token>(TokenType::End);
+        token = make_unique<Token>(TokenType::End);
     }
-    return *token;
+    return move(*token);
 }
 
 std::string Tokenizer::get_err_info(const string &message)
