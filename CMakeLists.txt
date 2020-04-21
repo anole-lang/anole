@@ -19,7 +19,21 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
             readline
     )
     install (TARGETS anole DESTINATION bin)
-ELSE()
+ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
+    set(CMAKE_CXX_FLAGS "-pg -Wall")
+    ADD_DEFINITIONS(-D_DEBUG)
+
+    file(GLOB SOURCES "src/*.cpp")
+    add_executable(anole ${SOURCES})
+
+    target_link_libraries(anole
+        PRIVATE
+            dl
+            stdc++fs
+            readline
+    )
+    install (TARGETS anole DESTINATION bin)
+ELSE ()
     set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
     add_library(error SHARED
