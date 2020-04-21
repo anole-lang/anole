@@ -1,0 +1,5 @@
+use token, 　, ->, V, Info from parsec;
+
+infixop 30 　;
+infixop 20 ->;
+infixop 10 V;

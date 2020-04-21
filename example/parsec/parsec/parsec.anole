@@ -1,0 +1,69 @@
+@+=(&var, value): var: var + value;
+infixop +=;
+
+@Info(&str, &index, state: true): @() {};
+
+@V(&lhs, &rhs):
+    @(info) {
+        @anchor: info.index;
+        @res: lhs(info);
+        if info.state = false {
+            info.index: anchor;
+            info.state: true;
+            res: rhs(info);
+        }
+        if info.state = true, return res;
+    };
+
+@　(&lhs, &rhs):
+    @(info) {
+        @anchor: info.index;
+        @lr: lhs(info);
+        if info.state = false {
+            info.index: anchor;
+        } else {
+            @rr: rhs(info);
+            if info.state, return @(f): rr(lr(f));
+        }
+    };
+
+@->(&exec, callback):
+    @(info) {
+        @res: exec(info);
+        if info.state {
+            return @(f): f(res(callback));
+        }
+    };
+
+@token: @(){
+
+@literial(str):
+    @(info) {
+        @i: 0;
+        while i < str.size() {
+            if (info.index < info.str.size() and info.str[info.index] = str[i]) {
+                i += 1;
+                info.index += 1;
+            } else, break;
+        }
+        if i != str.size(), info.state: false;
+        else, return @(f): f(str);
+    };
+
+@by(cond):
+    @(info) {
+        if info.index < info.str.size() and cond(info.str[info.index]) {
+            info.state: true;
+            @res: info.str[info.index];
+            info.index += 1;
+            return @(f): f(res);
+        }
+        else, info.state: false;
+    };
+
+@epsilon(init):
+    @(info): @(f): f(init());
+
+return @() {};
+
+}();

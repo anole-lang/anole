@@ -1,0 +1,34 @@
+use * from parsec;
+
+blank
+:   token.by(@(ch): ch = " ")
+;
+
+blanks
+:   blank　blanks -> (@(blank):@(blanks): none)
+V   token.epsilon(@(): none)
+;
+
+digit
+:   token.by(@(ch): "0" <= ch and ch <= "9")
+;
+
+decimal
+:   blanks　digit -> (@(blanks):@(digit): digit)
+;
+
+number
+:   decimal　number -> (@(decimal):@(number): decimal + number)
+V   token.epsilon(@(): "")
+;
+
+primary
+:   number -> (@(num): num.to_int())
+;
+
+additive
+:  primary　token.literial("+")　additive -> (@(lhs):@(op):@(rhs): lhs + rhs)
+V  primary
+;
+
+println(additive(Info("  1+2+3", 0))(@(x): x));
