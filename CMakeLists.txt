@@ -32,6 +32,19 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
             readline
     )
     install (TARGETS anole DESTINATION bin)
+ELSEIF (CMAKE_BUILD_TYPE STREQUAL Static)
+    set(CMAKE_CXX_FLAGS "-O3 -Wall")
+
+    file(GLOB SOURCES "src/*.cpp")
+    add_executable(anole ${SOURCES})
+
+    target_link_libraries(anole
+        PRIVATE
+            dl
+            stdc++fs
+            readline
+    )
+    install (TARGETS anole DESTINATION bin)
 ELSE ()
     set(CMAKE_CXX_FLAGS "-O3 -Wall")
 
