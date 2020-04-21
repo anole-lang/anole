@@ -12,6 +12,18 @@ string BuiltInFunctionObject::to_str()
     return "<builtin-function>"s;
 }
 
+void BuiltInFunctionObject::call(size_t)
+{
+    func_();
+    ++theCurrentContext->pc();
+}
+
+void BuiltInFunctionObject::call_tail(size_t)
+{
+    func_();
+    ++theCurrentContext->pc();
+}
+
 static map<string, SPtr<BuiltInFunctionObject>> &get_built_in_functions()
 {
     static map<string, SPtr<BuiltInFunctionObject>> built_in_functions;
@@ -32,10 +44,5 @@ void BuiltInFunctionObject::register_built_in_function(
     const string &name, function<void()> func)
 {
     get_built_in_functions()[name] = make_shared<BuiltInFunctionObject>(func);
-}
-
-void BuiltInFunctionObject::operator()()
-{
-    func_();
 }
 }

@@ -16,13 +16,15 @@ class FunctionObject : public Object
       , code_(code), base_(base){}
 
     SPtr<Scope> scope() { return scope_; }
-    SPtr<Code> code() { return code_; }
-    std::size_t base() { return base_; }
+    SPtr<Code>  code()  { return code_; }
+    std::size_t base()  { return base_; }
 
     std::string to_str() override;
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
     SPtr<ObjectPtr> load_member(const std::string &name) override;
+    void call(size_t) override;
+    void call_tail(size_t) override;
 
   private:
     SPtr<Scope> scope_;

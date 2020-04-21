@@ -60,6 +60,8 @@ class Object
     virtual ObjectPtr brs(ObjectPtr);
     virtual SPtr<ObjectPtr> index(ObjectPtr);
     virtual SPtr<ObjectPtr> load_member(const std::string &name);
+    virtual void call(size_t);
+    virtual void call_tail(size_t);
 
   private:
     ObjectType type_;
