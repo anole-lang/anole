@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Use ObjectType instead of dynamic_cast to distinguish different objects
+
 ### Fixed
 
 - Context can traceback to the correct origin when meeting compile-error in REPL mode
