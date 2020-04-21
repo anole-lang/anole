@@ -117,8 +117,9 @@ void load_handle()
     const auto &name = OPRAND(string);
     auto obj = theCurrentContext->scope()->load_symbol(name);
 
-    if (auto thunk = dynamic_pointer_cast<ThunkObject>(*obj))
+    if (*obj and (*obj)->type() == ObjectType::Thunk)
     {
+        auto thunk = reinterpret_pointer_cast<ThunkObject>(*obj);
         theCurrentContext = make_shared<Context>(
             theCurrentContext, thunk->scope(), thunk->code(), thunk->base() - 1);
     }
@@ -183,7 +184,7 @@ void scopeend_handle()
 
 void call_handle()
 {
-    if (dynamic_pointer_cast<FunctionObject>(theCurrentContext->top()))
+    if (theCurrentContext->top()->type() == ObjectType::Func)
     {
         auto num = OPRAND(size_t);
         auto func = theCurrentContext->pop<FunctionObject>();
@@ -229,12 +230,12 @@ void call_handle()
         }
     }
     // builtins don't support default arguments
-    else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentContext->top()))
+    else if (theCurrentContext->top()->type() == ObjectType::BuiltinFunc)
     {
         theCurrentContext->pop<BuiltInFunctionObject>()->operator()();
         ++theCurrentContext->pc();
     }
-    else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
+    else if (theCurrentContext->top()->type() == ObjectType::Cont)
     {
         auto resume = theCurrentContext->pop<ContObject>()->resume();
         auto retval = theCurrentContext->pop();
@@ -250,7 +251,7 @@ void call_handle()
 
 void calltail_handle()
 {
-    if (dynamic_pointer_cast<FunctionObject>(theCurrentContext->top()))
+    if (theCurrentContext->top()->type() == ObjectType::Func)
     {
         auto num = OPRAND(size_t);
         auto func = theCurrentContext->pop<FunctionObject>();
@@ -297,12 +298,12 @@ void calltail_handle()
         }
     }
     // builtins don't support default arguments
-    else if (dynamic_pointer_cast<BuiltInFunctionObject>(theCurrentContext->top()))
+    else if (theCurrentContext->top()->type() == ObjectType::BuiltinFunc)
     {
         theCurrentContext->pop<BuiltInFunctionObject>()->operator()();
         ++theCurrentContext->pc();
     }
-    else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
+    else if (theCurrentContext->top()->type() == ObjectType::Cont)
     {
         auto resume = theCurrentContext->pop<ContObject>()->resume();
         auto retval = theCurrentContext->pop();

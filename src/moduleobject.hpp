@@ -8,7 +8,8 @@ namespace anole
 class ModuleObject : public Object
 {
   public:
-    ModuleObject() = default;
+    ModuleObject()
+      : Object(ObjectType::Module) {}
     virtual ~ModuleObject() = 0;
     virtual SPtr<ObjectPtr> load_member(const std::string &name) = 0;
 

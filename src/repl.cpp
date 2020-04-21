@@ -91,7 +91,7 @@ R"(    _                _
         theCurrentContext->pc() = code->size();
 
         auto stmt = parser.gen_statement();
-        if (dynamic_cast<ExprStmt *>(stmt.get()))
+        if (stmt->is_expr_stmt())
         {
             ExprList args;
             args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr));

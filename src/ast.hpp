@@ -20,6 +20,9 @@ struct AST
     virtual ~AST() = 0;
     virtual void codegen(Code &) = 0;
 
+    virtual bool is_integer_expr();
+    virtual bool is_expr_stmt();
+
     // for codegen
     static bool &interpretive()
     {
@@ -61,6 +64,7 @@ struct IntegerExpr : Expr
 
     IntegerExpr(int64_t value) : value(value) {}
 
+    bool is_integer_expr() override;
     void codegen(Code &) override;
 };
 
@@ -276,6 +280,7 @@ struct ExprStmt : Stmt
     ExprStmt(Ptr<Expr> &&expr)
       : expr(std::move(expr)) {}
 
+    bool is_expr_stmt() override;
     void codegen(Code &) override;
 };
 

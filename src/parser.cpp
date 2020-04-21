@@ -644,8 +644,8 @@ Ptr<Expr> Parser::gen_expr(int layer)
         auto pos = tokenizer_.last_pos();
         get_next_token();
         auto rhs = gen_expr(layer);
-        if (dynamic_cast<IntegerExpr *>(lhs.get()) and
-            dynamic_cast<IntegerExpr *>(rhs.get()))
+        if (lhs->is_integer_expr() and
+            rhs->is_integer_expr())
         {
             auto alias = reinterpret_cast<IntegerExpr *>(lhs.get());
             auto rv = reinterpret_cast<IntegerExpr *>(rhs.get())->value;

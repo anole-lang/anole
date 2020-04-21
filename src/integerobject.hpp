@@ -8,7 +8,8 @@ class IntegerObject : public Object
 {
   public:
     IntegerObject(int64_t value)
-      : value_(value) {}
+      : Object(ObjectType::Integer)
+      , value_(value) {}
 
     bool to_bool() override;
     std::string to_str() override;

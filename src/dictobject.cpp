@@ -49,8 +49,6 @@ built_in_methods_for_dict
     }
 };
 
-DictObject::DictObject() = default;
-
 bool DictObject::to_bool()
 {
     return !data_.empty();

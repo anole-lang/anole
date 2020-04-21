@@ -9,7 +9,8 @@ class EnumObject : public Object
 {
   public:
     EnumObject(SPtr<Scope> scope)
-      : scope_(scope) {}
+      : Object(ObjectType::Enum)
+      , scope_(scope) {}
 
     SPtr<ObjectPtr> load_member(const std::string &name) override;
 

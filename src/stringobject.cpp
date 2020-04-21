@@ -48,8 +48,9 @@ string StringObject::to_str()
 
 ObjectPtr StringObject::add(ObjectPtr obj)
 {
-    if (auto p = dynamic_pointer_cast<StringObject>(obj))
+    if (obj->type() == ObjectType::String)
     {
+        auto p = reinterpret_pointer_cast<StringObject>(obj);
         return make_shared<StringObject>(value_ + p->value_);
     }
     else
@@ -60,8 +61,9 @@ ObjectPtr StringObject::add(ObjectPtr obj)
 
 ObjectPtr StringObject::ceq(ObjectPtr obj)
 {
-    if (auto p = dynamic_pointer_cast<StringObject>(obj))
+    if (obj->type() == ObjectType::String)
     {
+        auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ == p->value_ ? theTrue : theFalse;
     }
     else
@@ -72,8 +74,9 @@ ObjectPtr StringObject::ceq(ObjectPtr obj)
 
 ObjectPtr StringObject::cne(ObjectPtr obj)
 {
-    if (auto p = dynamic_pointer_cast<StringObject>(obj))
+    if (obj->type() == ObjectType::String)
     {
+        auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ != p->value_ ? theTrue : theFalse;
     }
     else
@@ -84,8 +87,9 @@ ObjectPtr StringObject::cne(ObjectPtr obj)
 
 ObjectPtr StringObject::clt(ObjectPtr obj)
 {
-    if (auto p = dynamic_pointer_cast<StringObject>(obj))
+    if (obj->type() == ObjectType::String)
     {
+        auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ < p->value_ ? theTrue : theFalse;
     }
     else
@@ -96,8 +100,9 @@ ObjectPtr StringObject::clt(ObjectPtr obj)
 
 ObjectPtr StringObject::cle(ObjectPtr obj)
 {
-    if (auto p = dynamic_pointer_cast<StringObject>(obj))
+    if (obj->type() == ObjectType::String)
     {
+        auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ <= p->value_ ? theTrue : theFalse;
     }
     else
@@ -108,8 +113,9 @@ ObjectPtr StringObject::cle(ObjectPtr obj)
 
 SPtr<ObjectPtr> StringObject::index(ObjectPtr index)
 {
-    if (auto p = dynamic_pointer_cast<IntegerObject>(index))
+    if (index->type() == ObjectType::Integer)
     {
+        auto p = reinterpret_pointer_cast<IntegerObject>(index);
         return make_shared<ObjectPtr>(
             make_shared<StringObject>(string(1, value_[p->value()]))
         );

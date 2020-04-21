@@ -20,7 +20,8 @@ class BuiltInFunctionObject : public Object
 {
   public:
     BuiltInFunctionObject(std::function<void()> func)
-      : func_(std::move(func)) {}
+      : Object(ObjectType::BuiltinFunc)
+      , func_(std::move(func)) {}
 
     std::string to_str() override;
 

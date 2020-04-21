@@ -62,8 +62,6 @@ built_in_methods_for_list
     }
 };
 
-ListObject::ListObject() = default;
-
 bool ListObject::to_bool()
 {
     return !objects_.empty();
@@ -88,10 +86,11 @@ string ListObject::to_key()
     return 'l' + to_str();
 }
 
-ObjectPtr ListObject::add(ObjectPtr rhs)
+ObjectPtr ListObject::add(ObjectPtr obj)
 {
-    if (auto p = dynamic_pointer_cast<ListObject>(rhs))
+    if (obj->type() == ObjectType::List)
     {
+        auto p = reinterpret_pointer_cast<ListObject>(obj);
         auto res = make_shared<ListObject>();
         for (auto &obj : objects_)
         {
@@ -111,10 +110,10 @@ ObjectPtr ListObject::add(ObjectPtr rhs)
 
 SPtr<ObjectPtr> ListObject::index(ObjectPtr index)
 {
-    if (auto p = dynamic_pointer_cast<IntegerObject>(index))
+    if (index->type() == ObjectType::Integer)
     {
         auto it = objects_.begin();
-        auto v = p->value();
+        auto v = reinterpret_pointer_cast<IntegerObject>(index)->value();
         while (v--)
         {
             ++it;

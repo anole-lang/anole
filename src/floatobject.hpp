@@ -7,7 +7,9 @@ namespace anole
 class FloatObject : public Object
 {
   public:
-    FloatObject(double value) : value_(value) {}
+    FloatObject(double value)
+      : Object(ObjectType::Float)
+      , value_(value) {}
 
     bool to_bool() override;
     std::string to_str() override;

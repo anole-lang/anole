@@ -11,7 +11,8 @@ class FunctionObject : public Object
   public:
     FunctionObject(SPtr<Scope> pre_scope,
         SPtr<Code> code, std::size_t base)
-      : scope_(std::make_shared<Scope>(pre_scope))
+      : Object(ObjectType::Func)
+      , scope_(std::make_shared<Scope>(pre_scope))
       , code_(code), base_(base){}
 
     SPtr<Scope> scope() { return scope_; }

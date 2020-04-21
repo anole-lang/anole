@@ -6,11 +6,38 @@
 
 namespace anole
 {
+namespace object_type
+{
+enum ObjectType : int
+{
+    NotDefined,
+    None,
+    Boolean,
+    Integer,
+    Float,
+    String,
+    Enum,
+    List,
+    Dict,
+    BuiltinFunc,
+    Func,
+    Thunk,
+    Cont,
+    Module,
+};
+}
+
+using object_type::ObjectType;
 using ObjectPtr = SPtr<class Object>;
 
 class Object
 {
   public:
+    Object() : type_(ObjectType::NotDefined) {}
+    Object(ObjectType type) : type_(type) {}
+
+    ObjectType type() const { return type_; }
+
     virtual ~Object() = 0;
     virtual bool to_bool();
     virtual std::string to_str();
@@ -33,5 +60,8 @@ class Object
     virtual ObjectPtr brs(ObjectPtr);
     virtual SPtr<ObjectPtr> index(ObjectPtr);
     virtual SPtr<ObjectPtr> load_member(const std::string &name);
+
+  private:
+    ObjectType type_;
 };
 }

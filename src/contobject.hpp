@@ -9,7 +9,8 @@ class ContObject : public Object
 {
   public:
     ContObject(SPtr<Context> resume)
-      : resume_(std::make_shared<Context>(*resume)) {}
+      : Object(ObjectType::Cont)
+      , resume_(std::make_shared<Context>(*resume)) {}
 
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;

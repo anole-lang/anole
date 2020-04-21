@@ -10,7 +10,8 @@ class StringObject : public Object
 {
   public:
     StringObject(std::string value)
-      : value_(std::move(value)) {}
+      : Object(ObjectType::String)
+      , value_(std::move(value)) {}
 
     bool to_bool() override;
     std::string to_str() override;

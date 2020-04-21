@@ -8,7 +8,8 @@ namespace anole
 class ListObject : public Object
 {
   public:
-    ListObject();
+    ListObject()
+      : Object(ObjectType::List) {}
 
     bool to_bool() override;
     std::string to_str() override;

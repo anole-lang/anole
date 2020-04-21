@@ -19,7 +19,7 @@ namespace anole
 {
 REGISTER_BUILTIN(eval,
 {
-    auto str = dynamic_pointer_cast<StringObject>(theCurrentContext->pop());
+    auto str = theCurrentContext->pop<StringObject>();
     istringstream ss{"return " + str->to_str() + ";"};
     auto code = make_shared<Code>("<eval>");
     Parser(ss, "<eval>").gen_statement()->codegen(*code);
@@ -29,7 +29,7 @@ REGISTER_BUILTIN(eval,
 
 REGISTER_BUILTIN(call_with_current_continuation,
 {
-    if (dynamic_pointer_cast<FunctionObject>(theCurrentContext->top()))
+    if (theCurrentContext->top()->type() == ObjectType::Func)
     {
         auto func = theCurrentContext->pop<FunctionObject>();
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
@@ -39,7 +39,7 @@ REGISTER_BUILTIN(call_with_current_continuation,
         *theCurrentContext->scope()->create_symbol(any_cast<string>(theCurrentContext->oprand()))
             = cont_obj;
     }
-    else if (dynamic_pointer_cast<ContObject>(theCurrentContext->top()))
+    else if (theCurrentContext->top()->type() == ObjectType::Cont)
     {
         auto resume = theCurrentContext->pop<ContObject>()->resume();
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
