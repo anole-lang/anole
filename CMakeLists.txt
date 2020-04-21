@@ -20,7 +20,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
     )
     install (TARGETS anole DESTINATION bin)
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
-    set(CMAKE_CXX_FLAGS "-pg -Wall")
+    set(CMAKE_CXX_FLAGS "-pg -O3 -Wall")
 
     file(GLOB SOURCES "src/*.cpp")
     add_executable(anole ${SOURCES})
