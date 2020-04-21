@@ -37,6 +37,13 @@ built_in_methods_for_list
             theCurrentContext->push(*res);
         }
     },
+    {"pop_front", [](ListObject *obj)
+        {
+            auto res = obj->objects().front();
+            obj->objects().pop_front();
+            theCurrentContext->push(*res);
+        }
+    },
     {"front", [](ListObject *obj)
         {
             theCurrentContext->push(*obj->objects().front());
@@ -65,10 +72,13 @@ bool ListObject::to_bool()
 string ListObject::to_str()
 {
     string res = "[";
-    for (size_t i = 0; i < objects_.size(); ++i)
+    for (auto it = objects_.begin(); it != objects_.end(); ++it)
     {
-        if (i) res += ", ";
-        res += (*objects_[i])->to_str();
+        if (it != objects_.begin())
+        {
+            res += ", ";
+        }
+        res += (**it)->to_str();
     }
     return res + "]";
 }
@@ -78,11 +88,38 @@ string ListObject::to_key()
     return 'l' + to_str();
 }
 
+ObjectPtr ListObject::add(ObjectPtr rhs)
+{
+    if (auto p = dynamic_pointer_cast<ListObject>(rhs))
+    {
+        auto res = make_shared<ListObject>();
+        for (auto &obj : objects_)
+        {
+            res->objects().push_back(obj);
+        }
+        for (auto &obj : p->objects())
+        {
+            res->objects().push_back(obj);
+        }
+        return res;
+    }
+    else
+    {
+        throw RuntimeError("expected");
+    }
+}
+
 SPtr<ObjectPtr> ListObject::index(ObjectPtr index)
 {
     if (auto p = dynamic_pointer_cast<IntegerObject>(index))
     {
-        return objects_[p->value()];
+        auto it = objects_.begin();
+        auto v = p->value();
+        while (v--)
+        {
+            ++it;
+        }
+        return *it;
     }
     else
     {
@@ -105,7 +142,7 @@ SPtr<ObjectPtr> ListObject::load_member(const string &name)
     return Object::load_member(name);
 }
 
-vector<SPtr<ObjectPtr>> &ListObject::objects()
+list<SPtr<ObjectPtr>> &ListObject::objects()
 {
     return objects_;
 }

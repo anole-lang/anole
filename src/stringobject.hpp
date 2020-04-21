@@ -18,8 +18,12 @@ class StringObject : public Object
     ObjectPtr add(ObjectPtr) override;
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
+    ObjectPtr clt(ObjectPtr) override;
+    ObjectPtr cle(ObjectPtr) override;
+    SPtr<ObjectPtr> index(ObjectPtr) override;
+    SPtr<ObjectPtr> load_member(const std::string &name) override;
 
-    std::string value() const
+    const std::string &value() const
     {
         return value_;
     }

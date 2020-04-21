@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <list>
 #include "object.hpp"
 
 namespace anole
@@ -13,13 +13,14 @@ class ListObject : public Object
     bool to_bool() override;
     std::string to_str() override;
     std::string to_key() override;
+    ObjectPtr add(ObjectPtr) override;
     SPtr<ObjectPtr> index(ObjectPtr) override;
     SPtr<ObjectPtr> load_member(const std::string &name) override;
 
-    std::vector<SPtr<ObjectPtr>> &objects();
+    std::list<SPtr<ObjectPtr>> &objects();
     void append(ObjectPtr obj);
 
   private:
-    std::vector<SPtr<ObjectPtr>> objects_;
+    std::list<SPtr<ObjectPtr>> objects_;
 };
 }

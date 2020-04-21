@@ -1,10 +1,41 @@
+#include "context.hpp"
 #include "boolobject.hpp"
 #include "stringobject.hpp"
+#include "integerobject.hpp"
 
 using namespace std;
 
 namespace anole
 {
+static map<string, function<void(StringObject *)>>
+built_in_methods_for_list
+{
+    {"size", [](StringObject *obj)
+        {
+            theCurrentContext
+                ->push(
+                    make_shared<IntegerObject>(
+                        static_cast<int64_t>(
+                            obj->value().size()
+                        )
+                    )
+                );
+        }
+    },
+    {"to_int", [](StringObject *obj)
+        {
+            theCurrentContext
+                ->push(
+                    make_shared<IntegerObject>(
+                        static_cast<int64_t>(
+                            stoll(obj->value())
+                        )
+                    )
+                );
+        }
+    },
+};
+
 bool StringObject::to_bool()
 {
     return !value_.empty();
@@ -49,5 +80,58 @@ ObjectPtr StringObject::cne(ObjectPtr obj)
     {
         return Object::cne(obj);
     }
+}
+
+ObjectPtr StringObject::clt(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<StringObject>(obj))
+    {
+        return value_ < p->value_ ? theTrue : theFalse;
+    }
+    else
+    {
+        return Object::cne(obj);
+    }
+}
+
+ObjectPtr StringObject::cle(ObjectPtr obj)
+{
+    if (auto p = dynamic_pointer_cast<StringObject>(obj))
+    {
+        return value_ <= p->value_ ? theTrue : theFalse;
+    }
+    else
+    {
+        return Object::cne(obj);
+    }
+}
+
+SPtr<ObjectPtr> StringObject::index(ObjectPtr index)
+{
+    if (auto p = dynamic_pointer_cast<IntegerObject>(index))
+    {
+        return make_shared<ObjectPtr>(
+            make_shared<StringObject>(string(1, value_[p->value()]))
+        );
+    }
+    else
+    {
+        throw RuntimeError("index should be integer");
+    }
+}
+
+SPtr<ObjectPtr> StringObject::load_member(const string &name)
+{
+    if (built_in_methods_for_list.count(name))
+    {
+        auto &func = built_in_methods_for_list[name];
+        return make_shared<ObjectPtr>(
+            make_shared<BuiltInFunctionObject>([this, func]
+            {
+                func(this);
+            })
+        );
+    }
+    return Object::load_member(name);
 }
 }

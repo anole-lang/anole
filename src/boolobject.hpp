@@ -13,6 +13,9 @@ class BoolObject : public Object
     bool to_bool() override;
     std::string to_str() override;
 
+    ObjectPtr ceq(ObjectPtr) override;
+    ObjectPtr cne(ObjectPtr) override;
+
   private:
     bool value_;
 };
