@@ -57,9 +57,10 @@ class Scope
   private:
     SPtr<ObjectPtr> find_symbol(const std::string &name)
     {
-        if (symbols_.count(name))
+        auto res = symbols_.find(name);
+        if (res != symbols_.end())
         {
-            return symbols_[name];
+            return res->second;
         }
         else if (pre_scope_)
         {
