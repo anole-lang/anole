@@ -152,6 +152,11 @@ class Context : public std::enable_shared_from_this<Context>
         return stack_->size();
     }
 
+    const SPtr<StackType> &stack()
+    {
+        return stack_;
+    }
+
     std::filesystem::path &current_path()
     {
         return current_path_;

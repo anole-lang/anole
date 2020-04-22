@@ -190,7 +190,10 @@ void calltail_handle()
 void return_handle()
 {
     auto pre_context = theCurrentContext->pre_context();
-    pre_context->push_straight(theCurrentContext->pop_straight());
+    if (theCurrentContext->stack() != pre_context->stack())
+    {
+        pre_context->push_straight(theCurrentContext->pop_straight());
+    }
     theCurrentContext = pre_context;
     ++theCurrentContext->pc();
 }
