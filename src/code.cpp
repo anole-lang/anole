@@ -103,12 +103,6 @@ size_t Code::size()
     return instructions_.size();
 }
 
-size_t &Code::nested_scopes()
-{
-    static size_t value = 0;
-    return value;
-}
-
 void Code::push_break(size_t ind)
 {
     breaks_.push_back(ind);
@@ -226,11 +220,8 @@ void Code::print(ostream &out)
             out << i << "\tStoreLocal\t" << OPRAND(string) << endl;
             break;
 
-        case Opcode::ScopeBegin:
-            out << i << "\tScopeBegin" << endl;
-            break;
-        case Opcode::ScopeEnd:
-            out << i << "\tScopeEnd" << endl;
+        case Opcode::NewScope:
+            out << i << "\tNewScope" << endl;
             break;
 
         case Opcode::Call:

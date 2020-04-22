@@ -332,7 +332,7 @@ void DotExpr::codegen(Code &code)
 
 void EnumExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::ScopeBegin>();
+    code.add_ins<Opcode::NewScope>();
     for (auto &decl : decls)
     {
         decl->expr->codegen(code);
@@ -501,11 +501,6 @@ void ClassDeclarationStmt::codegen(Code &code)
 
 void BreakStmt::codegen(Code &code)
 {
-    for (size_t i = 0; i < code.nested_scopes(); ++i)
-    {
-        code.add_ins<Opcode::ScopeEnd>();
-    }
-
     code.push_break(code.add_ins());
 }
 
@@ -535,9 +530,6 @@ void ReturnStmt::codegen(Code &code)
 
 void IfElseStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::ScopeBegin>();
-    ++code.nested_scopes();
-
     cond->codegen(code);
     code.mapping()[code.size()] = cond->pos;
     auto o1 = code.add_ins();
@@ -553,17 +545,10 @@ void IfElseStmt::codegen(Code &code)
     {
         code.set_ins<Opcode::JumpIfNot>(o1, code.size());
     }
-
-    --code.nested_scopes();
-    code.add_ins<Opcode::ScopeEnd>();
 }
 
 void WhileStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::ScopeBegin>();
-    auto backup = code.nested_scopes();
-    code.nested_scopes() = 0;
-
     auto o1 = code.size();
     cond->codegen(code);
     code.mapping()[code.size()] = cond->pos;
@@ -573,17 +558,10 @@ void WhileStmt::codegen(Code &code)
     code.set_ins<Opcode::JumpIfNot>(o2, code.size());
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o1, o1);
-
-    code.nested_scopes() = backup;
-    code.add_ins<Opcode::ScopeEnd>();
 }
 
 void DoWhileStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::ScopeBegin>();
-    auto backup = code.nested_scopes();
-    code.nested_scopes() = 0;
-
     auto o1 = code.size();
     block->codegen(code);
     auto o2 = code.size();
@@ -592,26 +570,19 @@ void DoWhileStmt::codegen(Code &code)
     code.add_ins<Opcode::JumpIf>(o1);
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o2, o1);
-
-    code.nested_scopes() = backup;
-    code.add_ins<Opcode::ScopeEnd>();
 }
 
 /** foreach expr as ident { stmts }
  *    is equivalent to:
  *
- *  (@() {
  *    @&__it: expr.__iterator__();
  *    while __it.__has_next__() {
  *      @&ident: __it.__next__();
  *      ... stmts ...
  *    }
- *  })();
 */
 void ForeachStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::ScopeBegin>();
-
     expr->codegen(code);
     code.add_ins<Opcode::LoadMember>(string("__iterator__"));
     code.add_ins<Opcode::Call>(static_cast<size_t>(0));
@@ -638,7 +609,5 @@ void ForeachStmt::codegen(Code &code)
     }
 
     WhileStmt(move(cond), move(block)).codegen(code);
-
-    code.add_ins<Opcode::ScopeEnd>();
 }
 }

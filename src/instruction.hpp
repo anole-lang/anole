@@ -21,8 +21,7 @@ enum Opcode
     StoreRef,     // StoreRef name
     StoreLocal,   // StoreLocal name
 
-    ScopeBegin,   // ScopeBegin
-    ScopeEnd,     // ScopeEnd
+    NewScope,     // NewScope
 
     Call,         // Call num
     CallTail,     // CallTail num

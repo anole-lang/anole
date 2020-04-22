@@ -14,6 +14,11 @@
 
 - Context can traceback to the correct origin when meeting compile-error in REPL mode
 
+### Removed
+
+- Instruction ScopeEnd
+- Remove support of block scope new :(
+
 ## 0.0.10 - 2020/04/20
 
 ### Added

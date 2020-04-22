@@ -117,19 +117,20 @@ void load_handle()
     const auto &name = OPRAND(string);
     auto obj = theCurrentContext->scope()->load_symbol(name);
 
-    if (*obj and (*obj)->type() == ObjectType::Thunk)
+    if (!*obj)
+    {
+        Context::add_not_defined_symbol(name, obj);
+        theCurrentContext->push_straight(obj);
+    }
+    else if ((*obj)->type() != ObjectType::Thunk)
+    {
+        theCurrentContext->push_straight(obj);
+    }
+    else
     {
         auto thunk = reinterpret_pointer_cast<ThunkObject>(*obj);
         theCurrentContext = make_shared<Context>(
             theCurrentContext, thunk->scope(), thunk->code(), thunk->base() - 1);
-    }
-    else
-    {
-        if (!*obj)
-        {
-            Context::add_not_defined_symbol(name, obj);
-        }
-        theCurrentContext->push_straight(obj);
     }
     ++theCurrentContext->pc();
 }
@@ -170,15 +171,9 @@ void storelocal_handle()
     ++theCurrentContext->pc();
 }
 
-void scopebegin_handle()
+void newscope_handle()
 {
     theCurrentContext->scope() = make_shared<Scope>(theCurrentContext->scope());
-    ++theCurrentContext->pc();
-}
-
-void scopeend_handle()
-{
-    theCurrentContext->scope() = theCurrentContext->scope()->pre();
     ++theCurrentContext->pc();
 }
 
@@ -458,8 +453,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::storeref_handle,
     &op_handles::storelocal_handle,
 
-    &op_handles::scopebegin_handle,
-    &op_handles::scopeend_handle,
+    &op_handles::newscope_handle,
 
     &op_handles::call_handle,
     &op_handles::calltail_handle,
