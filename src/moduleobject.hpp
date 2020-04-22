@@ -11,7 +11,7 @@ class ModuleObject : public Object
     ModuleObject()
       : Object(ObjectType::Module) {}
     virtual ~ModuleObject() = 0;
-    virtual SPtr<ObjectPtr> load_member(const std::string &name) = 0;
+    virtual Address load_member(const std::string &name) = 0;
 
     bool good()
     {
@@ -30,7 +30,7 @@ class AnoleModuleObject : public ModuleObject
     AnoleModuleObject(const std::string &name);
     AnoleModuleObject(SPtr<Scope> scope)
       : scope_(scope) {}
-    SPtr<ObjectPtr> load_member(const std::string &name) override;
+    Address load_member(const std::string &name) override;
 
     const SPtr<Scope> &scope() const
     {
@@ -55,7 +55,7 @@ class CppModuleObject
   public:
     CppModuleObject(const std::string &name);
     ~CppModuleObject();
-    SPtr<ObjectPtr> load_member(const std::string &name) override;
+    Address load_member(const std::string &name) override;
 
     const std::vector<std::string> *names()
     {

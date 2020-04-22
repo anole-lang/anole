@@ -108,7 +108,7 @@ ObjectPtr ListObject::add(ObjectPtr obj)
     }
 }
 
-SPtr<ObjectPtr> ListObject::index(ObjectPtr index)
+Address ListObject::index(ObjectPtr index)
 {
     if (index->type() == ObjectType::Integer)
     {
@@ -126,7 +126,7 @@ SPtr<ObjectPtr> ListObject::index(ObjectPtr index)
     }
 }
 
-SPtr<ObjectPtr> ListObject::load_member(const string &name)
+Address ListObject::load_member(const string &name)
 {
     if (built_in_methods_for_list.count(name))
     {
@@ -141,7 +141,7 @@ SPtr<ObjectPtr> ListObject::load_member(const string &name)
     return Object::load_member(name);
 }
 
-list<SPtr<ObjectPtr>> &ListObject::objects()
+list<Address> &ListObject::objects()
 {
     return objects_;
 }

@@ -15,10 +15,10 @@ ModuleObject::~ModuleObject() = default;
 
 SPtr<ModuleObject> ModuleObject::generate(const string &name)
 {
-    SPtr<ModuleObject> mod = make_shared<AnoleModuleObject>(name);
+    Ptr<ModuleObject> mod = make_unique<AnoleModuleObject>(name);
     if (!mod->good())
     {
-        mod = make_shared<CppModuleObject>(name);
+        mod = make_unique<CppModuleObject>(name);
     }
 
     return mod;
@@ -49,7 +49,7 @@ AnoleModuleObject::AnoleModuleObject(const string &name)
     }
 }
 
-SPtr<ObjectPtr> AnoleModuleObject::load_member(const string &name)
+Address AnoleModuleObject::load_member(const string &name)
 {
     if (scope_->symbols().count(name))
     {
@@ -125,7 +125,7 @@ CppModuleObject::~CppModuleObject()
     }
 }
 
-SPtr<ObjectPtr> CppModuleObject::load_member(const string &name)
+Address CppModuleObject::load_member(const string &name)
 {
     using FuncType = void (*)();
     auto func = reinterpret_cast<FuncType>(dlsym(handle_, name.c_str()));

@@ -12,7 +12,7 @@ class EnumObject : public Object
       : Object(ObjectType::Enum)
       , scope_(scope) {}
 
-    SPtr<ObjectPtr> load_member(const std::string &name) override;
+    Address load_member(const std::string &name) override;
 
   private:
     SPtr<Scope> scope_;

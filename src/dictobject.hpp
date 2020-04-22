@@ -16,7 +16,7 @@ class DictObject : public Object
         }
     };
 
-    using DataType = std::map<ObjectPtr, SPtr<ObjectPtr>, ObjectCmp>;
+    using DataType = std::map<ObjectPtr, Address, ObjectCmp>;
 
     DictObject()
       : Object(ObjectType::Dict) {}
@@ -24,8 +24,8 @@ class DictObject : public Object
     bool to_bool() override;
     std::string to_str() override;
     std::string to_key() override;
-    SPtr<ObjectPtr> index(ObjectPtr) override;
-    SPtr<ObjectPtr> load_member(const std::string &name) override;
+    Address index(ObjectPtr) override;
+    Address load_member(const std::string &name) override;
 
     DataType &data();
     void insert(ObjectPtr key, ObjectPtr value);

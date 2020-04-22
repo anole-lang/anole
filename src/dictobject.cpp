@@ -74,12 +74,12 @@ string DictObject::to_key()
     return 'd' + to_str();
 }
 
-SPtr<ObjectPtr> DictObject::index(ObjectPtr index)
+Address DictObject::index(ObjectPtr index)
 {
     return data_[index];
 }
 
-SPtr<ObjectPtr> DictObject::load_member(const string &name)
+Address DictObject::load_member(const string &name)
 {
     if (built_in_methods_for_dict.count(name))
     {

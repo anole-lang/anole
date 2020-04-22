@@ -102,12 +102,12 @@ ObjectPtr Object::brs(ObjectPtr)
     throw RuntimeError("no brs method");
 }
 
-SPtr<ObjectPtr> Object::index(ObjectPtr)
+Address Object::index(ObjectPtr)
 {
     throw RuntimeError("not support index");
 }
 
-SPtr<ObjectPtr> Object::load_member(const string &name)
+Address Object::load_member(const string &name)
 {
     throw RuntimeError("no member named " + name);
 }

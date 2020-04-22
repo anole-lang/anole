@@ -19,7 +19,7 @@ class Scope
         return pre_scope_;
     }
 
-    SPtr<ObjectPtr> &create_symbol(const std::string &name)
+    Address &create_symbol(const std::string &name)
     {
         if (!symbols_.count(name))
         {
@@ -28,19 +28,19 @@ class Scope
         return symbols_[name];
     }
 
-    void create_symbol(const std::string &name, SPtr<ObjectPtr> value)
+    void create_symbol(const std::string &name, Address value)
     {
         symbols_[name] = std::move(value);
     }
 
-    SPtr<ObjectPtr> load_symbol(const std::string &name)
+    Address load_symbol(const std::string &name)
     {
         auto ptr = find_symbol(name);
         auto res = ptr ? ptr : load_builtin(name);
         return res ? res : create_symbol(name);
     }
 
-    SPtr<ObjectPtr> load_builtin(const std::string &name)
+    Address load_builtin(const std::string &name)
     {
         if (auto func = BuiltInFunctionObject::load_built_in_function(name))
         {
@@ -49,13 +49,13 @@ class Scope
         return nullptr;
     }
 
-    const std::map<std::string, SPtr<ObjectPtr>> &symbols()
+    const std::map<std::string, Address> &symbols()
     {
         return symbols_;
     }
 
   private:
-    SPtr<ObjectPtr> find_symbol(const std::string &name)
+    Address find_symbol(const std::string &name)
     {
         auto res = symbols_.find(name);
         if (res != symbols_.end())
@@ -73,6 +73,6 @@ class Scope
     }
 
     SPtr<Scope> pre_scope_;
-    std::map<std::string, SPtr<ObjectPtr>> symbols_;
+    std::map<std::string, Address> symbols_;
 };
 }

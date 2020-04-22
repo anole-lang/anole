@@ -21,8 +21,8 @@ class StringObject : public Object
     ObjectPtr cne(ObjectPtr) override;
     ObjectPtr clt(ObjectPtr) override;
     ObjectPtr cle(ObjectPtr) override;
-    SPtr<ObjectPtr> index(ObjectPtr) override;
-    SPtr<ObjectPtr> load_member(const std::string &name) override;
+    Address index(ObjectPtr) override;
+    Address load_member(const std::string &name) override;
 
     const std::string &value() const
     {

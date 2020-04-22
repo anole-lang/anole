@@ -111,7 +111,7 @@ ObjectPtr StringObject::cle(ObjectPtr obj)
     }
 }
 
-SPtr<ObjectPtr> StringObject::index(ObjectPtr index)
+Address StringObject::index(ObjectPtr index)
 {
     if (index->type() == ObjectType::Integer)
     {
@@ -126,7 +126,7 @@ SPtr<ObjectPtr> StringObject::index(ObjectPtr index)
     }
 }
 
-SPtr<ObjectPtr> StringObject::load_member(const string &name)
+Address StringObject::load_member(const string &name)
 {
     if (built_in_methods_for_list.count(name))
     {

@@ -23,7 +23,7 @@ ObjectPtr FunctionObject::cne(ObjectPtr obj)
     return (this != obj.get()) ? theTrue : theFalse;
 }
 
-SPtr<ObjectPtr> FunctionObject::load_member(const string &name)
+Address FunctionObject::load_member(const string &name)
 {
     auto ptr = scope_->load_symbol(name);
     if (!*ptr)
@@ -45,7 +45,7 @@ void FunctionObject::call(size_t num)
         {
         case Opcode::StoreRef:
             theCurrentContext->scope()->create_symbol(OPRAND(string),
-                theCurrentContext->pop_straight());
+                theCurrentContext->pop_address());
             ++pc;
             --num;
             break;
@@ -82,7 +82,7 @@ void FunctionObject::call_tail(size_t num)
         {
         case Opcode::StoreRef:
             theCurrentContext->scope()->create_symbol(OPRAND(string),
-                theCurrentContext->pop_straight());
+                theCurrentContext->pop_address());
             ++pc;
             --num;
             break;

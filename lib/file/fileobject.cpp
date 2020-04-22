@@ -10,10 +10,16 @@ using namespace anole;
 
 void _open()
 {
-    auto path = theCurrentContext->pop<StringObject>();
-    auto mode = theCurrentContext->pop<IntegerObject>();
+    auto path = theCurrentContext->pop();
+    auto mode = theCurrentContext->pop();
 
-    theCurrentContext->push(make_shared<FileObject>(path->to_str(), mode->value()));
+    theCurrentContext
+        ->push(
+            make_shared<FileObject>(
+                path->to_str(),
+                reinterpret_cast<IntegerObject *>(mode.get())->value()
+            )
+        );
 }
 
 static map<string, function<void(FileObject *)>>
@@ -57,7 +63,7 @@ built_in_methods_for_file
     {"write", [](FileObject *obj)
         {
             const auto &str
-                = theCurrentContext->pop<StringObject>()->to_str();
+                = reinterpret_cast<StringObject *>(theCurrentContext->pop().get())->to_str();
             obj->file().write(str.c_str(), str.size());
         }
     },
@@ -73,12 +79,12 @@ built_in_methods_for_file
     },
     {"seekg", [](FileObject *obj)
         {
-            obj->file().seekg(theCurrentContext->pop<IntegerObject>()->value());
+            obj->file().seekg(reinterpret_cast<IntegerObject *>(theCurrentContext->pop().get())->value());
         }
     },
     {"seekp", [](FileObject *obj)
         {
-            obj->file().seekp(theCurrentContext->pop<IntegerObject>()->value());
+            obj->file().seekp(reinterpret_cast<IntegerObject *>(theCurrentContext->pop().get())->value());
         }
     }
 };
@@ -116,7 +122,7 @@ FileObject::FileObject(const string &path, int64_t mode)
     file_.open(path, mod);
 }
 
-SPtr<ObjectPtr> FileObject::load_member(const string &name)
+Address FileObject::load_member(const string &name)
 {
     if (built_in_methods_for_file.count(name))
     {

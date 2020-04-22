@@ -29,6 +29,7 @@ enum ObjectType : int
 
 using object_type::ObjectType;
 using ObjectPtr = SPtr<class Object>;
+using Address = SPtr<ObjectPtr>;
 
 class Object
 {
@@ -58,8 +59,8 @@ class Object
     virtual ObjectPtr band(ObjectPtr);
     virtual ObjectPtr bls(ObjectPtr);
     virtual ObjectPtr brs(ObjectPtr);
-    virtual SPtr<ObjectPtr> index(ObjectPtr);
-    virtual SPtr<ObjectPtr> load_member(const std::string &name);
+    virtual Address index(ObjectPtr);
+    virtual Address load_member(const std::string &name);
     virtual void call(size_t);
     virtual void call_tail(size_t);
 

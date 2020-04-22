@@ -15,13 +15,13 @@ class ListObject : public Object
     std::string to_str() override;
     std::string to_key() override;
     ObjectPtr add(ObjectPtr) override;
-    SPtr<ObjectPtr> index(ObjectPtr) override;
-    SPtr<ObjectPtr> load_member(const std::string &name) override;
+    Address index(ObjectPtr) override;
+    Address load_member(const std::string &name) override;
 
-    std::list<SPtr<ObjectPtr>> &objects();
+    std::list<Address> &objects();
     void append(ObjectPtr obj);
 
   private:
-    std::list<SPtr<ObjectPtr>> objects_;
+    std::list<Address> objects_;
 };
 }
