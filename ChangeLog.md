@@ -4,7 +4,7 @@
 
 ### Updated
 
-- Add some optimizations to make anole faster
+- Rewrite some code to make anole faster
 
 ### Changed
 
