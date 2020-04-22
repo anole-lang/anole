@@ -9,6 +9,7 @@
 ### Changed
 
 - Use ObjectType instead of dynamic_cast to distinguish different objects
+- Default compile mode is static now
 
 ### Fixed
 
