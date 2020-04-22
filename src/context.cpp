@@ -56,7 +56,7 @@ namespace op_handles
 {
 void pop_handle()
 {
-    theCurrentContext->pop();
+    theCurrentContext->stack()->pop();
     ++theCurrentContext->pc();
 }
 

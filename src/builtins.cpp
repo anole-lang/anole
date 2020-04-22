@@ -58,7 +58,14 @@ REGISTER_BUILTIN(call_with_current_continuation,
 
 REGISTER_BUILTIN(id,
 {
-    theCurrentContext->push(make_shared<IntegerObject>(reinterpret_cast<int64_t>(theCurrentContext->pop().get())));
+    theCurrentContext
+        ->push(
+            make_shared<IntegerObject>(
+                reinterpret_cast<int64_t>(
+                    theCurrentContext->pop().get()
+                )
+            )
+        );
 })
 
 REGISTER_BUILTIN(print,
