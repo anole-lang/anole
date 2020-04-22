@@ -36,7 +36,12 @@ class Code
         }
     }
 
-    Opcode opcode_at(std::size_t i)
+    Instruction &ins_at(std::size_t i)
+    {
+        return instructions_[i];
+    }
+
+    Opcode &opcode_at(std::size_t i)
     {
         return instructions_[i].opcode;
     }
@@ -73,7 +78,6 @@ class Code
     }
 
     std::size_t size();
-    std::vector<Instruction> &get_instructions();
     std::size_t &nested_scopes();
     void push_break(std::size_t ind);
     void set_break_to(std::size_t ind, std::size_t base);

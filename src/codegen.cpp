@@ -519,10 +519,10 @@ void ReturnStmt::codegen(Code &code)
     expr->codegen(code);
     code.add_ins<Opcode::Return>();
 
-    auto &ins = code.get_instructions()[code.size() - 2];
-    if (ins.opcode == Opcode::Call)
+    auto &opcode = code.opcode_at(code.size() - 2);
+    if (opcode == Opcode::Call)
     {
-        ins.opcode = Opcode::CallTail;
+        opcode = Opcode::CallTail;
     }
 
     /**

@@ -80,14 +80,15 @@ class Context : public std::enable_shared_from_this<Context>
 
     Instruction &ins()
     {
-        return code_->get_instructions()[pc_];
+        return code_->ins_at(pc_);
     }
 
-    Instruction &ins_at(std::size_t index) {
-        return code_->get_instructions()[index];
+    Instruction &ins_at(std::size_t index)
+    {
+        return code_->ins_at(index);
     }
 
-    Opcode opcode()
+    Opcode &opcode()
     {
         return code_->opcode_at(pc_);
     }
@@ -144,7 +145,7 @@ class Context : public std::enable_shared_from_this<Context>
         return res;
     }
 
-    std::size_t size()
+    std::size_t size() const
     {
         return stack_->size();
     }

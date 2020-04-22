@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Updated
+
+- Add some optimizations to make anole faster
+
 ### Changed
 
 - Use ObjectType instead of dynamic_cast to distinguish different objects

@@ -103,11 +103,6 @@ size_t Code::size()
     return instructions_.size();
 }
 
-vector<Instruction> &Code::get_instructions()
-{
-    return instructions_;
-}
-
 size_t &Code::nested_scopes()
 {
     static size_t value = 0;
