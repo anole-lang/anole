@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(anole VERSION 0.0.8)
+project(anole VERSION 0.0.10)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)
-    set(CMAKE_CXX_FLAGS "-g -Wall")
+    set(CMAKE_CXX_FLAGS "-g -Wall -rdynamic")
     ADD_DEFINITIONS(-D_DEBUG)
 
     file(GLOB SOURCES "src/*.cpp")
@@ -20,7 +20,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
     )
     install (TARGETS anole DESTINATION bin)
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
-    set(CMAKE_CXX_FLAGS "-pg -O3 -Wall")
+    set(CMAKE_CXX_FLAGS "-pg -O3 -Wall -rdynamic")
 
     file(GLOB SOURCES "src/*.cpp")
     add_executable(anole ${SOURCES})
@@ -32,21 +32,8 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
             readline
     )
     install (TARGETS anole DESTINATION bin)
-ELSEIF (CMAKE_BUILD_TYPE STREQUAL Static)
-    set(CMAKE_CXX_FLAGS "-O3 -Wall")
-
-    file(GLOB SOURCES "src/*.cpp")
-    add_executable(anole ${SOURCES})
-
-    target_link_libraries(anole
-        PRIVATE
-            dl
-            stdc++fs
-            readline
-    )
-    install (TARGETS anole DESTINATION bin)
-ELSE ()
-    set(CMAKE_CXX_FLAGS "-O3 -Wall")
+ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
+    set(CMAKE_CXX_FLAGS "-O3 -Wall -rdynamic")
 
     add_library(error SHARED
         src/error.cpp
@@ -112,34 +99,46 @@ ELSE ()
 
     set_target_properties(anole PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
     install (TARGETS anole DESTINATION bin)
+ELSE ()
+    set(CMAKE_CXX_FLAGS "-O3 -Wall -rdynamic")
 
-    file(GLOB HEADERS "src/*.hpp")
-
-    install (
-        FILES
-        ${HEADERS}
-        DESTINATION "include/anole"
+    file(GLOB SOURCES "src/*.cpp")
+    add_executable(anole ${SOURCES})
+    target_link_libraries(anole
+        PRIVATE
+            dl
+            stdc++fs
+            readline
     )
-
-    add_library(fileobject SHARED
-        lib/file/fileobject.cpp
-    )
-
-    install (
-        FILES
-        "lib/file/__init__.anole"
-        DESTINATION "lib/anole/file"
-    )
-
-    install (
-        TARGETS
-            fileobject
-        DESTINATION "lib/anole/file"
-    )
-
-    install (
-        FILES
-        "lib/coroutine/__init__.anole"
-        DESTINATION "lib/anole/coroutine"
-    )
+    install (TARGETS anole DESTINATION bin)
 ENDIF()
+
+file(GLOB HEADERS "src/*.hpp")
+
+install (
+    FILES
+    ${HEADERS}
+    DESTINATION "include/anole"
+)
+
+add_library(fileobject SHARED
+    lib/file/fileobject.cpp
+)
+
+install (
+    FILES
+    "lib/file/__init__.anole"
+    DESTINATION "lib/anole/file"
+)
+
+install (
+    TARGETS
+        fileobject
+    DESTINATION "lib/anole/file"
+)
+
+install (
+    FILES
+    "lib/coroutine/__init__.anole"
+    DESTINATION "lib/anole/coroutine"
+)

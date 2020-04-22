@@ -15,10 +15,10 @@ ModuleObject::~ModuleObject() = default;
 
 SPtr<ModuleObject> ModuleObject::generate(const string &name)
 {
-    Ptr<ModuleObject> mod = make_unique<AnoleModuleObject>(name);
+    SPtr<ModuleObject> mod = make_shared<AnoleModuleObject>(name);
     if (!mod->good())
     {
-        mod = make_unique<CppModuleObject>(name);
+        mod = make_shared<CppModuleObject>(name);
     }
 
     return mod;
