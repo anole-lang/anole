@@ -15,7 +15,7 @@ namespace anole
 class Context : public std::enable_shared_from_this<Context>
 {
   private:
-    using StackType = std::stack<SPtr<ObjectPtr>>;
+    using StackType = std::stack<Address>;
 
   public:
     // this for resume from ContObject
@@ -53,12 +53,15 @@ class Context : public std::enable_shared_from_this<Context>
     static void execute();
 
     static void
-    add_not_defined_symbol(const std::string &name,
-        SPtr<ObjectPtr> ptr);
+    add_not_defined_symbol(
+        const std::string &name,
+        const Address &ptr);
+
     static void
-    rm_not_defined_symbol(SPtr<ObjectPtr> ptr);
+    rm_not_defined_symbol(const Address &ptr);
+
     static const std::string
-    &get_not_defined_symbol(SPtr<ObjectPtr> ptr);
+    &get_not_defined_symbol(const Address &ptr);
 
     SPtr<Context> &pre_context()
     {
@@ -102,16 +105,16 @@ class Context : public std::enable_shared_from_this<Context>
 
     void push(ObjectPtr value)
     {
-        stack_->push(std::make_shared<ObjectPtr>(value));
+        stack_->push(std::make_shared<ObjectPtr>(std::move(value)));
     }
 
-    void push_straight(SPtr<ObjectPtr> ptr)
+    void push_address(Address ptr)
     {
-        stack_->push(ptr);
+        stack_->push(move(ptr));
     }
 
     template <typename R = Object>
-    SPtr<R> top()
+    R *top()
     {
         if (*stack_->top() == nullptr)
         {
@@ -119,30 +122,31 @@ class Context : public std::enable_shared_from_this<Context>
                 "no such var named " +
                 get_not_defined_symbol(stack_->top()));
         }
-        return std::reinterpret_pointer_cast<R>(*stack_->top());
+        return reinterpret_cast<R *>(stack_->top().get()->get());
     }
 
-    SPtr<ObjectPtr> &top_straight()
+    Address &top_address()
     {
         return stack_->top();
     }
 
     void set_top(ObjectPtr ptr)
     {
-        stack_->top() = std::make_shared<ObjectPtr>(ptr);
+        stack_->top() = std::make_shared<ObjectPtr>(std::move(ptr));
     }
 
-    template <typename R = Object>
-    SPtr<R> pop()
+    ObjectPtr pop()
     {
-        auto res = top<R>();
+        // use copy ctor,
+        // because the object ptr may be pointed by other address
+        auto res = *stack_->top();
         stack_->pop();
         return res;
     }
 
-    SPtr<ObjectPtr> pop_straight()
+    Address pop_address()
     {
-        auto res = top_straight();
+        auto res = std::move(top_address());
         stack_->pop();
         return res;
     }

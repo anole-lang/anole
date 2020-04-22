@@ -26,16 +26,18 @@ namespace anole
 {
 SPtr<Context> theCurrentContext = nullptr;
 
-static map<SPtr<ObjectPtr>, string> not_defineds;
+static map<Address, string> not_defineds;
 
-void Context::add_not_defined_symbol(
-    const string &name, SPtr<ObjectPtr> ptr)
+void
+Context::add_not_defined_symbol(
+    const string &name, const Address &ptr)
 {
     not_defineds[ptr] = name;
 }
 
-void Context::rm_not_defined_symbol(
-    SPtr<ObjectPtr> ptr)
+void
+Context::rm_not_defined_symbol(
+    const Address &ptr)
 {
     if (not_defineds.count(ptr))
     {
@@ -43,8 +45,9 @@ void Context::rm_not_defined_symbol(
     }
 }
 
-const string &Context::get_not_defined_symbol(
-    SPtr<ObjectPtr> ptr)
+const string
+&Context::get_not_defined_symbol(
+    const Address &ptr)
 {
     return not_defineds[ptr];
 }
@@ -66,14 +69,14 @@ void import_handle()
         throw RuntimeError("no module named " + name);
     }
 
-    theCurrentContext->push(mod);
+    theCurrentContext->push(move(mod));
     ++theCurrentContext->pc();
 }
 
 void importpart_handle()
 {
     const auto &name = OPRAND(string);
-    theCurrentContext->push_straight(
+    theCurrentContext->push_address(
         theCurrentContext->top<ModuleObject>()->load_member(name));
     ++theCurrentContext->pc();
 }
@@ -120,19 +123,20 @@ void load_handle()
     if (!*obj)
     {
         Context::add_not_defined_symbol(name, obj);
-        theCurrentContext->push_straight(obj);
+        theCurrentContext->push_address(obj);
+        ++theCurrentContext->pc();
     }
     else if ((*obj)->type() != ObjectType::Thunk)
     {
-        theCurrentContext->push_straight(obj);
+        theCurrentContext->push_address(obj);
+        ++theCurrentContext->pc();
     }
     else
     {
-        auto thunk = reinterpret_pointer_cast<ThunkObject>(*obj);
+        auto thunk = reinterpret_cast<ThunkObject *>(obj.get()->get());
         theCurrentContext = make_shared<Context>(
-            theCurrentContext, thunk->scope(), thunk->code(), thunk->base() - 1);
+            theCurrentContext, thunk->scope(), thunk->code(), thunk->base());
     }
-    ++theCurrentContext->pc();
 }
 
 void loadconst_handle()
@@ -144,15 +148,20 @@ void loadconst_handle()
 void loadmember_handle()
 {
     const auto &name = OPRAND(string);
-    theCurrentContext->push_straight(theCurrentContext->pop()->load_member(name));
+    theCurrentContext
+        ->push_address(
+            theCurrentContext
+                ->pop()
+                ->load_member(name)
+        );
     ++theCurrentContext->pc();
 }
 
 void store_handle()
 {
-    auto p = theCurrentContext->pop_straight();
+    auto p = theCurrentContext->pop_address();
     *p = theCurrentContext->pop();
-    theCurrentContext->push_straight(p);
+    theCurrentContext->push_address(p);
     Context::rm_not_defined_symbol(p);
     ++theCurrentContext->pc();
 }
@@ -160,7 +169,7 @@ void store_handle()
 void storeref_handle()
 {
     theCurrentContext->scope()->create_symbol(
-        OPRAND(string), theCurrentContext->pop_straight());
+        OPRAND(string), theCurrentContext->pop_address());
     ++theCurrentContext->pc();
 }
 
@@ -192,7 +201,7 @@ void return_handle()
     auto pre_context = theCurrentContext->pre_context();
     if (theCurrentContext->stack() != pre_context->stack())
     {
-        pre_context->push_straight(theCurrentContext->pop_straight());
+        pre_context->push_address(theCurrentContext->pop_address());
     }
     theCurrentContext = pre_context;
     ++theCurrentContext->pc();
@@ -314,7 +323,7 @@ void mod_handle()
 void is_handle()
 {
     auto rhs = theCurrentContext->pop();
-    theCurrentContext->set_top(theCurrentContext->top().get() == rhs.get() ? theTrue : theFalse);
+    theCurrentContext->set_top(theCurrentContext->top() == rhs.get() ? theTrue : theFalse);
     ++theCurrentContext->pc();
 }
 
@@ -400,7 +409,7 @@ void index_handle()
 {
     auto obj = theCurrentContext->pop();
     auto index = theCurrentContext->pop();
-    theCurrentContext->push_straight(obj->index(index));
+    theCurrentContext->push_address(obj->index(index));
     ++theCurrentContext->pc();
 }
 

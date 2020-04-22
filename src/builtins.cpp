@@ -19,8 +19,11 @@ namespace anole
 {
 REGISTER_BUILTIN(eval,
 {
-    auto str = theCurrentContext->pop<StringObject>();
-    istringstream ss{"return " + str->to_str() + ";"};
+    istringstream ss
+    { "return " +
+        (reinterpret_cast<StringObject *>(theCurrentContext->pop().get()))->to_str() +
+      ";"
+    };
     auto code = make_shared<Code>("<eval>");
     Parser(ss, "<eval>").gen_statement()->codegen(*code);
     theCurrentContext = make_shared<Context>(theCurrentContext,
@@ -31,17 +34,18 @@ REGISTER_BUILTIN(call_with_current_continuation,
 {
     if (theCurrentContext->top()->type() == ObjectType::Func)
     {
-        auto func = theCurrentContext->pop<FunctionObject>();
+        auto func = theCurrentContext->pop();
+        auto ptr = reinterpret_cast<FunctionObject *>(func.get());
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
         // base => LoadConst 0, so start with base + 1
         theCurrentContext = make_shared<Context>(
-            theCurrentContext, func->scope(), func->code(), func->base() + 1);
+            theCurrentContext, ptr->scope(), ptr->code(), ptr->base() + 1);
         *theCurrentContext->scope()->create_symbol(any_cast<string>(theCurrentContext->oprand()))
             = cont_obj;
     }
     else if (theCurrentContext->top()->type() == ObjectType::Cont)
     {
-        auto resume = theCurrentContext->pop<ContObject>()->resume();
+        auto resume = reinterpret_cast<ContObject *>(theCurrentContext->pop().get())->resume();
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
         theCurrentContext = make_shared<Context>(resume);
         theCurrentContext->push(cont_obj);
@@ -59,7 +63,7 @@ REGISTER_BUILTIN(id,
 
 REGISTER_BUILTIN(print,
 {
-    if (theCurrentContext->top() != theNone)
+    if (theCurrentContext->top() != theNone.get())
     {
         cout << theCurrentContext->pop()->to_str();
     }
@@ -68,7 +72,7 @@ REGISTER_BUILTIN(print,
 
 REGISTER_BUILTIN(println,
 {
-    if (theCurrentContext->top() != theNone)
+    if (theCurrentContext->top() != theNone.get())
     {
         cout << theCurrentContext->pop()->to_str() << endl;
     }
