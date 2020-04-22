@@ -27,21 +27,21 @@ SPtr<ModuleObject> ModuleObject::generate(const string &name)
 AnoleModuleObject::AnoleModuleObject(const string &name)
 {
     good_ = true;
-    if (is_directory(theCurrentContext->current_path() / name))
-    {
-        init(theCurrentContext->current_path() / name / "__init__.anole");
-    }
-    else if (is_regular_file(theCurrentContext->current_path() / (name + ".anole")))
+    if (is_regular_file(theCurrentContext->current_path() / (name + ".anole")))
     {
         init(theCurrentContext->current_path() / (name + ".anole"));
     }
-    else if (is_directory(filesystem::path("/usr/local/lib/anole") / name))
+    else if (is_directory(theCurrentContext->current_path() / name))
     {
-        init(filesystem::path("/usr/local/lib/anole") / name / "__init__.anole");
+        init(theCurrentContext->current_path() / name / "__init__.anole");
     }
     else if (is_regular_file(filesystem::path("/usr/local/lib/anole") / (name + ".anole")))
     {
         init(filesystem::path("/usr/local/lib/anole") / (name + ".anole"));
+    }
+    else if (is_directory(filesystem::path("/usr/local/lib/anole") / name))
+    {
+        init(filesystem::path("/usr/local/lib/anole") / name / "__init__.anole");
     }
     else
     {
