@@ -44,8 +44,10 @@ class Context : public std::enable_shared_from_this<Context>
 
     Context(SPtr<Context> pre, SPtr<Scope> scope,
         SPtr<Code> code, std::size_t pc = 0)
-      : pre_context_(pre), scope_(std::make_shared<Scope>(scope))
-      , code_(code), pc_(pc), stack_(pre->stack_)
+      : pre_context_(pre)
+      , scope_(std::make_shared<Scope>(scope))
+      , code_(std::move(code)), pc_(pc)
+      , stack_(pre->stack_)
       , current_path_(pre->current_path_) {}
 
     static void execute();

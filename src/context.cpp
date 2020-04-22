@@ -503,7 +503,7 @@ void Context::execute()
         cout << "run at: " << theCurrentContext->code()->from() << ":" << theCurrentContext->pc() << endl;
         #endif
 
-        theOpHandles[theCurrentContext->ins().opcode]();
+        theOpHandles[theCurrentContext->opcode()]();
     }
 }
 }
