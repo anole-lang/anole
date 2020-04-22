@@ -39,36 +39,36 @@ void FunctionObject::call(size_t num)
         theCurrentContext, scope_, code_, base_);
 
     auto &pc = theCurrentContext->pc();
-    while (num--)
+    const auto size = theCurrentContext->code()->size();
+    while (num)
     {
-        while (theCurrentContext->opcode() != Opcode::StoreRef
-            and theCurrentContext->opcode() != Opcode::StoreLocal)
+        switch (theCurrentContext->opcode())
         {
-            auto &ins = theCurrentContext->ins();
-            if (ins.opcode == Opcode::LambdaDecl or
-                ins.opcode == Opcode::ThunkDecl)
-            {
-                pc = OPRAND(size_t);
-            }
-            else if (++pc > theCurrentContext->code()->size())
-            {
-                theCurrentContext = theCurrentContext->pre_context();
-                throw RuntimeError("much arguments");
-            }
-        }
-
-        if (theCurrentContext->opcode() == Opcode::StoreRef)
-        {
+        case Opcode::StoreRef:
             theCurrentContext->scope()->create_symbol(OPRAND(string),
                 theCurrentContext->pop_straight());
-        }
-        else if (theCurrentContext->opcode() == Opcode::StoreLocal)
-        {
+            ++pc;
+            --num;
+            break;
+
+        case Opcode::StoreLocal:
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();
+            ++pc;
+            --num;
+            break;
+
+        case Opcode::LambdaDecl:
+        case Opcode::ThunkDecl:
+            pc = OPRAND(size_t);
+            break;
+
+        default:
+            ++pc;
+            break;
         }
 
-        if (++pc > theCurrentContext->code()->size())
+        if (pc > size)
         {
             theCurrentContext = theCurrentContext->pre_context();
             throw RuntimeError("much arguments");
@@ -83,36 +83,36 @@ void FunctionObject::call_tail(size_t num)
     theCurrentContext->pc() = base_;
 
     auto &pc = theCurrentContext->pc();
-    while (num--)
+    const auto size = code_->size();
+    while (num)
     {
-        while (theCurrentContext->opcode() != Opcode::StoreRef
-            and theCurrentContext->opcode() != Opcode::StoreLocal)
+        switch (theCurrentContext->opcode())
         {
-            auto &ins = theCurrentContext->ins();
-            if (ins.opcode == Opcode::LambdaDecl or
-                ins.opcode == Opcode::ThunkDecl)
-            {
-                pc = OPRAND(size_t);
-            }
-            else if (++pc > theCurrentContext->code()->size())
-            {
-                theCurrentContext = theCurrentContext->pre_context();
-                throw RuntimeError("much arguments");
-            }
-        }
-
-        if (theCurrentContext->opcode() == Opcode::StoreRef)
-        {
+        case Opcode::StoreRef:
             theCurrentContext->scope()->create_symbol(OPRAND(string),
                 theCurrentContext->pop_straight());
-        }
-        else if (theCurrentContext->opcode() == Opcode::StoreLocal)
-        {
+            ++pc;
+            --num;
+            break;
+
+        case Opcode::StoreLocal:
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();
+            ++pc;
+            --num;
+            break;
+
+        case Opcode::LambdaDecl:
+        case Opcode::ThunkDecl:
+            pc = OPRAND(size_t);
+            break;
+
+        default:
+            ++pc;
+            break;
         }
 
-        if (++pc > theCurrentContext->code()->size())
+        if (pc > size)
         {
             theCurrentContext = theCurrentContext->pre_context();
             throw RuntimeError("much arguments");

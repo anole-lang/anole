@@ -30,7 +30,7 @@ class Scope
 
     void create_symbol(const std::string &name, SPtr<ObjectPtr> value)
     {
-        symbols_[name] = value;
+        symbols_[name] = std::move(value);
     }
 
     SPtr<ObjectPtr> load_symbol(const std::string &name)
