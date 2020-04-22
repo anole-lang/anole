@@ -39,7 +39,6 @@ void FunctionObject::call(size_t num)
         theCurrentContext, scope_, code_, base_);
 
     auto &pc = theCurrentContext->pc();
-    const auto size = theCurrentContext->code()->size();
     while (num)
     {
         switch (theCurrentContext->opcode())
@@ -66,12 +65,6 @@ void FunctionObject::call(size_t num)
         default:
             ++pc;
             break;
-        }
-
-        if (pc > size)
-        {
-            theCurrentContext = theCurrentContext->pre_context();
-            throw RuntimeError("much arguments");
         }
     }
 }
@@ -83,7 +76,6 @@ void FunctionObject::call_tail(size_t num)
     theCurrentContext->pc() = base_;
 
     auto &pc = theCurrentContext->pc();
-    const auto size = code_->size();
     while (num)
     {
         switch (theCurrentContext->opcode())
@@ -110,12 +102,6 @@ void FunctionObject::call_tail(size_t num)
         default:
             ++pc;
             break;
-        }
-
-        if (pc > size)
-        {
-            theCurrentContext = theCurrentContext->pre_context();
-            throw RuntimeError("much arguments");
         }
     }
 }
