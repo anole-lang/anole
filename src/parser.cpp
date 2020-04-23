@@ -89,6 +89,17 @@ static set<TokenType> &bops_at_layer(size_t layer)
 }
 }
 
+void Parser::add_prefixop(const string &str)
+{
+    auto type = Token::add_token_type(str);
+    if (type <= TokenType::End)
+    {
+        throw RuntimeError("can't define predefined keywords or operators");
+    }
+
+    operators::unary_ops.insert(type);
+}
+
 void Parser::add_infixop(const string &str, size_t priority)
 {
     auto type = Token::add_token_type(str);
@@ -309,6 +320,9 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::Use:
         return gen_use_stmt();
 
+    case TokenType::Prefixop:
+        return gen_prefixop_decl();
+
     case TokenType::Infixop:
         return gen_infixop_decl();
 
@@ -395,7 +409,7 @@ Ptr<Stmt> Parser::gen_declaration()
         {
             get_next_token();
             block = make_unique<BlockExpr>();
-            block->statements.push_back(make_unique<ReturnStmt>(gen_expr()));
+            block->statements.push_back(make_unique<ReturnStmt>(gen_delay_expr()));
         }
         else
         {
@@ -413,6 +427,13 @@ Ptr<Stmt> Parser::gen_declaration()
         break;
     }
     return make_unique<VariableDeclarationStmt>(move(id), nullptr);
+}
+
+Ptr<Stmt> Parser::gen_prefixop_decl()
+{
+    get_next_token();
+    check<TokenType::Identifier>("expected an identifier here");
+    return make_unique<PrefixopDeclarationStmt>(gen_ident());
 }
 
 Ptr<Stmt> Parser::gen_infixop_decl()
@@ -624,7 +645,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
         if (operators::unary_ops.count(current_token_.type))
         {
             auto pos = tokenizer_.last_pos();
-            auto op = current_token_.type;
+            auto op = current_token_;
             get_next_token();
             try_continue();
             auto expr = make_unique<UnaryOperatorExpr>(op, gen_expr(layer));

@@ -17,6 +17,7 @@ class Parser
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();
 
+    static void add_prefixop(const std::string &str);
     static void add_infixop(const std::string &str,
         std::size_t priority);
 
@@ -58,6 +59,7 @@ class Parser
     Ptr<Stmt> gen_stmt();
     Ptr<Stmt> gen_declaration();
     Ptr<Stmt> gen_var_assign();
+    Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();
     Ptr<Stmt> gen_class_decl();
     Ptr<Stmt> gen_use_stmt();
