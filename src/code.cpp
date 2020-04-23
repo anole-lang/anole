@@ -246,6 +246,10 @@ void Code::print(ostream &out)
             out << i << "\tMatch\t\t" << OPRAND(size_t) << endl;
             break;
 
+        case Opcode::AddPrefixOp:
+            out << i << "\tAddPrefixOp\t" << OPRAND(string) << endl;
+            break;
+
         case Opcode::AddInfixOp:
         {
             using type = pair<string, size_t>;
@@ -394,6 +398,7 @@ void Code::serialize(ostream &out)
         case Opcode::LoadMember:
         case Opcode::StoreRef:
         case Opcode::StoreLocal:
+        case Opcode::AddPrefixOp:
             typeout(out, OPRAND(string));
             break;
 
@@ -496,6 +501,7 @@ void Code::unserialize(ifstream &in)
         case Opcode::LoadMember:
         case Opcode::StoreRef:
         case Opcode::StoreLocal:
+        case Opcode::AddPrefixOp:
         {
             string val;
             typein(in, val);
