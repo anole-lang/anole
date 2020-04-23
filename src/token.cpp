@@ -29,6 +29,7 @@ static map<string, TokenType> mapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
+    { "prefixop",   TokenType::Prefixop },
     { "infixop",    TokenType::Infixop  },
     { "if",         TokenType::If       },
     { "elif",       TokenType::Elif     },

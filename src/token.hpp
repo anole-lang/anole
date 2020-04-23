@@ -13,6 +13,7 @@ enum TokenType : int
 
     Use,       // use
     From,      // from
+    Prefixop,  // prefixop
     Infixop,   // infixop
     If,        // if
     Elif,      // elif
