@@ -100,7 +100,7 @@ void ParenOperatorExpr::codegen(Code &code)
 void UnaryOperatorExpr::codegen(Code &code)
 {
     expr->codegen(code);
-    switch (op)
+    switch (op.type)
     {
     case TokenType::Sub:
         code.mapping(pos);
@@ -125,6 +125,8 @@ void UnaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
+        code.add_ins<Opcode::Load>(op.value);
+        code.add_ins<Opcode::Call>(static_cast<size_t>(1));
         break;
     }
 }
@@ -487,6 +489,11 @@ void FunctionDeclarationStmt::codegen(Code &code)
 {
     lambda->codegen(code);
     code.add_ins<Opcode::StoreRef>(id->name);
+}
+
+void PrefixopDeclarationStmt::codegen(Code &code)
+{
+    code.add_ins<Opcode::AddPrefixOp>(id->name);
 }
 
 void InfixopDeclarationStmt::codegen(Code &code)
