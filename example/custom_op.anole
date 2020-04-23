@@ -13,3 +13,11 @@ infixop 200 *^*;
 println(2 * 3 *=* 4 * 5);
 println(2 * 3 *-* 4 * 5);
 println(2 * 3 *^* 4 * 5);
+
+@refof(&var): delay var;
+prefixop refof;
+
+@a: 1;
+@test(var): var: 10;
+test(refof a);
+println(a);
