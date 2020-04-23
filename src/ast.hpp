@@ -121,10 +121,10 @@ struct ParenOperatorExpr : Expr
 
 struct UnaryOperatorExpr : Expr
 {
-    TokenType op;
+    Token op;
     Ptr<Expr> expr;
 
-    UnaryOperatorExpr(TokenType op,
+    UnaryOperatorExpr(Token op,
         Ptr<Expr> &&expr)
       : op(op), expr(std::move(expr)) {}
 
@@ -311,6 +311,16 @@ struct FunctionDeclarationStmt : Stmt
         Ptr<LambdaExpr> &&lambda)
       : id(std::move(id))
       , lambda(std::move(lambda)) {}
+
+    void codegen(Code &) override;
+};
+
+struct PrefixopDeclarationStmt : Stmt
+{
+    Ptr<IdentifierExpr> id;
+
+    PrefixopDeclarationStmt(Ptr<IdentifierExpr> &&id)
+      : id(std::move(id)) {}
 
     void codegen(Code &) override;
 };
