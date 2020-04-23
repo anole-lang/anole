@@ -250,6 +250,12 @@ void match_handle()
     }
 }
 
+void addprefixop_handle()
+{
+    Parser::add_prefixop(OPRAND(string));
+    ++theCurrentContext->pc();
+}
+
 void addinfixop_handle()
 {
     using type = pair<string, size_t>;
@@ -475,6 +481,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::jumpifnot_handle,
     &op_handles::match_handle,
 
+    &op_handles::addprefixop_handle,
     &op_handles::addinfixop_handle,
 
     &op_handles::lambdadecl_handle,
