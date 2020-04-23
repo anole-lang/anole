@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Insturction AddPrefixOp to make identifier as prefix operator
+
 ### Updated
 
 - Rewrite some code to make anole faster
