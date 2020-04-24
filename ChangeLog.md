@@ -6,6 +6,10 @@
 
 - Support use list in foreach statement directly
 
+### Fixed
+
+- Fix bug in old eval function which will skip the first opcode
+
 ## 0.0.11 - 2020/04/24
 
 ### Added

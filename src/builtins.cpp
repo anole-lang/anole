@@ -20,14 +20,17 @@ namespace anole
 REGISTER_BUILTIN(eval,
 {
     istringstream ss
-    { "return " +
-        (reinterpret_cast<StringObject *>(theCurrentContext->pop().get()))->to_str() +
+    {
+      "return " +
+        (reinterpret_cast<StringObject *>(theCurrentContext->pop().get()))->value() +
       ";"
     };
+
     auto code = make_shared<Code>("<eval>");
     Parser(ss, "<eval>").gen_statement()->codegen(*code);
     theCurrentContext = make_shared<Context>(theCurrentContext,
-        theCurrentContext->scope(), code, 0);
+        theCurrentContext->scope(), code, -1);
+    theCurrentContext->scope() = theCurrentContext->scope()->pre();
 });
 
 REGISTER_BUILTIN(call_with_current_continuation,
