@@ -1,5 +1,9 @@
+#include <map>
+#include "context.hpp"
 #include "boolobject.hpp"
+#include "stringobject.hpp"
 #include "integerobject.hpp"
+#include "builtinfuncobject.hpp"
 
 using namespace std;
 
@@ -210,5 +214,20 @@ ObjectPtr IntegerObject::brs(ObjectPtr obj)
     {
         throw RuntimeError("no match method");
     }
+}
+
+Address IntegerObject::load_member(const string &name)
+{
+    if (name == "to_str")
+    {
+        return make_shared<ObjectPtr>(
+            make_shared<BuiltInFunctionObject>([val = value_]
+            {
+                theCurrentContext
+                    ->push(make_shared<StringObject>(to_string(val)));
+            })
+        );
+    }
+    return Object::load_member(name);
 }
 }

@@ -30,6 +30,7 @@ class IntegerObject : public Object
     ObjectPtr band(ObjectPtr) override;
     ObjectPtr bls(ObjectPtr) override;
     ObjectPtr brs(ObjectPtr) override;
+    Address load_member(const std::string &name) override;
 
     int64_t value() const { return value_; }
 
