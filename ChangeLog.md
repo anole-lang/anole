@@ -5,6 +5,7 @@
 ### Added
 
 - Support use list in foreach statement directly
+- Method to_str for integer object
 
 ### Fixed
 
