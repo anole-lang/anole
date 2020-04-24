@@ -1,0 +1,22 @@
+@with(f, args) {
+    @i: 0;
+    @args_s: "";
+    while i < args.size() {
+        if i = 0 {
+            args_s: args_s + "args[" + i.to_str() + "]";
+        } else {
+            args_s: args_s + ", " + "args[" + i.to_str() + "]";
+        }
+        i: i + 1;
+    }
+    return eval("f(" + args_s + ")");
+}
+
+infixop with;
+
+@f(arg1, arg2) {
+    println(arg1);
+    println(arg2);
+}
+
+f with [1, 2];

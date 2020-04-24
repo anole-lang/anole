@@ -37,3 +37,8 @@
 
 l: MyList(range(0, 10));
 foreach l as item, print(item);
+
+l: [1, 2, 3];
+foreach l as i, println(i);
+foreach l as i, i: 10;
+println(l);
