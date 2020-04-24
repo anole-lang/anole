@@ -1,5 +1,11 @@
 # ChangeLog for Anole
 
+## Unreleased
+
+### Added
+
+- Support use list in foreach statement directly
+
 ## 0.0.11 - 2020/04/24
 
 ### Added

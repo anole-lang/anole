@@ -18,6 +18,7 @@ enum ObjectType : int
     String,
     Enum,
     List,
+    ListIterator,
     Dict,
     BuiltinFunc,
     Func,

@@ -59,6 +59,14 @@ built_in_methods_for_list
             obj->objects().clear();
             theCurrentContext->push(theNone);
         }
+    },
+
+    // used by foreach
+    {"__iterator__", [](ListObject *obj)
+        {
+            theCurrentContext
+                ->push(make_shared<ListIteratorObject>(obj));
+        }
     }
 };
 
@@ -128,9 +136,10 @@ Address ListObject::index(ObjectPtr index)
 
 Address ListObject::load_member(const string &name)
 {
-    if (built_in_methods_for_list.count(name))
+    auto method = built_in_methods_for_list.find(name);
+    if (method != built_in_methods_for_list.end())
     {
-        auto &func = built_in_methods_for_list[name];
+        auto &func = method->second;
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([this, func]
             {
@@ -149,5 +158,39 @@ list<Address> &ListObject::objects()
 void ListObject::append(ObjectPtr obj)
 {
     objects_.push_back(make_shared<ObjectPtr>(obj));
+}
+
+static map<string, function<void(ListIteratorObject *)>>
+built_in_methods_for_listiterator
+{
+    // used by foreach
+    {"__has_next__", [](ListIteratorObject *obj)
+        {
+            theCurrentContext
+                ->push(obj->has_next() ? theTrue : theFalse);
+        }
+    },
+    {"__next__", [](ListIteratorObject *obj)
+        {
+            theCurrentContext
+                ->push_address(obj->next());
+        }
+    }
+};
+
+Address ListIteratorObject::load_member(const string &name)
+{
+    auto method = built_in_methods_for_listiterator.find(name);
+    if (method != built_in_methods_for_listiterator.end())
+    {
+        auto &func = method->second;
+        return make_shared<ObjectPtr>(
+            make_shared<BuiltInFunctionObject>([this, func]
+            {
+                func(this);
+            })
+        );
+    }
+    return Object::load_member(name);
 }
 }

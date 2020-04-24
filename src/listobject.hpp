@@ -24,4 +24,20 @@ class ListObject : public Object
   private:
     std::list<Address> objects_;
 };
+
+class ListIteratorObject : public Object
+{
+  public:
+    ListIteratorObject(ListObject *bind)
+      : bind_(bind), current_(bind->objects().begin()) {}
+
+    Address load_member(const std::string &name) override;
+
+    bool has_next() { return current_ != bind_->objects().end(); }
+    Address next() { return *current_++; }
+
+  private:
+    ListObject *bind_;
+    std::list<Address>::iterator current_;
+};
 }
