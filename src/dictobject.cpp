@@ -81,9 +81,10 @@ Address DictObject::index(ObjectPtr index)
 
 Address DictObject::load_member(const string &name)
 {
-    if (built_in_methods_for_dict.count(name))
+    auto method = built_in_methods_for_dict.find(name);
+    if (method != built_in_methods_for_dict.end())
     {
-        auto &func = built_in_methods_for_dict[name];
+        auto &func = method->second;
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([this, func]()
             {

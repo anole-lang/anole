@@ -8,7 +8,7 @@ using namespace std;
 namespace anole
 {
 static map<string, function<void(StringObject *)>>
-built_in_methods_for_list
+built_in_methods_for_string
 {
     {"size", [](StringObject *obj)
         {
@@ -128,9 +128,10 @@ Address StringObject::index(ObjectPtr index)
 
 Address StringObject::load_member(const string &name)
 {
-    if (built_in_methods_for_list.count(name))
+    auto method = built_in_methods_for_string.find(name);
+    if (method != built_in_methods_for_string.end())
     {
-        auto &func = built_in_methods_for_list[name];
+        auto &func = method->second;
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([this, func]
             {
