@@ -1,10 +1,11 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.11 - 2020/04/24
 
 ### Added
 
 - Insturction AddPrefixOp to make identifier as prefix operator
+- Support custom unary operators now
 
 ### Updated
 
