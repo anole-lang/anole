@@ -9,18 +9,25 @@ namespace anole
 Token::Token(TokenType type, string value)
   : type(type), value(move(value)) {}
 
-Token::Token(Token &&token) noexcept
-  : type(token.type)
-  , value(std::move(token.value)) {}
+Token::Token(Token &&other) noexcept
+  : type(other.type)
+  , value(std::move(other.value)) {}
 
-Token::Token(const Token &token)
-  : type(token.type)
-  , value(token.value) {}
+Token::Token(const Token &other)
+  : type(other.type)
+  , value(other.value) {}
 
-Token &Token::operator=(const Token &token)
+Token &Token::operator=(Token &&other) noexcept
 {
-    type = token.type;
-    value = token.value;
+    type = other.type;
+    value = move(other.value);
+    return *this;
+}
+
+Token &Token::operator=(const Token &other)
+{
+    type = other.type;
+    value = other.value;
     return *this;
 }
 

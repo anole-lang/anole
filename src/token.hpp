@@ -92,9 +92,10 @@ struct Token
     Token() = default;
     explicit Token(TokenType type, std::string value = "");
     explicit Token(std::string value);
-    Token(Token &&token) noexcept;
-    Token(const Token &token);
-    Token &operator=(const Token &token);
+    Token(Token &&other) noexcept;
+    Token(const Token &other);
+    Token &operator=(Token &&other) noexcept;
+    Token &operator=(const Token &other);
 
     static TokenType add_token_type(const std::string &str);
 
