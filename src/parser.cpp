@@ -367,6 +367,10 @@ Ptr<Stmt> Parser::gen_stmt()
         return make_unique<ExprStmt>(gen_expr());
 
     default:
+        if (operators::unary_ops.count(current_token_.type))
+        {
+            return make_unique<ExprStmt>(gen_expr());
+        }
         break;
     }
     throw_err("wrong token here");
