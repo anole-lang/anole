@@ -11,36 +11,44 @@ Except: (@() {
         }
     }
 
-    @try(f, catch) {
+    @catch(try, cfun) {
         @e: call_with_current_continuation(@(cont) {
             conts.push(cont);
-            f();
+            try(@(x): x)();
         });
-        if !(e is none), catch(e);
+        if !(e is none), cfun(e);
     }
+
+    @try(fun): @(f): f(fun);
 
     return @() {};
 })();
 
-div: @(a, b) {
-    if b = 0, Except.throw("err: div 0");
-    return a / b;
-}
+@throw: Except.throw;
+prefixop throw;
 
-div_forever: @(a) {
+@try: Except.try;
+prefixop try;
+
+@catch: Except.catch;
+infixop catch;
+
+@div(a, b) {
+    if b = 0, throw "err: div 0";
+    return a / b;
+};
+
+@div_forever(a) {
     @b: a;
     while true {
         div(a, b);
         b: b - 1;
     }
-}
+};
 
-test: @() {
-    Except.try (@() {
-        div_forever(100);
-    }, @(e) {
-        println(e);
-    });
+try @() {
+    div_forever(100);
 }
-
-test();
+catch @(e) {
+    println(e);
+}
