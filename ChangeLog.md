@@ -10,6 +10,7 @@
 ### Fixed
 
 - Fix bug in old eval function which will skip the first opcode
+- Fix bug in parsing user defined unary operators
 
 ## 0.0.11 - 2020/04/24
 
