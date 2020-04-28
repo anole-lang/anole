@@ -46,6 +46,7 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
++ [ ] Support variadic arguments
 + [ ] Implement self any and variant instead of using the standard
 + [ ] Provide debugger
 + [ ] Support threads and processes
