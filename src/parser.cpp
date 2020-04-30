@@ -537,6 +537,7 @@ Ptr<Stmt> Parser::gen_if_else()
     auto cond = gen_expr();
     cond->pos = pos;
     auto block_true = gen_block();
+    try_continue();
     auto else_stmt = gen_if_else_tail();
     return make_unique<IfElseStmt>(
         move(cond), move(block_true), move(else_stmt));
@@ -552,8 +553,7 @@ Ptr<Stmt> Parser::gen_if_else_tail()
     {
         get_next_token();
         auto block = gen_block();
-        return make_unique<IfElseStmt>(
-            make_unique<IntegerExpr>(1), move(block), nullptr);
+        return make_unique<ExprStmt>(move(block));
     }
     else
     {
