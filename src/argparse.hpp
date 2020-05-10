@@ -133,7 +133,8 @@ class ArgumentParser
 
         for (auto &ind_keys : optional_arguments_)
         {
-            for (std::size_t i = 0; i < ind_keys.second.size(); ++i)
+            for (decltype(ind_keys.second.size()) i = 0;
+                i < ind_keys.second.size(); ++i)
             {
                 if (i) out << ", ";
                 out << ind_keys.second[i];

@@ -539,8 +539,8 @@ Ptr<Stmt> Parser::gen_if_else()
     auto block_true = gen_block();
     try_continue();
     auto else_stmt = gen_if_else_tail();
-    return make_unique<IfElseStmt>(
-        move(cond), move(block_true), move(else_stmt));
+    return make_unique<IfElseStmt>(move(cond),
+        move(block_true), move(else_stmt));
 }
 
 Ptr<Stmt> Parser::gen_if_else_tail()
