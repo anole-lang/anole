@@ -664,11 +664,13 @@ Ptr<Expr> Parser::gen_expr(int layer)
 
     auto lhs = gen_expr(layer + 1);
     auto op = current_token_;
-    if (operators::bops_at_layer(static_cast<size_t>(layer)).count(op.type))
+    // user `if` if right-associative
+    while (operators::bops_at_layer(static_cast<size_t>(layer)).count(op.type))
     {
         auto pos = tokenizer_.last_pos();
         get_next_token();
-        auto rhs = gen_expr(layer);
+        // gen_expr(layer) if right-associative
+        auto rhs = gen_expr(layer + 1);
         if (lhs->is_integer_expr() and
             rhs->is_integer_expr())
         {
@@ -742,6 +744,8 @@ Ptr<Expr> Parser::gen_expr(int layer)
             lhs = make_unique<BinaryOperatorExpr>(move(lhs), op, move(rhs));
             lhs->pos = pos;
         }
+        // delete if right-associative
+        op = current_token_;
     }
     return lhs;
 }
