@@ -1,0 +1,13 @@
+# not complete
+# need to support typeof and variadic arguments
+
+@~>(lhs, rhs):
+  @(arg) {
+    return rhs(lhs(arg));    
+  }
+infixop ~>;
+
+@asList(x): [x];
+@printList(l): println(l);
+
+(asList ~> printList)(10);
