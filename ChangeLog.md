@@ -12,6 +12,10 @@
 - Fix bug in old eval function which will skip the first opcode
 - Fix bug in parsing user defined unary operators
 
+### Changed
+
+- Binary operators are left-associative instead of right-associative now
+
 ## 0.0.11 - 2020/04/24
 
 ### Added
