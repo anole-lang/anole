@@ -1,7 +1,4 @@
-@~>(arg, func):
-  @(arg) {
-      return (arg is none) ? none, func(arg);
-  }
+@~>(arg, func): (arg is none) ? none, func(arg);
 infixop ~>;
 
 @asList(x): [x];
