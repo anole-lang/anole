@@ -591,9 +591,9 @@ void DoWhileStmt::codegen(Code &code)
 void ForeachStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Opcode::LoadMember>(string("__iterator__"));
+    code.add_ins<Opcode::LoadMember>("__iterator__"s);
     code.add_ins<Opcode::Call>(static_cast<size_t>(0));
-    code.add_ins<Opcode::StoreRef>(string("__it"));
+    code.add_ins<Opcode::StoreRef>("__it"s);
 
     auto cond = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
