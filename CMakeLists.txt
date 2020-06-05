@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)
-    set(CMAKE_CXX_FLAGS "-g -Wall -rdynamic")
+    set(CMAKE_CXX_FLAGS "-g -Wall -rdynamic -Wno-unused-command-line-argument")
     ADD_DEFINITIONS(-D_DEBUG)
 
     file(GLOB SOURCES "src/*.cpp")
@@ -20,7 +20,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
     )
     install (TARGETS anole DESTINATION bin)
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
-    set(CMAKE_CXX_FLAGS "-pg -O3 -Wall -rdynamic")
+    set(CMAKE_CXX_FLAGS "-pg -O3 -Wall -rdynamic -Wno-unused-command-line-argument")
 
     file(GLOB SOURCES "src/*.cpp")
     add_executable(anole ${SOURCES})
@@ -33,7 +33,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
     )
     install (TARGETS anole DESTINATION bin)
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
-    set(CMAKE_CXX_FLAGS "-O3 -Wall -rdynamic")
+    set(CMAKE_CXX_FLAGS "-O3 -Wall -rdynamic -Wno-unused-command-line-argument")
 
     add_library(error SHARED
         src/error.cpp
@@ -100,7 +100,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
     set_target_properties(anole PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
     install (TARGETS anole DESTINATION bin)
 ELSE ()
-    set(CMAKE_CXX_FLAGS "-O3 -Wall -rdynamic")
+    set(CMAKE_CXX_FLAGS "-O3 -Wall -rdynamic -Wno-unused-command-line-argument")
 
     file(GLOB SOURCES "src/*.cpp")
     add_executable(anole ${SOURCES})
