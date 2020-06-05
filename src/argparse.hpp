@@ -162,7 +162,7 @@ class ArgumentParser
         {
             add_optional_argument(keys...);
         }
-        arguments_[k] = std::move(Argument());
+        arguments_[k] = Argument();
         return arguments_[k];
     }
 
@@ -179,7 +179,7 @@ class ArgumentParser
         auto k = arguments_.size();
         positional_arguments_[k] = key;
         keys_[positional_arguments_[k]] = k;
-        arguments_[k] = std::move(Argument());
+        arguments_[k] = Argument();
         return arguments_[k];
     }
 
