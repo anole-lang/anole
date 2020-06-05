@@ -536,14 +536,14 @@ Ptr<Stmt> Parser::gen_if_else()
     auto pos = tokenizer_.last_pos();
     auto cond = gen_expr();
     cond->pos = pos;
-    auto block_true = gen_block();
+    auto true_block = gen_block();
     try_continue();
-    auto else_stmt = gen_if_else_tail();
+    auto false_branch = gen_if_else_tail();
     return make_unique<IfElseStmt>(move(cond),
-        move(block_true), move(else_stmt));
+        move(true_block), move(false_branch));
 }
 
-Ptr<Stmt> Parser::gen_if_else_tail()
+Ptr<AST> Parser::gen_if_else_tail()
 {
     if (current_token_.type == TokenType::Elif)
     {
@@ -552,8 +552,7 @@ Ptr<Stmt> Parser::gen_if_else_tail()
     else if (current_token_.type == TokenType::Else)
     {
         get_next_token();
-        auto block = gen_block();
-        return make_unique<ExprStmt>(move(block));
+        return gen_block();
     }
     else
     {
@@ -644,6 +643,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
         return expr;
     }
 
+    // parse unary operation or term expression
     if (static_cast<size_t>(layer) == operators::bop_priorities.size())
     {
         if (operators::unary_ops.count(current_token_.type))

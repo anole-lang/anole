@@ -375,15 +375,15 @@ struct ReturnStmt : Stmt
 struct IfElseStmt : Stmt
 {
     Ptr<Expr> cond;
-    Ptr<Expr> block_true;
-    Ptr<Stmt> else_stmt;
+    Ptr<BlockExpr> true_block;
+    Ptr<AST> false_branch;
 
     IfElseStmt(Ptr<Expr> &&cond,
-        Ptr<Expr> &&block_true,
-        Ptr<Stmt> &&else_stmt)
+        Ptr<BlockExpr> &&true_block,
+        Ptr<AST> &&false_branch)
       : cond(std::move(cond))
-      , block_true(std::move(block_true))
-      , else_stmt(std::move(else_stmt)) {}
+      , true_block(std::move(true_block))
+      , false_branch(std::move(false_branch)) {}
 
     void codegen(Code &) override;
 };

@@ -540,12 +540,12 @@ void IfElseStmt::codegen(Code &code)
     cond->codegen(code);
     code.mapping()[code.size()] = cond->pos;
     auto o1 = code.add_ins();
-    block_true->codegen(code);
-    if (else_stmt)
+    true_block->codegen(code);
+    if (false_branch)
     {
         auto o2 = code.add_ins();
         code.set_ins<Opcode::JumpIfNot>(o1, code.size());
-        else_stmt->codegen(code);
+        false_branch->codegen(code);
         code.set_ins<Opcode::Jump>(o2, code.size());
     }
     else
