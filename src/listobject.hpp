@@ -5,7 +5,7 @@
 
 namespace anole
 {
-class ListObject : public Object
+class ListObject : public Object, public std::enable_shared_from_this<ListObject>
 {
   public:
     ListObject()
@@ -28,7 +28,7 @@ class ListObject : public Object
 class ListIteratorObject : public Object
 {
   public:
-    ListIteratorObject(ListObject *bind)
+    ListIteratorObject(SPtr<ListObject> bind)
       : bind_(bind), current_(bind->objects().begin()) {}
 
     Address load_member(const std::string &name) override;
@@ -37,7 +37,7 @@ class ListIteratorObject : public Object
     Address next() { return *current_++; }
 
   private:
-    ListObject *bind_;
+    SPtr<ListObject> bind_;
     std::list<Address>::iterator current_;
 };
 }
