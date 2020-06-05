@@ -9,12 +9,13 @@
 
 ### Fixed
 
-- Fix bug in old eval function which will skip the first opcode
+- Fix bug that old eval function which will skip the first opcode
 - Fix bug in parsing user defined unary operators
 
 ### Changed
 
 - Binary operators are left-associative instead of right-associative now
+- Built-in method will contain a shared pointer of its object
 
 ## 0.0.11 - 2020/04/24
 
