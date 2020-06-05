@@ -6,7 +6,7 @@
 
 namespace anole
 {
-class StringObject : public Object
+class StringObject : public Object, public std::enable_shared_from_this<StringObject>
 {
   public:
     StringObject(std::string value)

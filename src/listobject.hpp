@@ -25,7 +25,7 @@ class ListObject : public Object, public std::enable_shared_from_this<ListObject
     std::list<Address> objects_;
 };
 
-class ListIteratorObject : public Object
+class ListIteratorObject : public Object, public std::enable_shared_from_this<ListIteratorObject>
 {
   public:
     ListIteratorObject(SPtr<ListObject> bind)

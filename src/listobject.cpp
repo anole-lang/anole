@@ -11,50 +11,50 @@ using namespace std;
 
 namespace anole
 {
-static map<string, function<void(SPtr<ListObject>)>>
+static map<string, function<void(SPtr<ListObject> &)>>
 built_in_methods_for_list
 {
-    {"empty", [](SPtr<ListObject> obj)
+    {"empty", [](SPtr<ListObject> &obj)
         {
             theCurrentContext->push(obj->objects().empty() ? theTrue : theFalse);
         }
     },
-    {"size", [](SPtr<ListObject> obj)
+    {"size", [](SPtr<ListObject> &obj)
         {
             theCurrentContext->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->objects().size())));
         }
     },
-    {"push", [](SPtr<ListObject> obj)
+    {"push", [](SPtr<ListObject> &obj)
         {
             obj->append(theCurrentContext->pop());
             theCurrentContext->push(theNone);
         }
     },
-    {"pop", [](SPtr<ListObject> obj)
+    {"pop", [](SPtr<ListObject> &obj)
         {
             auto res = obj->objects().back();
             obj->objects().pop_back();
             theCurrentContext->push_address(res);
         }
     },
-    {"pop_front", [](SPtr<ListObject> obj)
+    {"pop_front", [](SPtr<ListObject> &obj)
         {
             auto res = obj->objects().front();
             obj->objects().pop_front();
             theCurrentContext->push_address(res);
         }
     },
-    {"front", [](SPtr<ListObject> obj)
+    {"front", [](SPtr<ListObject> &obj)
         {
             theCurrentContext->push_address(obj->objects().front());
         }
     },
-    {"back", [](SPtr<ListObject> obj)
+    {"back", [](SPtr<ListObject> &obj)
         {
             theCurrentContext->push_address(obj->objects().back());
         }
     },
-    {"clear", [](SPtr<ListObject> obj)
+    {"clear", [](SPtr<ListObject> &obj)
         {
             obj->objects().clear();
             theCurrentContext->push(theNone);
@@ -62,7 +62,7 @@ built_in_methods_for_list
     },
 
     // used by foreach
-    {"__iterator__", [](SPtr<ListObject> obj)
+    {"__iterator__", [](SPtr<ListObject> &obj)
         {
             theCurrentContext
                 ->push(make_shared<ListIteratorObject>(obj));
@@ -139,10 +139,11 @@ Address ListObject::load_member(const string &name)
     auto method = built_in_methods_for_list.find(name);
     if (method != built_in_methods_for_list.end())
     {
-        auto &func = method->second;
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([ptr = shared_from_this(), func]
-             {
+            make_shared<BuiltInFunctionObject>([
+                ptr = shared_from_this(),
+                &func = method->second]() mutable
+            {
                 func(ptr);
             })
         );
@@ -160,17 +161,17 @@ void ListObject::append(ObjectPtr obj)
     objects_.push_back(make_shared<ObjectPtr>(obj));
 }
 
-static map<string, function<void(ListIteratorObject *)>>
+static map<string, function<void(SPtr<ListIteratorObject> &)>>
 built_in_methods_for_listiterator
 {
     // used by foreach
-    {"__has_next__", [](ListIteratorObject *obj)
+    {"__has_next__", [](SPtr<ListIteratorObject> &obj)
         {
             theCurrentContext
                 ->push(obj->has_next() ? theTrue : theFalse);
         }
     },
-    {"__next__", [](ListIteratorObject *obj)
+    {"__next__", [](SPtr<ListIteratorObject> &obj)
         {
             theCurrentContext
                 ->push_address(obj->next());
@@ -183,11 +184,12 @@ Address ListIteratorObject::load_member(const string &name)
     auto method = built_in_methods_for_listiterator.find(name);
     if (method != built_in_methods_for_listiterator.end())
     {
-        auto &func = method->second;
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([this, func]
+            make_shared<BuiltInFunctionObject>([
+                ptr = shared_from_this(),
+                &func = method->second]() mutable
             {
-                func(this);
+                func(ptr);
             })
         );
     }

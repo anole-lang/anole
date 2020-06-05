@@ -7,10 +7,10 @@ using namespace std;
 
 namespace anole
 {
-static map<string, function<void(StringObject *)>>
+static map<string, function<void(SPtr<StringObject> &)>>
 built_in_methods_for_string
 {
-    {"size", [](StringObject *obj)
+    {"size", [](SPtr<StringObject> &obj)
         {
             theCurrentContext
                 ->push(
@@ -22,7 +22,7 @@ built_in_methods_for_string
                 );
         }
     },
-    {"to_int", [](StringObject *obj)
+    {"to_int", [](SPtr<StringObject> &obj)
         {
             theCurrentContext
                 ->push(
@@ -131,11 +131,12 @@ Address StringObject::load_member(const string &name)
     auto method = built_in_methods_for_string.find(name);
     if (method != built_in_methods_for_string.end())
     {
-        auto &func = method->second;
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([this, func]
+            make_shared<BuiltInFunctionObject>([
+                ptr = shared_from_this(),
+                &func = method->second]() mutable
             {
-                func(this);
+                func(ptr);
             })
         );
     }

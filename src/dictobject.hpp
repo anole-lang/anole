@@ -5,7 +5,7 @@
 
 namespace anole
 {
-class DictObject : public Object
+class DictObject : public Object, public std::enable_shared_from_this<DictObject>
 {
   public:
     struct ObjectCmp

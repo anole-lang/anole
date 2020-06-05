@@ -9,25 +9,25 @@ using namespace std;
 
 namespace anole
 {
-static map<string, function<void(DictObject *)>>
+static map<string, function<void(SPtr<DictObject> &)>>
 built_in_methods_for_dict
 {
-    {"empty", [](DictObject *obj)
+    {"empty", [](SPtr<DictObject> &obj)
         {
             theCurrentContext->push(obj->data().empty() ? theTrue : theFalse);
         }
     },
-    {"size", [](DictObject *obj)
+    {"size", [](SPtr<DictObject> &obj)
         {
             theCurrentContext->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->data().size())));
         }
     },
-    {"at", [](DictObject *obj)
+    {"at", [](SPtr<DictObject> &obj)
         {
             theCurrentContext->push(*(obj->index(theCurrentContext->pop())));
         }
     },
-    {"insert", [](DictObject *obj)
+    {"insert", [](SPtr<DictObject> &obj)
         {
             auto p1 = theCurrentContext->pop();
             auto p2 = theCurrentContext->pop();
@@ -35,13 +35,13 @@ built_in_methods_for_dict
             theCurrentContext->push(theNone);
         }
     },
-    {"erase", [](DictObject *obj)
+    {"erase", [](SPtr<DictObject> &obj)
         {
             obj->data().erase(theCurrentContext->pop());
             theCurrentContext->push(theNone);
         }
     },
-    {"clear", [](DictObject *obj)
+    {"clear", [](SPtr<DictObject> &obj)
         {
             obj->data().clear();
             theCurrentContext->push(theNone);
@@ -84,11 +84,12 @@ Address DictObject::load_member(const string &name)
     auto method = built_in_methods_for_dict.find(name);
     if (method != built_in_methods_for_dict.end())
     {
-        auto &func = method->second;
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([this, func]()
+            make_shared<BuiltInFunctionObject>([
+                ptr = shared_from_this(),
+                &func = method->second]() mutable
             {
-                func(this);
+                func(ptr);
             })
         );
     }
