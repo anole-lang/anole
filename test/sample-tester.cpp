@@ -131,7 +131,7 @@ true
 
     TEST_METHOD(Continuation)
         istringstream ss(R"code(
-Xb: @() {
+Xb: {
     println("Hi! My name is Xu Bo.");
     cont: call_with_current_continuation(Lyx);
     println("Do you love me?");
