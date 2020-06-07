@@ -1,0 +1,31 @@
+@Zero: @(f): @(x): x;
+@Succ: @(n): @(f): @(x): f(n(f)(x));
+
+@Plus: @(m, n): @(f): @(x): m(f)(n(f)(x));
+@Mult: @(m, n): @(f): n(m(f));
+@Exp: @(m, n): n(m);
+@Pred: @(n): @(f): @(x): n(@(g): @(h): h(g(f)))(@(u): x)(@(u): u);
+
+@True: @(t, f): t;
+@False: @(t, f): f;
+@And: @(l, r): @(t, f): l(r(t)(f))(f);
+@Or: @(l, r): @(t, f): l(t)(r(t)(f));
+@Not: @(cond): @(t, f): cond(f)(t);
+
+@IsZero: @(n): n(@(u): False)(True);
+@GreaterThan: @(m, n): IsZero(m(Pred)(n));
+
+@One: Succ(Zero);
+@Two: Succ(One);
+@Four: Mult(Two, Two);
+
+@show(x) {
+    println(x);
+    return x;
+}
+
+One(show)(1);
+Two(show)(2);
+Four(show)(4);
+
+println(GreaterThan(One, Two)(true, false));
