@@ -1,4 +1,4 @@
-tip: @() {};
+tip: {};
 
 tree: @(left, val, right):
   @(f):

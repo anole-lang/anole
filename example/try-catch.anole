@@ -1,4 +1,4 @@
-@Except: (@() {
+@Except: {
     @conts: [];
 
     @throw(e) {
@@ -21,8 +21,8 @@
 
     @try(fun): @(f): f(fun);
 
-    return @() {};
-})();
+    return {};
+}();
 
 @throw: Except.throw;
 prefixop throw;
@@ -46,7 +46,7 @@ infixop catch;
     }
 };
 
-try @() {
+try {
     div_forever(100);
 }
 catch @(e) {

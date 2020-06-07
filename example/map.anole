@@ -1,4 +1,4 @@
-nil: @() {}
+nil: {}
 
 pair: @(x, y): @(z): z(x, y);
 fst: @(p): p(@(x, y): x);

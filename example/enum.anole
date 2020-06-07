@@ -7,11 +7,13 @@ State: enum {
 state: State.Start;
 while (state != State.End) {
     println(match state {
-        State.Start => (@() {
+        State.Start => {
             state: State.Running;
-            return "start"; })(),
-        State.Running => (@() {
+            return "start";
+        }(),
+        State.Running => {
             state: State.End;
-            return "running" })(),
+            return "running"
+        }(),
     } else "end");
 }

@@ -1,4 +1,4 @@
-nil: @() {};
+nil: {};
 
 list:
   @(head, tail):

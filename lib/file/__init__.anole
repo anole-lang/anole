@@ -1,6 +1,6 @@
 use _open from libfileobject;
 
-@mode: (@(){
+@mode: {
     @app:    1 << 0;
     @binary: 1 << 1;
     @in:     1 << 2;
@@ -8,8 +8,8 @@ use _open from libfileobject;
     @trunc:  1 << 4;
     @ate:    1 << 5;
 
-    return @() {};
-})();
+    return {};
+}();
 
 @open(path, mode: mode.in | mode.out) {
     return _open(path, mode);

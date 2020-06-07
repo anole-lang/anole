@@ -9,11 +9,11 @@
         return res;
     }
 
-    return @() {};
+    return {};
 }
 
 @MyList(l: []) {
-    @this: @(){};
+    @this: {};
 
     @_list: l;
 

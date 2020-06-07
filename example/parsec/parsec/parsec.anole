@@ -1,7 +1,7 @@
 @+=(&var, value): var: var + value;
 infixop +=;
 
-@Info(&str, &index, state: true): @() {};
+@Info(&str, &index, state: true): {};
 
 @V(&lhs, &rhs):
     @(info) {
@@ -35,7 +35,7 @@ infixop +=;
         }
     };
 
-@token: @(){
+@token: {
 
 @literial(str):
     @(info) {
@@ -64,6 +64,6 @@ infixop +=;
 @epsilon(init):
     @(info): @(f): f(init());
 
-return @() {};
+return {};
 
 }();
