@@ -360,6 +360,7 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::LParen:
     case TokenType::New:
     case TokenType::Enum:
+    case TokenType::Dict:
     case TokenType::Match:
     case TokenType::LBracket:
     case TokenType::LBrace:
@@ -795,8 +796,11 @@ Ptr<Expr> Parser::gen_term()
     case TokenType::Enum:
         return gen_enum_expr();
 
-    case TokenType::LBrace:
+    case TokenType::Dict:
         return gen_dict_expr();
+
+    case TokenType::LBrace:
+        return make_unique<LambdaExpr>(DeclList{}, gen_block());
 
     default:
         throw_err("expected an expr here");
@@ -930,7 +934,8 @@ Ptr<Expr> Parser::gen_enum_expr()
 
 Ptr<Expr> Parser::gen_dict_expr()
 {
-    get_next_token();
+    get_next_token(); // skip `dict`
+    eat<TokenType::LBrace>("expected '{'");
     auto dict_expr = make_unique<DictExpr>();
 
     while (current_token_.type != TokenType::RBrace)
@@ -952,7 +957,14 @@ Ptr<Expr> Parser::gen_dict_expr()
     return dict_expr;
 }
 
-// generate lambda expr as @(): expr, @(){} and also @(){}()..
+/**
+ * generate lambda expr like:
+ *   @(): expr
+ *   @(), stmt
+ *   @() {}
+ * '()' cannot be ignored because anole enable '@var: expr and @var()...',
+ *   so '()' is viewed as the component of lambda
+*/
 Ptr<Expr> Parser::gen_lambda_expr()
 {
     // eat '('
@@ -975,17 +987,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
         block = gen_block();
     }
 
-    Ptr<Expr> node = make_unique<LambdaExpr>(move(args), move(block));
-    try_continue();
-    while (current_token_.type == TokenType::LParen)
-    {
-        auto pos = tokenizer_.last_pos();
-        node = make_unique<ParenOperatorExpr>(move(node), gen_arguments());
-        node->pos = pos;
-        try_continue();
-    }
-
-    return node;
+    return gen_term_tail(make_unique<LambdaExpr>(move(args), move(block)));
 }
 
 // generate new expr as @instance: new Class()

@@ -53,6 +53,7 @@ static map<string, TokenType> mapping
 
     { "new",        TokenType::New      },
     { "enum",       TokenType::Enum     },
+    { "dict",       TokenType::Dict     },
 
     { "none",       TokenType::None     },
     { "true",       TokenType::True     },

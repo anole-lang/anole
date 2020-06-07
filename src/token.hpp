@@ -30,6 +30,7 @@ enum TokenType : int
 
     New,       // new
     Enum,      // enum
+    Dict,      // dict
 
     None,      // none
     True,      // true
