@@ -46,7 +46,6 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-+ [ ] Use `dict {}` instead of '{}' for dict expr, '{}' will be considered as lambda expression with no paramemters
 + [ ] Support variadic arguments
 + [ ] Implement self any and variant instead of using the standard
 + [ ] Provide debugger
