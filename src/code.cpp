@@ -259,7 +259,11 @@ void Code::print(ostream &out)
             break;
 
         case Opcode::LambdaDecl:
-            out << i << "\tLambdaDecl\t" << OPRAND(size_t) << endl;
+        {
+            using type = pair<size_t, size_t>;
+            const auto &num_target = OPRAND(type);
+            out << i << "\tLambdaDecl\t" << num_target.first << " " << num_target.second << endl;
+        }
             break;
         case Opcode::ThunkDecl:
             out << i << "\tThunkDecl\t" << OPRAND(size_t) << endl;
@@ -384,7 +388,6 @@ void Code::serialize(ostream &out)
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
         case Opcode::Match:
-        case Opcode::LambdaDecl:
         case Opcode::ThunkDecl:
         case Opcode::BuildList:
         case Opcode::BuildDict:
@@ -403,8 +406,17 @@ void Code::serialize(ostream &out)
             break;
 
         case Opcode::AddInfixOp:
+        {
             using type = pair<string, size_t>;
             typeout(out, OPRAND(type));
+        }
+            break;
+
+        case Opcode::LambdaDecl:
+        {
+            using type = pair<size_t, size_t>;
+            typeout(out, OPRAND(type));
+        }
             break;
 
         default:
@@ -483,7 +495,6 @@ void Code::unserialize(ifstream &in)
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
         case Opcode::Match:
-        case Opcode::LambdaDecl:
         case Opcode::ThunkDecl:
         case Opcode::BuildList:
         case Opcode::BuildDict:
@@ -512,6 +523,14 @@ void Code::unserialize(ifstream &in)
         case Opcode::AddInfixOp:
         {
             pair<string, size_t> val;
+            typein(in, val);
+            oprand = val;
+        }
+            break;
+
+        case Opcode::LambdaDecl:
+        {
+            pair<size_t, size_t> val;
             typein(in, val);
             oprand = val;
         }
