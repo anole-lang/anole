@@ -46,7 +46,7 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-+ [ ] Support variadic arguments
++ [ ] Support items in list as arguments to call, like `foo(list_expr...)`
 + [ ] Implement self any and variant instead of using the standard
 + [ ] Provide debugger
 + [ ] Support threads and processes
