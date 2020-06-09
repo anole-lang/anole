@@ -316,7 +316,7 @@ void LambdaExpr::codegen(Code &code)
 
     code.add_ins<Opcode::LoadConst, size_t>(0);
     code.add_ins<Opcode::Return>();
-    code.set_ins<Opcode::LambdaDecl>(o1, code.size());
+    code.set_ins<Opcode::LambdaDecl>(o1, make_pair(decls.size(), code.size()));
 }
 
 // [AFTER] [CLASS]

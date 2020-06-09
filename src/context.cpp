@@ -266,10 +266,12 @@ void addinfixop_handle()
 
 void lambdadecl_handle()
 {
+    using type = pair<size_t, size_t>;
+    const auto &num_target = OPRAND(type);
     theCurrentContext->push(make_shared<FunctionObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
-        theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = OPRAND(size_t);
+        theCurrentContext->pc() + 1, num_target.first));
+    theCurrentContext->pc() = num_target.second;
 }
 
 void thunkdecl_handle()

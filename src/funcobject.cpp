@@ -1,6 +1,7 @@
 #include "context.hpp"
 #include "funcobject.hpp"
 #include "boolobject.hpp"
+#include "listobject.hpp"
 
 #define OPRAND(T) any_cast<const T &>(theCurrentContext->oprand())
 
@@ -33,13 +34,14 @@ Address FunctionObject::load_member(const string &name)
     return ptr;
 }
 
-void FunctionObject::call(size_t num)
+void FunctionObject::call(size_t arg_num)
 {
     theCurrentContext = make_shared<Context>(
         theCurrentContext, scope_, code_, base_);
 
+    auto parameter_num = parameter_num_;
     auto &pc = theCurrentContext->pc();
-    while (num)
+    while (arg_num and parameter_num)
     {
         switch (theCurrentContext->opcode())
         {
@@ -47,17 +49,24 @@ void FunctionObject::call(size_t num)
             theCurrentContext->scope()->create_symbol(OPRAND(string),
                 theCurrentContext->pop_address());
             ++pc;
-            --num;
+            --arg_num;
+            --parameter_num;
             break;
 
         case Opcode::StoreLocal:
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();
             ++pc;
-            --num;
+            --arg_num;
+            --parameter_num;
             break;
 
         case Opcode::LambdaDecl:
+        {
+            using type = pair<size_t, size_t>;
+            pc = (OPRAND(type)).second;
+        }
+            break;
         case Opcode::ThunkDecl:
             pc = OPRAND(size_t);
             break;
@@ -67,16 +76,28 @@ void FunctionObject::call(size_t num)
             break;
         }
     }
+
+    if (arg_num)
+    {
+        auto list = make_shared<ListObject>();
+        while (arg_num--)
+        {
+            list->append(theCurrentContext->pop());
+        }
+        theCurrentContext->scope()->create_symbol("va_list"s,
+            make_shared<ObjectPtr>(list));
+    }
 }
 
-void FunctionObject::call_tail(size_t num)
+void FunctionObject::call_tail(size_t arg_num)
 {
     theCurrentContext->scope() = make_shared<Scope>(scope_);
     theCurrentContext->code() = code_;
     theCurrentContext->pc() = base_;
 
+    auto parameter_num = parameter_num_;
     auto &pc = theCurrentContext->pc();
-    while (num)
+    while (arg_num)
     {
         switch (theCurrentContext->opcode())
         {
@@ -84,17 +105,24 @@ void FunctionObject::call_tail(size_t num)
             theCurrentContext->scope()->create_symbol(OPRAND(string),
                 theCurrentContext->pop_address());
             ++pc;
-            --num;
+            --arg_num;
+            --parameter_num;
             break;
 
         case Opcode::StoreLocal:
             *theCurrentContext->scope()->create_symbol(OPRAND(string))
                 = theCurrentContext->pop();
             ++pc;
-            --num;
+            --arg_num;
+            --parameter_num;
             break;
 
         case Opcode::LambdaDecl:
+        {
+            using type = pair<size_t, size_t>;
+            pc = (OPRAND(type)).second;
+        }
+            break;
         case Opcode::ThunkDecl:
             pc = OPRAND(size_t);
             break;
@@ -103,6 +131,17 @@ void FunctionObject::call_tail(size_t num)
             ++pc;
             break;
         }
+    }
+    
+    if (arg_num)
+    {
+        auto list = make_shared<ListObject>();
+        while (arg_num--)
+        {
+            list->append(theCurrentContext->pop());
+        }
+        theCurrentContext->scope()->create_symbol("va_list"s,
+            make_shared<ObjectPtr>(list));
     }
 }
 }
