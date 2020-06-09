@@ -34,7 +34,7 @@ enum Opcode
     AddPrefixOp,  // AddPrefixOp op
     AddInfixOp,   // AddInfixOp (op, priority)
 
-    LambdaDecl,   // LambdaDecl target
+    LambdaDecl,   // LambdaDecl (num, target)
     ThunkDecl,    // ThunkDecl target
 
     Neg,          // Neg
