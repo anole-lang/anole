@@ -32,7 +32,7 @@ enum Opcode
     Match,        // Match target
 
     AddPrefixOp,  // AddPrefixOp op
-    AddInfixOp,   // AddInfixOp op priority
+    AddInfixOp,   // AddInfixOp (op, priority)
 
     LambdaDecl,   // LambdaDecl target
     ThunkDecl,    // ThunkDecl target
