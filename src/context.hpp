@@ -166,6 +166,8 @@ class Context : public std::enable_shared_from_this<Context>
         return current_path_;
     }
 
+    std::stack<std::size_t> &call_anchors();
+
   private:
     SPtr<Context> pre_context_;
     SPtr<Scope> scope_;

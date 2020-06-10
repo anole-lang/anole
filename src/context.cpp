@@ -26,22 +26,23 @@ namespace anole
 {
 SPtr<Context> theCurrentContext = nullptr;
 
-static map<Address, string> not_defineds;
+static map<Address, string> s_not_defineds;
+static stack<size_t> s_call_anchors;
 
 void
 Context::add_not_defined_symbol(
     const string &name, const Address &ptr)
 {
-    not_defineds[ptr] = name;
+    s_not_defineds[ptr] = name;
 }
 
 void
 Context::rm_not_defined_symbol(
     const Address &ptr)
 {
-    if (not_defineds.count(ptr))
+    if (s_not_defineds.count(ptr))
     {
-        not_defineds.erase(ptr);
+        s_not_defineds.erase(ptr);
     }
 }
 
@@ -49,7 +50,13 @@ const string
 &Context::get_not_defined_symbol(
     const Address &ptr)
 {
-    return not_defineds[ptr];
+    return s_not_defineds[ptr];
+}
+
+stack<size_t>
+&Context::call_anchors()
+{
+    return s_call_anchors;
 }
 
 namespace op_handles
@@ -134,8 +141,17 @@ void load_handle()
     else
     {
         auto thunk = reinterpret_cast<ThunkObject *>(obj.get()->get());
-        theCurrentContext = make_shared<Context>(
+        if (thunk->computed())
+        {
+            theCurrentContext->push_address(thunk->result());
+            ++theCurrentContext->pc();
+        }
+        else
+        {
+            theCurrentContext->push_address(obj);
+            theCurrentContext = make_shared<Context>(
             theCurrentContext, thunk->scope(), thunk->code(), thunk->base());
+        }
     }
 }
 
@@ -186,14 +202,20 @@ void newscope_handle()
     ++theCurrentContext->pc();
 }
 
+void callanchor_handle()
+{
+    theCurrentContext->call_anchors().push(theCurrentContext->size());
+    ++theCurrentContext->pc();
+}
+
 void call_handle()
 {
-    theCurrentContext->pop()->call(OPRAND(size_t));
+    theCurrentContext->pop()->call();
 }
 
 void calltail_handle()
 {
-    theCurrentContext->pop()->call_tail(OPRAND(size_t));
+    theCurrentContext->pop()->call_tail();
 }
 
 void return_handle()
@@ -264,6 +286,26 @@ void addinfixop_handle()
     ++theCurrentContext->pc();
 }
 
+void pack_handle()
+{
+    // if pack_handle is called, nothing will happen
+    ++theCurrentContext->pc();
+}
+
+void unpack_handle()
+{
+    if (auto l = dynamic_cast<ListObject*>(theCurrentContext->top()))
+    {
+        auto handle = theCurrentContext->pop();
+        for (auto it = l->objects().rbegin();
+            it != l->objects().rend(); ++it)
+        {
+            theCurrentContext->push_address(*it);
+        }
+    }
+    ++theCurrentContext->pc();
+}
+
 void lambdadecl_handle()
 {
     using type = pair<size_t, size_t>;
@@ -280,6 +322,15 @@ void thunkdecl_handle()
         theCurrentContext->scope(), theCurrentContext->code(),
         theCurrentContext->pc() + 1));
     theCurrentContext->pc() = OPRAND(size_t);
+}
+
+void thunkover_handle()
+{
+    auto result = theCurrentContext->pop_address();
+    theCurrentContext->top<ThunkObject>()->set_result(result);
+    theCurrentContext->top_address() = result;
+    theCurrentContext = theCurrentContext->pre_context();
+    ++theCurrentContext->pc();
 }
 
 void neg_handle()
@@ -475,6 +526,7 @@ constexpr OpHandle theOpHandles[] =
 
     &op_handles::newscope_handle,
 
+    &op_handles::callanchor_handle,
     &op_handles::call_handle,
     &op_handles::calltail_handle,
     &op_handles::return_handle,
@@ -486,8 +538,12 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::addprefixop_handle,
     &op_handles::addinfixop_handle,
 
+    &op_handles::pack_handle,
+    &op_handles::unpack_handle,
+
     &op_handles::lambdadecl_handle,
     &op_handles::thunkdecl_handle,
+    &op_handles::thunkover_handle,
 
     &op_handles::neg_handle,
     &op_handles::add_handle,
@@ -521,7 +577,7 @@ void Context::execute()
     while (theCurrentContext->pc() < theCurrentContext->code()->size())
     {
         #ifdef _DEBUG
-        cout << "run at: " << theCurrentContext->code()->from() << ":" << theCurrentContext->pc() << endl;
+        cerr << "run at: " << theCurrentContext->code()->from() << ":" << theCurrentContext->pc() << endl;
         #endif
 
         theOpHandles[theCurrentContext->opcode()]();
