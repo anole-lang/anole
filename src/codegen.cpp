@@ -88,27 +88,33 @@ void IdentifierExpr::codegen(Code &code)
 
 void ParenOperatorExpr::codegen(Code &code)
 {
+    code.add_ins<Opcode::CallAnchor>();
     for (auto it = args.rbegin(); it != args.rend(); ++it)
     {
-        (*it)->codegen(code);
+        (*it).first->codegen(code);
+        if ((*it).second)
+        {
+            code.add_ins<Opcode::Unpack>();
+        }
     }
     expr->codegen(code);
     code.mapping(pos);
-    code.add_ins<Opcode::Call>(args.size());
+    code.add_ins<Opcode::Call>();
 }
 
 void UnaryOperatorExpr::codegen(Code &code)
 {
-    expr->codegen(code);
     switch (op.type)
     {
     case TokenType::Sub:
+        expr->codegen(code);
         code.mapping(pos);
         code.add_ins<Opcode::Neg>();
         break;
 
     case TokenType::Not:
     {
+        expr->codegen(code);
         code.mapping(pos);
         auto o1 = code.add_ins();
         code.add_ins<Opcode::LoadConst, size_t>(1); // theTrue
@@ -120,13 +126,16 @@ void UnaryOperatorExpr::codegen(Code &code)
         break;
 
     case TokenType::BNeg:
+        expr->codegen(code);
         code.mapping(pos);
         code.add_ins<Opcode::BNeg>();
         break;
 
     default:
+        code.add_ins<Opcode::CallAnchor>();
+        expr->codegen(code);
         code.add_ins<Opcode::Load>(op.value);
-        code.add_ins<Opcode::Call>(static_cast<size_t>(1));
+        code.add_ins<Opcode::Call>();
         break;
     }
 }
@@ -295,11 +304,12 @@ void BinaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
+        code.add_ins<Opcode::CallAnchor>();
         rhs->codegen(code);
         lhs->codegen(code);
         code.add_ins<Opcode::Load>(op.value);
         code.mapping(pos);
-        code.add_ins<Opcode::Call>(static_cast<size_t>(2));
+        code.add_ins<Opcode::Call>();
         break;
     }
 }
@@ -308,15 +318,22 @@ void LambdaExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
 
-    for (auto &decl : decls)
+    for (auto &parameter : parameters)
     {
-        decl->codegen(code);
+        parameter.first->codegen(code);
+        if (parameter.second)
+        {
+            auto store_ins = code.ins_at(code.size() - 1);
+            code.set_ins<Opcode::Pack>(code.size() - 1);
+            code.add_ins();
+            code.ins_at(code.size() - 1) = store_ins;
+        }
     }
     block->codegen(code);
 
     code.add_ins<Opcode::LoadConst, size_t>(0);
     code.add_ins<Opcode::Return>();
-    code.set_ins<Opcode::LambdaDecl>(o1, make_pair(decls.size(), code.size()));
+    code.set_ins<Opcode::LambdaDecl>(o1, make_pair(parameters.size(), code.size()));
 }
 
 // [AFTER] [CLASS]
@@ -413,7 +430,7 @@ void DelayExpr::codegen(Code &code)
 {
     auto o1 = code.add_ins();
     expr->codegen(code);
-    code.add_ins<Opcode::Return>();
+    code.add_ins<Opcode::ThunkOver>();
     code.set_ins<Opcode::ThunkDecl>(o1, code.size());
 }
 
@@ -590,21 +607,22 @@ void DoWhileStmt::codegen(Code &code)
 */
 void ForeachStmt::codegen(Code &code)
 {
+    code.add_ins<Opcode::CallAnchor>();
     expr->codegen(code);
     code.add_ins<Opcode::LoadMember>("__iterator__"s);
-    code.add_ins<Opcode::Call>(static_cast<size_t>(0));
+    code.add_ins<Opcode::Call>();
     code.add_ins<Opcode::StoreRef>("__it"s);
 
     auto cond = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
             make_unique<IdentifierExpr>("__has_next__")),
-        ExprList());
+        ArgumentList());
 
     block->statements.insert(block->statements.begin(), nullptr);
     auto next = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
             make_unique<IdentifierExpr>("__next__")),
-        ExprList());
+        ArgumentList());
     if (id != nullptr)
     {
         *block->statements.begin()

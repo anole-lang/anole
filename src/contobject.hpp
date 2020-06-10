@@ -14,8 +14,8 @@ class ContObject : public Object
 
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
-    void call(size_t) override;
-    void call_tail(size_t) override;
+    void call() override;
+    void call_tail() override;
 
     SPtr<Context> resume()
     {
