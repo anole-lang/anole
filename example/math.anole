@@ -2,24 +2,26 @@ println("Let's start!");
 
 # define
 
-@fib1(n): (n < 2) ? 1, fib1(n - 1) + fib1(n - 2);
+@fib1(n): (n < 3) ? 1, fib1(n - 1) + fib1(n - 2);
 
 @Y(f):
   (@(x): f(delay x(delay x)))
   (@(x): f(delay x(delay x)));
 
 @fib2(f):
-  @(n): (n < 2) ? 1, f(n - 1) + f(n - 2);
+  @(n): (n < 3) ? 1, f(n - 1) + f(n - 2);
 
 # test time
 
+print("fib 30: ");
 start: time();
-fib1(30);
+println(fib1(30));
 print(time() - start);
 println("s");
 
+print("fib 30: ");
 start: time();
-Y(fib2)(25);
+println(Y(fib2)(30));
 print(time() - start);
 println("s");
 
