@@ -23,8 +23,9 @@ enum Opcode
 
     NewScope,     // NewScope
 
-    Call,         // Call num
-    CallTail,     // CallTail num
+    CallAnchor,   // CallAnchor
+    Call,         // Call
+    CallTail,     // CallTail
     Return,       // Return
     Jump,         // Jump target
     JumpIf,       // JumpIf target
@@ -34,8 +35,12 @@ enum Opcode
     AddPrefixOp,  // AddPrefixOp op
     AddInfixOp,   // AddInfixOp (op, priority)
 
+    Pack,         // Pack
+    Unpack,       // Unpack
+
     LambdaDecl,   // LambdaDecl (num, target)
     ThunkDecl,    // ThunkDecl target
+    ThunkOver,    // ThunkOver
 
     Neg,          // Neg
     Add,          // Add

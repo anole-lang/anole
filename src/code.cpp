@@ -224,11 +224,14 @@ void Code::print(ostream &out)
             out << i << "\tNewScope" << endl;
             break;
 
+        case Opcode::CallAnchor:
+            out << i << "\tCallAnchor" << endl;
+            break;
         case Opcode::Call:
-            out << i << "\tCall\t\t" << OPRAND(size_t) << endl;
+            out << i << "\tCall" << endl;
             break;
         case Opcode::CallTail:
-            out << i << "\tCallTail\t" << OPRAND(size_t) << endl;
+            out << i << "\tCallTail" << endl;
             break;
         case Opcode::Return:
             out << i << "\tReturn" << endl;
@@ -258,6 +261,13 @@ void Code::print(ostream &out)
         }
             break;
 
+        case Opcode::Pack:
+            out << i << "\tPack" << endl;
+            break;
+        case Opcode::Unpack:
+            out << i << "\tUnpack" << endl;
+            break;
+
         case Opcode::LambdaDecl:
         {
             using type = pair<size_t, size_t>;
@@ -267,6 +277,9 @@ void Code::print(ostream &out)
             break;
         case Opcode::ThunkDecl:
             out << i << "\tThunkDecl\t" << OPRAND(size_t) << endl;
+            break;
+        case Opcode::ThunkOver:
+            out << i << "\tThunkOver" << endl;
             break;
 
         case Opcode::Neg:
@@ -382,8 +395,6 @@ void Code::serialize(ostream &out)
         switch (ins.opcode)
         {
         case Opcode::LoadConst:
-        case Opcode::Call:
-        case Opcode::CallTail:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
@@ -489,8 +500,6 @@ void Code::unserialize(ifstream &in)
         switch (opcode)
         {
         case Opcode::LoadConst:
-        case Opcode::Call:
-        case Opcode::CallTail:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
