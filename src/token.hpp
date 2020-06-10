@@ -43,6 +43,7 @@ enum TokenType : int
 
     Comma,     // ,
     Dot,       // .
+    Dooot,     // ...
 
     LParen,    // (
     RParen,    // )

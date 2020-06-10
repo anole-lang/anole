@@ -73,6 +73,8 @@ Token Tokenizer::next()
         Begin,
 
         InAT,
+        InDot,
+        InDoot,
 
         InComment,
         InInteger,
@@ -129,7 +131,7 @@ Token Tokenizer::next()
                 break;
 
             case '.':
-                token = make_unique<Token>(TokenType::Dot);
+                state = State::InDot;
                 break;
 
             case '(':
@@ -181,26 +183,46 @@ Token Tokenizer::next()
             break;
 
         case State::InAT:
-            switch (last_input_)
+            if (last_input_ == '@')
             {
-            case '@':
                 token = make_unique<Token>(TokenType::AtAt);
-                break;
-
-            default:
+            }
+            else
+            {
                 return Token(TokenType::At);
             }
             break;
 
-        case State::InInteger:
-            switch (last_input_)
+        case State::InDot:
+            if (last_input_ == '.')
             {
-            case '.':
+                state = State::InDoot;
+            }
+            else
+            {
+                return Token(TokenType::Dot);
+            }
+            break;
+
+        case State::InDoot:
+            if (last_input_ == '.')
+            {
+                token = make_unique<Token>(TokenType::Dooot);
+            }
+            else
+            {
+                throw CompileError("unexpected \"..\"");
+            }
+            break;
+
+        case State::InInteger:
+            if (last_input_ == '.')
+            {
                 value += '.';
                 state = State::InDouble;
-                break;
-
-            default:
+            }
+            else
+            {
                 if (isdigit(last_input_))
                 {
                     value += last_input_;
@@ -209,7 +231,6 @@ Token Tokenizer::next()
                 {
                     return Token(TokenType::Integer, value);
                 }
-                break;
             }
             break;
 
@@ -273,7 +294,6 @@ Token Tokenizer::next()
             {
             case '\n':
                 throw CompileError("expected \"");
-                exit(0);
 
             case 'n':
                 value += '\n';

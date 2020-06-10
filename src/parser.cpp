@@ -143,26 +143,6 @@ std::string Parser::get_err_info(const string &message)
     return tokenizer_.get_err_info(message);
 }
 
-ExprList Parser::gen_arguments()
-{
-    ExprList args;
-    get_next_token(); // eat '('
-    while (current_token_.type != TokenType::RParen)
-    {
-        args.push_back(gen_delay_expr());
-        if (current_token_.type == TokenType::Comma)
-        {
-            get_next_token(); // eat ','
-        }
-        else
-        {
-            check<TokenType::RParen>("expected ')'");
-        }
-    }
-    get_next_token(); // eat ')'
-    return args;
-}
-
 IdentList Parser::gen_idents()
 {
     IdentList idents;
@@ -181,9 +161,36 @@ IdentList Parser::gen_idents()
     return idents;
 }
 
-DeclList Parser::gen_arg_decls()
+ArgumentList Parser::gen_arguments()
 {
-    DeclList decls;
+    ArgumentList args;
+    get_next_token(); // eat '('
+    while (current_token_.type != TokenType::RParen)
+    {
+        auto expr = gen_delay_expr();
+        bool unpack = false;
+        if (current_token_.type == TokenType::Dooot)
+        {
+            unpack = true;
+            get_next_token();
+        }
+        args.push_back(make_pair(move(expr), unpack));
+        if (current_token_.type == TokenType::Comma)
+        {
+            get_next_token(); // eat ','
+        }
+        else
+        {
+            check<TokenType::RParen>("expected ')'");
+        }
+    }
+    get_next_token(); // eat ')'
+    return args;
+}
+
+ParameterList Parser::gen_parameters()
+{
+    ParameterList parameters;
     while (current_token_.type != TokenType::RParen)
     {
         bool is_ref = false;
@@ -194,17 +201,26 @@ DeclList Parser::gen_arg_decls()
         }
 
         auto ident = gen_ident();
+        Ptr<VariableDeclarationStmt> decl = nullptr;
+        bool pack = false;
         if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
-            decls.push_back(make_unique<VariableDeclarationStmt>(
-                move(ident), gen_expr(), is_ref));
+            decl = make_unique<VariableDeclarationStmt>(
+                move(ident), gen_expr(), is_ref);
         }
         else
         {
-            decls.push_back(make_unique<VariableDeclarationStmt>(
-                move(ident), make_unique<NoneExpr>(), is_ref));
+            decl = make_unique<VariableDeclarationStmt>(
+                move(ident), make_unique<NoneExpr>(), is_ref);
         }
+
+        if (current_token_.type == TokenType::Dooot)
+        {
+            pack = true;
+            get_next_token();
+        }
+        parameters.push_back(make_pair(move(decl), pack));
 
         if (current_token_.type == TokenType::Comma)
         {
@@ -215,7 +231,7 @@ DeclList Parser::gen_arg_decls()
             check<TokenType::RParen>("expected ')' here");
         }
     }
-    return decls;
+    return parameters;
 }
 
 // usually use when interacting
@@ -404,7 +420,7 @@ Ptr<Stmt> Parser::gen_declaration()
         }
 
         get_next_token();
-        auto args = gen_arg_decls();
+        auto parameters = gen_parameters();
         get_next_token();
 
         try_continue();
@@ -421,7 +437,7 @@ Ptr<Stmt> Parser::gen_declaration()
             block = gen_block();
         }
         return make_unique<FunctionDeclarationStmt>(move(id),
-            make_unique<LambdaExpr>(move(args), move(block)));
+            make_unique<LambdaExpr>(move(parameters), move(block)));
     }
 
     default:
@@ -800,7 +816,7 @@ Ptr<Expr> Parser::gen_term()
         return gen_dict_expr();
 
     case TokenType::LBrace:
-        return make_unique<LambdaExpr>(DeclList{}, gen_block());
+        return make_unique<LambdaExpr>(ParameterList{}, gen_block());
 
     default:
         throw_err("expected an expr here");
@@ -969,7 +985,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
 {
     // eat '('
     get_next_token();
-    auto args = gen_arg_decls();
+    auto parameters = gen_parameters();
     // eat ')'
     get_next_token();
 
@@ -987,7 +1003,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
         block = gen_block();
     }
 
-    return gen_term_tail(make_unique<LambdaExpr>(move(args), move(block)));
+    return gen_term_tail(make_unique<LambdaExpr>(move(parameters), move(block)));
 }
 
 // generate new expr as @instance: new Class()

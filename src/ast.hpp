@@ -12,8 +12,10 @@ class Code;
 
 using StmtList  = std::vector<Ptr<struct Stmt>>;
 using ExprList  = std::vector<Ptr<struct Expr>>;
-using IdentList = std::vector<Ptr<struct IdentifierExpr>>;
 using DeclList  = std::vector<Ptr<struct VariableDeclarationStmt>>;
+using IdentList = std::vector<Ptr<struct IdentifierExpr>>;
+using ArgumentList = std::vector<std::pair<Ptr<struct Expr>, bool>>; // boolean stands for whether it is unpacked
+using ParameterList = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>; // boolean stands for whether it is packed
 
 struct AST
 {
@@ -109,10 +111,10 @@ struct IdentifierExpr : Expr
 struct ParenOperatorExpr : Expr
 {
     Ptr<Expr> expr;
-    ExprList args;
+    ArgumentList args;
 
     ParenOperatorExpr(Ptr<Expr> &&expr,
-        ExprList &&args)
+        ArgumentList &&args)
       : expr(std::move(expr))
       , args(std::move(args)) {}
 
@@ -146,12 +148,12 @@ struct BinaryOperatorExpr : Expr
 
 struct LambdaExpr : Expr
 {
-    DeclList decls;
+    ParameterList parameters;
     Ptr<BlockExpr> block;
 
-    LambdaExpr(DeclList &&decls,
+    LambdaExpr(ParameterList &&parameters,
         Ptr<BlockExpr> &&block)
-      : decls(std::move(decls))
+      : parameters(std::move(parameters))
       , block(std::move(block)) {}
 
     void codegen(Code &) override;
@@ -160,10 +162,10 @@ struct LambdaExpr : Expr
 struct NewExpr : Expr
 {
     Ptr<IdentifierExpr> id;
-    ExprList args;
+    ArgumentList args;
 
     NewExpr(Ptr<IdentifierExpr> &&id,
-        ExprList &&args)
+        ArgumentList &&args)
       : id(std::move(id))
       , args(std::move(args)) {}
 

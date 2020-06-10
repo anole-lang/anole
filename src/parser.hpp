@@ -49,9 +49,9 @@ class Parser
     void try_continue();
     std::string get_err_info(const std::string &message);
 
-    ExprList gen_arguments();
     IdentList gen_idents();
-    DeclList gen_arg_decls();
+    ArgumentList gen_arguments();
+    ParameterList gen_parameters();
 
     Ptr<BlockExpr> gen_stmts();
     Ptr<BlockExpr> gen_block();

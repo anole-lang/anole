@@ -93,8 +93,8 @@ R"(    _                _
         auto stmt = parser.gen_statement();
         if (stmt->is_expr_stmt())
         {
-            ExprList args;
-            args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr));
+            ArgumentList args;
+            args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr), false);
             stmt = make_unique<ParenOperatorExpr>(
                 make_unique<IdentifierExpr>("println"),
                 move(args));
