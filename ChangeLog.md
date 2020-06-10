@@ -2,10 +2,20 @@
 
 ## Unreleased
 
+### Updated
+
+- Delay expression can store the computed value now
+
 ### Changed
 
 - Use `dict {}` instead of '{}' for dict expr, '{}' will be considered as lambda expression with no paramemters
-- Support variadic arguments, use `va_list` in function
+- Support variadic parameters and arguments with `...`
+- Call/CallTail without arguments number now
+
+### Added
+
+- New insturctions `Pack/Unpack` for variadic parameters and arguments
+- New instruction `ThunkOver` to support storing computed value for delay expression
 
 ## 0.0.12 - 2020/06/05
 
