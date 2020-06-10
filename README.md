@@ -49,4 +49,4 @@ See [ChangeLog.md](ChangeLog.md)
 + [ ] Support items in list as arguments to call, like `foo(list_expr...)`
 + [ ] Implement self any and variant instead of using the standard
 + [ ] Provide debugger
-+ [ ] Support threads and processes
++ [ ] Support multi threads and processes
