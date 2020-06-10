@@ -12,14 +12,16 @@ string BuiltInFunctionObject::to_str()
     return "<builtin-function>"s;
 }
 
-void BuiltInFunctionObject::call(size_t)
+void BuiltInFunctionObject::call()
 {
+    theCurrentContext->call_anchors().pop();
     func_();
     ++theCurrentContext->pc();
 }
 
-void BuiltInFunctionObject::call_tail(size_t)
+void BuiltInFunctionObject::call_tail()
 {
+    theCurrentContext->call_anchors().pop();
     func_();
     ++theCurrentContext->pc();
 }

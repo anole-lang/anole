@@ -112,12 +112,12 @@ Address Object::load_member(const string &name)
     throw RuntimeError("no member named " + name);
 }
 
-void Object::call(size_t)
+void Object::call()
 {
     throw RuntimeError("failed call with the given non-function");
 }
 
-void Object::call_tail(size_t)
+void Object::call_tail()
 {
     throw RuntimeError("failed call with the given non-function");
 }

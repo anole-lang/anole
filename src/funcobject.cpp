@@ -34,8 +34,11 @@ Address FunctionObject::load_member(const string &name)
     return ptr;
 }
 
-void FunctionObject::call(size_t arg_num)
+void FunctionObject::call()
 {
+    auto arg_num = theCurrentContext->size() - theCurrentContext->call_anchors().top();
+    theCurrentContext->call_anchors().pop();
+
     theCurrentContext = make_shared<Context>(
         theCurrentContext, scope_, code_, base_);
 
@@ -45,6 +48,19 @@ void FunctionObject::call(size_t arg_num)
     {
         switch (theCurrentContext->opcode())
         {
+        case Opcode::Pack:
+        {
+            auto list = make_shared<ListObject>();
+            while (arg_num)
+            {
+                list->append(theCurrentContext->pop());
+                --arg_num;
+            }
+            theCurrentContext->push(list);
+        }
+            ++pc;
+            break;
+
         case Opcode::StoreRef:
             theCurrentContext->scope()->create_symbol(OPRAND(string),
                 theCurrentContext->pop_address());
@@ -79,28 +95,38 @@ void FunctionObject::call(size_t arg_num)
 
     if (arg_num)
     {
-        auto list = make_shared<ListObject>();
-        while (arg_num--)
-        {
-            list->append(theCurrentContext->pop());
-        }
-        theCurrentContext->scope()->create_symbol("va_list"s,
-            make_shared<ObjectPtr>(list));
+        throw RuntimeError("too much arguments for this function");
     }
 }
 
-void FunctionObject::call_tail(size_t arg_num)
+void FunctionObject::call_tail()
 {
+    auto arg_num = theCurrentContext->size() - theCurrentContext->call_anchors().top();
+    theCurrentContext->call_anchors().pop();
+
     theCurrentContext->scope() = make_shared<Scope>(scope_);
     theCurrentContext->code() = code_;
     theCurrentContext->pc() = base_;
 
     auto parameter_num = parameter_num_;
     auto &pc = theCurrentContext->pc();
-    while (arg_num)
+    while (arg_num and parameter_num)
     {
         switch (theCurrentContext->opcode())
         {
+        case Opcode::Pack:
+        {
+            auto list = make_shared<ListObject>();
+            while (arg_num)
+            {
+                list->append(theCurrentContext->pop());
+                --arg_num;
+            }
+            theCurrentContext->push(list);
+        }
+            ++pc;
+            break;
+
         case Opcode::StoreRef:
             theCurrentContext->scope()->create_symbol(OPRAND(string),
                 theCurrentContext->pop_address());
@@ -132,16 +158,10 @@ void FunctionObject::call_tail(size_t arg_num)
             break;
         }
     }
-    
+
     if (arg_num)
     {
-        auto list = make_shared<ListObject>();
-        while (arg_num--)
-        {
-            list->append(theCurrentContext->pop());
-        }
-        theCurrentContext->scope()->create_symbol("va_list"s,
-            make_shared<ObjectPtr>(list));
+        throw RuntimeError("too much arguments for this function");
     }
 }
 }

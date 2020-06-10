@@ -62,8 +62,8 @@ class Object
     virtual ObjectPtr brs(ObjectPtr);
     virtual Address index(ObjectPtr);
     virtual Address load_member(const std::string &name);
-    virtual void call(size_t);
-    virtual void call_tail(size_t);
+    virtual void call();
+    virtual void call_tail();
 
   private:
     ObjectType type_;
