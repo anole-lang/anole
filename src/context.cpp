@@ -26,23 +26,26 @@ namespace anole
 {
 SPtr<Context> theCurrentContext = nullptr;
 
-static map<Address, string> s_not_defineds;
-static stack<size_t> s_call_anchors;
+namespace
+{
+map<Address, string> not_defineds;
+stack<size_t> calll_anchors;
+}
 
 void
 Context::add_not_defined_symbol(
     const string &name, const Address &ptr)
 {
-    s_not_defineds[ptr] = name;
+    not_defineds[ptr] = name;
 }
 
 void
 Context::rm_not_defined_symbol(
     const Address &ptr)
 {
-    if (s_not_defineds.count(ptr))
+    if (not_defineds.count(ptr))
     {
-        s_not_defineds.erase(ptr);
+        not_defineds.erase(ptr);
     }
 }
 
@@ -50,13 +53,13 @@ const string
 &Context::get_not_defined_symbol(
     const Address &ptr)
 {
-    return s_not_defineds[ptr];
+    return not_defineds[ptr];
 }
 
 stack<size_t>
 &Context::call_anchors()
 {
-    return s_call_anchors;
+    return calll_anchors;
 }
 
 namespace op_handles

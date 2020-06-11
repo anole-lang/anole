@@ -52,11 +52,13 @@ void Tokenizer::get_next_input()
     }
 }
 
-static const set<char> illegal_idchrs
+namespace
+{
+const set<char> illegal_idchrs
 {
     '_', '#', '@', '.', ',', ':', ';', '?', '(', ')', '[', ']', '{', '}', '"'
 };
-static bool is_legal_idchr(char chr)
+bool is_legal_idchr(char chr)
 {
     if (isspace(chr) or isdigit(chr) or isalpha(chr)
         or illegal_idchrs.count(chr))
@@ -64,6 +66,7 @@ static bool is_legal_idchr(char chr)
         return false;
     }
     return true;
+}
 }
 
 Token Tokenizer::next()

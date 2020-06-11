@@ -22,8 +22,10 @@ void _open()
         );
 }
 
-static map<string, function<void(FileObject *)>>
-built_in_methods_for_file
+namespace
+{
+map<string, function<void(FileObject *)>>
+builtin_methods
 {
     {"good", [](FileObject *obj)
         {
@@ -88,6 +90,7 @@ built_in_methods_for_file
         }
     }
 };
+}
 
 FileObject::FileObject(const string &path, int64_t mode)
 {
@@ -124,9 +127,9 @@ FileObject::FileObject(const string &path, int64_t mode)
 
 Address FileObject::load_member(const string &name)
 {
-    if (built_in_methods_for_file.count(name))
+    if (builtin_methods.count(name))
     {
-        auto &func = built_in_methods_for_file[name];
+        auto &func = builtin_methods[name];
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([this, func]
             {

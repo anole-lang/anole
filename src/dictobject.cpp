@@ -9,8 +9,10 @@ using namespace std;
 
 namespace anole
 {
-static map<string, function<void(SPtr<DictObject> &)>>
-built_in_methods_for_dict
+namespace
+{
+map<string, function<void(SPtr<DictObject> &)>>
+builtin_methods
 {
     {"empty", [](SPtr<DictObject> &obj)
         {
@@ -48,6 +50,7 @@ built_in_methods_for_dict
         }
     }
 };
+}
 
 bool DictObject::to_bool()
 {
@@ -81,8 +84,8 @@ Address DictObject::index(ObjectPtr index)
 
 Address DictObject::load_member(const string &name)
 {
-    auto method = built_in_methods_for_dict.find(name);
-    if (method != built_in_methods_for_dict.end())
+    auto method = builtin_methods.find(name);
+    if (method != builtin_methods.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([

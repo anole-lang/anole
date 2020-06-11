@@ -26,10 +26,13 @@ void BuiltInFunctionObject::call_tail()
     ++theCurrentContext->pc();
 }
 
-static map<string, SPtr<BuiltInFunctionObject>> &get_built_in_functions()
+namespace
+{
+map<string, SPtr<BuiltInFunctionObject>> &get_built_in_functions()
 {
     static map<string, SPtr<BuiltInFunctionObject>> built_in_functions;
     return built_in_functions;
+}
 }
 
 ObjectPtr

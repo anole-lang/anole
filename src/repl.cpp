@@ -15,9 +15,9 @@ using namespace std;
 
 namespace
 {
-static sigjmp_buf env;
+sigjmp_buf env;
 
-static string read_line(const char * str)
+string read_line(const char * str)
 {
     char *temp = readline(str);
     if (!temp)
@@ -29,7 +29,7 @@ static string read_line(const char * str)
     return line;
 }
 
-static void handle_sigint(int)
+void handle_sigint(int)
 {
     cout << "\b \b\b \b\nKeyboard Interrupt\n";
     rl_on_new_line();

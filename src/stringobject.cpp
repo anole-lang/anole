@@ -7,8 +7,10 @@ using namespace std;
 
 namespace anole
 {
-static map<string, function<void(SPtr<StringObject> &)>>
-built_in_methods_for_string
+namespace
+{
+map<string, function<void(SPtr<StringObject> &)>>
+builtin_methods
 {
     {"size", [](SPtr<StringObject> &obj)
         {
@@ -35,6 +37,7 @@ built_in_methods_for_string
         }
     },
 };
+}
 
 bool StringObject::to_bool()
 {
@@ -128,8 +131,8 @@ Address StringObject::index(ObjectPtr index)
 
 Address StringObject::load_member(const string &name)
 {
-    auto method = built_in_methods_for_string.find(name);
-    if (method != built_in_methods_for_string.end())
+    auto method = builtin_methods.find(name);
+    if (method != builtin_methods.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([

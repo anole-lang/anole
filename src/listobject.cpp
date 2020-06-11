@@ -11,8 +11,10 @@ using namespace std;
 
 namespace anole
 {
-static map<string, function<void(SPtr<ListObject> &)>>
-built_in_methods_for_list
+namespace
+{
+map<string, function<void(SPtr<ListObject> &)>>
+builtin_methods_for_list
 {
     {"empty", [](SPtr<ListObject> &obj)
         {
@@ -69,6 +71,25 @@ built_in_methods_for_list
         }
     }
 };
+
+map<string, function<void(SPtr<ListIteratorObject> &)>>
+builtin_methods_for_listiterator
+{
+    // used by foreach
+    {"__has_next__", [](SPtr<ListIteratorObject> &obj)
+        {
+            theCurrentContext
+                ->push(obj->has_next() ? theTrue : theFalse);
+        }
+    },
+    {"__next__", [](SPtr<ListIteratorObject> &obj)
+        {
+            theCurrentContext
+                ->push_address(obj->next());
+        }
+    }
+};
+}
 
 bool ListObject::to_bool()
 {
@@ -136,8 +157,8 @@ Address ListObject::index(ObjectPtr index)
 
 Address ListObject::load_member(const string &name)
 {
-    auto method = built_in_methods_for_list.find(name);
-    if (method != built_in_methods_for_list.end())
+    auto method = builtin_methods_for_list.find(name);
+    if (method != builtin_methods_for_list.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
@@ -161,28 +182,10 @@ void ListObject::append(ObjectPtr obj)
     objects_.push_back(make_shared<ObjectPtr>(obj));
 }
 
-static map<string, function<void(SPtr<ListIteratorObject> &)>>
-built_in_methods_for_listiterator
-{
-    // used by foreach
-    {"__has_next__", [](SPtr<ListIteratorObject> &obj)
-        {
-            theCurrentContext
-                ->push(obj->has_next() ? theTrue : theFalse);
-        }
-    },
-    {"__next__", [](SPtr<ListIteratorObject> &obj)
-        {
-            theCurrentContext
-                ->push_address(obj->next());
-        }
-    }
-};
-
 Address ListIteratorObject::load_member(const string &name)
 {
-    auto method = built_in_methods_for_listiterator.find(name);
-    if (method != built_in_methods_for_listiterator.end())
+    auto method = builtin_methods_for_listiterator.find(name);
+    if (method != builtin_methods_for_listiterator.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([

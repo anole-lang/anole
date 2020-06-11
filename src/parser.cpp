@@ -51,16 +51,16 @@ Ptr<AST> Parser::gen_statements()
 
 namespace operators
 {
-static set<TokenType> unary_ops
+set<TokenType> unary_ops
 {
     TokenType::Not, TokenType::Sub, TokenType::BNeg
 };
 
-static vector<size_t> bop_priorities
+vector<size_t> bop_priorities
 {
     100, 110, 120, 130, 140, 150, 160, 170, 180, 190
 };
-static map<size_t, set<TokenType>> bop_mapping
+map<size_t, set<TokenType>> bop_mapping
 {
     { 100, { TokenType::Or } },
     { 110, { TokenType::And } },
@@ -74,7 +74,7 @@ static map<size_t, set<TokenType>> bop_mapping
     { 190, { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod } }
 };
 
-static set<TokenType> &bops_at_priority(size_t priority)
+set<TokenType> &bops_at_priority(size_t priority)
 {
     if (!bop_mapping.count(priority))
     {
@@ -83,7 +83,7 @@ static set<TokenType> &bops_at_priority(size_t priority)
     return bop_mapping[priority];
 }
 
-static set<TokenType> &bops_at_layer(size_t layer)
+set<TokenType> &bops_at_layer(size_t layer)
 {
     return bop_mapping[bop_priorities[layer]];
 }

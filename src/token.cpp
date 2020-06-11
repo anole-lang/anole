@@ -31,8 +31,10 @@ Token &Token::operator=(const Token &other)
     return *this;
 }
 
-static int end_of_token_type = TokenType::End;
-static map<string, TokenType> mapping
+namespace
+{
+int end_of_token_type = TokenType::End;
+map<string, TokenType> mapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
@@ -84,6 +86,7 @@ static map<string, TokenType> mapping
     { "<<",         TokenType::BLS      },
     { ">>",         TokenType::BRS      },
 };
+}
 
 Token::Token(std::string value)
   : type(mapping.count(value)
