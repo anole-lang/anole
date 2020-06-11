@@ -156,7 +156,7 @@ class Context : public std::enable_shared_from_this<Context>
         return stack_->size();
     }
 
-    SPtr<StackType> &stack()
+    SPtr<StackType> &get_stack()
     {
         return stack_;
     }

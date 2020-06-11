@@ -29,7 +29,6 @@ SPtr<Context> theCurrentContext = nullptr;
 namespace
 {
 map<Address, string> not_defineds;
-stack<size_t> calll_anchors;
 }
 
 void
@@ -59,14 +58,16 @@ const string
 stack<size_t>
 &Context::call_anchors()
 {
-    return calll_anchors;
+    // all context share the anchors
+    static stack<size_t> anchors;
+    return anchors;
 }
 
 namespace op_handles
 {
 void pop_handle()
 {
-    theCurrentContext->stack()->pop();
+    theCurrentContext->get_stack()->pop();
     ++theCurrentContext->pc();
 }
 
@@ -224,7 +225,7 @@ void calltail_handle()
 void return_handle()
 {
     auto pre_context = theCurrentContext->pre_context();
-    if (theCurrentContext->stack() != pre_context->stack())
+    if (theCurrentContext->get_stack() != pre_context->get_stack())
     {
         pre_context->push_address(theCurrentContext->pop_address());
     }

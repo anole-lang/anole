@@ -94,7 +94,7 @@ builtin_methods
 
 FileObject::FileObject(const string &path, int64_t mode)
 {
-    static ios_base::openmode mapping[6]
+    static const ios_base::openmode mapping[6]
     {
         ios_base::app,
         ios_base::binary,
