@@ -1,10 +1,10 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.13 - 2020/06/11
 
 ### Updated
 
-- Delay expression can store the computed value now
+- Delay expression can store its computed value now
 
 ### Changed
 
