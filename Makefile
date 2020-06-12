@@ -1,7 +1,8 @@
 ADD =
 
 CC = clang++
-FLAGS = -std=c++17 -stdlib=libstdc++ -ldl -lstdc++fs -lreadline ${ADD}
+FLAGS = -std=c++17 -stdlib=libstdc++ ${ADD}
+LDS = -ldl -lstdc++fs -lreadline
 
 DIR_TMP = tmp
 
@@ -48,7 +49,7 @@ tmp/repl.so: src/repl.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 tmp/test: test/test.cpp ${OBJ} | ${DIR_TMP}
-	${CC} ${FLAGS} $< ${FPOBJ} -lgtest -lpthread -o $@
+	${CC} ${FLAGS} $< ${FPOBJ} ${LDS} -lgtest -lpthread -o $@
 
 ${DIR_TMP}:
 	mkdir $@
