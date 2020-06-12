@@ -1,7 +1,7 @@
 #include "../src/parser.hpp"
 #include "../src/context.hpp"
 #include "../src/boolobject.hpp"
-#include "tester.hpp"
+#include <gtest/gtest.h>
 #include <cstdio>
 #include <sstream>
 #include <iostream>
@@ -9,47 +9,55 @@
 using namespace std;
 using namespace anole;
 
-#ifdef _DEBUG
-#define PRINT code->print()
-#else
-#define PRINT
-#endif
+inline string execute(const string &input)
+{
+    istringstream ss{input};
+    auto code = make_shared<Code>();
+    theCurrentContext = make_shared<Context>(code);
+    auto ast = Parser(ss).gen_statements();
+    ast->codegen(*code);
+    #ifdef _DEBUG
+    code->print();
+    #endif
+    ostringstream out;
+    auto backup = cout.rdbuf();
+    cout.rdbuf(out.rdbuf());
+    Context::execute();
+    cout.rdbuf(backup);
+    return out.str();
+}
 
-#define PRE auto code = make_shared<Code>(); \
-            theCurrentContext = make_shared<Context>(code); \
-            auto ast = Parser(ss).gen_statements(); \
-            ast->codegen(*code); \
-            PRINT; \
-            ostringstream out; \
-            auto backup = cout.rdbuf(); \
-            cout.rdbuf(out.rdbuf()); \
-            Context::execute(); \
-            cout.rdbuf(backup)
-
-
-TEST_CLASS(Sample)
-    TEST_METHOD(SimpleRun)
-        istringstream ss(R"(
+TEST(Sample, SimpleRun)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
 a: 1;
 b: 2;
 b: a : 3;
-print(a + b);
-        )");
-        PRE;
-        ASSERT(out.str() == R"(6)");
-    TEST_END
+print(a + b);)"),
 
-    TEST_METHOD(SimpleFunc)
-        istringstream ss(R"(
+// output
+"6");
+}
+
+TEST(Sample, SimpleFunction)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
 @adddd: @(a): @(b): @(c): @(d): a + b + c + d;
-print(adddd(1)(2)(3)(4));
-        )");
-        PRE;
-        ASSERT(out.str() == R"(10)");
-    TEST_END
+print(adddd(1)(2)(3)(4));)"),
 
-    TEST_METHOD(SimpleIfElseStmt)
-        istringstream ss(R"(
+// output
+"10");
+}
+
+TEST(Sample, SimpleIfElseStmt)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
 a: 1;
 @foo(x)
 {
@@ -64,14 +72,17 @@ a: 1;
     };
 };
 print(foo(1));
-print(foo(0));
-        )");
-        PRE;
-        ASSERT(out.str() == R"(23)");
-    TEST_END
+print(foo(0));)"),
 
-    TEST_METHOD(Y)
-        istringstream ss(R"(
+// output
+"23");
+}
+
+TEST(Sample, Y)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
 @Y(f):
   (@(x): f(delay x(delay x)))
   (@(x): f(delay x(delay x)));
@@ -79,14 +90,17 @@ print(foo(0));
 @fact(f):
   @(n): n ? (n * f(n-1)) , 1;
 
-print(Y(fact)(5));
-        )");
-        PRE;
-        ASSERT(out.str() == R"(120)");
-    TEST_END
+print(Y(fact)(5));)"),
 
-    TEST_METHOD(Chunch)
-        istringstream ss(R"(
+// output
+"120");
+}
+
+TEST(Sample, Chunch)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
 Zero: @(f): @(x): x;
 Succ: @(n): @(f): @(x): f(n(f)(x));
 Pred: @(n): @(f): @(x): n(@(g): @(h): h(g(f)))(@(u): x)(@(u): u);
@@ -120,17 +134,20 @@ Two: Add(One, One);
 
 println(Equal(Two, Add(One, One)) = True);
 println(Equal(Two, Add(Two, Two)) = True);
-println(Equal(Two, Add2(One, One)) = True);
-        )");
-        PRE;
-        ASSERT(out.str() == R"(true
+println(Equal(Two, Add2(One, One)) = True);)"),
+
+// output
+R"(true
 false
 true
 )");
-    TEST_END
+}
 
-    TEST_METHOD(Continuation)
-        istringstream ss(R"code(
+TEST(Sample, Continuation)
+{
+    ASSERT_EQ(execute(
+// input
+R"code(
 Xb: {
     println("Hi! My name is Xu Bo.");
     cont: call_with_current_continuation(Lyx);
@@ -146,12 +163,12 @@ Lyx: @(cont) {
 }
 
 Xb();
-        )code");
-        PRE;
-        ASSERT(out.str() == R"(Hi! My name is Xu Bo.
+        )code"),
+
+// output
+R"(Hi! My name is Xu Bo.
 Hello! I'm Luo yuexuan.
 Do you love me?
 Yes! I love you very very much!
 )");
-    TEST_END
-TEST_END
+}

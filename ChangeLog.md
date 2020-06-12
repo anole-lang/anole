@@ -1,5 +1,11 @@
 # ChangeLog for Anole
 
+## Unreleased
+
+### Updated
+
+- Use gtest instead of the old simple test to make test
+
 ## 0.0.13 - 2020/06/11
 
 ### Updated
