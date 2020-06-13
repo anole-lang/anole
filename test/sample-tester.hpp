@@ -1,10 +1,10 @@
-#include "../src/parser.hpp"
-#include "../src/context.hpp"
-#include "../src/boolobject.hpp"
-#include <gtest/gtest.h>
 #include <cstdio>
 #include <sstream>
 #include <iostream>
+#include <gtest/gtest.h>
+#include "../src/parser.hpp"
+#include "../src/context.hpp"
+#include "../src/boolobject.hpp"
 
 using namespace std;
 using namespace anole;
