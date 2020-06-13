@@ -12,7 +12,8 @@ class Tokenizer
 {
   public:
     explicit
-    Tokenizer(std::istream & = std::cin, std::string = "<stdint>");
+    Tokenizer(std::istream & = std::cin,
+        std::string = "<stdint>");
 
     Token next();
     void cont();
