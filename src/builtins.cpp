@@ -40,9 +40,9 @@ REGISTER_BUILTIN(call_with_current_continuation,
         auto func = theCurrentContext->pop();
         auto ptr = reinterpret_cast<FunctionObject *>(func.get());
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
-        // base => LoadConst 0, so start with base + 1
         theCurrentContext = make_shared<Context>(
-            theCurrentContext, ptr->scope(), ptr->code(), ptr->base() + 1);
+            theCurrentContext, ptr->scope(), ptr->code(), ptr->base());
+        // the base => StoreRef/StoreLocal
         *theCurrentContext->scope()->create_symbol(any_cast<string>(theCurrentContext->oprand()))
             = cont_obj;
     }
