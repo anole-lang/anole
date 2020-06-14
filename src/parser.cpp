@@ -661,7 +661,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
     }
 
     // parse unary operation or term expression
-    if (static_cast<size_t>(layer) == operators::bop_priorities.size())
+    if (size_t(layer) == operators::bop_priorities.size())
     {
         if (operators::unary_ops.count(current_token_.type))
         {
@@ -682,7 +682,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
     auto lhs = gen_expr(layer + 1);
     auto op = current_token_;
     // user `if` if right-associative
-    while (operators::bops_at_layer(static_cast<size_t>(layer)).count(op.type))
+    while (operators::bops_at_layer(size_t(layer)).count(op.type))
     {
         auto pos = tokenizer_.last_pos();
         get_next_token();

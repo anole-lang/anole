@@ -98,7 +98,7 @@ TokenType Token::add_token_type(const string &str)
 {
     if (!mapping.count(str))
     {
-        mapping[str] = static_cast<TokenType>(++end_of_token_type);
+        mapping[str] = TokenType(++end_of_token_type);
     }
     return mapping[str];
 }
