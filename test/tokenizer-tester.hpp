@@ -27,7 +27,7 @@ identifier 0123456789 0123456789.0123456789 "string"
 and or not ! is = != < <= > >= => ?)");
     for (int type = 0; type < TokenType::End; ++type)
     {
-        ASSERT_EQ(tokenizer.next().type, (TokenType)type);
+        ASSERT_EQ(tokenizer.next().type, TokenType(type));
         if (type == TokenType::Not)
         {
             ASSERT_EQ(tokenizer.next().type, TokenType::Not);
