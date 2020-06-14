@@ -58,12 +58,10 @@ class Parser
 
     Ptr<Stmt> gen_stmt();
     Ptr<Stmt> gen_declaration();
-    Ptr<Stmt> gen_var_assign();
     Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();
     Ptr<Stmt> gen_class_decl();
     Ptr<Stmt> gen_use_stmt();
-    // should be rewrited
     Ptr<Stmt> gen_if_else();
     Ptr<AST> gen_if_else_tail();
     Ptr<Stmt> gen_while_stmt();

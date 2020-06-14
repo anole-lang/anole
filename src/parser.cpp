@@ -190,40 +190,66 @@ ArgumentList Parser::gen_arguments()
 
 ParameterList Parser::gen_parameters()
 {
+    bool need_default = false;
+    bool packed = false;
+
     ParameterList parameters;
     while (current_token_.type != TokenType::RParen)
     {
-        bool is_ref = false;
-        if (current_token_.type == TokenType::BAnd)
+        if (current_token_.type == TokenType::Dooot)
         {
-            is_ref = true;
+            packed = true;
             get_next_token();
-        }
 
-        auto ident = gen_ident();
-        Ptr<VariableDeclarationStmt> decl = nullptr;
-        bool pack = false;
-        if (current_token_.type == TokenType::Colon)
-        {
-            get_next_token();
-            decl = make_unique<VariableDeclarationStmt>(
-                move(ident), gen_expr(), is_ref);
+            bool is_ref = false;
+            if (current_token_.type == TokenType::BAnd)
+            {
+                is_ref = true;
+                get_next_token();
+            }
+
+            auto decl = make_unique<VariableDeclarationStmt>(
+                gen_ident(), nullptr, is_ref
+            );
+            parameters.push_back(make_pair(move(decl), true));
         }
         else
         {
-            decl = make_unique<VariableDeclarationStmt>(
-                move(ident), make_unique<NoneExpr>(), is_ref);
-        }
+            bool is_ref = false;
+            if (current_token_.type == TokenType::BAnd)
+            {
+                is_ref = true;
+                get_next_token();
+            }
 
-        if (current_token_.type == TokenType::Dooot)
-        {
-            pack = true;
-            get_next_token();
+            auto ident = gen_ident();
+            Ptr<VariableDeclarationStmt> decl = nullptr;
+            if (current_token_.type == TokenType::Colon)
+            {
+                need_default = true;
+                get_next_token();
+                decl = make_unique<VariableDeclarationStmt>(
+                    move(ident), gen_expr(), is_ref);
+            }
+            else if (need_default)
+            {
+                throw_err("parameter without default argument cannot follow parameter with default argument");
+            }
+            else
+            {
+                decl = make_unique<VariableDeclarationStmt>(
+                    move(ident), nullptr, is_ref);
+            }
+
+            parameters.push_back(make_pair(move(decl), false));
         }
-        parameters.push_back(make_pair(move(decl), pack));
 
         if (current_token_.type == TokenType::Comma)
         {
+            if (packed)
+            {
+                throw_err("packed parameter should be the last parameter");
+            }
             get_next_token();
         }
         else
@@ -416,7 +442,7 @@ Ptr<Stmt> Parser::gen_declaration()
     {
         if (is_ref)
         {
-            throw CompileError("& cannot be here");
+            throw_err("& cannot be here");
         }
 
         get_next_token();
@@ -443,11 +469,11 @@ Ptr<Stmt> Parser::gen_declaration()
     default:
         if (is_ref)
         {
-            throw CompileError("reference should be binded with other variable");
+            throw_err("reference should be binded with other variable");
         }
         break;
     }
-    return make_unique<VariableDeclarationStmt>(move(id), nullptr);
+    return make_unique<VariableDeclarationStmt>(move(id), make_unique<NoneExpr>());
 }
 
 Ptr<Stmt> Parser::gen_prefixop_decl()
