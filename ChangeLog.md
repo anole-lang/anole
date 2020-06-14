@@ -5,6 +5,16 @@
 ### Updated
 
 - Use gtest instead of the old simple test to make test
+- Builtin function will get the number of arguments when it is called
+
+### Added
+
+- Instructions `CallEx/CallExTail` for call with unpacked argument
+
+### Changed
+
+- Instruction `CallAnchor` is renamed to `CallExAnchor`
+- Instructions `Call/CallTail` have a oprand for the number of arguments
 
 ## 0.0.13 - 2020/06/11
 
