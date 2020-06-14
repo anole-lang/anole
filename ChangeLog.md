@@ -6,15 +6,25 @@
 
 - Use gtest instead of the old simple test to make test
 - Builtin function will get the number of arguments when it is called
+- Paramemter without default value cannot follow parameter with default value
+- Packed parameter should be the last parameter in function declaration
+- Update grammar for packed parameter from `name...` to `...name`
 
 ### Added
 
 - Instructions `CallEx/CallExTail` for call with unpacked argument
+- Add check when calling with less arguments
 
 ### Changed
 
 - Instruction `CallAnchor` is renamed to `CallExAnchor`
 - Instructions `Call/CallTail` have a oprand for the number of arguments
+- No default value for parameter which is not given now, it is none in the past
+
+### Fixed
+
+- Packed parameter will be empty list if it is not given arguments
+- Packed parameter cannot have default value now
 
 ## 0.0.13 - 2020/06/11
 
@@ -24,7 +34,7 @@
 
 ### Changed
 
-- Use `dict {}` instead of '{}' for dict expr, '{}' will be considered as lambda expression with no paramemters
+- Use `dict {}` instead of '{}' for dict expr, '{}' will be considered as lambda expression with no parameters
 - Support variadic parameters and arguments with `...`
 - Call/CallTail without arguments number now
 

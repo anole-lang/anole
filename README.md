@@ -46,7 +46,6 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-+ [ ] Remove the default default-argument and add check for less arguments
 + [ ] Implement self any and variant instead of using the standard
 + [ ] Provide debugger
 + [ ] Support multi threads and processes
