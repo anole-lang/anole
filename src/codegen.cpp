@@ -504,10 +504,11 @@ void VariableDeclarationStmt::codegen(Code &code)
     {
         expr->codegen(code);
     }
-    else
-    {
-        NoneExpr().codegen(code);
-    }
+    /**
+     * if expr is nullptr
+     *  means that it is the parameter without default value
+     *  so that we can check the number of arguments
+    */
 
     if (is_ref)
     {
