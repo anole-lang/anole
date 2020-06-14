@@ -25,8 +25,8 @@ class FunctionObject : public Object
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
     Address load_member(const std::string &name) override;
-    void call() override;
-    void call_tail() override;
+    void call(std::size_t num) override;
+    void call_tail(std::size_t num) override;
 
   private:
     SPtr<Scope> scope_;

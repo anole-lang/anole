@@ -165,8 +165,9 @@ class Context : public std::enable_shared_from_this<Context>
     {
         return current_path_;
     }
-
-    std::stack<std::size_t> &call_anchors();
+    
+    void set_callex_anchor();
+    std::size_t get_callex_args_num();
 
   private:
     SPtr<Context> pre_context_;

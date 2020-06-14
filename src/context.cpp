@@ -29,6 +29,7 @@ SPtr<Context> theCurrentContext = nullptr;
 namespace
 {
 map<Address, string> not_defineds;
+stack<size_t> call_anchors;
 }
 
 void
@@ -55,12 +56,16 @@ const string
     return not_defineds[ptr];
 }
 
-stack<size_t>
-&Context::call_anchors()
+void Context::set_callex_anchor()
 {
-    // all context share the anchors
-    static stack<size_t> anchors;
-    return anchors;
+    call_anchors.push(stack_->size());
+}
+
+size_t Context::get_callex_args_num()
+{
+    auto n = stack_->size() - call_anchors.top();
+    call_anchors.pop();
+    return n;
 }
 
 namespace op_handles
@@ -206,20 +211,31 @@ void newscope_handle()
     ++theCurrentContext->pc();
 }
 
-void callanchor_handle()
-{
-    theCurrentContext->call_anchors().push(theCurrentContext->size());
-    ++theCurrentContext->pc();
-}
-
 void call_handle()
 {
-    theCurrentContext->pop()->call();
+    theCurrentContext->pop()->call(OPRAND(size_t));
 }
 
 void calltail_handle()
 {
-    theCurrentContext->pop()->call_tail();
+    theCurrentContext->pop()->call_tail(OPRAND(size_t));
+}
+
+void callexanchor_handle()
+{
+    theCurrentContext->set_callex_anchor();
+    ++theCurrentContext->pc();
+}
+
+void callex_handle()
+{
+    theCurrentContext->pop()->call(theCurrentContext->get_callex_args_num());
+}
+
+void callextail_handle()
+{
+
+    theCurrentContext->pop()->call_tail(theCurrentContext->get_callex_args_num());
 }
 
 void return_handle()
@@ -530,9 +546,11 @@ constexpr OpHandle theOpHandles[] =
 
     &op_handles::newscope_handle,
 
-    &op_handles::callanchor_handle,
     &op_handles::call_handle,
     &op_handles::calltail_handle,
+    &op_handles::callexanchor_handle,
+    &op_handles::callex_handle,
+    &op_handles::callextail_handle,
     &op_handles::return_handle,
     &op_handles::jump_handle,
     &op_handles::jumpif_handle,

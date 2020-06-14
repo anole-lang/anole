@@ -88,18 +88,37 @@ void IdentifierExpr::codegen(Code &code)
 
 void ParenOperatorExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::CallAnchor>();
-    for (auto it = args.rbegin(); it != args.rend(); ++it)
+    bool ex = false;
+    for (auto &arg : args)
     {
-        (*it).first->codegen(code);
-        if ((*it).second)
-        {
-            code.add_ins<Opcode::Unpack>();
-        }
+        ex |= arg.second;
     }
-    expr->codegen(code);
-    code.mapping(pos);
-    code.add_ins<Opcode::Call>();
+
+    if (!ex)
+    {
+        for (auto it = args.rbegin(); it != args.rend(); ++it)
+        {
+            (*it).first->codegen(code);
+        }
+        expr->codegen(code);
+        code.mapping(pos);
+        code.add_ins<Opcode::Call>(args.size());
+    }
+    else
+    {
+        code.add_ins<Opcode::CallExAnchor>();
+        for (auto it = args.rbegin(); it != args.rend(); ++it)
+        {
+            (*it).first->codegen(code);
+            if ((*it).second)
+            {
+                code.add_ins<Opcode::Unpack>();
+            }
+        }
+        expr->codegen(code);
+        code.mapping(pos);
+        code.add_ins<Opcode::CallEx>();
+    }
 }
 
 void UnaryOperatorExpr::codegen(Code &code)
@@ -132,10 +151,9 @@ void UnaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
-        code.add_ins<Opcode::CallAnchor>();
         expr->codegen(code);
         code.add_ins<Opcode::Load>(op.value);
-        code.add_ins<Opcode::Call>();
+        code.add_ins<Opcode::Call>(size_t(1));
         break;
     }
 }
@@ -304,12 +322,11 @@ void BinaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
-        code.add_ins<Opcode::CallAnchor>();
         rhs->codegen(code);
         lhs->codegen(code);
         code.add_ins<Opcode::Load>(op.value);
         code.mapping(pos);
-        code.add_ins<Opcode::Call>();
+        code.add_ins<Opcode::Call>(size_t(2));
         break;
     }
 }
@@ -543,6 +560,10 @@ void ReturnStmt::codegen(Code &code)
     {
         opcode = Opcode::CallTail;
     }
+    else if (opcode == Opcode::CallEx)
+    {
+        opcode = Opcode::CallExTail;
+    }
 
     /**
      * Instruction Return cannot be deleted
@@ -607,10 +628,9 @@ void DoWhileStmt::codegen(Code &code)
 */
 void ForeachStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::CallAnchor>();
     expr->codegen(code);
     code.add_ins<Opcode::LoadMember>("__iterator__"s);
-    code.add_ins<Opcode::Call>();
+    code.add_ins<Opcode::Call>(size_t(0));
     code.add_ins<Opcode::StoreRef>("__it"s);
 
     auto cond = make_unique<ParenOperatorExpr>(

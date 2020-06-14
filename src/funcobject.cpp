@@ -34,11 +34,8 @@ Address FunctionObject::load_member(const string &name)
     return ptr;
 }
 
-void FunctionObject::call()
+void FunctionObject::call(size_t arg_num)
 {
-    auto arg_num = theCurrentContext->size() - theCurrentContext->call_anchors().top();
-    theCurrentContext->call_anchors().pop();
-
     theCurrentContext = make_shared<Context>(
         theCurrentContext, scope_, code_, base_);
 
@@ -99,11 +96,8 @@ void FunctionObject::call()
     }
 }
 
-void FunctionObject::call_tail()
+void FunctionObject::call_tail(size_t arg_num)
 {
-    auto arg_num = theCurrentContext->size() - theCurrentContext->call_anchors().top();
-    theCurrentContext->call_anchors().pop();
-
     theCurrentContext->scope() = make_shared<Scope>(scope_);
     theCurrentContext->code() = code_;
     theCurrentContext->pc() = base_;

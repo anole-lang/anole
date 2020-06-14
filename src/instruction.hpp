@@ -23,9 +23,11 @@ enum Opcode
 
     NewScope,     // NewScope
 
-    CallAnchor,   // CallAnchor
-    Call,         // Call
-    CallTail,     // CallTail
+    Call,         // Call n
+    CallTail,     // CallTail n
+    CallExAnchor, // CallExAnchor
+    CallEx,       // CallEx
+    CallExTail,   // CallExTail
     Return,       // Return
     Jump,         // Jump target
     JumpIf,       // JumpIf target

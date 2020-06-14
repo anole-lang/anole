@@ -224,14 +224,20 @@ void Code::print(ostream &out)
             out << i << "\tNewScope" << endl;
             break;
 
-        case Opcode::CallAnchor:
-            out << i << "\tCallAnchor" << endl;
-            break;
         case Opcode::Call:
-            out << i << "\tCall" << endl;
+            out << i << "\tCall\t\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::CallTail:
-            out << i << "\tCallTail" << endl;
+            out << i << "\tCallTail\t" << OPRAND(size_t) << endl;
+            break;
+        case Opcode::CallExAnchor:
+            out << i << "\tCallExAnchor" << endl;
+            break;
+        case Opcode::CallEx:
+            out << i << "\tCallEx" << endl;
+            break;
+        case Opcode::CallExTail:
+            out << i << "\tCallExTail" << endl;
             break;
         case Opcode::Return:
             out << i << "\tReturn" << endl;
@@ -395,6 +401,8 @@ void Code::serialize(ostream &out)
         switch (ins.opcode)
         {
         case Opcode::LoadConst:
+        case Opcode::Call:
+        case Opcode::CallTail:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
@@ -495,11 +503,13 @@ void Code::unserialize(ifstream &in)
 
     while (instructions_size --> 0)
     {
-        Opcode opcode = static_cast<Opcode>(in.get());
+        Opcode opcode = Opcode(in.get());
         std::any oprand = {};
         switch (opcode)
         {
         case Opcode::LoadConst:
+        case Opcode::Call:
+        case Opcode::CallTail:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
