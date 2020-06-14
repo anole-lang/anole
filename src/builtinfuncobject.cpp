@@ -12,17 +12,15 @@ string BuiltInFunctionObject::to_str()
     return "<builtin-function>"s;
 }
 
-void BuiltInFunctionObject::call()
+void BuiltInFunctionObject::call(size_t n)
 {
-    theCurrentContext->call_anchors().pop();
-    func_();
+    func_(n);
     ++theCurrentContext->pc();
 }
 
-void BuiltInFunctionObject::call_tail()
+void BuiltInFunctionObject::call_tail(size_t n)
 {
-    theCurrentContext->call_anchors().pop();
-    func_();
+    func_(n);
     ++theCurrentContext->pc();
 }
 
@@ -46,7 +44,7 @@ BuiltInFunctionObject::load_built_in_function(const string &name)
 }
 
 void BuiltInFunctionObject::register_built_in_function(
-    const string &name, function<void()> func)
+    const string &name, function<void(std::size_t)> func)
 {
     get_built_in_functions()[name] = make_shared<BuiltInFunctionObject>(func);
 }

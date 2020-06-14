@@ -9,7 +9,7 @@ void _open();
 
 namespace anole
 {
-class FileObject : public Object
+class FileObject : public Object, public std::enable_shared_from_this<FileObject>
 {
   public:
     FileObject(const std::string &, std::int64_t mode);

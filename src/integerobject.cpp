@@ -221,7 +221,7 @@ Address IntegerObject::load_member(const string &name)
     if (name == "to_str")
     {
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([val = value_]
+            make_shared<BuiltInFunctionObject>([val = value_](size_t)
             {
                 theCurrentContext
                     ->push(make_shared<StringObject>(to_string(val)));

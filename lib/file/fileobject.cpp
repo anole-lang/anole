@@ -24,37 +24,37 @@ void _open()
 
 namespace
 {
-map<string, function<void(FileObject *)>>
+map<string, function<void(SPtr<FileObject> &)>>
 builtin_methods
 {
-    {"good", [](FileObject *obj)
+    {"good", [](SPtr<FileObject> &obj)
         {
             theCurrentContext->push(obj->file().good() ? theTrue : theFalse);
         }
     },
-    {"eof", [](FileObject *obj)
+    {"eof", [](SPtr<FileObject> &obj)
         {
             theCurrentContext->push(obj->file().eof() ? theTrue : theFalse);
         }
     },
-    {"close", [](FileObject *obj)
+    {"close", [](SPtr<FileObject> &obj)
         {
             obj->file().close();
         }
     },
-    {"flush", [](FileObject *obj)
+    {"flush", [](SPtr<FileObject> &obj)
         {
             obj->file().flush();
         }
     },
-    {"read", [](FileObject *obj)
+    {"read", [](SPtr<FileObject> &obj)
         {
             theCurrentContext->push(
                 make_shared<StringObject>(
                     string(1, obj->file().get())));
         }
     },
-    {"readline", [](FileObject *obj)
+    {"readline", [](SPtr<FileObject> &obj)
         {
             string line;
             std::getline(obj->file(), line);
@@ -62,29 +62,29 @@ builtin_methods
                 make_shared<StringObject>(line));
         }
     },
-    {"write", [](FileObject *obj)
+    {"write", [](SPtr<FileObject> &obj)
         {
             const auto &str
                 = reinterpret_cast<StringObject *>(theCurrentContext->pop().get())->to_str();
             obj->file().write(str.c_str(), str.size());
         }
     },
-    {"tellg", [](FileObject *obj)
+    {"tellg", [](SPtr<FileObject> &obj)
         {
             theCurrentContext->push(make_shared<IntegerObject>(obj->file().tellg()));
         }
     },
-    {"tellp", [](FileObject *obj)
+    {"tellp", [](SPtr<FileObject> &obj)
         {
             theCurrentContext->push(make_shared<IntegerObject>(obj->file().tellp()));
         }
     },
-    {"seekg", [](FileObject *obj)
+    {"seekg", [](SPtr<FileObject> &obj)
         {
             obj->file().seekg(reinterpret_cast<IntegerObject *>(theCurrentContext->pop().get())->value());
         }
     },
-    {"seekp", [](FileObject *obj)
+    {"seekp", [](SPtr<FileObject> &obj)
         {
             obj->file().seekp(reinterpret_cast<IntegerObject *>(theCurrentContext->pop().get())->value());
         }
@@ -127,13 +127,15 @@ FileObject::FileObject(const string &path, int64_t mode)
 
 Address FileObject::load_member(const string &name)
 {
-    if (builtin_methods.count(name))
+    auto method = builtin_methods.find(name);
+    if (method != builtin_methods.end())
     {
-        auto &func = builtin_methods[name];
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([this, func]
+            make_shared<BuiltInFunctionObject>([
+                ptr = shared_from_this(),
+                &func = method->second](size_t) mutable
             {
-                func(this);
+                func(ptr);
             })
         );
     }

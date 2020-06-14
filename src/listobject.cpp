@@ -23,7 +23,7 @@ builtin_methods_for_list
     },
     {"size", [](SPtr<ListObject> &obj)
         {
-            theCurrentContext->push(make_shared<IntegerObject>(static_cast<int64_t>(obj->objects().size())));
+            theCurrentContext->push(make_shared<IntegerObject>(int64_t(obj->objects().size())));
         }
     },
     {"push", [](SPtr<ListObject> &obj)
@@ -163,7 +163,7 @@ Address ListObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second]() mutable
+                &func = method->second](size_t) mutable
             {
                 func(ptr);
             })
@@ -190,7 +190,7 @@ Address ListIteratorObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second]() mutable
+                &func = method->second](size_t) mutable
             {
                 func(ptr);
             })

@@ -134,7 +134,7 @@ Address CppModuleObject::load_member(const string &name)
         throw RuntimeError(dlerror());
     }
     auto result = make_shared<BuiltInFunctionObject>(
-        [mod = shared_from_this(), func] { func(); });
+        [mod = shared_from_this(), func](size_t) { func(); });
     return make_shared<ObjectPtr>(result);
 }
 }

@@ -17,9 +17,7 @@ builtin_methods
             theCurrentContext
                 ->push(
                     make_shared<IntegerObject>(
-                        static_cast<int64_t>(
-                            obj->value().size()
-                        )
+                        int64_t(obj->value().size())
                     )
                 );
         }
@@ -29,9 +27,7 @@ builtin_methods
             theCurrentContext
                 ->push(
                     make_shared<IntegerObject>(
-                        static_cast<int64_t>(
-                            stoll(obj->value())
-                        )
+                        int64_t(stoll(obj->value()))
                     )
                 );
         }
@@ -137,7 +133,7 @@ Address StringObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second]() mutable
+                &func = method->second](size_t) mutable
             {
                 func(ptr);
             })
