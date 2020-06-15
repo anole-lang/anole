@@ -26,7 +26,7 @@ If you want to remove anole, you can execute `cat install_manifest.txt | sudo xa
 ~> anole
 ```
 
-You can see some examples in `example/` or the `test/sample-tester.cpp`, this is the yin-yang puzzle for fun
+You can see some examples in `example/` or the `test/sample-tester.hpp`, this is the yin-yang puzzle for fun
 
 ```
 (@(yang): @(yin): yin(yang))
