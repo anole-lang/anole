@@ -11,18 +11,22 @@ using namespace anole;
 
 inline string execute(const string &input)
 {
-    istringstream ss{input};
-    auto code = make_shared<Code>();
-    theCurrentContext = make_shared<Context>(code);
-    auto ast = Parser(ss).gen_statements();
-    ast->codegen(*code);
-    #ifdef _DEBUG
-    code->print();
-    #endif
     ostringstream out;
     auto backup = cout.rdbuf();
     cout.rdbuf(out.rdbuf());
-    Context::execute();
+
+    istringstream ss{input};
+    auto code = make_shared<Code>();
+    theCurrentContext = make_shared<Context>(code);
+    Parser parser{ss};
+    while (auto ast = parser.gen_statement())
+    {
+        ast->codegen(*code);
+        Context::execute();
+    }
+    #ifdef _DEBUG
+    code->print();
+    #endif
     cout.rdbuf(backup);
     return out.str();
 }
@@ -51,6 +55,24 @@ print(adddd(1)(2)(3)(4));)"),
 
 // output
 "10");
+}
+
+TEST(Sample, VariadicArguments)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
+@foo(a, b, ...c) {
+    return c;
+}
+
+@l: [2, 3, 4, 5, 6];
+
+println(foo(1, l..., 7));)"),
+
+// output
+R"([3, 4, 5, 6, 7]
+)");
 }
 
 TEST(Sample, SimpleIfElseStmt)
@@ -105,7 +127,9 @@ Zero: @(f): @(x): x;
 Succ: @(n): @(f): @(x): f(n(f)(x));
 Pred: @(n): @(f): @(x): n(@(g): @(h): h(g(f)))(@(u): x)(@(u): u);
 
-Add: @(m, n): @(f): @(x): m(f)(n(f)(x));
+Plus: @(m, n): @(f): @(x): m(f)(n(f)(x));
+Mult: @(m, n): @(f): n(m(f));
+Exp: @(m, n): n(m);
 
 True: @(x, y): x;
 False: @(x, y): y;
@@ -130,16 +154,33 @@ Equal: @(x, y):
             delay Equal(Pred(x), Pred(y))));
 
 One: Succ(Zero);
-Two: Add(One, One);
+Two: Plus(One, One);
+Four: Mult(Two, Two);
 
-println(Equal(Two, Add(One, One)) = True);
-println(Equal(Two, Add(Two, Two)) = True);
-println(Equal(Two, Add2(One, One)) = True);)"),
+println(Equal(Two, Plus(One, One)) = True);
+println(Equal(Two, Plus(Two, Two)) = True);
+println(Equal(Two, Add2(One, One)) = True);
+
+@show(x) {
+    println(x);
+    return x;
+}
+
+One(show)(1);
+Two(show)(2);
+Four(show)(4);)"),
 
 // output
 R"(true
 false
 true
+1
+2
+2
+4
+4
+4
+4
 )");
 }
 
@@ -170,5 +211,107 @@ R"(Hi! My name is Xu Bo.
 Hello! I'm Luo yuexuan.
 Do you love me?
 Yes! I love you very very much!
+)");
+}
+
+TEST(Sample, CostumTryCatch)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
+@Except: {
+    @conts: [];
+
+    @throw(e) {
+        if conts.empty() {
+            println(e);
+            exit();
+        } else {
+            @cont: conts.pop();
+            cont(e);
+        }
+    }
+
+    @catch(try, cfun) {
+        @e: call_with_current_continuation(@(cont) {
+            conts.push(cont);
+            try(@(x): x)();
+        });
+        if !(e is none), cfun(e);
+    }
+
+    @try(fun): @(f): f(fun);
+
+    return {};
+}();
+
+@throw: Except.throw;
+prefixop throw;
+
+@try: Except.try;
+prefixop try;
+
+@catch: Except.catch;
+infixop catch;
+
+@div(a, b) {
+    if b = 0, throw "err: div 0";
+    return a / b;
+};
+
+@div_forever(a) {
+    @b: a;
+    while true {
+        div(a, b);
+        b: b - 1;
+    }
+};
+
+try {
+    div_forever(100);
+}
+catch @(e) {
+    println(e);
+})"),
+
+// output
+R"(err: div 0
+)");
+}
+
+TEST(Sample, CustomOp)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
+@*=*(lhs, rhs): lhs + rhs;
+
+@*-*(lhs, rhs), return lhs + rhs;
+
+@*^*(lhs, rhs) {
+    return lhs + rhs;
+}
+
+infixop 50  *=*;
+infixop 100 *-*;
+infixop 200 *^*;
+
+println(2 * 3 *=* 4 * 5);
+println(2 * 3 *-* 4 * 5);
+println(2 * 3 *^* 4 * 5);
+
+@refof(&var): delay var;
+prefixop refof;
+
+@a: 1;
+@test(var): var: 10;
+test(refof a);
+println(a);)"),
+
+// output
+R"(26
+26
+70
+10
 )");
 }
