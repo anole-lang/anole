@@ -7,6 +7,12 @@
 
 ## Quick Usage
 
+### Requirements
+
+```bash
+sudo apt-get install libreadline6-dev
+```
+
 ### Install
 
 ```bash
