@@ -348,38 +348,6 @@ R"(2
 )");
 }
 
-TEST(Sample, DefaultArgument)
-{
-    ASSERT_EQ(execute(
-// input
-R"(
-foo: @(m, n: n) {
-    return m + n;
-};
-
-n: 1;
-println(foo(1));
-
-n: 2;
-println(foo(1));
-
-foo: @(x, func: @(x): x + y) {
-    return func(x);
-};
-
-y: 10;
-println(foo(10));
-
-println(foo(10, @(x): x + 1));)"),
-
-// output
-R"(2
-3
-20
-11
-)");
-}
-
 TEST(Sample, SimpleEnum)
 {
     ASSERT_EQ(execute(
