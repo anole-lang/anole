@@ -52,6 +52,7 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-+ [ ] Implement self any and variant instead of using the standard
++ [ ] Implement self any, variant and so on instead of using the standard library
++ [ ] Use GC instead of simple shared_ptr
 + [ ] Provide debugger
 + [ ] Support multi threads and processes
