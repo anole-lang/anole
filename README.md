@@ -52,6 +52,7 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
++ [ ] Support tuple and syntax `(id1, ..., idn): expr` or `@id1, ..., idn: expr`，this will unpack expr if it is a tuple
 + [ ] Implement self any, variant and so on instead of using the standard library
 + [ ] Use GC instead of simple shared_ptr
 + [ ] Provide debugger
