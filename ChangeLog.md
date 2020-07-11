@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Enable packed parameter be reference as `...&name`, notice that it is an old feature and just not mention before
+
 ## 0.0.14 - 2020/06/17
 
 ### Updated
