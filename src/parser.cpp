@@ -867,7 +867,7 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
             expr = make_unique<ParenOperatorExpr>(move(expr), gen_arguments());
             expr->pos = pos;
         }
-        else // if Token is LBracket
+        else // if token is LBracket
         {
             expr = gen_index_expr(move(expr));
         }
