@@ -1,0 +1,14 @@
+@let(...&vars): @(...exprs) {
+    @i: 0;
+    foreach vars as var {
+        var: exprs[i];
+        i: i + 1;
+    }
+}
+
+@a; @b;
+
+let(a, b)(1, 2);
+
+println(a);
+println(b);
