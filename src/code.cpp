@@ -240,7 +240,7 @@ void Code::print(ostream &out)
             out << i << "\tCallExTail" << endl;
             break;
         case Opcode::Return:
-            out << i << "\tReturn" << endl;
+            out << i << "\tReturn\t\t" << OPRAND(size_t) << endl;
             break;
         case Opcode::Jump:
             out << i << "\tJump\t\t" << OPRAND(size_t) << endl;
@@ -403,6 +403,7 @@ void Code::serialize(ostream &out)
         case Opcode::LoadConst:
         case Opcode::Call:
         case Opcode::CallTail:
+        case Opcode::Return:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
@@ -510,6 +511,7 @@ void Code::unserialize(ifstream &in)
         case Opcode::LoadConst:
         case Opcode::Call:
         case Opcode::CallTail:
+        case Opcode::Return:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
