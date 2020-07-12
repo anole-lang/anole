@@ -433,6 +433,34 @@ Ptr<Stmt> Parser::gen_declaration()
     auto id = gen_ident();
     switch (current_token_.type)
     {
+    case TokenType::Comma:
+    {
+        vector<pair<Ptr<IdentifierExpr>, bool>> vars;
+        vars.push_back(make_pair(move(id), is_ref));
+
+        while (current_token_.type == TokenType::Comma)
+        {
+            get_next_token();
+            bool is_ref = false;
+            if (current_token_.type == TokenType::BAnd)
+            {
+                is_ref = true;
+                get_next_token();
+            }
+            vars.push_back(make_pair(gen_ident(), is_ref));
+        }
+
+        // @var1, ..., varn
+        if (current_token_.type != TokenType::Colon)
+        {
+            return make_unique<MultiVarsDeclarationStmt>(move(vars), nullptr);
+        }
+
+        // @var1, ..., varn: expr
+        get_next_token();
+        return make_unique<MultiVarsDeclarationStmt>(move(vars), gen_expr());
+    }
+
     case TokenType::Colon:
         get_next_token();
         return make_unique<VariableDeclarationStmt>(
@@ -456,7 +484,15 @@ Ptr<Stmt> Parser::gen_declaration()
         {
             get_next_token();
             block = make_unique<BlockExpr>();
-            block->statements.push_back(make_unique<ReturnStmt>(gen_delay_expr()));
+            ExprList exprs;
+            exprs.push_back(gen_delay_expr());
+            while (current_token_.type == TokenType::Comma)
+            {
+                get_next_token();
+                exprs.push_back(gen_delay_expr());
+            }
+
+            block->statements.push_back(make_unique<ReturnStmt>(move(exprs)));
         }
         else
         {
@@ -650,7 +686,16 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
 Ptr<Stmt> Parser::gen_return_stmt()
 {
     get_next_token();
-    return make_unique<ReturnStmt>(gen_expr());
+
+    ExprList exprs;
+    exprs.push_back(gen_delay_expr());
+    while (current_token_.type == TokenType::Comma)
+    {
+        get_next_token();
+        exprs.push_back(gen_delay_expr());
+    }
+
+    return make_unique<ReturnStmt>(move(exprs));
 }
 
 Ptr<Expr> Parser::gen_delay_expr()
@@ -1022,7 +1067,15 @@ Ptr<Expr> Parser::gen_lambda_expr()
     {
         get_next_token();
         block = make_unique<BlockExpr>();
-        block->statements.push_back(make_unique<ReturnStmt>(gen_delay_expr()));
+        ExprList exprs;
+        exprs.push_back(gen_delay_expr());
+        while (current_token_.type == TokenType::Comma)
+        {
+            get_next_token();
+            exprs.push_back(gen_delay_expr());
+        }
+
+        block->statements.push_back(make_unique<ReturnStmt>(move(exprs)));
     }
     else
     {
