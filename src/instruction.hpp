@@ -28,7 +28,7 @@ enum Opcode
     CallExAnchor, // CallExAnchor
     CallEx,       // CallEx
     CallExTail,   // CallExTail
-    Return,       // Return
+    Return,       // Return n
     Jump,         // Jump target
     JumpIf,       // JumpIf target
     JumpIfNot,    // JumpIfNot target
