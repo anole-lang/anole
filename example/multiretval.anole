@@ -1,14 +1,31 @@
+@prints(...args) {
+    foreach args as arg {
+        println(arg);
+    }
+}
+
+@+=(&var, n): var: var + n;
+infixop +=;
+
 @let(...&vars): @(...exprs) {
     @i: 0;
     foreach vars as var {
         var: exprs[i];
-        i: i + 1;
+        i += 1;
     }
 }
 
-@a; @b;
+@test(): 1, 2;
 
-let(a, b)(1, 2);
+@a, b: test();
+prints(a, b);
 
-println(a);
-println(b);
+let(a, b)(b, a);
+prints(a, b);
+
+let(a, b)(test());
+prints(a, b);
+
+@nested(): test(), 3, 4;
+@a, b, c, d: nested();
+prints(a, b, c, d);
