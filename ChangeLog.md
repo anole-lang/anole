@@ -2,8 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+- Support multi-ret-vals now! The syntax likes `return expr1, ..., exprn`. Multi-ret-vals can be nested in other call expression like `foo(1, bar(...), 2)`, arguments are variadic if `bar(...)` returns multi values
+- Support multi-vars-decl now! And it can be used with multi-ret-vals, the syntax likes `@var1, ..., varn: foo(...)`
+
 ### Changed
 
+- Ins `Return` has an oprand for the number of values to return now
 - Enable packed parameter be reference as `...&name`, notice that it is an old feature and just not mention before
 
 ## 0.0.14 - 2020/06/17
