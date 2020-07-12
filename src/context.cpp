@@ -240,10 +240,14 @@ void callextail_handle()
 
 void return_handle()
 {
+    auto n = OPRAND(size_t);
     auto pre_context = theCurrentContext->pre_context();
     if (theCurrentContext->get_stack() != pre_context->get_stack())
     {
-        pre_context->push_address(theCurrentContext->pop_address());
+        for (size_t i = 0; i < n; ++i)
+        {
+            pre_context->push_address(theCurrentContext->pop_address());
+        }
     }
     theCurrentContext = pre_context;
     ++theCurrentContext->pc();
