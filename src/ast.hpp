@@ -303,6 +303,20 @@ struct VariableDeclarationStmt : Stmt
     void codegen(Code &) override;
 };
 
+struct MultiVarsDeclarationStmt : Stmt
+{
+    std::vector<std::pair<Ptr<IdentifierExpr>, bool>> vars; // bool stands for whether it's ref
+    Ptr<Expr> expr;
+
+    MultiVarsDeclarationStmt(
+        std::vector<std::pair<Ptr<IdentifierExpr>, bool>> &&vars,
+        Ptr<Expr> &&expr)
+      : vars(std::move(vars))
+      , expr(std::move(expr)) {}
+
+    void codegen(Code &) override;
+};
+
 struct FunctionDeclarationStmt : Stmt
 {
     Ptr<IdentifierExpr> id;
@@ -366,10 +380,10 @@ struct ContinueStmt : Stmt
 
 struct ReturnStmt : Stmt
 {
-    Ptr<Expr> expr;
+    ExprList exprs;
 
-    ReturnStmt(Ptr<Expr> &&expr)
-      : expr(std::move(expr)) {}
+    ReturnStmt(ExprList &&exprs)
+      : exprs(std::move(exprs)) {}
 
     void codegen(Code &) override;
 };
