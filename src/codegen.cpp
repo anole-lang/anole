@@ -92,6 +92,17 @@ void ParenOperatorExpr::codegen(Code &code)
     for (auto &arg : args)
     {
         ex |= arg.second;
+        /**
+         * for example:
+         *  @foo(): 1, 2;
+         *  @bar(a, b): b, a;
+         *  bar(foo());
+         * so extended call should be generated when there is call-expr in arguments
+        */
+        if (dynamic_cast<ParenOperatorExpr *>(arg.first.get()))
+        {
+            ex = true;
+        }
     }
 
     if (!ex)
@@ -348,8 +359,8 @@ void LambdaExpr::codegen(Code &code)
     }
     block->codegen(code);
 
-    code.add_ins<Opcode::LoadConst, size_t>(0);
-    code.add_ins<Opcode::Return>();
+    make_unique<NoneExpr>()->codegen(code);
+    code.add_ins<Opcode::Return>(size_t(1));
     code.set_ins<Opcode::LambdaDecl>(o1, make_pair(parameters.size(), code.size()));
 }
 
@@ -520,6 +531,33 @@ void VariableDeclarationStmt::codegen(Code &code)
     }
 }
 
+void MultiVarsDeclarationStmt::codegen(Code &code)
+{
+    if (expr)
+    {
+        expr->codegen(code);
+    }
+    else
+    {
+        for (size_t i = 0; i < vars.size(); ++i)
+        {
+            make_unique<NoneExpr>()->codegen(code);
+        }
+    }
+
+    for (auto &var : vars)
+    {
+        if (var.second)
+        {
+            code.add_ins<Opcode::StoreRef>(var.first->name);
+        }
+        else
+        {
+            code.add_ins<Opcode::StoreLocal>(var.first->name);
+        }
+    }
+}
+
 void FunctionDeclarationStmt::codegen(Code &code)
 {
     lambda->codegen(code);
@@ -553,8 +591,12 @@ void ContinueStmt::codegen(Code &code)
 
 void ReturnStmt::codegen(Code &code)
 {
-    expr->codegen(code);
-    code.add_ins<Opcode::Return>();
+    for (auto expr = exprs.rbegin(); expr != exprs.rend(); ++expr)
+    {
+        (*expr)->codegen(code);
+    }
+
+    code.add_ins<Opcode::Return>(exprs.size());
 
     auto &opcode = code.opcode_at(code.size() - 2);
     if (opcode == Opcode::Call)
