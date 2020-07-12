@@ -52,7 +52,6 @@ See [ChangeLog.md](ChangeLog.md)
 
 ## To Do
 
-+ [ ] Support multi return-values and syntax like `return expr1, ..., exprn;` and `@var1, ..., &varn: foo(...);`
 + [ ] Implement self any, variant and so on instead of using the standard library
 + [ ] Use GC instead of simple shared_ptr
 + [ ] Provide debugger
