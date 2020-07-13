@@ -13,18 +13,105 @@ using namespace std;
 
 namespace
 {
+class Printer
+{
+  public:
+    Printer(ostream &out) : out_(out) {}
+
+    template<typename ...Ts>
+    void add_line(Ts ...args)
+    {
+        lines_.emplace_back();
+        if constexpr (sizeof...(Ts) > 0)
+        {
+            gen_line(lines_.back(), args...);
+        }
+    }
+
+    void add_intro(string intro)
+    {
+        lines_.push_back({intro});
+    }
+
+    void print()
+    {
+        for (auto &line : lines_)
+        {
+            for (size_t i = 0; i < line.size(); ++i)
+            {
+                out_ << line[i];
+                if (i < line.size() - 1)
+                {
+                    out_ << string(lens_[i] - line[i].size(), ' ');
+                }
+            }
+            out_ << endl;
+        }
+    }
+
+    void clear()
+    {
+        lines_.clear();
+        lens_.clear();
+    }
+
+  private:
+    string gen_each(size_t value)
+    {
+        return to_string(value);
+    }
+
+    string gen_each(const char *value)
+    {
+        return value;
+    }
+
+    string gen_each(string value)
+    {
+        return value;
+    }
+
+    template<typename T1, typename T2>
+    string gen_each(pair<T1, T2> value)
+    {
+        return "(" + gen_each(value.first) + ", " + gen_each(value.second) + ")";
+    }
+
+    template<typename T, typename ...Ts>
+    void gen_line(vector<string> &line, T arg, Ts ...args)
+    {
+        auto str = gen_each(arg);
+        if (lens_.size() <= line.size())
+        {
+            lens_.push_back(0);
+        }
+        if (str.size() > lens_[line.size()])
+        {
+            lens_[line.size()] = (str.size() / 4 + 1) * 4;
+        }
+        line.push_back(move(str));
+        if constexpr (sizeof...(Ts) > 0)
+        {
+            gen_line(line, args...);
+        }
+    }
+
+    ostream &out_;
+    vector<vector<string>> lines_;
+    vector<size_t> lens_;
+};
+
 template<typename T>
 void typeout(ostream &out, T value)
 {
-    char *chrs = reinterpret_cast<char *>(&value);
+    const char *chrs = reinterpret_cast<const char *>(&value);
     for (size_t i = 0; i < sizeof(T); ++i)
     {
         out.put(*chrs++);
     }
 }
 
-template<>
-void typeout<string>(ostream &out, string value)
+void typeout(ostream &out, string value)
 {
     typeout(out, value.size());
     for (auto c : value)
@@ -34,7 +121,7 @@ void typeout<string>(ostream &out, string value)
 }
 
 template<typename T, typename ...Args>
-void typeouts(ostream &out, T arg, Args... args)
+void typeouts(ostream &out, T arg, Args ...args)
 {
     typeout(out, arg);
     if constexpr (sizeof...(Args) > 0)
@@ -43,6 +130,7 @@ void typeouts(ostream &out, T arg, Args... args)
     }
 }
 
+// not partial specialization
 template<typename T1, typename T2>
 void typeout(ostream &out, pair<T1, T2> pir)
 {
@@ -61,7 +149,6 @@ void typein(istream &in, T &target)
     target = *(reinterpret_cast<T*>(temp));
 }
 
-template<>
 void typein(istream &in, string &value)
 {
     size_t len;
@@ -170,14 +257,22 @@ void Code::print(const filesystem::path &path)
 
 void Code::print(ostream &out)
 {
-    out << "Constants:\nConsIndex\tValue" << endl;
+    Printer printer{out};
+
+    printer.add_intro("Constants:");
+    printer.add_line("CI", "Value");
 
     for (size_t i = 0; i < constants_literals_.size(); ++i)
     {
-        out << i + 3 << "\t\t" << constants_literals_[i] << endl;
+        printer.add_line(i + 3, constants_literals_[i]);
     }
 
-    out << "\nInstructions:\nLine\tOp" << endl;
+    printer.add_line();
+    printer.print();
+    printer.clear();
+
+    printer.add_intro("Instructions:");
+    printer.add_line("L", "Opcode", "Oprand");
 
     for (size_t i = 0; i < instructions_.size(); ++i)
     {
@@ -188,175 +283,174 @@ void Code::print(ostream &out)
             break;
 
         case Opcode::Pop:
-            out << i << "\tPop" << endl;
+            printer.add_line(i, "Pop");
             break;
 
         case Opcode::Import:
-            out << i << "\tImport\t\t" << OPRAND(string) << endl;
+            printer.add_line(i, "Import", OPRAND(string));
             break;
         case Opcode::ImportPart:
-            out << i << "\tImportPart\t" << OPRAND(string) << endl;
+            printer.add_line(i, "ImportPart", OPRAND(string));
             break;
         case Opcode::ImportAll:
-            out << i << "\tImportAll\t" << OPRAND(string) << endl;
+            printer.add_line(i, "ImportAll", OPRAND(string));
             break;
 
         case Opcode::Load:
-            out << i << "\tLoad\t\t" << OPRAND(string) << endl;
+            printer.add_line(i, "Load", OPRAND(string));
             break;
         case Opcode::LoadConst:
-            out << i << "\tLoadConst\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "LoadConst", OPRAND(size_t));
             break;
         case Opcode::LoadMember:
-            out << i << "\tLoadMember\t" << OPRAND(string) << endl;
+            printer.add_line(i, "LoadMember", OPRAND(string));
             break;
         case Opcode::Store:
-            out << i << "\tStore" << endl;
+            printer.add_line(i, "Store");
             break;
         case Opcode::StoreRef:
-            out << i << "\tStoreRef\t" << OPRAND(string) << endl;
+            printer.add_line(i, "StoreRef", OPRAND(string));
             break;
         case Opcode::StoreLocal:
-            out << i << "\tStoreLocal\t" << OPRAND(string) << endl;
+            printer.add_line(i, "StoreLocal", OPRAND(string));
             break;
 
         case Opcode::NewScope:
-            out << i << "\tNewScope" << endl;
+            printer.add_line(i, "NewScope");
             break;
 
         case Opcode::Call:
-            out << i << "\tCall\t\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "Call", OPRAND(size_t));
             break;
         case Opcode::CallTail:
-            out << i << "\tCallTail\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "CallTail", OPRAND(size_t));
             break;
         case Opcode::CallExAnchor:
-            out << i << "\tCallExAnchor" << endl;
+            printer.add_line(i, "CallExAnchor");
             break;
         case Opcode::CallEx:
-            out << i << "\tCallEx" << endl;
+            printer.add_line(i, "CallEx");
             break;
         case Opcode::CallExTail:
-            out << i << "\tCallExTail" << endl;
+            printer.add_line(i, "CallExTail");
             break;
         case Opcode::Return:
-            out << i << "\tReturn\t\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "Return", OPRAND(size_t));
             break;
         case Opcode::Jump:
-            out << i << "\tJump\t\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "Jump", OPRAND(size_t));
             break;
         case Opcode::JumpIf:
-            out << i << "\tJumpIf\t\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "JumpIf", OPRAND(size_t));
             break;
         case Opcode::JumpIfNot:
-            out << i << "\tJumpIfNot\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "JumpIfNot", OPRAND(size_t));
             break;
         case Opcode::Match:
-            out << i << "\tMatch\t\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "Match", OPRAND(size_t));
             break;
 
         case Opcode::AddPrefixOp:
-            out << i << "\tAddPrefixOp\t" << OPRAND(string) << endl;
+            printer.add_line(i, "AddPrefixOp", OPRAND(string));
             break;
 
         case Opcode::AddInfixOp:
         {
             using type = pair<string, size_t>;
-            const auto &op_p = OPRAND(type);
-            out << i << "\tAddInfixOp\t" << op_p.first << " " << op_p.second << endl;
+            printer.add_line(i, "AddInfixOp", OPRAND(type));
         }
             break;
 
         case Opcode::Pack:
-            out << i << "\tPack" << endl;
+            printer.add_line(i, "Pack");
             break;
         case Opcode::Unpack:
-            out << i << "\tUnpack" << endl;
+            printer.add_line(i, "Unpack");
             break;
 
         case Opcode::LambdaDecl:
         {
             using type = pair<size_t, size_t>;
-            const auto &num_target = OPRAND(type);
-            out << i << "\tLambdaDecl\t" << num_target.first << " " << num_target.second << endl;
+            printer.add_line(i, "LambdaDecl", OPRAND(type));
         }
             break;
         case Opcode::ThunkDecl:
-            out << i << "\tThunkDecl\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "ThunkDecl", OPRAND(size_t));
             break;
         case Opcode::ThunkOver:
-            out << i << "\tThunkOver" << endl;
+            printer.add_line(i, "ThunkOver");
             break;
 
         case Opcode::Neg:
-            out << i << "\tNeg" << endl;
+            printer.add_line(i, "Neg");
             break;
         case Opcode::Add:
-            out << i << "\tAdd" << endl;
+            printer.add_line(i, "Add");
             break;
         case Opcode::Sub:
-            out << i << "\tSub" << endl;
+            printer.add_line(i, "Sub");
             break;
         case Opcode::Mul:
-            out << i << "\tMul" << endl;
+            printer.add_line(i, "Mul");
             break;
         case Opcode::Div:
-            out << i << "\tDiv" << endl;
+            printer.add_line(i, "Div");
             break;
         case Opcode::Mod:
-            out << i << "\tMod" << endl;
+            printer.add_line(i, "Mod");
             break;
 
         case Opcode::Is:
-            out << i << "\tIs" << endl;
+            printer.add_line(i, "Is");
             break;
         case Opcode::CEQ:
-            out << i << "\tCEQ" << endl;
+            printer.add_line(i, "CEQ");
             break;
         case Opcode::CNE:
-            out << i << "\tCNE" << endl;
+            printer.add_line(i, "CNE");
             break;
         case Opcode::CLT:
-            out << i << "\tCLT" << endl;
+            printer.add_line(i, "CLT");
             break;
         case Opcode::CLE:
-            out << i << "\tCLE" << endl;
+            printer.add_line(i, "CLE");
             break;
 
         case Opcode::BNeg:
-            out << i << "\tBNeg" << endl;
+            printer.add_line(i, "BNeg");
             break;
         case Opcode::BOr:
-            out << i << "\tBOr" << endl;
+            printer.add_line(i, "BOr");
             break;
         case Opcode::BXor:
-            out << i << "\tBXor" << endl;
+            printer.add_line(i, "BXor");
             break;
         case Opcode::BAnd:
-            out << i << "\tBAnd" << endl;
+            printer.add_line(i, "BAnd");
             break;
         case Opcode::BLS:
-            out << i << "\tBLS" << endl;
+            printer.add_line(i, "BLS");
             break;
         case Opcode::BRS:
-            out << i << "\tBRS" << endl;
+            printer.add_line(i, "BRS");
             break;
 
         case Opcode::Index:
-            out << i << "\tIndex" << endl;
+            printer.add_line(i, "Index");
             break;
 
         case Opcode::BuildEnum:
-            out << i << "\tBuildEnum" << endl;
+            printer.add_line(i, "BuildEnum");
             break;
         case Opcode::BuildList:
-            out << i << "\tBuildList\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "BuildList", OPRAND(size_t));
             break;
         case Opcode::BuildDict:
-            out << i << "\tBuildDict\t" << OPRAND(size_t) << endl;
+            printer.add_line(i, "BuildDict", OPRAND(size_t));
             break;
         }
     }
+    printer.print();
 }
 
 void Code::serialize(const filesystem::path &path)
