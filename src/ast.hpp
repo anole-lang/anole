@@ -306,13 +306,13 @@ struct VariableDeclarationStmt : Stmt
 struct MultiVarsDeclarationStmt : Stmt
 {
     std::vector<std::pair<Ptr<IdentifierExpr>, bool>> vars; // bool stands for whether it's ref
-    Ptr<Expr> expr;
+    ExprList exprs;
 
     MultiVarsDeclarationStmt(
         std::vector<std::pair<Ptr<IdentifierExpr>, bool>> &&vars,
-        Ptr<Expr> &&expr)
+        ExprList &&exprs)
       : vars(std::move(vars))
-      , expr(std::move(expr)) {}
+      , exprs(std::move(exprs)) {}
 
     void codegen(Code &) override;
 };
