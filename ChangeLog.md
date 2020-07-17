@@ -1,11 +1,13 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.15 - 2020/07/17
 
 ### Added
 
-- Support multi-ret-vals now! The syntax likes `return expr1, ..., exprn`. Multi-ret-vals can be nested in other call expression like `foo(1, bar(...), 2)`, arguments are variadic if `bar(...)` returns multi values
-- Support multi-vars-decl now! And it can be used with multi-ret-vals, the syntax likes `@var1, ..., varn: foo(...)`
+- Support multi ret-vals such as `return expr1, ..., exprn`, `@(): expr1, ..., exprn`
+- Supoprt multi vars-decl like `@var1, ..., varn` or `@var1, ..., varn: expr1, ..., exprn`
+- Multi ret-vals will be flated on where the call expr appears. For example, `return ..., foo(...)` is equivalent to `return ..., expr1, ..., exprn` after `foo(...)` is called. The call expr with multi ret-vals also can appear in multi vars-decl and as argument of other function, and then it will be flated also
+- Enale prefix operator receiving call expr with multi-ret-vals like `cstm_preop foo(...)` with `foo(...): expr1, ..., exprn`
 
 ### Changed
 
