@@ -27,8 +27,7 @@ void Parser::reset()
 }
 
 void Parser::set_continue_action(
-    function<void()> action
-)
+    function<void()> action)
 {
     continue_action_ = move(action);
 }
@@ -453,12 +452,19 @@ Ptr<Stmt> Parser::gen_declaration()
         // @var1, ..., varn
         if (current_token_.type != TokenType::Colon)
         {
-            return make_unique<MultiVarsDeclarationStmt>(move(vars), nullptr);
+            return make_unique<MultiVarsDeclarationStmt>(move(vars), ExprList{});
         }
 
         // @var1, ..., varn: expr
         get_next_token();
-        return make_unique<MultiVarsDeclarationStmt>(move(vars), gen_expr());
+        ExprList exprs;
+        exprs.push_back(gen_delay_expr());
+        while (current_token_.type == TokenType::Comma)
+        {
+            get_next_token();
+            exprs.push_back(gen_delay_expr());
+        }
+        return make_unique<MultiVarsDeclarationStmt>(move(vars), move(exprs));
     }
 
     case TokenType::Colon:
