@@ -17,7 +17,7 @@ infixop +=;
 
 @test(): 1, 2;
 
-@a, b: test();
+@a, b: 1, 2;
 prints(a, b);
 
 let(a, b)(b, a);
@@ -26,6 +26,11 @@ prints(a, b);
 let(a, b)(test());
 prints(a, b);
 
-@nested(): test(), 3, 4;
-@a, b, c, d: nested();
+@nested(): test(), 3;
+@a, b, c, d: nested(), 4;
 prints(a, b, c, d);
+
+@rasl(...args): args.size() = 1 ? args[0], args;
+prefixop rasl;
+
+prints(rasl nested(), rasl (@(): 1)());
