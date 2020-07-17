@@ -162,9 +162,27 @@ void UnaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
-        expr->codegen(code);
-        code.add_ins<Opcode::Load>(op.value);
-        code.add_ins<Opcode::Call>(size_t(1));
+    {
+        bool ex = false;
+        if (dynamic_cast<ParenOperatorExpr*>(expr.get()))
+        {
+            ex = true;
+        }
+
+        if (ex)
+        {
+            code.add_ins<Opcode::CallExAnchor>();
+            expr->codegen(code);
+            code.add_ins<Opcode::Load>(op.value);
+            code.add_ins<Opcode::CallEx>();
+        }
+        else
+        {
+            expr->codegen(code);
+            code.add_ins<Opcode::Load>(op.value);
+            code.add_ins<Opcode::Call>(size_t(1));
+        }
+    }
         break;
     }
 }
@@ -533,9 +551,12 @@ void VariableDeclarationStmt::codegen(Code &code)
 
 void MultiVarsDeclarationStmt::codegen(Code &code)
 {
-    if (expr)
+    if (!exprs.empty())
     {
-        expr->codegen(code);
+        for (auto expr = exprs.rbegin(); expr != exprs.rend(); ++expr)
+        {
+            (*expr)->codegen(code);
+        }
     }
     else
     {
