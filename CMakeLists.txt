@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(anole VERSION 0.0.15)
+project(anole VERSION 0.0.16)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
