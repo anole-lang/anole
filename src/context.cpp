@@ -177,8 +177,7 @@ void loadmember_handle()
         ->push_address(
             theCurrentContext
                 ->pop()
-                ->load_member(name)
-        );
+                    ->load_member(name));
     ++theCurrentContext->pc();
 }
 
@@ -234,7 +233,6 @@ void callex_handle()
 
 void callextail_handle()
 {
-
     theCurrentContext->pop()->call_tail(theCurrentContext->get_callex_args_num());
 }
 
