@@ -113,6 +113,7 @@ ELSE ()
     install (TARGETS anole DESTINATION bin)
 ENDIF()
 
+# install headers of anole
 file(GLOB HEADERS "src/*.hpp")
 
 install (
@@ -121,6 +122,8 @@ install (
     DESTINATION "include/anole"
 )
 
+#install libs of anole
+#install lib file
 add_library(fileobject SHARED
     lib/file/fileobject.cpp
 )
@@ -137,6 +140,31 @@ install (
     DESTINATION "lib/anole/file"
 )
 
+#install lib os
+install (
+    FILES
+    "lib/os/__init__.anole"
+    DESTINATION "lib/anole/os"
+)
+
+#install lib path of lib os
+add_library("path" SHARED
+    "lib/os/path/path.cpp"
+)
+
+install (
+    FILES
+    "lib/os/path/__init__.anole"
+    DESTINATION "lib/anole/os/path"
+)
+
+install (
+    TARGETS
+        "path"
+    DESTINATION "lib/anole/os/path"
+)
+
+#install lib coroutine
 install (
     FILES
     "lib/coroutine/__init__.anole"
