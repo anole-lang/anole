@@ -6,6 +6,7 @@
 #include <iostream>
 #include <filesystem>
 #include <type_traits>
+#include "ast.hpp"
 #include "helper.hpp"
 #include "object.hpp"
 #include "instruction.hpp"
@@ -22,13 +23,13 @@ class Code
         return from_;
     }
 
-    std::map<std::size_t, std::pair<std::size_t, std::size_t>>
+    std::map<std::size_t, AST::Position>
     &mapping()
     {
         return mapping_;
     }
 
-    void mapping(std::pair<std::size_t, std::size_t> pos)
+    void mapping(const AST::Position &pos)
     {
         if (pos.first != 0)
         {
@@ -51,28 +52,28 @@ class Code
         return instructions_[i].oprand;
     }
 
-    template <Opcode op = Opcode::PlaceHolder>
+    template<Opcode op = Opcode::PlaceHolder>
     std::size_t add_ins()
     {
         instructions_.push_back({ op });
         return instructions_.size() - 1;
     }
 
-    template <Opcode op, typename T>
-    std::size_t add_ins(T value)
+    template<Opcode op, typename T>
+    std::size_t add_ins(const T &value)
     {
         instructions_.push_back({ op, value });
         return instructions_.size() - 1;
     }
 
-    template <Opcode op>
+    template<Opcode op>
     void set_ins(std::size_t ind)
     {
         instructions_[ind] = { op };
     }
 
-    template <Opcode op, typename T>
-    void set_ins(std::size_t ind, T value)
+    template<Opcode op, typename T>
+    void set_ins(std::size_t ind, const T &value)
     {
         instructions_[ind] = { op, value };
     }
@@ -85,7 +86,7 @@ class Code
     bool check();
     ObjectPtr load_const(std::size_t ind);
 
-    template <typename O, typename T>
+    template<typename O, typename T>
     std::size_t create_const(std::string key, T value)
     {
         if (constants_map_.count(key))
@@ -112,7 +113,7 @@ class Code
 
   private:
     std::string from_;
-    std::map<std::size_t, std::pair<std::size_t, std::size_t>> mapping_;
+    std::map<std::size_t, AST::Position> mapping_;
 
     std::vector<Instruction> instructions_;
     // these two should be checked is empty or not

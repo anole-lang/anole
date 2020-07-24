@@ -19,6 +19,8 @@ using ParameterList = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>,
 
 struct AST
 {
+    using Position = std::pair<std::size_t, std::size_t>;
+
     virtual ~AST() = 0;
     virtual void codegen(Code &) = 0;
 
@@ -33,7 +35,7 @@ struct AST
     }
 
     // pos not be uesd in each node
-    std::pair<std::size_t, std::size_t> pos = {0, 0};
+    Position pos = {0, 0};
 };
 
 struct Stmt : AST
