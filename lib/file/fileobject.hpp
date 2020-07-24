@@ -4,7 +4,7 @@
 
 extern "C"
 {
-void _open();
+void __open();
 }
 
 namespace anole

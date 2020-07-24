@@ -1,32 +1,32 @@
-@_co_funcs: [];
-@_co_conts: [];
-@_co_deletes: [];
-@_co_cont: none;
+@__co_funcs: [];
+@__co_conts: [];
+@__co_deletes: [];
+@__co_cont: none;
 
 @co_create(func) {
-    if _co_deletes.empty() {
-        @id: _co_funcs.size();
-        _co_funcs.push(func);
-        _co_conts.push(none);
+    if __co_deletes.empty() {
+        @id: __co_funcs.size();
+        __co_funcs.push(func);
+        __co_conts.push(none);
         return id;
     } else {
-        @id: _co_deletes.pop();
-        _co_funcs[id]: func;
-        _co_conts[id]: none;
+        @id: __co_deletes.pop();
+        __co_funcs[id]: func;
+        __co_conts[id]: none;
         return id;
     }
 }
 
 @co_resume(id) {
-    if _co_conts[id] = none {
-        _co_conts[id]: call_with_current_continuation(@(cont) {
-            _co_cont: cont;
-            _co_funcs[id]();
+    if __co_conts[id] = none {
+        __co_conts[id]: call_with_current_continuation(@(cont) {
+            __co_cont: cont;
+            __co_funcs[id]();
         });
     } else {
-        _co_conts[id]: call_with_current_continuation(@(cont) {
-            _co_cont: cont;
-            _co_conts[id](none);
+        __co_conts[id]: call_with_current_continuation(@(cont) {
+            __co_cont: cont;
+            __co_conts[id](none);
         });
     }
 }
@@ -36,6 +36,6 @@
 }
 
 @co_destroy(id) {
-    _co_funcs[id]: _co_conts[id]: none;
-    _co_deletes.push(id);
+    __co_funcs[id]: __co_conts[id]: none;
+    __co_deletes.push(id);
 }

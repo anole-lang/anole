@@ -8,7 +8,7 @@
 using namespace std;
 using namespace anole;
 
-void _open()
+void __open()
 {
     auto path = theCurrentContext->pop();
     auto mode = theCurrentContext->pop();

@@ -1,4 +1,4 @@
-use _open from libfileobject;
+use __open from libfileobject;
 
 @mode: {
     @app:    1 << 0;
@@ -12,5 +12,5 @@ use _open from libfileobject;
 }();
 
 @open(path, mode: mode.in | mode.out) {
-    return _open(path, mode);
+    return __open(path, mode);
 }
