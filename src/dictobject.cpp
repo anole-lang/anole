@@ -2,6 +2,7 @@
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "dictobject.hpp"
+#include "stringobject.hpp"
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
 
@@ -79,7 +80,15 @@ string DictObject::to_key()
 
 Address DictObject::index(ObjectPtr index)
 {
-    return data_[index];
+    auto it = data_.find(index);
+    if (it != data_.end())
+    {
+        return it->second;
+    }
+    /**
+     * dict will create an empty target if the key is not recorded
+    */
+    return data_[index] = make_shared<ObjectPtr>(nullptr);
 }
 
 Address DictObject::load_member(const string &name)
@@ -96,7 +105,7 @@ Address DictObject::load_member(const string &name)
             })
         );
     }
-    return Object::load_member(name);
+    return index(make_shared<StringObject>(name));
 }
 
 DictObject::DataType &DictObject::data()

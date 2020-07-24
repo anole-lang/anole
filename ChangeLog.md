@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-### Added
+### Updated
+
+- Dict will create an empty target if the given key is not recorded
 
 ## 0.0.15 - 2020/07/17
 

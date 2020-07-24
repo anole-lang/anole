@@ -15,6 +15,7 @@ class StringObject : public Object, public std::enable_shared_from_this<StringOb
 
     bool to_bool() override;
     std::string to_str() override;
+    std::string to_key() override;
 
     ObjectPtr add(ObjectPtr) override;
     ObjectPtr ceq(ObjectPtr) override;

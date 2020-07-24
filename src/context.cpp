@@ -173,11 +173,12 @@ void loadconst_handle()
 void loadmember_handle()
 {
     const auto &name = OPRAND(string);
-    theCurrentContext
-        ->push_address(
-            theCurrentContext
-                ->pop()
-                    ->load_member(name));
+    auto address = theCurrentContext->pop()->load_member(name);
+    if (!*address)
+    {
+        Context::add_not_defined_symbol(name, address);
+    }
+    theCurrentContext->push_address(address);
     ++theCurrentContext->pc();
 }
 

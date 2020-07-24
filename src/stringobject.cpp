@@ -45,6 +45,11 @@ string StringObject::to_str()
     return value_;
 }
 
+string StringObject::to_key()
+{
+    return "s" + to_str();
+}
+
 ObjectPtr StringObject::add(ObjectPtr obj)
 {
     if (obj->type() == ObjectType::String)
