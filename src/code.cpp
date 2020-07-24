@@ -102,7 +102,7 @@ class Printer
 };
 
 template<typename T>
-void typeout(ostream &out, T value)
+void typeout(ostream &out, const T &value)
 {
     const char *chrs = reinterpret_cast<const char *>(&value);
     for (size_t i = 0; i < sizeof(T); ++i)
@@ -111,17 +111,17 @@ void typeout(ostream &out, T value)
     }
 }
 
-void typeout(ostream &out, string value)
+void typeout(ostream &out, const string &value)
 {
     typeout(out, value.size());
-    for (auto c : value)
+    for (const auto c : value)
     {
         out.put(c);
     }
 }
 
 template<typename T, typename ...Args>
-void typeouts(ostream &out, T arg, Args ...args)
+void typeouts(ostream &out, const T &arg, const Args &...args)
 {
     typeout(out, arg);
     if constexpr (sizeof...(Args) > 0)
@@ -132,7 +132,7 @@ void typeouts(ostream &out, T arg, Args ...args)
 
 // not partial specialization
 template<typename T1, typename T2>
-void typeout(ostream &out, pair<T1, T2> pir)
+void typeout(ostream &out, const pair<T1, T2> &pir)
 {
     typeouts(out, pir.first, pir.second);
 }
