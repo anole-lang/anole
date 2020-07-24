@@ -27,21 +27,28 @@ SPtr<ModuleObject> ModuleObject::generate(const string &name)
 AnoleModuleObject::AnoleModuleObject(const string &name)
 {
     good_ = true;
-    if (is_regular_file(theCurrentContext->current_path() / (name + ".anole")))
+
+    /**
+     * use module-name will look up the module in current directory firstly
+     *  and then look up in "/usr/local/lib/anole/" if not find
+    */
+
+    auto cpath = theCurrentContext->current_path();
+    if (is_regular_file(cpath / (name + ".anole")))
     {
-        init(theCurrentContext->current_path() / (name + ".anole"));
+        init(cpath / (name + ".anole"));
     }
-    else if (is_directory(theCurrentContext->current_path() / name))
+    else if (is_directory(cpath / name))
     {
-        init(theCurrentContext->current_path() / name / "__init__.anole");
+        init(cpath / name / "__init__.anole");
     }
-    else if (is_regular_file(filesystem::path("/usr/local/lib/anole") / (name + ".anole")))
+    else if (is_regular_file(path("/usr/local/lib/anole") / (name + ".anole")))
     {
-        init(filesystem::path("/usr/local/lib/anole") / (name + ".anole"));
+        init(path("/usr/local/lib/anole") / (name + ".anole"));
     }
-    else if (is_directory(filesystem::path("/usr/local/lib/anole") / name))
+    else if (is_directory(path("/usr/local/lib/anole") / name))
     {
-        init(filesystem::path("/usr/local/lib/anole") / name / "__init__.anole");
+        init(path("/usr/local/lib/anole") / name / "__init__.anole");
     }
     else
     {
