@@ -5,9 +5,9 @@
 
 namespace anole
 {
-template <typename T>
+template<typename T>
 using SPtr = std::shared_ptr<T>;
-template <typename T>
+template<typename T>
 using Ptr = std::unique_ptr<T>;
 
 namespace info

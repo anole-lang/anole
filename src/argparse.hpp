@@ -28,14 +28,14 @@ class Argument
         return *this;
     }
 
-    template <typename T>
+    template<typename T>
     Argument &default_value(const T &&value)
     {
         value_ = value;
         return *this;
     }
 
-    template <typename T>
+    template<typename T>
     Argument &implict_value(const T &&value)
     {
         implict_value_ = value;
@@ -58,7 +58,7 @@ class Argument
         value_ = implict_value_;
     }
 
-    template <typename T = std::string>
+    template<typename T = std::string>
     T get()
     {
         return std::any_cast<T>(value_);
@@ -143,7 +143,7 @@ class ArgumentParser
         }
     }
 
-    template <typename ...Ts>
+    template<typename ...Ts>
     Argument &add_argument(const std::string &key,
         const Ts & ...keys)
     {
@@ -166,7 +166,7 @@ class ArgumentParser
         return arguments_[k];
     }
 
-    template <typename V = std::string>
+    template<typename V = std::string>
     V get(const std::string &key)
     {
         return arguments_[keys_[key]].get<V>();
@@ -183,7 +183,7 @@ class ArgumentParser
         return arguments_[k];
     }
 
-    template <typename ...Ts>
+    template<typename ...Ts>
     void add_optional_argument(
         const std::string &key,
         const Ts & ...keys)

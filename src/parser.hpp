@@ -28,7 +28,7 @@ class Parser
 
     void throw_err(const std::string &err_info);
 
-    template <TokenType type>
+    template<TokenType type>
     void check(const std::string &err_info)
     {
         try_continue();
@@ -38,7 +38,7 @@ class Parser
         }
     }
 
-    template <TokenType type>
+    template<TokenType type>
     void eat(const std::string &err_info = "")
     {
         check<type>(err_info);

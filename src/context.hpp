@@ -113,7 +113,7 @@ class Context : public std::enable_shared_from_this<Context>
         stack_->push(move(ptr));
     }
 
-    template <typename R = Object>
+    template<typename R = Object>
     R *top()
     {
         if (*stack_->top() == nullptr)
