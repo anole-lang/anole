@@ -1,1 +1,2 @@
-use current_path from path;
+use path;
+
