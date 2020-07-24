@@ -1,0 +1,3 @@
+use * from libpath;
+
+@current_path(): __current_path();
