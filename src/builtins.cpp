@@ -107,4 +107,9 @@ REGISTER_BUILTIN(time,
     time_t result = time(nullptr);
     theCurrentContext->push(make_shared<IntegerObject>(result));
 });
+
+REGISTER_BUILTIN(str,
+{
+    theCurrentContext->push(make_shared<StringObject>(theCurrentContext->pop()->to_str()));
+});
 }
