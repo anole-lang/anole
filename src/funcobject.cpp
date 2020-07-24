@@ -26,12 +26,7 @@ ObjectPtr FunctionObject::cne(ObjectPtr obj)
 
 Address FunctionObject::load_member(const string &name)
 {
-    auto ptr = scope_->load_symbol(name);
-    if (!*ptr)
-    {
-        Context::add_not_defined_symbol(name, ptr);
-    }
-    return ptr;
+    return scope_->load_symbol(name);
 }
 
 void FunctionObject::call(size_t num)
