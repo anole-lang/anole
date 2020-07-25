@@ -8,8 +8,13 @@
 using namespace std;
 using namespace anole;
 
-void __open()
+void __open(size_t n)
 {
+    if (n != 2)
+    {
+        throw RuntimeError("function open need 2 arguments");
+    }
+
     auto path = theCurrentContext->pop();
     auto mode = theCurrentContext->pop();
 

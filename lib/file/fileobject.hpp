@@ -4,7 +4,7 @@
 
 extern "C"
 {
-void __open();
+void __open(std::size_t);
 }
 
 namespace anole
