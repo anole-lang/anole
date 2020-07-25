@@ -5,8 +5,24 @@ using namespace std;
 namespace fs = filesystem;
 using namespace anole;
 
-void __current_path()
+extern "C"
 {
+extern vector<string> _FUNCTIONS;
+void __current_path(size_t);
+}
+
+vector<string> _FUNCTIONS
+{
+    "__current_path"s
+};
+
+void __current_path(size_t n)
+{
+    if (n != 0)
+    {
+        throw RuntimeError("function current_path need no arguments");
+    }
+
     theCurrentContext
         ->push(
             make_shared<PathObject>(
@@ -14,10 +30,6 @@ void __current_path()
             )
         );
 }
-
-vector<string> _FUNCTIONS {
-    "__current_path"s
-};
 
 namespace
 {

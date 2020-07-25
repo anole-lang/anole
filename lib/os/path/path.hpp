@@ -3,12 +3,6 @@
 #include <filesystem>
 #include "../../../src/object.hpp"
 
-extern "C"
-{
-void __current_path();
-extern std::vector<std::string> _FUNCTIONS;
-}
-
 namespace anole
 {
 class PathObject : public Object, public std::enable_shared_from_this<PathObject>
