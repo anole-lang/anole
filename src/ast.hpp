@@ -264,14 +264,29 @@ struct QuesExpr : Expr
 
 struct UseStmt : Stmt
 {
-    using NamesType = std::vector<std::pair<std::string, std::string>>;
+    struct Module
+    {
+        enum class Type
+        {
+            Name,
+            Path,
+            Null
+        };
+        std::string mod;
+        Type type;
+    };
 
-    NamesType names;
-    std::string from;
+    using Alias = std::pair<Module, std::string>;
+    // second string is the alias
+    using Aliases = std::vector<Alias>;
 
-    UseStmt(NamesType &&names,
-        std::string from)
-      : names(std::move(names))
+    // aliases are empty means `use *`
+    Aliases aliases;
+    // from may be a name or a path
+    Module from;
+
+    UseStmt(Aliases &&aliases, Module from)
+      : aliases(std::move(aliases))
       , from(std::move(from)) {}
 
     void codegen(Code &) override;
