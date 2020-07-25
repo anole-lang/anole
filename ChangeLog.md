@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+
+- Support use direct path of module like `use * from "/path/to/module"`, `use "/path/to/module" as mod` and `use part as alias from "/path/to/module"`
+- Instruction `ImportPath/ImportAllPath` to use module with its path directly
+
 ### Updated
 
 - Dict will create an empty target if the given key is not recorded
