@@ -555,64 +555,91 @@ Ptr<Stmt> Parser::gen_class_decl()
     return make_unique<ClassDeclarationStmt>(move(id), move(bases), move(block));
 }
 
-Ptr<Stmt> Parser::gen_use_stmt()
+UseStmt::Module Parser::gen_module()
 {
-    vector<pair<string, string>> names;
-    string from;
-
-    get_next_token();
-    if (current_token_.type == TokenType::Mul)
+    UseStmt::Module mod;
+    if (current_token_.type == TokenType::Identifier)
     {
-        get_next_token();
-        eat<TokenType::From>("need from ident here");
-        check<TokenType::Identifier>("need identifier after from");
-        from = current_token_.value;
-        get_next_token();
-        return make_unique<UseStmt>(move(names), move(from));
+        mod = { current_token_.value, UseStmt::Module::Type::Name };
     }
-    check<TokenType::Identifier>("need identifier here");
-    auto name = current_token_.value;
+    else if (current_token_.type == TokenType::String)
+    {
+        mod = { current_token_.value, UseStmt::Module::Type::Path };
+    }
+    else
+    {
+        throw_err("need name or path of the source module after from");
+    }
+    // eat `<module>`
     get_next_token();
+    return mod;
+}
+
+UseStmt::Alias Parser::gen_alias()
+{
+    UseStmt::Alias alias;
+    alias.first = gen_module();
     if (current_token_.type == TokenType::As)
     {
         get_next_token();
         check<TokenType::Identifier>("need the alias here");
-        names.push_back({name, current_token_.value});
+        alias.second = current_token_.value;
         get_next_token();
     }
     else
     {
-        names.push_back({name, name});
-    }
-
-    while (current_token_.type == TokenType::Comma)
-    {
-        get_next_token();
-        check<TokenType::Identifier>("need identifier here");
-        auto name = current_token_.value;
-        get_next_token();
-        if (current_token_.type == TokenType::As)
+        if (alias.first.type == UseStmt::Module::Type::Path)
         {
-            get_next_token();
-            check<TokenType::Identifier>("need the alias here");
-            names.push_back({name, current_token_.value});
-            get_next_token();
+            throw_err("use direct path of module need an alias");
         }
         else
         {
-            names.push_back({name, name});
+            alias.second = alias.first.mod;
         }
+    }
+    return alias;
+}
+
+Ptr<Stmt> Parser::gen_use_stmt()
+{
+    UseStmt::Aliases aliases;
+    UseStmt::Module  from;
+
+    // eat `use`
+    get_next_token();
+
+    // use * from <module>
+    if (current_token_.type == TokenType::Mul)
+    {
+        get_next_token();
+        eat<TokenType::From>("need from ident here");
+        return make_unique<UseStmt>(move(aliases), gen_module());
+    }
+
+    aliases.push_back(gen_alias());
+    bool use_direct = aliases.back().first.type == UseStmt::Module::Type::Path;
+    while (current_token_.type == TokenType::Comma)
+    {
+        get_next_token();
+        aliases.push_back(gen_alias());
+        use_direct |= aliases.back().first.type == UseStmt::Module::Type::Path;
     }
 
     if (current_token_.type == TokenType::From)
     {
+        if (use_direct)
+        {
+            throw_err("path of module cannot appear before from");
+        }
         get_next_token();
-        check<TokenType::Identifier>("need Module name here");
-        from = current_token_.value;
-        get_next_token();
+        from = gen_module();
+    }
+    else
+    {
+        from.type = UseStmt::Module::Type::Null;
     }
 
-    return make_unique<UseStmt>(move(names), move(from));
+    return make_unique<UseStmt>(move(aliases), move(from));
 }
 
 Ptr<Stmt> Parser::gen_if_else()

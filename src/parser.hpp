@@ -17,7 +17,9 @@ class Parser
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();
 
+    // add new prefix operator
     static void add_prefixop(const std::string &str);
+    // add new infix operator with priority
     static void add_infixop(const std::string &str,
         std::size_t priority);
 
@@ -61,6 +63,8 @@ class Parser
     Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();
     Ptr<Stmt> gen_class_decl();
+    UseStmt::Module gen_module();
+    UseStmt::Alias gen_alias();
     Ptr<Stmt> gen_use_stmt();
     Ptr<Stmt> gen_if_else();
     Ptr<AST>  gen_if_else_tail();
