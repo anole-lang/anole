@@ -164,6 +164,23 @@ install (
     DESTINATION "lib/anole/os/path"
 )
 
+#install lib read_dir of lib os
+add_library("read_dir" SHARED
+    "lib/os/read_dir/read_dir.cpp"
+)
+
+install (
+    FILES
+    "lib/os/read_dir/__init__.anole"
+    DESTINATION "lib/anole/os/read_dir"
+)
+
+install (
+    TARGETS
+        "read_dir"
+    DESTINATION "lib/anole/os/read_dir"
+)
+
 #install lib coroutine
 install (
     FILES
