@@ -289,11 +289,17 @@ void Code::print(ostream &out)
         case Opcode::Import:
             printer.add_line(i, "Import", OPRAND(string));
             break;
-        case Opcode::ImportPart:
-            printer.add_line(i, "ImportPart", OPRAND(string));
+        case Opcode::ImportPath:
+            printer.add_line(i, "ImportPath", OPRAND(string));
             break;
         case Opcode::ImportAll:
             printer.add_line(i, "ImportAll", OPRAND(string));
+            break;
+        case Opcode::ImportAllPath:
+            printer.add_line(i, "ImportAllPath", OPRAND(string));
+            break;
+        case Opcode::ImportPart:
+            printer.add_line(i, "ImportPart", OPRAND(string));
             break;
 
         case Opcode::Load:
@@ -509,8 +515,10 @@ void Code::serialize(ostream &out)
             break;
 
         case Opcode::Import:
-        case Opcode::ImportPart:
+        case Opcode::ImportPath:
         case Opcode::ImportAll:
+        case Opcode::ImportAllPath:
+        case Opcode::ImportPart:
         case Opcode::Load:
         case Opcode::LoadMember:
         case Opcode::StoreRef:
@@ -621,8 +629,10 @@ void Code::unserialize(ifstream &in)
             break;
 
         case Opcode::Import:
-        case Opcode::ImportPart:
+        case Opcode::ImportPath:
         case Opcode::ImportAll:
+        case Opcode::ImportAllPath:
+        case Opcode::ImportPart:
         case Opcode::Load:
         case Opcode::LoadMember:
         case Opcode::StoreRef:

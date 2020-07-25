@@ -11,8 +11,10 @@ enum Opcode
     Pop,          // Pop
 
     Import,       // Import name
-    ImportPart,   // ImportPart name
+    ImportPath,   // ImportPath path
     ImportAll,    // ImportAll name
+    ImportAllPath,// ImportAllPath path
+    ImportPart,   // ImportPart name
 
     Load,         // Load name
     LoadConst,    // LoadConst index
