@@ -494,27 +494,50 @@ void QuesExpr::codegen(Code &code)
 
 void UseStmt::codegen(Code &code)
 {
-    if (from.empty())
+    if (from.type == Module::Type::Null)
     {
-        for (auto &name_as : names)
+        for (auto &alias : aliases)
         {
-            code.add_ins<Opcode::Import>(name_as.first);
-            code.add_ins<Opcode::StoreRef>(name_as.second);
+            if (alias.first.type == Module::Type::Name)
+            {
+                code.add_ins<Opcode::Import>(alias.first.mod);
+            }
+            else
+            {
+                code.add_ins<Opcode::ImportPath>(alias.first.mod);
+            }
+            code.add_ins<Opcode::StoreRef>(alias.second);
         }
     }
     else
     {
-        if (names.empty())
+        // means `use *`
+        if (aliases.empty())
         {
-            code.add_ins<Opcode::ImportAll>(from);
+            if (from.type == Module::Type::Name)
+            {
+                code.add_ins<Opcode::ImportAll>(from.mod);
+            }
+            else
+            {
+                code.add_ins<Opcode::ImportAllPath>(from.mod);
+            }
         }
         else
         {
-            code.add_ins<Opcode::Import>(from);
-            for (auto &name_as : names)
+            if (from.type == Module::Type::Name)
             {
-                code.add_ins<Opcode::ImportPart>(name_as.first);
-                code.add_ins<Opcode::StoreRef>(name_as.second);
+                code.add_ins<Opcode::Import>(from.mod);
+            }
+            else
+            {
+                code.add_ins<Opcode::ImportPath>(from.mod);
+            }
+
+            for (auto &alias : aliases)
+            {
+                code.add_ins<Opcode::ImportPart>(alias.first.mod);
+                code.add_ins<Opcode::StoreRef>(alias.second);
             }
             code.add_ins<Opcode::Pop>();
         }
