@@ -3,6 +3,7 @@
 #endif
 #include <set>
 #include <fstream>
+#include <filesystem>
 #include "error.hpp"
 #include "parser.hpp"
 #include "context.hpp"
@@ -89,11 +90,20 @@ void import_handle()
     ++theCurrentContext->pc();
 }
 
-void importpart_handle()
+void importpath_handle()
 {
-    const auto &name = OPRAND(string);
-    theCurrentContext->push_address(
-        theCurrentContext->top<ModuleObject>()->load_member(name));
+    auto path = filesystem::path(OPRAND(string));
+    if (path.is_relative())
+    {
+        path = theCurrentContext->current_path() / path;
+    }
+    auto mod = ModuleObject::generate(path);
+    if (!mod->good())
+    {
+        throw RuntimeError("no such module: " + path.string());
+    }
+
+    theCurrentContext->push(move(mod));
     ++theCurrentContext->pc();
 }
 
@@ -128,6 +138,52 @@ void importall_handle()
         theCurrentContext->scope()->create_symbol(
             name, cpp_mod->load_member(name));
     }
+    ++theCurrentContext->pc();
+}
+
+void importallpath_handle()
+{
+    auto path = filesystem::path(OPRAND(string));
+    if (path.is_relative())
+    {
+        path = theCurrentContext->current_path() / path;
+    }
+
+    auto anole_mod = make_shared<AnoleModuleObject>(path);
+    if (anole_mod->good())
+    {
+        for (const auto &name_ptr : anole_mod->scope()->symbols())
+        {
+            theCurrentContext->scope()->create_symbol(
+                name_ptr.first, name_ptr.second);
+        }
+        ++theCurrentContext->pc();
+        return;
+    }
+
+    auto cpp_mod = make_shared<CppModuleObject>(path);
+    if (!cpp_mod->good())
+    {
+        throw RuntimeError("no such module: " + path.string());
+    }
+    auto names = cpp_mod->names();
+    if (!names)
+    {
+        throw RuntimeError("no defined _FUNCTIONS in C++ source");
+    }
+    for (const auto &name : *names)
+    {
+        theCurrentContext->scope()->create_symbol(
+            name, cpp_mod->load_member(name));
+    }
+    ++theCurrentContext->pc();
+}
+
+void importpart_handle()
+{
+    const auto &name = OPRAND(string);
+    theCurrentContext->push_address(
+        theCurrentContext->top<ModuleObject>()->load_member(name));
     ++theCurrentContext->pc();
 }
 
@@ -542,8 +598,10 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::pop_handle,
 
     &op_handles::import_handle,
-    &op_handles::importpart_handle,
+    &op_handles::importpath_handle,
     &op_handles::importall_handle,
+    &op_handles::importallpath_handle,
+    &op_handles::importpart_handle,
 
     &op_handles::load_handle,
     &op_handles::loadconst_handle,
