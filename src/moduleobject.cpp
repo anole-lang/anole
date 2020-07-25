@@ -147,11 +147,11 @@ void AnoleModuleObject::init(const filesystem::path &path)
 CppModuleObject::CppModuleObject(const string &name)
 {
     auto path = theCurrentContext->current_path() / (name + ".so");
-    handle_ = dlopen(path.c_str(), RTLD_NOW);
+    handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
     if (!handle_)
     {
         auto path = "/usr/local/lib/anole/" + name + ".so";
-        handle_ = dlopen(path.c_str(), RTLD_NOW);
+        handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
     }
     good_ = handle_;
     names_ = good_
@@ -161,7 +161,7 @@ CppModuleObject::CppModuleObject(const string &name)
 
 CppModuleObject::CppModuleObject(const fs::path &path)
 {
-    handle_ = dlopen(path.c_str(), RTLD_NOW);
+    handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
     good_ = handle_;
     names_ = good_
         ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
@@ -178,14 +178,14 @@ CppModuleObject::~CppModuleObject()
 
 Address CppModuleObject::load_member(const string &name)
 {
-    using FuncType = void (*)();
+    using FuncType = void (*)(size_t);
     auto func = reinterpret_cast<FuncType>(dlsym(handle_, name.c_str()));
     if (!func)
     {
         throw RuntimeError(dlerror());
     }
     auto result = make_shared<BuiltInFunctionObject>(
-        [mod = shared_from_this(), func](size_t) { func(); });
+        [mod = shared_from_this(), func](size_t n) { func(n); });
     return make_shared<ObjectPtr>(result);
 }
 }
