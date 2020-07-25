@@ -32,7 +32,7 @@
 }
 
 @co_yield() {
-    call_with_current_continuation(_co_cont);
+    call_with_current_continuation(__co_cont);
 }
 
 @co_destroy(id) {
