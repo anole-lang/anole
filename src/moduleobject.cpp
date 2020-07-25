@@ -6,7 +6,7 @@
 #include "builtinfuncobject.hpp"
 
 using namespace std;
-using namespace filesystem;
+namespace fs = filesystem;
 using namespace chrono_literals;
 
 namespace anole
@@ -20,7 +20,20 @@ SPtr<ModuleObject> ModuleObject::generate(const string &name)
     {
         mod = make_shared<CppModuleObject>(name);
     }
+    return mod;
+}
 
+SPtr<ModuleObject> ModuleObject::generate(const fs::path &path)
+{
+    SPtr<ModuleObject> mod;
+    if (path.extension() == ".so")
+    {
+        mod = make_shared<CppModuleObject>(path);
+    }
+    else
+    {
+        mod = make_shared<AnoleModuleObject>(path);
+    }
     return mod;
 }
 
@@ -34,21 +47,43 @@ AnoleModuleObject::AnoleModuleObject(const string &name)
     */
 
     auto cpath = theCurrentContext->current_path();
-    if (is_regular_file(cpath / (name + ".anole")))
+    if (fs::is_regular_file(cpath / (name + ".anole")))
     {
         init(cpath / (name + ".anole"));
     }
-    else if (is_directory(cpath / name))
+    else if (fs::is_directory(cpath / name))
     {
         init(cpath / name / "__init__.anole");
     }
-    else if (is_regular_file(path("/usr/local/lib/anole") / (name + ".anole")))
+    else if (fs::is_regular_file(fs::path("/usr/local/lib/anole") / (name + ".anole")))
     {
-        init(path("/usr/local/lib/anole") / (name + ".anole"));
+        init(fs::path("/usr/local/lib/anole") / (name + ".anole"));
     }
-    else if (is_directory(path("/usr/local/lib/anole") / name))
+    else if (fs::is_directory(fs::path("/usr/local/lib/anole") / name))
     {
-        init(path("/usr/local/lib/anole") / name / "__init__.anole");
+        init(fs::path("/usr/local/lib/anole") / name / "__init__.anole");
+    }
+    else
+    {
+        good_ = false;
+    }
+}
+
+AnoleModuleObject::AnoleModuleObject(const fs::path &path)
+{
+    good_ = true;
+
+    /**
+     * support "/path/to/mod.anole"
+     *  and "/path/to/mod" with "/path/to/mod/__init__.anole"
+    */
+    if (path.extension() == ".anole")
+    {
+        init(path);
+    }
+    else if (fs::is_directory(path))
+    {
+        init(path / "__init__.anole");
     }
     else
     {
@@ -75,8 +110,8 @@ void AnoleModuleObject::init(const filesystem::path &path)
     theCurrentContext = make_shared<Context>(code_, dir);
     theCurrentContext->pre_context() = origin;
 
-    if (is_regular_file(ir_path)
-        and last_write_time(ir_path) >= last_write_time(path))
+    if (fs::is_regular_file(ir_path)
+        and fs::last_write_time(ir_path) >= fs::last_write_time(path))
     {
         code_->unserialize(ir_path);
         Context::execute();
@@ -118,6 +153,15 @@ CppModuleObject::CppModuleObject(const string &name)
         auto path = "/usr/local/lib/anole/" + name + ".so";
         handle_ = dlopen(path.c_str(), RTLD_NOW);
     }
+    good_ = handle_;
+    names_ = good_
+        ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
+        : nullptr;
+}
+
+CppModuleObject::CppModuleObject(const fs::path &path)
+{
+    handle_ = dlopen(path.c_str(), RTLD_NOW);
     good_ = handle_;
     names_ = good_
         ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))

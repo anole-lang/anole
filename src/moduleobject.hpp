@@ -19,6 +19,7 @@ class ModuleObject : public Object
     }
 
     static SPtr<ModuleObject> generate(const std::string &name);
+    static SPtr<ModuleObject> generate(const std::filesystem::path &path);
 
   protected:
     bool good_;
@@ -28,8 +29,7 @@ class AnoleModuleObject : public ModuleObject
 {
   public:
     AnoleModuleObject(const std::string &name);
-    AnoleModuleObject(SPtr<Scope> scope)
-      : scope_(scope) {}
+    AnoleModuleObject(const std::filesystem::path &path);
     Address load_member(const std::string &name) override;
 
     const SPtr<Scope> &scope() const
@@ -54,6 +54,7 @@ class CppModuleObject
 {
   public:
     CppModuleObject(const std::string &name);
+    CppModuleObject(const std::filesystem::path &path);
     ~CppModuleObject();
     Address load_member(const std::string &name) override;
 
