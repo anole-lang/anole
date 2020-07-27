@@ -15,7 +15,7 @@ using namespace std;
 
 namespace
 {
-sigjmp_buf env;
+sigjmp_buf lc_env;
 
 string read_line(const char * str)
 {
@@ -34,7 +34,7 @@ void handle_sigint(int)
     cout << "\b \b\b \b\nKeyboard Interrupt\n";
     rl_on_new_line();
     rl_replace_line("", 0);
-    siglongjmp(env, 1);
+    siglongjmp(lc_env, 1);
 }
 }
 
@@ -75,7 +75,7 @@ R"(    _                _
         parser.cont();
     });
 
-    sigsetjmp(env, 1);
+    sigsetjmp(lc_env, 1);
     for(;;) try
     {
         do
