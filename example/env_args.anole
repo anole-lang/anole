@@ -1,0 +1,3 @@
+use env;
+
+println(env.args());
