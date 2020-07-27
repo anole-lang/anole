@@ -47,7 +47,7 @@ void __read_dir(size_t n)
     auto paths = make_shared<ListObject>();
     for (auto &p : fs::directory_iterator(path))
     {
-        paths->append(make_shared<PathObject>(p.path()));
+        paths->append(make_shared<PathObject>(p.path().lexically_normal()));
     }
 
     theCurrentContext->push(paths);
