@@ -29,24 +29,40 @@ SPtr<Context> theCurrentContext = nullptr;
 
 namespace
 {
-map<Address, string> not_defineds;
-stack<size_t> call_anchors;
+vector<char *> lc_args;
+map<Address, string> lc_not_defineds;
+stack<size_t> lc_call_anchors;
+}
+
+void
+Context::set_args(int argc, char *argv[], int start)
+{
+    for (; start < argc; ++start)
+    {
+        lc_args.push_back(argv[start]);
+    }
+}
+
+const vector<char *>
+&Context::get_args()
+{
+    return lc_args;
 }
 
 void
 Context::add_not_defined_symbol(
     const string &name, const Address &ptr)
 {
-    not_defineds[ptr] = name;
+    lc_not_defineds[ptr] = name;
 }
 
 void
 Context::rm_not_defined_symbol(
     const Address &ptr)
 {
-    if (not_defineds.count(ptr))
+    if (lc_not_defineds.count(ptr))
     {
-        not_defineds.erase(ptr);
+        lc_not_defineds.erase(ptr);
     }
 }
 
@@ -54,18 +70,18 @@ const string
 &Context::get_not_defined_symbol(
     const Address &ptr)
 {
-    return not_defineds[ptr];
+    return lc_not_defineds[ptr];
 }
 
 void Context::set_callex_anchor()
 {
-    call_anchors.push(stack_->size());
+    lc_call_anchors.push(stack_->size());
 }
 
 size_t Context::get_callex_args_num()
 {
-    auto n = stack_->size() - call_anchors.top();
-    call_anchors.pop();
+    auto n = stack_->size() - lc_call_anchors.top();
+    lc_call_anchors.pop();
     return n;
 }
 

@@ -50,6 +50,9 @@ class Context : public std::enable_shared_from_this<Context>
       , stack_(pre->stack_)
       , current_path_(pre->current_path_) {}
 
+    static void set_args(int argc, char *argv[], int start);
+    static const std::vector<char *> &get_args();
+
     static void execute();
 
     static void
@@ -165,7 +168,7 @@ class Context : public std::enable_shared_from_this<Context>
     {
         return current_path_;
     }
-    
+
     void set_callex_anchor();
     std::size_t get_callex_args_num();
 
