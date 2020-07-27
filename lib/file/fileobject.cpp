@@ -30,7 +30,7 @@ void __open(size_t n)
 namespace
 {
 map<string, function<void(SPtr<FileObject> &)>>
-builtin_methods
+lc_builtin_methods
 {
     {"good", [](SPtr<FileObject> &obj)
         {
@@ -132,8 +132,8 @@ FileObject::FileObject(const string &path, int64_t mode)
 
 Address FileObject::load_member(const string &name)
 {
-    auto method = builtin_methods.find(name);
-    if (method != builtin_methods.end())
+    auto method = lc_builtin_methods.find(name);
+    if (method != lc_builtin_methods.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
