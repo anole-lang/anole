@@ -58,6 +58,11 @@ class Argument
         value_ = implict_value_;
     }
 
+    bool is_implict()
+    {
+        return implict_value_.has_value();
+    }
+
     template<typename T = std::string>
     T get()
     {
@@ -100,13 +105,21 @@ class ArgumentParser
             {
                 arguments_[pit++->first].consume(value);
             }
-            else if (i < argc and argv[i][0] != '-')
-            {
-                arguments_[keys_[get_main(value)]].consume(argv[i++]);
-            }
             else
             {
-                arguments_[keys_[get_main(value)]].set_implict_value();
+                auto &arg = arguments_[keys_[get_main(value)]];
+                if (arg.is_implict())
+                {
+                    arg.set_implict_value();
+                }
+                else if (i < argc and argv[i][0] != '-')
+                {
+                    arg.consume(argv[i++]);
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
     }
