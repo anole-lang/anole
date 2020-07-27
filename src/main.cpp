@@ -1,4 +1,5 @@
 #include <fstream>
+#include <algorithm>
 #include "code.hpp"
 #include "repl.hpp"
 #include "parser.hpp"
@@ -11,6 +12,29 @@ using namespace anole;
 
 namespace fs = std::filesystem;
 
+namespace
+{
+bool ends_with(const string_view &str,
+    const string_view &target)
+{
+    if (str.size() < target.size())
+    {
+        return false;
+    }
+
+    for (size_t i = 0, j = str.size() - target.size();
+        i < target.size(); ++i, ++j)
+    {
+        if (target[i] != str[j])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+}
+
 int main(int argc, char *argv[])
 {
     if (argc == 1)
@@ -19,12 +43,28 @@ int main(int argc, char *argv[])
     }
     else
     {
+        /**
+         * find where the first anole file is
+         *  anole [-r] (file) [arg1[ arg2[ ...]]]
+         * just find it by the extension ".anole"
+        */
+        int file_pos;
+        for (file_pos = 0; file_pos < argc; ++file_pos)
+        {
+            if (ends_with(argv[file_pos], ".anole"sv))
+            {
+                break;
+            }
+        }
+
         ArgumentParser parser("anole");
         parser.add_argument("file");
         parser.add_argument("-r")
               .default_value(false)
               .implict_value(true);
-        parser.parse(argc, argv);
+        parser.parse(min(file_pos + 1, argc), argv);
+
+        Context::set_args(argc, argv, file_pos);
 
         auto path = fs::path(parser.get("file"));
         theCurrentContext = make_shared<Context>(make_shared<Code>(),
