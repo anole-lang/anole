@@ -140,6 +140,23 @@ install (
     DESTINATION "lib/anole/file"
 )
 
+#install lib env
+add_library(env SHARED
+    lib/env/env.cpp
+)
+
+install (
+    FILES
+    "lib/env/__init__.anole"
+    DESTINATION "lib/anole/env"
+)
+
+install (
+    TARGETS
+        env
+    DESTINATION "lib/anole/env"
+)
+
 #install lib os
 install (
     FILES
