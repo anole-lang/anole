@@ -324,9 +324,15 @@ void return_handle()
     auto pre_context = theCurrentContext->pre_context();
     if (theCurrentContext->get_stack() != pre_context->get_stack())
     {
+        Context::StackType temp;
         for (size_t i = 0; i < n; ++i)
         {
-            pre_context->push_address(theCurrentContext->pop_address());
+            temp.push(theCurrentContext->pop_address());
+        }
+        for (size_t i = 0; i < n; ++i)
+        {
+            pre_context->push_address(temp.top());
+            temp.pop();
         }
     }
     theCurrentContext = pre_context;

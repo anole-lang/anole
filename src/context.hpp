@@ -14,10 +14,9 @@ namespace anole
 // Context should be contructed by make_shared
 class Context : public std::enable_shared_from_this<Context>
 {
-  private:
+  public:
     using StackType = std::stack<Address>;
 
-  public:
     // this for resume from ContObject
     Context(SPtr<Context> resume)
       : pre_context_(resume->pre_context_)
