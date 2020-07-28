@@ -325,23 +325,23 @@ void Code::print(ostream &out)
             printer.add_line(i, "NewScope");
             break;
 
+        case Opcode::CallAc:
+            printer.add_line(i, "CallAc");
+            break;
         case Opcode::Call:
-            printer.add_line(i, "Call", OPRAND(size_t));
+            printer.add_line(i, "Call");
             break;
-        case Opcode::CallTail:
-            printer.add_line(i, "CallTail", OPRAND(size_t));
+        case Opcode::FastCall:
+            printer.add_line(i, "FastCall");
             break;
-        case Opcode::CallExAnchor:
-            printer.add_line(i, "CallExAnchor");
-            break;
-        case Opcode::CallEx:
-            printer.add_line(i, "CallEx");
-            break;
-        case Opcode::CallExTail:
-            printer.add_line(i, "CallExTail");
+        case Opcode::ReturnAc:
+            printer.add_line(i, "ReturnAc");
             break;
         case Opcode::Return:
-            printer.add_line(i, "Return", OPRAND(size_t));
+            printer.add_line(i, "Return");
+            break;
+        case Opcode::ReturnNone:
+            printer.add_line(i, "ReturnNone");
             break;
         case Opcode::Jump:
             printer.add_line(i, "Jump", OPRAND(size_t));
@@ -501,9 +501,6 @@ void Code::serialize(ostream &out)
         switch (ins.opcode)
         {
         case Opcode::LoadConst:
-        case Opcode::Call:
-        case Opcode::CallTail:
-        case Opcode::Return:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
@@ -611,9 +608,6 @@ void Code::unserialize(ifstream &in)
         switch (opcode)
         {
         case Opcode::LoadConst:
-        case Opcode::Call:
-        case Opcode::CallTail:
-        case Opcode::Return:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
