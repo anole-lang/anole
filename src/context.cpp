@@ -32,6 +32,7 @@ namespace
 vector<char *> lc_args;
 map<Address, string> lc_not_defineds;
 stack<size_t> lc_call_anchors;
+stack<size_t> lc_return_anchors;
 }
 
 void
@@ -73,15 +74,27 @@ const string
     return lc_not_defineds[ptr];
 }
 
-void Context::set_callex_anchor()
+void Context::set_call_anchor()
 {
     lc_call_anchors.push(stack_->size());
 }
 
-size_t Context::get_callex_args_num()
+size_t Context::get_call_args_num()
 {
     auto n = stack_->size() - lc_call_anchors.top();
     lc_call_anchors.pop();
+    return n;
+}
+
+void Context::set_return_anchor()
+{
+    lc_return_anchors.push(stack_->size());
+}
+
+size_t Context::get_return_vals_num()
+{
+    auto n = stack_->size() - lc_return_anchors.top();
+    lc_return_anchors.pop();
     return n;
 }
 
@@ -283,35 +296,31 @@ void newscope_handle()
     ++theCurrentContext->pc();
 }
 
-void call_handle()
+void callac_handle()
 {
-    theCurrentContext->pop()->call(OPRAND(size_t));
-}
-
-void calltail_handle()
-{
-    theCurrentContext->pop()->call_tail(OPRAND(size_t));
-}
-
-void callexanchor_handle()
-{
-    theCurrentContext->set_callex_anchor();
+    theCurrentContext->set_call_anchor();
     ++theCurrentContext->pc();
 }
 
-void callex_handle()
+void call_handle()
 {
-    theCurrentContext->pop()->call(theCurrentContext->get_callex_args_num());
+    theCurrentContext->pop()->call(theCurrentContext->get_call_args_num());
 }
 
-void callextail_handle()
+void fastcall_handle()
 {
-    theCurrentContext->pop()->call_tail(theCurrentContext->get_callex_args_num());
+    theCurrentContext->pop()->call(0);
+}
+
+void returnac_handle()
+{
+    theCurrentContext->set_return_anchor();
+    ++theCurrentContext->pc();
 }
 
 void return_handle()
 {
-    auto n = OPRAND(size_t);
+    auto n = theCurrentContext->get_return_vals_num();
     auto pre_context = theCurrentContext->pre_context();
     if (theCurrentContext->get_stack() != pre_context->get_stack())
     {
@@ -321,6 +330,13 @@ void return_handle()
         }
     }
     theCurrentContext = pre_context;
+    ++theCurrentContext->pc();
+}
+
+void returnnone_handle()
+{
+    theCurrentContext = theCurrentContext->pre_context();
+    theCurrentContext->push(theNone);
     ++theCurrentContext->pc();
 }
 
@@ -628,12 +644,12 @@ constexpr OpHandle theOpHandles[] =
 
     &op_handles::newscope_handle,
 
+    &op_handles::callac_handle,
     &op_handles::call_handle,
-    &op_handles::calltail_handle,
-    &op_handles::callexanchor_handle,
-    &op_handles::callex_handle,
-    &op_handles::callextail_handle,
+    &op_handles::fastcall_handle,
+    &op_handles::returnac_handle,
     &op_handles::return_handle,
+    &op_handles::returnnone_handle,
     &op_handles::jump_handle,
     &op_handles::jumpif_handle,
     &op_handles::jumpifnot_handle,
