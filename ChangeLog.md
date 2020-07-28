@@ -5,11 +5,22 @@
 ### Added
 
 - Support use direct path of module like `use * from "/path/to/module"`, `use "/path/to/module" as mod` and `use part as alias from "/path/to/module"`
-- Instruction `ImportPath/ImportAllPath` to use module with its path directly
+- Instructions `ImportPath/ImportAllPath` to use module with its path directly
+- Instructions `ReturnAc/Return` to hold all return situations
+- Instruction `FastCall` for call expression without arguments
+- Instruction `ReturnNone` for implicit return none
 
 ### Updated
 
 - Dict will create an empty target if the given key is not recorded
+
+### Changed
+
+- Rename Instructions `CallExAnchor/CallEx` to `CallAc/Call`
+
+### Removed
+
+- Remove old Instructions `Call/CallTail/CallExTail/Return` because call expression may return multi values and there are many complex situation
 
 ## 0.0.15 - 2020/07/17
 
