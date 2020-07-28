@@ -18,12 +18,6 @@ void BuiltInFunctionObject::call(size_t n)
     ++theCurrentContext->pc();
 }
 
-void BuiltInFunctionObject::call_tail(size_t n)
-{
-    func_(n);
-    ++theCurrentContext->pc();
-}
-
 namespace
 {
 map<string, SPtr<BuiltInFunctionObject>> &get_built_in_functions()

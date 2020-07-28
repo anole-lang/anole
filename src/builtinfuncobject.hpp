@@ -25,7 +25,6 @@ class BuiltInFunctionObject : public Object
 
     std::string to_str() override;
     void call(std::size_t num) override;
-    void call_tail(std::size_t num) override;
 
     static ObjectPtr load_built_in_function(const std::string &);
     static void register_built_in_function(const std::string &,

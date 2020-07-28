@@ -26,16 +26,4 @@ void ContObject::call(size_t n)
     theCurrentContext->push(retval);
     ++theCurrentContext->pc();
 }
-
-void ContObject::call_tail(size_t n)
-{
-    if (n != 1)
-    {
-        throw RuntimeError("continuation need a argument");
-    }
-    auto retval = theCurrentContext->pop();
-    theCurrentContext = make_shared<Context>(resume_);
-    theCurrentContext->push(retval);
-    ++theCurrentContext->pc();
-}
 }

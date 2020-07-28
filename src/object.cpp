@@ -116,9 +116,4 @@ void Object::call(std::size_t arg_num)
 {
     throw RuntimeError("failed call with the given non-function");
 }
-
-void Object::call_tail(std::size_t arg_num)
-{
-    throw RuntimeError("failed call with the given non-function");
-}
 }

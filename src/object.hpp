@@ -63,7 +63,6 @@ class Object
     virtual Address index(ObjectPtr);
     virtual Address load_member(const std::string &name);
     virtual void call(std::size_t num);
-    virtual void call_tail(std::size_t num);
 
   private:
     ObjectType type_;
