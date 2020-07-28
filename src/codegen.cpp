@@ -88,48 +88,26 @@ void IdentifierExpr::codegen(Code &code)
 
 void ParenOperatorExpr::codegen(Code &code)
 {
-    bool ex = false;
-    for (auto &arg : args)
+    if (args.empty())
     {
-        ex |= arg.second;
-        /**
-         * for example:
-         *  @foo(): 1, 2;
-         *  @bar(a, b): b, a;
-         *  bar(foo());
-         * so extended call should be generated when there is call-expr in arguments
-        */
-        if (dynamic_cast<ParenOperatorExpr *>(arg.first.get()))
-        {
-            ex = true;
-        }
+        expr->codegen(code);
+        code.mapping(pos);
+        code.add_ins<Opcode::FastCall>();
+        return;
     }
 
-    if (!ex)
+    code.add_ins<Opcode::CallAc>();
+    for (auto it = args.rbegin(); it != args.rend(); ++it)
     {
-        for (auto it = args.rbegin(); it != args.rend(); ++it)
+        (*it).first->codegen(code);
+        if ((*it).second)
         {
-            (*it).first->codegen(code);
+            code.add_ins<Opcode::Unpack>();
         }
-        expr->codegen(code);
-        code.mapping(pos);
-        code.add_ins<Opcode::Call>(args.size());
     }
-    else
-    {
-        code.add_ins<Opcode::CallExAnchor>();
-        for (auto it = args.rbegin(); it != args.rend(); ++it)
-        {
-            (*it).first->codegen(code);
-            if ((*it).second)
-            {
-                code.add_ins<Opcode::Unpack>();
-            }
-        }
-        expr->codegen(code);
-        code.mapping(pos);
-        code.add_ins<Opcode::CallEx>();
-    }
+    expr->codegen(code);
+    code.mapping(pos);
+    code.add_ins<Opcode::Call>();
 }
 
 void UnaryOperatorExpr::codegen(Code &code)
@@ -163,25 +141,10 @@ void UnaryOperatorExpr::codegen(Code &code)
 
     default:
     {
-        bool ex = false;
-        if (dynamic_cast<ParenOperatorExpr*>(expr.get()))
-        {
-            ex = true;
-        }
-
-        if (ex)
-        {
-            code.add_ins<Opcode::CallExAnchor>();
-            expr->codegen(code);
-            code.add_ins<Opcode::Load>(op.value);
-            code.add_ins<Opcode::CallEx>();
-        }
-        else
-        {
-            expr->codegen(code);
-            code.add_ins<Opcode::Load>(op.value);
-            code.add_ins<Opcode::Call>(size_t(1));
-        }
+        code.add_ins<Opcode::CallAc>();
+        expr->codegen(code);
+        code.add_ins<Opcode::Load>(op.value);
+        code.add_ins<Opcode::Call>();
     }
         break;
     }
@@ -351,11 +314,12 @@ void BinaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
+        code.add_ins<Opcode::CallAc>();
         rhs->codegen(code);
         lhs->codegen(code);
         code.add_ins<Opcode::Load>(op.value);
         code.mapping(pos);
-        code.add_ins<Opcode::Call>(size_t(2));
+        code.add_ins<Opcode::Call>();
         break;
     }
 }
@@ -377,8 +341,7 @@ void LambdaExpr::codegen(Code &code)
     }
     block->codegen(code);
 
-    make_unique<NoneExpr>()->codegen(code);
-    code.add_ins<Opcode::Return>(size_t(1));
+    code.add_ins<Opcode::ReturnNone>();
     code.set_ins<Opcode::LambdaDecl>(o1, make_pair(parameters.size(), code.size()));
 }
 
@@ -635,29 +598,12 @@ void ContinueStmt::codegen(Code &code)
 
 void ReturnStmt::codegen(Code &code)
 {
+    code.add_ins<Opcode::ReturnAc>();
     for (auto expr = exprs.rbegin(); expr != exprs.rend(); ++expr)
     {
         (*expr)->codegen(code);
     }
-
-    code.add_ins<Opcode::Return>(exprs.size());
-
-    auto &opcode = code.opcode_at(code.size() - 2);
-    if (opcode == Opcode::Call)
-    {
-        opcode = Opcode::CallTail;
-    }
-    else if (opcode == Opcode::CallEx)
-    {
-        opcode = Opcode::CallExTail;
-    }
-
-    /**
-     * Instruction Return cannot be deleted
-     * because if return cond ? true_expr, false_expr,
-     * it will not return if false_expr is a tail call
-     * while true_expr is not
-    */
+    code.add_ins<Opcode::Return>();
 }
 
 void IfElseStmt::codegen(Code &code)
@@ -717,7 +663,7 @@ void ForeachStmt::codegen(Code &code)
 {
     expr->codegen(code);
     code.add_ins<Opcode::LoadMember>("__iterator__"s);
-    code.add_ins<Opcode::Call>(size_t(0));
+    code.add_ins<Opcode::FastCall>();
     code.add_ins<Opcode::StoreRef>("__it"s);
 
     auto cond = make_unique<ParenOperatorExpr>(
