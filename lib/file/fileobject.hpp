@@ -2,11 +2,6 @@
 #include <fstream>
 #include "../../src/object.hpp"
 
-extern "C"
-{
-void __open(std::size_t);
-}
-
 namespace anole
 {
 class FileObject : public Object, public std::enable_shared_from_this<FileObject>

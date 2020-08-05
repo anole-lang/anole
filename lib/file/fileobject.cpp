@@ -8,6 +8,8 @@
 using namespace std;
 using namespace anole;
 
+extern "C"
+{
 void __open(size_t n)
 {
     if (n != 2)
@@ -25,6 +27,7 @@ void __open(size_t n)
                 reinterpret_cast<IntegerObject *>(mode.get())->value()
             )
         );
+}
 }
 
 namespace
