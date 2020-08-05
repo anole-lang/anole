@@ -7,10 +7,6 @@ using namespace anole;
 
 extern "C"
 {
-extern vector<string> _FUNCTIONS;
-void __current_path(size_t);
-}
-
 vector<string> _FUNCTIONS
 {
     "__current_path"s
@@ -29,6 +25,7 @@ void __current_path(size_t n)
                 fs::current_path()
             )
         );
+}
 }
 
 namespace
