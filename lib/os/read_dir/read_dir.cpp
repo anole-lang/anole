@@ -12,10 +12,6 @@ using namespace anole;
 
 extern "C"
 {
-extern vector<string> _FUNCTIONS;
-void __read_dir(size_t);
-}
-
 vector<string> _FUNCTIONS
 {
     "__read_dir"s
@@ -51,4 +47,5 @@ void __read_dir(size_t n)
     }
 
     theCurrentContext->push(paths);
+}
 }
