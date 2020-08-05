@@ -9,10 +9,6 @@ using namespace anole;
 
 extern "C"
 {
-extern vector<string> _FUNCTIONS;
-void __args(size_t);
-}
-
 vector<string> _FUNCTIONS
 {
     "__args"s
@@ -34,4 +30,5 @@ void __args(size_t n)
     }
 
     theCurrentContext->push(args);
+}
 }
