@@ -15,7 +15,7 @@ namespace anole
  *
  * YYYY/MM/DD is the date when the last commit is committed
 */
-constexpr auto theVersion = "HEAD 0.0.17 2020/08/07";
+constexpr auto theVersion = "0.0.17 2020/08/07";
 
 /**
  * theMagic stands for version of IR
