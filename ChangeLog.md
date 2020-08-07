@@ -4,7 +4,7 @@
 
 ### Added
 
-- Add magic number in the head of .ir file
+- Add magic number in the head of .ir file to stand for the version of IR
 - Add command-line argument `--version` to print the version of anole
 
 ## 0.0.16 - 2020/07/28
