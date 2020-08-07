@@ -2,6 +2,7 @@
 #include <fstream>
 #include "base.hpp"
 #include "code.hpp"
+#include "version.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 #include "floatobject.hpp"
@@ -467,9 +468,10 @@ void Code::serialize(const filesystem::path &path)
     serialize(fout);
 }
 
-// out should be opened by binary mode
 void Code::serialize(ostream &out)
 {
+    typeout(out, theMagic);
+
     typeouts(out, constants_literals_.size(),
                   instructions_.size(),
                   mapping_.size());
@@ -552,18 +554,23 @@ void Code::serialize(ostream &out)
     }
 }
 
-void Code::unserialize(const filesystem::path &path)
+bool Code::unserialize(const filesystem::path &path)
 {
     ifstream fin{path};
-    unserialize(fin);
+    return unserialize(fin);
 }
 
-// in should be opened by binary mode
-void Code::unserialize(ifstream &in)
+bool Code::unserialize(ifstream &in)
 {
+    Magic magic; typein(in, magic);
+    if (magic != theMagic)
+    {
+        return false;
+    }
+
     Size constants_size = 0,
-           instructions_size = 0,
-           mapping_size = 0;
+        instructions_size = 0,
+        mapping_size = 0;
     typeins(in, constants_size, instructions_size, mapping_size);
 
     while (constants_size --> 0)
@@ -670,5 +677,6 @@ void Code::unserialize(ifstream &in)
         mapping_[line] = { pf, ps };
     }
 
+    return true;
 }
 }

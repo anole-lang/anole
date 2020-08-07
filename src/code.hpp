@@ -107,8 +107,10 @@ class Code
     void serialize(const std::filesystem::path &path);
     void serialize(std::ostream &out);
 
-    void unserialize(const std::filesystem::path &path);
-    void unserialize(std::ifstream &in);
+    bool unserialize(const std::filesystem::path &path);
+    bool unserialize(std::ifstream &in);
+
+    void clear();
 
   private:
     String from_;
