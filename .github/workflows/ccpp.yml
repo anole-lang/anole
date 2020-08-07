@@ -25,6 +25,7 @@ jobs:
           make test
       - name: make install
         run: |
+          mkdir build
           cd build
           cmake ..
           make install
