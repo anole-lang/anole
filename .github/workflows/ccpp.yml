@@ -21,5 +21,7 @@ jobs:
           sudo make
           sudo cp *.a /usr/lib
       - name: make test
-        run:
+        run: |
           make test -j
+          cd example
+          bash test.sh
