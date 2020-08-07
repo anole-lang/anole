@@ -111,9 +111,9 @@ void AnoleModuleObject::init(const filesystem::path &path)
     theCurrentContext->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
-        and fs::last_write_time(ir_path) >= fs::last_write_time(path))
+        and fs::last_write_time(ir_path) >= fs::last_write_time(path)
+        and code_->unserialize(ir_path))
     {
-        code_->unserialize(ir_path);
         Context::execute();
     }
     else
@@ -134,6 +134,7 @@ void AnoleModuleObject::init(const filesystem::path &path)
 
         code_->serialize(ir_path);
     }
+
     #ifdef _DEBUG
     auto rd_path = path;
     rd_path += ".rd";
