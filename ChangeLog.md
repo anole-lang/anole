@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+
+- Add magic number in the head of .ir file
+- Add command-line argument `--version` to print the version of anole
+
 ## 0.0.16 - 2020/07/28
 
 ### Added
