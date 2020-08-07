@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <sstream>
 #include <iostream>
 #include <setjmp.h>
@@ -9,6 +10,7 @@
 #include "code.hpp"
 #include "repl.hpp"
 #include "parser.hpp"
+#include "version.hpp"
 #include "context.hpp"
 #include "noneobject.hpp"
 
@@ -48,13 +50,13 @@ void replrun::run()
     rl_bind_key('\t', rl_insert);
     // read_history(NULL);
 
-    cout <<
-R"(    _                _
+    printf(R"(    _                _
    / \   _ __   ___ | | ___
   / _ \ | '_ \ / _ \| |/ _ \
- / ___ \| | | | (_) | |  __/    Version 0.0.17
+ / ___ \| | | | (_) | |  __/    %s
 /_/   \_\_| |_|\___/|_|\___|
-)"  << endl;
+
+)",                             theVersion);
 
     AST::interpretive() = true;
 
