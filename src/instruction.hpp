@@ -1,6 +1,8 @@
 #pragma once
 
 #include <any>
+#include <variant>
+#include "base.hpp"
 
 namespace anole
 {

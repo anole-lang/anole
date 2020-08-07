@@ -8,7 +8,7 @@ using namespace std;
 
 namespace anole
 {
-Parser::Parser(istream &in, string name_of_in)
+Parser::Parser(istream &in, String name_of_in)
   : tokenizer_(in, name_of_in)
 {
     get_next_token();
@@ -55,11 +55,11 @@ set<TokenType> unary_ops
     TokenType::Not, TokenType::Sub, TokenType::BNeg
 };
 
-vector<size_t> bop_priorities
+vector<Size> bop_priorities
 {
     100, 110, 120, 130, 140, 150, 160, 170, 180, 190
 };
-map<size_t, set<TokenType>> bop_mapping
+map<Size, set<TokenType>> bop_mapping
 {
     { 100, { TokenType::Or } },
     { 110, { TokenType::And } },
@@ -73,7 +73,7 @@ map<size_t, set<TokenType>> bop_mapping
     { 190, { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod } }
 };
 
-set<TokenType> &bops_at_priority(size_t priority)
+set<TokenType> &bops_at_priority(Size priority)
 {
     if (!bop_mapping.count(priority))
     {
@@ -82,13 +82,13 @@ set<TokenType> &bops_at_priority(size_t priority)
     return bop_mapping[priority];
 }
 
-set<TokenType> &bops_at_layer(size_t layer)
+set<TokenType> &bops_at_layer(Size layer)
 {
     return bop_mapping[bop_priorities[layer]];
 }
 }
 
-void Parser::add_prefixop(const string &str)
+void Parser::add_prefixop(const String &str)
 {
     auto type = Token::add_token_type(str);
     if (type <= TokenType::End)
@@ -99,7 +99,7 @@ void Parser::add_prefixop(const string &str)
     operators::unary_ops.insert(type);
 }
 
-void Parser::add_infixop(const string &str, size_t priority)
+void Parser::add_infixop(const String &str, Size priority)
 {
     auto type = Token::add_token_type(str);
     if (type <= TokenType::End)
@@ -117,7 +117,7 @@ void Parser::add_infixop(const string &str, size_t priority)
     operators::bops_at_priority(priority).insert(type);
 }
 
-void Parser::throw_err(const string &err_info)
+void Parser::throw_err(const String &err_info)
 {
     throw CompileError(get_err_info(err_info));
 }
@@ -137,7 +137,7 @@ void Parser::try_continue()
     }
 }
 
-std::string Parser::get_err_info(const string &message)
+String Parser::get_err_info(const String &message)
 {
     return tokenizer_.get_err_info(message);
 }
@@ -528,7 +528,7 @@ Ptr<Stmt> Parser::gen_prefixop_decl()
 Ptr<Stmt> Parser::gen_infixop_decl()
 {
     get_next_token();
-    size_t priority = 50;
+    Size priority = 50;
     if (current_token_.type == TokenType::Integer)
     {
         priority = stoull(current_token_.value);
@@ -765,7 +765,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
     }
 
     // parse unary operation or term expression
-    if (size_t(layer) == operators::bop_priorities.size())
+    if (Size(layer) == operators::bop_priorities.size())
     {
         if (operators::unary_ops.count(current_token_.type))
         {
@@ -786,7 +786,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
     auto lhs = gen_expr(layer + 1);
     auto op = current_token_;
     // user `if` if right-associative
-    while (operators::bops_at_layer(size_t(layer)).count(op.type))
+    while (operators::bops_at_layer(Size(layer)).count(op.type))
     {
         auto pos = tokenizer_.last_pos();
         get_next_token();

@@ -2,11 +2,11 @@
 
 #include <any>
 #include <map>
-#include <string>
 #include <vector>
 #include <iostream>
 #include <exception>
 #include <functional>
+#include "base.hpp"
 
 namespace anole
 {
@@ -14,15 +14,15 @@ class Argument
 {
   public:
     using ActionType =
-        std::function<std::any(const std::string &)>;
+        std::function<std::any(const String &)>;
 
     Argument()
-      : action_([](const std::string &value) { return value; })
+      : action_([](const String &value) { return value; })
     {
         // ...
     }
 
-    Argument &help(std::string info)
+    Argument &help(String info)
     {
         help_info_ = std::move(info);
         return *this;
@@ -48,7 +48,7 @@ class Argument
         return *this;
     }
 
-    void consume(const std::string &value)
+    void consume(const String &value)
     {
         value_ = action_(value);
     }
@@ -63,13 +63,13 @@ class Argument
         return implict_value_.has_value();
     }
 
-    template<typename T = std::string>
+    template<typename T = String>
     T get()
     {
         return std::any_cast<T>(value_);
     }
 
-    const std::string &help_info() const
+    const String &help_info() const
     {
         return help_info_;
     }
@@ -77,7 +77,7 @@ class Argument
   private:
     std::any value_;
     std::any implict_value_;
-    std::string help_info_;
+    String help_info_;
     ActionType action_;
 };
 
@@ -86,7 +86,7 @@ class ArgumentParser
   public:
     ArgumentParser() = default;
 
-    ArgumentParser(std::string program)
+    ArgumentParser(String program)
       : program_(std::move(program)) {}
 
     void parse(int argc, char *argv[])
@@ -100,7 +100,7 @@ class ArgumentParser
         auto pit = positional_arguments_.begin();
         while (i < argc)
         {
-            std::string value = argv[i++];
+            String value = argv[i++];
             if (value[0] != '-')
             {
                 arguments_[pit++->first].consume(value);
@@ -157,7 +157,7 @@ class ArgumentParser
     }
 
     template<typename ...Ts>
-    Argument &add_argument(const std::string &key,
+    Argument &add_argument(const String &key,
         const Ts & ...keys)
     {
         if (key.empty())
@@ -179,15 +179,15 @@ class ArgumentParser
         return arguments_[k];
     }
 
-    template<typename V = std::string>
-    V get(const std::string &key)
+    template<typename V = String>
+    V get(const String &key)
     {
         return arguments_[keys_[key]].get<V>();
     }
 
   private:
     Argument &add_positional_argument(
-        const std::string &key)
+        const String &key)
     {
         auto k = arguments_.size();
         positional_arguments_[k] = key;
@@ -198,7 +198,7 @@ class ArgumentParser
 
     template<typename ...Ts>
     void add_optional_argument(
-        const std::string &key,
+        const String &key,
         const Ts & ...keys)
     {
         auto k = arguments_.size();
@@ -211,7 +211,7 @@ class ArgumentParser
     }
 
     // assume arg starts with '-'
-    std::string get_main(const std::string &arg)
+    String get_main(const String &arg)
     {
         if (arg[1] == '-')
         {
@@ -220,10 +220,10 @@ class ArgumentParser
         return arg.substr(1);
     }
 
-    std::string program_;
-    std::map<std::string, std::size_t> keys_;
-    std::map<std::size_t, std::string> positional_arguments_;
-    std::map<std::size_t, std::vector<std::string>> optional_arguments_;
-    std::map<std::size_t, Argument> arguments_;
+    String program_;
+    std::map<String, Size> keys_;
+    std::map<Size, String> positional_arguments_;
+    std::map<Size, std::vector<String>> optional_arguments_;
+    std::map<Size, Argument> arguments_;
 };
 }

@@ -10,7 +10,7 @@ using namespace anole;
 
 extern "C"
 {
-void __open(size_t n)
+void __open(Size n)
 {
     if (n != 2)
     {
@@ -32,7 +32,7 @@ void __open(size_t n)
 
 namespace
 {
-map<string, function<void(SPtr<FileObject> &)>>
+map<String, function<void(SPtr<FileObject> &)>>
 lc_builtin_methods
 {
     {"good", [](SPtr<FileObject> &obj)
@@ -59,12 +59,12 @@ lc_builtin_methods
         {
             theCurrentContext->push(
                 make_shared<StringObject>(
-                    string(1, obj->file().get())));
+                    String(1, obj->file().get())));
         }
     },
     {"readline", [](SPtr<FileObject> &obj)
         {
-            string line;
+            String line;
             std::getline(obj->file(), line);
             theCurrentContext->push(
                 make_shared<StringObject>(line));
@@ -100,7 +100,7 @@ lc_builtin_methods
 };
 }
 
-FileObject::FileObject(const string &path, int64_t mode)
+FileObject::FileObject(const String &path, int64_t mode)
 {
     static const ios_base::openmode mapping[6]
     {
@@ -133,7 +133,7 @@ FileObject::FileObject(const string &path, int64_t mode)
     file_.open(path, mod);
 }
 
-Address FileObject::load_member(const string &name)
+Address FileObject::load_member(const String &name)
 {
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
@@ -141,7 +141,7 @@ Address FileObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second](size_t) mutable
+                &func = method->second](Size) mutable
             {
                 func(ptr);
             })

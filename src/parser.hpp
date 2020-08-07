@@ -10,7 +10,7 @@ class Parser
 {
   public:
     Parser(std::istream & = std::cin,
-        std::string = "<stdin>");
+        String = "<stdin>");
     void cont();
     void reset();
     void set_continue_action(std::function<void()>);
@@ -18,20 +18,20 @@ class Parser
     Ptr<AST> gen_statements();
 
     // add new prefix operator
-    static void add_prefixop(const std::string &str);
+    static void add_prefixop(const String &str);
     // add new infix operator with priority
-    static void add_infixop(const std::string &str,
-        std::size_t priority);
+    static void add_infixop(const String &str,
+        Size priority);
 
   private:
     Token current_token_;
     Tokenizer tokenizer_;
     std::function<void()> continue_action_;
 
-    void throw_err(const std::string &err_info);
+    void throw_err(const String &err_info);
 
     template<TokenType type>
-    void check(const std::string &err_info)
+    void check(const String &err_info)
     {
         try_continue();
         if (current_token_.type != type)
@@ -41,7 +41,7 @@ class Parser
     }
 
     template<TokenType type>
-    void eat(const std::string &err_info = "")
+    void eat(const String &err_info = "")
     {
         check<type>(err_info);
         get_next_token();
@@ -49,7 +49,7 @@ class Parser
 
     Token &get_next_token();
     void try_continue();
-    std::string get_err_info(const std::string &message);
+    String get_err_info(const String &message);
 
     IdentList gen_idents();
     ArgumentList gen_arguments();

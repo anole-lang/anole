@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <string>
 #include <functional>
 #include "object.hpp"
 
@@ -9,7 +8,7 @@
     __attribute__((constructor)) static void F_##NAME () \
     { \
         BuiltInFunctionObject::register_built_in_function(#NAME, \
-            [](std::size_t n) \
+            [](Size n) \
                 FUNC \
         ); \
     }
@@ -19,18 +18,18 @@ namespace anole
 class BuiltInFunctionObject : public Object
 {
   public:
-    BuiltInFunctionObject(std::function<void(std::size_t)> func)
+    BuiltInFunctionObject(std::function<void(Size)> func)
       : Object(ObjectType::BuiltinFunc)
       , func_(std::move(func)) {}
 
-    std::string to_str() override;
-    void call(std::size_t num) override;
+    String to_str() override;
+    void call(Size num) override;
 
-    static ObjectPtr load_built_in_function(const std::string &);
-    static void register_built_in_function(const std::string &,
-        std::function<void(std::size_t)>);
+    static ObjectPtr load_built_in_function(const String &);
+    static void register_built_in_function(const String &,
+        std::function<void(Size)>);
 
   private:
-    std::function<void(std::size_t)> func_;
+    std::function<void(Size)> func_;
 };
 }

@@ -10,7 +10,7 @@ class ThunkObject : public Object
 {
   public:
     ThunkObject(SPtr<Scope> pre_scope,
-        SPtr<Code> code, std::size_t base)
+        SPtr<Code> code, Size base)
       : Object(ObjectType::Thunk)
       , computed_(false)
       , scope_(std::make_shared<Scope>(pre_scope))
@@ -25,13 +25,13 @@ class ThunkObject : public Object
     Address result() { return result_; }
     SPtr<Scope> scope() { return scope_; }
     SPtr<Code> code() { return code_; }
-    std::size_t base() { return base_; }
+    Size base() { return base_; }
 
   private:
     bool computed_;
     Address result_;
     SPtr<Scope> scope_;
     SPtr<Code> code_;
-    std::size_t base_;
+    Size base_;
 };
 }

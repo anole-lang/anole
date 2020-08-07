@@ -14,12 +14,12 @@ bool IntegerObject::to_bool()
     return value_;
 }
 
-string IntegerObject::to_str()
+String IntegerObject::to_str()
 {
     return to_string(value_);
 }
 
-string IntegerObject::to_key()
+String IntegerObject::to_key()
 {
     return 'i' + to_str();
 }
@@ -216,12 +216,12 @@ ObjectPtr IntegerObject::brs(ObjectPtr obj)
     }
 }
 
-Address IntegerObject::load_member(const string &name)
+Address IntegerObject::load_member(const String &name)
 {
     if (name == "to_str")
     {
         return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([val = value_](size_t)
+            make_shared<BuiltInFunctionObject>([val = value_](Size)
             {
                 theCurrentContext
                     ->push(make_shared<StringObject>(to_string(val)));

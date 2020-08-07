@@ -12,7 +12,7 @@ namespace anole
 {
 namespace
 {
-map<string, function<void(SPtr<DictObject> &)>>
+map<String, function<void(SPtr<DictObject> &)>>
 builtin_methods
 {
     {"empty", [](SPtr<DictObject> &obj)
@@ -58,9 +58,9 @@ bool DictObject::to_bool()
     return !data_.empty();
 }
 
-string DictObject::to_str()
+String DictObject::to_str()
 {
-    string res = "{";
+    String res = "{";
     for (auto it = data_.begin();
         it != data_.end(); ++it)
     {
@@ -73,7 +73,7 @@ string DictObject::to_str()
     return res + " }";
 }
 
-string DictObject::to_key()
+String DictObject::to_key()
 {
     return 'd' + to_str();
 }
@@ -91,7 +91,7 @@ Address DictObject::index(ObjectPtr index)
     return data_[index] = make_shared<ObjectPtr>(nullptr);
 }
 
-Address DictObject::load_member(const string &name)
+Address DictObject::load_member(const String &name)
 {
     auto method = builtin_methods.find(name);
     if (method != builtin_methods.end())
@@ -99,7 +99,7 @@ Address DictObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second](size_t) mutable
+                &func = method->second](Size) mutable
             {
                 func(ptr);
             })

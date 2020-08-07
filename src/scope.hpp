@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <string>
 #include "object.hpp"
 #include "builtinfuncobject.hpp"
 
@@ -19,7 +18,7 @@ class Scope
         return pre_scope_;
     }
 
-    Address &create_symbol(const std::string &name)
+    Address &create_symbol(const String &name)
     {
         if (!symbols_.count(name))
         {
@@ -28,19 +27,19 @@ class Scope
         return symbols_[name];
     }
 
-    void create_symbol(const std::string &name, Address value)
+    void create_symbol(const String &name, Address value)
     {
         symbols_[name] = std::move(value);
     }
 
-    Address load_symbol(const std::string &name)
+    Address load_symbol(const String &name)
     {
         auto ptr = find_symbol(name);
         auto res = ptr ? ptr : load_builtin(name);
         return res ? res : create_symbol(name);
     }
 
-    Address load_builtin(const std::string &name)
+    Address load_builtin(const String &name)
     {
         if (auto func = BuiltInFunctionObject::load_built_in_function(name))
         {
@@ -49,13 +48,13 @@ class Scope
         return nullptr;
     }
 
-    const std::map<std::string, Address> &symbols()
+    const std::map<String, Address> &symbols()
     {
         return symbols_;
     }
 
   private:
-    Address find_symbol(const std::string &name)
+    Address find_symbol(const String &name)
     {
         auto res = symbols_.find(name);
         if (res != symbols_.end())
@@ -73,6 +72,6 @@ class Scope
     }
 
     SPtr<Scope> pre_scope_;
-    std::map<std::string, Address> symbols_;
+    std::map<String, Address> symbols_;
 };
 }

@@ -13,7 +13,7 @@ namespace anole
 {
 ModuleObject::~ModuleObject() = default;
 
-SPtr<ModuleObject> ModuleObject::generate(const string &name)
+SPtr<ModuleObject> ModuleObject::generate(const String &name)
 {
     SPtr<ModuleObject> mod = make_shared<AnoleModuleObject>(name);
     if (!mod->good())
@@ -37,7 +37,7 @@ SPtr<ModuleObject> ModuleObject::generate(const fs::path &path)
     return mod;
 }
 
-AnoleModuleObject::AnoleModuleObject(const string &name)
+AnoleModuleObject::AnoleModuleObject(const String &name)
 {
     good_ = true;
 
@@ -91,7 +91,7 @@ AnoleModuleObject::AnoleModuleObject(const fs::path &path)
     }
 }
 
-Address AnoleModuleObject::load_member(const string &name)
+Address AnoleModuleObject::load_member(const String &name)
 {
     if (scope_->symbols().count(name))
     {
@@ -144,7 +144,7 @@ void AnoleModuleObject::init(const filesystem::path &path)
     theCurrentContext = origin;
 }
 
-CppModuleObject::CppModuleObject(const string &name)
+CppModuleObject::CppModuleObject(const String &name)
 {
     auto path = theCurrentContext->current_path() / (name + ".so");
     handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
@@ -176,16 +176,16 @@ CppModuleObject::~CppModuleObject()
     }
 }
 
-Address CppModuleObject::load_member(const string &name)
+Address CppModuleObject::load_member(const String &name)
 {
-    using FuncType = void (*)(size_t);
+    using FuncType = void (*)(Size);
     auto func = reinterpret_cast<FuncType>(dlsym(handle_, name.c_str()));
     if (!func)
     {
         throw RuntimeError(dlerror());
     }
     auto result = make_shared<BuiltInFunctionObject>(
-        [mod = shared_from_this(), func](size_t n) { func(n); });
+        [mod = shared_from_this(), func](Size n) { func(n); });
     return make_shared<ObjectPtr>(result);
 }
 }

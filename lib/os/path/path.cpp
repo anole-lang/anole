@@ -7,12 +7,12 @@ using namespace anole;
 
 extern "C"
 {
-vector<string> _FUNCTIONS
+vector<String> _FUNCTIONS
 {
     "__current_path"s
 };
 
-void __current_path(size_t n)
+void __current_path(Size n)
 {
     if (n != 0)
     {
@@ -36,12 +36,12 @@ namespace
 PathObject::PathObject(fs::path path)
   : path_(move(path)) {}
 
-Address PathObject::load_member(const string &name)
+Address PathObject::load_member(const String &name)
 {
     return nullptr;
 }
 
-string PathObject::to_str()
+String PathObject::to_str()
 {
     return path_.string();
 }

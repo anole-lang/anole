@@ -12,12 +12,12 @@ using namespace anole;
 
 extern "C"
 {
-vector<string> _FUNCTIONS
+vector<String> _FUNCTIONS
 {
     "__read_dir"s
 };
 
-void __read_dir(size_t n)
+void __read_dir(Size n)
 {
     if (n != 1)
     {

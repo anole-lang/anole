@@ -30,9 +30,9 @@ SPtr<Context> theCurrentContext = nullptr;
 namespace
 {
 vector<char *> lc_args;
-map<Address, string> lc_not_defineds;
-stack<size_t> lc_call_anchors;
-stack<size_t> lc_return_anchors;
+map<Address, String> lc_not_defineds;
+stack<Size> lc_call_anchors;
+stack<Size> lc_return_anchors;
 }
 
 void
@@ -52,7 +52,7 @@ const vector<char *>
 
 void
 Context::add_not_defined_symbol(
-    const string &name, const Address &ptr)
+    const String &name, const Address &ptr)
 {
     lc_not_defineds[ptr] = name;
 }
@@ -67,7 +67,7 @@ Context::rm_not_defined_symbol(
     }
 }
 
-const string
+const String
 &Context::get_not_defined_symbol(
     const Address &ptr)
 {
@@ -79,7 +79,7 @@ void Context::set_call_anchor()
     lc_call_anchors.push(stack_->size());
 }
 
-size_t Context::get_call_args_num()
+Size Context::get_call_args_num()
 {
     auto n = stack_->size() - lc_call_anchors.top();
     lc_call_anchors.pop();
@@ -91,7 +91,7 @@ void Context::set_return_anchor()
     lc_return_anchors.push(stack_->size());
 }
 
-size_t Context::get_return_vals_num()
+Size Context::get_return_vals_num()
 {
     auto n = stack_->size() - lc_return_anchors.top();
     lc_return_anchors.pop();
@@ -108,7 +108,7 @@ void pop_handle()
 
 void import_handle()
 {
-    const auto &name = OPRAND(string);
+    const auto &name = OPRAND(String);
     auto mod = ModuleObject::generate(name);
     if (!mod->good())
     {
@@ -121,7 +121,7 @@ void import_handle()
 
 void importpath_handle()
 {
-    auto path = filesystem::path(OPRAND(string));
+    auto path = filesystem::path(OPRAND(String));
     if (path.is_relative())
     {
         path = theCurrentContext->current_path() / path;
@@ -138,7 +138,7 @@ void importpath_handle()
 
 void importall_handle()
 {
-    const auto &name = OPRAND(string);
+    const auto &name = OPRAND(String);
 
     auto anole_mod = make_shared<AnoleModuleObject>(name);
     if (anole_mod->good())
@@ -172,7 +172,7 @@ void importall_handle()
 
 void importallpath_handle()
 {
-    auto path = filesystem::path(OPRAND(string));
+    auto path = filesystem::path(OPRAND(String));
     if (path.is_relative())
     {
         path = theCurrentContext->current_path() / path;
@@ -210,7 +210,7 @@ void importallpath_handle()
 
 void importpart_handle()
 {
-    const auto &name = OPRAND(string);
+    const auto &name = OPRAND(String);
     theCurrentContext->push_address(
         theCurrentContext->top<ModuleObject>()->load_member(name));
     ++theCurrentContext->pc();
@@ -218,7 +218,7 @@ void importpart_handle()
 
 void load_handle()
 {
-    const auto &name = OPRAND(string);
+    const auto &name = OPRAND(String);
     auto obj = theCurrentContext->scope()->load_symbol(name);
 
     if (!*obj)
@@ -251,13 +251,13 @@ void load_handle()
 
 void loadconst_handle()
 {
-    theCurrentContext->push(theCurrentContext->code()->load_const(OPRAND(size_t)));
+    theCurrentContext->push(theCurrentContext->code()->load_const(OPRAND(Size)));
     ++theCurrentContext->pc();
 }
 
 void loadmember_handle()
 {
-    const auto &name = OPRAND(string);
+    const auto &name = OPRAND(String);
     auto address = theCurrentContext->pop()->load_member(name);
     if (!*address)
     {
@@ -279,13 +279,13 @@ void store_handle()
 void storeref_handle()
 {
     theCurrentContext->scope()->create_symbol(
-        OPRAND(string), theCurrentContext->pop_address());
+        OPRAND(String), theCurrentContext->pop_address());
     ++theCurrentContext->pc();
 }
 
 void storelocal_handle()
 {
-    *theCurrentContext->scope()->create_symbol(OPRAND(string))
+    *theCurrentContext->scope()->create_symbol(OPRAND(String))
         = theCurrentContext->pop();
     ++theCurrentContext->pc();
 }
@@ -325,11 +325,11 @@ void return_handle()
     if (theCurrentContext->get_stack() != pre_context->get_stack())
     {
         Context::StackType temp;
-        for (size_t i = 0; i < n; ++i)
+        for (Size i = 0; i < n; ++i)
         {
             temp.push(theCurrentContext->pop_address());
         }
-        for (size_t i = 0; i < n; ++i)
+        for (Size i = 0; i < n; ++i)
         {
             pre_context->push_address(temp.top());
             temp.pop();
@@ -348,14 +348,14 @@ void returnnone_handle()
 
 void jump_handle()
 {
-    theCurrentContext->pc() = OPRAND(size_t);
+    theCurrentContext->pc() = OPRAND(Size);
 }
 
 void jumpif_handle()
 {
     if (theCurrentContext->pop()->to_bool())
     {
-        theCurrentContext->pc() = OPRAND(size_t);
+        theCurrentContext->pc() = OPRAND(Size);
     }
     else
     {
@@ -367,7 +367,7 @@ void jumpifnot_handle()
 {
     if (!theCurrentContext->pop()->to_bool())
     {
-        theCurrentContext->pc() = OPRAND(size_t);
+        theCurrentContext->pc() = OPRAND(Size);
     }
     else
     {
@@ -381,7 +381,7 @@ void match_handle()
     if (theCurrentContext->top()->ceq(key)->to_bool())
     {
         theCurrentContext->pop();
-        theCurrentContext->pc() = OPRAND(size_t);
+        theCurrentContext->pc() = OPRAND(Size);
     }
     else
     {
@@ -391,13 +391,13 @@ void match_handle()
 
 void addprefixop_handle()
 {
-    Parser::add_prefixop(OPRAND(string));
+    Parser::add_prefixop(OPRAND(String));
     ++theCurrentContext->pc();
 }
 
 void addinfixop_handle()
 {
-    using type = pair<string, size_t>;
+    using type = pair<String, Size>;
     const auto &op_p = OPRAND(type);
     Parser::add_infixop(op_p.first, op_p.second);
     ++theCurrentContext->pc();
@@ -430,7 +430,7 @@ void unpack_handle()
 
 void lambdadecl_handle()
 {
-    using type = pair<size_t, size_t>;
+    using type = pair<Size, Size>;
     const auto &num_target = OPRAND(type);
     theCurrentContext->push(make_shared<FunctionObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
@@ -443,7 +443,7 @@ void thunkdecl_handle()
     theCurrentContext->push(make_shared<ThunkObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
         theCurrentContext->pc() + 1));
-    theCurrentContext->pc() = OPRAND(size_t);
+    theCurrentContext->pc() = OPRAND(Size);
 }
 
 void thunkover_handle()
@@ -604,7 +604,7 @@ void buildenum_handle()
 void buildlist_handle()
 {
     auto list = make_shared<ListObject>();
-    auto size = OPRAND(size_t);
+    auto size = OPRAND(Size);
     while (size--)
     {
         list->append(theCurrentContext->pop());
@@ -616,7 +616,7 @@ void buildlist_handle()
 void builddict_handle()
 {
     auto dict = make_shared<DictObject>();
-    auto size = OPRAND(size_t);
+    auto size = OPRAND(Size);
     while (size--)
     {
         auto key = theCurrentContext->pop();

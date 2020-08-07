@@ -12,8 +12,8 @@ class IntegerObject : public Object
       , value_(value) {}
 
     bool to_bool() override;
-    std::string to_str() override;
-    std::string to_key() override;
+    String to_str() override;
+    String to_key() override;
     ObjectPtr neg() override;
     ObjectPtr add(ObjectPtr) override;
     ObjectPtr sub(ObjectPtr) override;
@@ -30,7 +30,7 @@ class IntegerObject : public Object
     ObjectPtr band(ObjectPtr) override;
     ObjectPtr bls(ObjectPtr) override;
     ObjectPtr brs(ObjectPtr) override;
-    Address load_member(const std::string &name) override;
+    Address load_member(const String &name) override;
 
     int64_t value() const { return value_; }
 

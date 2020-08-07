@@ -9,7 +9,7 @@ using namespace std;
 
 namespace anole
 {
-string FunctionObject::to_str()
+String FunctionObject::to_str()
 {
     return "<function>"s;
 }
@@ -24,12 +24,12 @@ ObjectPtr FunctionObject::cne(ObjectPtr obj)
     return (this != obj.get()) ? theTrue : theFalse;
 }
 
-Address FunctionObject::load_member(const string &name)
+Address FunctionObject::load_member(const String &name)
 {
     return scope_->load_symbol(name);
 }
 
-void FunctionObject::call(size_t num)
+void FunctionObject::call(Size num)
 {
     theCurrentContext = make_shared<Context>(
         theCurrentContext, scope_, code_, base_);
@@ -62,7 +62,7 @@ void FunctionObject::call(size_t num)
                     --arg_num;
                 }
             }
-            *theCurrentContext->scope()->create_symbol(OPRAND(string))
+            *theCurrentContext->scope()->create_symbol(OPRAND(String))
                 = list;
         }
             ++pc;
@@ -70,7 +70,7 @@ void FunctionObject::call(size_t num)
             break;
 
         case Opcode::StoreRef:
-            theCurrentContext->scope()->create_symbol(OPRAND(string),
+            theCurrentContext->scope()->create_symbol(OPRAND(String),
                 theCurrentContext->pop_address());
             ++pc;
             --arg_num;
@@ -78,7 +78,7 @@ void FunctionObject::call(size_t num)
             break;
 
         case Opcode::StoreLocal:
-            *theCurrentContext->scope()->create_symbol(OPRAND(string))
+            *theCurrentContext->scope()->create_symbol(OPRAND(String))
                 = theCurrentContext->pop();
             ++pc;
             --arg_num;
@@ -87,12 +87,12 @@ void FunctionObject::call(size_t num)
 
         case Opcode::LambdaDecl:
         {
-            using type = pair<size_t, size_t>;
+            using type = pair<Size, Size>;
             pc = (OPRAND(type)).second;
         }
             break;
         case Opcode::ThunkDecl:
-            pc = OPRAND(size_t);
+            pc = OPRAND(Size);
             break;
 
         default:
@@ -122,7 +122,7 @@ void FunctionObject::call(size_t num)
         if (theCurrentContext->opcode() == Opcode::StoreRef
             or theCurrentContext->opcode() == Opcode::StoreLocal)
         {
-            throw RuntimeError("missing the parameter named '" + OPRAND(string) + '\'');
+            throw RuntimeError("missing the parameter named '" + OPRAND(String) + '\'');
         }
     }
 }

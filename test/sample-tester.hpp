@@ -9,7 +9,7 @@
 using namespace std;
 using namespace anole;
 
-inline string execute(const string &input)
+inline String execute(const String &input)
 {
     ostringstream out;
     auto backup = cout.rdbuf();

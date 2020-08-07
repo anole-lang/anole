@@ -13,7 +13,7 @@ namespace anole
 {
 namespace
 {
-map<string, function<void(SPtr<ListObject> &)>>
+map<String, function<void(SPtr<ListObject> &)>>
 builtin_methods_for_list
 {
     {"empty", [](SPtr<ListObject> &obj)
@@ -72,7 +72,7 @@ builtin_methods_for_list
     }
 };
 
-map<string, function<void(SPtr<ListIteratorObject> &)>>
+map<String, function<void(SPtr<ListIteratorObject> &)>>
 builtin_methods_for_listiterator
 {
     // used by foreach
@@ -96,9 +96,9 @@ bool ListObject::to_bool()
     return !objects_.empty();
 }
 
-string ListObject::to_str()
+String ListObject::to_str()
 {
-    string res = "[";
+    String res = "[";
     for (auto it = objects_.begin(); it != objects_.end(); ++it)
     {
         if (it != objects_.begin())
@@ -110,7 +110,7 @@ string ListObject::to_str()
     return res + "]";
 }
 
-string ListObject::to_key()
+String ListObject::to_key()
 {
     return 'l' + to_str();
 }
@@ -155,7 +155,7 @@ Address ListObject::index(ObjectPtr index)
     }
 }
 
-Address ListObject::load_member(const string &name)
+Address ListObject::load_member(const String &name)
 {
     auto method = builtin_methods_for_list.find(name);
     if (method != builtin_methods_for_list.end())
@@ -163,7 +163,7 @@ Address ListObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second](size_t) mutable
+                &func = method->second](Size) mutable
             {
                 func(ptr);
             })
@@ -182,7 +182,7 @@ void ListObject::append(ObjectPtr obj)
     objects_.push_back(make_shared<ObjectPtr>(obj));
 }
 
-Address ListIteratorObject::load_member(const string &name)
+Address ListIteratorObject::load_member(const String &name)
 {
     auto method = builtin_methods_for_listiterator.find(name);
     if (method != builtin_methods_for_listiterator.end())
@@ -190,7 +190,7 @@ Address ListIteratorObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second](size_t) mutable
+                &func = method->second](Size) mutable
             {
                 func(ptr);
             })

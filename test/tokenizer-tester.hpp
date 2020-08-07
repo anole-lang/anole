@@ -22,7 +22,7 @@ TEST_F(TokenizerTester, Origin)
 use from prefixop infixop if elif else
 while do foreach as break continue return
 match delay new enum dict none true false
-identifier 0123456789 0123456789.0123456789 "string"
+identifier 0123456789 0123456789.0123456789 "String"
 , . ... () [] {} : ; + - * / % & | ^ ~ << >>
 and or not ! is = != < <= > >= => ?)");
     for (int type = 0; type < TokenType::End; ++type)

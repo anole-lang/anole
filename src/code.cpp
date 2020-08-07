@@ -1,5 +1,6 @@
 #include <set>
 #include <fstream>
+#include "base.hpp"
 #include "code.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
@@ -10,6 +11,7 @@
 #define OPRAND(TYPE) (any_cast<const TYPE &>(ins.oprand))
 
 using namespace std;
+using namespace anole;
 
 namespace
 {
@@ -28,7 +30,7 @@ class Printer
         }
     }
 
-    void add_intro(string intro)
+    void add_intro(String intro)
     {
         lines_.push_back({intro});
     }
@@ -37,12 +39,12 @@ class Printer
     {
         for (auto &line : lines_)
         {
-            for (size_t i = 0; i < line.size(); ++i)
+            for (Size i = 0; i < line.size(); ++i)
             {
                 out_ << line[i];
                 if (i < line.size() - 1)
                 {
-                    out_ << string(lens_[i] - line[i].size(), ' ');
+                    out_ << String(lens_[i] - line[i].size(), ' ');
                 }
             }
             out_ << endl;
@@ -56,29 +58,29 @@ class Printer
     }
 
   private:
-    string gen_each(size_t value)
+    String gen_each(Size value)
     {
         return to_string(value);
     }
 
-    string gen_each(const char *value)
+    String gen_each(const char *value)
     {
         return value;
     }
 
-    string gen_each(string value)
+    String gen_each(String value)
     {
         return value;
     }
 
     template<typename T1, typename T2>
-    string gen_each(pair<T1, T2> value)
+    String gen_each(pair<T1, T2> value)
     {
         return "(" + gen_each(value.first) + ", " + gen_each(value.second) + ")";
     }
 
     template<typename T, typename ...Ts>
-    void gen_line(vector<string> &line, T arg, Ts ...args)
+    void gen_line(vector<String> &line, T arg, Ts ...args)
     {
         auto str = gen_each(arg);
         if (lens_.size() <= line.size())
@@ -97,21 +99,21 @@ class Printer
     }
 
     ostream &out_;
-    vector<vector<string>> lines_;
-    vector<size_t> lens_;
+    vector<vector<String>> lines_;
+    vector<Size> lens_;
 };
 
 template<typename T>
 void typeout(ostream &out, const T &value)
 {
     const char *chrs = reinterpret_cast<const char *>(&value);
-    for (size_t i = 0; i < sizeof(T); ++i)
+    for (Size i = 0; i < sizeof(T); ++i)
     {
         out.put(*chrs++);
     }
 }
 
-void typeout(ostream &out, const string &value)
+void typeout(ostream &out, const String &value)
 {
     typeout(out, value.size());
     for (const auto c : value)
@@ -142,16 +144,16 @@ void typein(istream &in, T &target)
 {
     char temp[sizeof(T)];
     char *p = temp;
-    for (size_t i = 0; i < sizeof(T); ++i)
+    for (Size i = 0; i < sizeof(T); ++i)
     {
         *p++ = in.get();
     }
     target = *(reinterpret_cast<T*>(temp));
 }
 
-void typein(istream &in, string &value)
+void typein(istream &in, String &value)
 {
-    size_t len;
+    Size len;
     typein(in, len);
     while (len--)
     {
@@ -178,24 +180,24 @@ void typein(istream &in, pair<T1, T2> &pir)
 
 namespace anole
 {
-Code::Code(string from)
+Code::Code(String from)
   : from_(move(from))
   , constants_{ theNone, theTrue, theFalse }
 {
     // ...
 }
 
-size_t Code::size()
+Size Code::size()
 {
     return instructions_.size();
 }
 
-void Code::push_break(size_t ind)
+void Code::push_break(Size ind)
 {
     breaks_.push_back(ind);
 }
 
-void Code::set_break_to(size_t ind, size_t base)
+void Code::set_break_to(Size ind, Size base)
 {
     decltype(breaks_) breaks;
     for (auto i : breaks_)
@@ -212,12 +214,12 @@ void Code::set_break_to(size_t ind, size_t base)
     breaks_ = breaks;
 }
 
-void Code::push_continue(size_t ind)
+void Code::push_continue(Size ind)
 {
     continues_.push_back(ind);
 }
 
-void Code::set_continue_to(size_t ind, size_t base)
+void Code::set_continue_to(Size ind, Size base)
 {
     decltype(continues_) continues;
     for (auto i : continues_)
@@ -244,7 +246,7 @@ bool Code::check()
     return true;
 }
 
-ObjectPtr Code::load_const(size_t ind)
+ObjectPtr Code::load_const(Size ind)
 {
     return constants_[ind];
 }
@@ -262,7 +264,7 @@ void Code::print(ostream &out)
     printer.add_intro("Constants:");
     printer.add_line("CI", "Value");
 
-    for (size_t i = 0; i < constants_literals_.size(); ++i)
+    for (Size i = 0; i < constants_literals_.size(); ++i)
     {
         printer.add_line(i + 3, constants_literals_[i]);
     }
@@ -274,7 +276,7 @@ void Code::print(ostream &out)
     printer.add_intro("Instructions:");
     printer.add_line("L", "Opcode", "Oprand");
 
-    for (size_t i = 0; i < instructions_.size(); ++i)
+    for (Size i = 0; i < instructions_.size(); ++i)
     {
         auto &ins = instructions_[i];
         switch (ins.opcode)
@@ -287,38 +289,38 @@ void Code::print(ostream &out)
             break;
 
         case Opcode::Import:
-            printer.add_line(i, "Import", OPRAND(string));
+            printer.add_line(i, "Import", OPRAND(String));
             break;
         case Opcode::ImportPath:
-            printer.add_line(i, "ImportPath", OPRAND(string));
+            printer.add_line(i, "ImportPath", OPRAND(String));
             break;
         case Opcode::ImportAll:
-            printer.add_line(i, "ImportAll", OPRAND(string));
+            printer.add_line(i, "ImportAll", OPRAND(String));
             break;
         case Opcode::ImportAllPath:
-            printer.add_line(i, "ImportAllPath", OPRAND(string));
+            printer.add_line(i, "ImportAllPath", OPRAND(String));
             break;
         case Opcode::ImportPart:
-            printer.add_line(i, "ImportPart", OPRAND(string));
+            printer.add_line(i, "ImportPart", OPRAND(String));
             break;
 
         case Opcode::Load:
-            printer.add_line(i, "Load", OPRAND(string));
+            printer.add_line(i, "Load", OPRAND(String));
             break;
         case Opcode::LoadConst:
-            printer.add_line(i, "LoadConst", OPRAND(size_t));
+            printer.add_line(i, "LoadConst", OPRAND(Size));
             break;
         case Opcode::LoadMember:
-            printer.add_line(i, "LoadMember", OPRAND(string));
+            printer.add_line(i, "LoadMember", OPRAND(String));
             break;
         case Opcode::Store:
             printer.add_line(i, "Store");
             break;
         case Opcode::StoreRef:
-            printer.add_line(i, "StoreRef", OPRAND(string));
+            printer.add_line(i, "StoreRef", OPRAND(String));
             break;
         case Opcode::StoreLocal:
-            printer.add_line(i, "StoreLocal", OPRAND(string));
+            printer.add_line(i, "StoreLocal", OPRAND(String));
             break;
 
         case Opcode::NewScope:
@@ -344,25 +346,25 @@ void Code::print(ostream &out)
             printer.add_line(i, "ReturnNone");
             break;
         case Opcode::Jump:
-            printer.add_line(i, "Jump", OPRAND(size_t));
+            printer.add_line(i, "Jump", OPRAND(Size));
             break;
         case Opcode::JumpIf:
-            printer.add_line(i, "JumpIf", OPRAND(size_t));
+            printer.add_line(i, "JumpIf", OPRAND(Size));
             break;
         case Opcode::JumpIfNot:
-            printer.add_line(i, "JumpIfNot", OPRAND(size_t));
+            printer.add_line(i, "JumpIfNot", OPRAND(Size));
             break;
         case Opcode::Match:
-            printer.add_line(i, "Match", OPRAND(size_t));
+            printer.add_line(i, "Match", OPRAND(Size));
             break;
 
         case Opcode::AddPrefixOp:
-            printer.add_line(i, "AddPrefixOp", OPRAND(string));
+            printer.add_line(i, "AddPrefixOp", OPRAND(String));
             break;
 
         case Opcode::AddInfixOp:
         {
-            using type = pair<string, size_t>;
+            using type = pair<String, Size>;
             printer.add_line(i, "AddInfixOp", OPRAND(type));
         }
             break;
@@ -376,12 +378,12 @@ void Code::print(ostream &out)
 
         case Opcode::LambdaDecl:
         {
-            using type = pair<size_t, size_t>;
+            using type = pair<Size, Size>;
             printer.add_line(i, "LambdaDecl", OPRAND(type));
         }
             break;
         case Opcode::ThunkDecl:
-            printer.add_line(i, "ThunkDecl", OPRAND(size_t));
+            printer.add_line(i, "ThunkDecl", OPRAND(Size));
             break;
         case Opcode::ThunkOver:
             printer.add_line(i, "ThunkOver");
@@ -449,10 +451,10 @@ void Code::print(ostream &out)
             printer.add_line(i, "BuildEnum");
             break;
         case Opcode::BuildList:
-            printer.add_line(i, "BuildList", OPRAND(size_t));
+            printer.add_line(i, "BuildList", OPRAND(Size));
             break;
         case Opcode::BuildDict:
-            printer.add_line(i, "BuildDict", OPRAND(size_t));
+            printer.add_line(i, "BuildDict", OPRAND(Size));
             break;
         }
     }
@@ -472,7 +474,7 @@ void Code::serialize(ostream &out)
                   instructions_.size(),
                   mapping_.size());
 
-    for (size_t i = 0; i < constants_literals_.size(); ++i)
+    for (Size i = 0; i < constants_literals_.size(); ++i)
     {
         auto &cl = constants_literals_[i];
         auto &obj = constants_[i + 3];
@@ -508,7 +510,7 @@ void Code::serialize(ostream &out)
         case Opcode::ThunkDecl:
         case Opcode::BuildList:
         case Opcode::BuildDict:
-            typeout(out, OPRAND(size_t));
+            typeout(out, OPRAND(Size));
             break;
 
         case Opcode::Import:
@@ -521,19 +523,19 @@ void Code::serialize(ostream &out)
         case Opcode::StoreRef:
         case Opcode::StoreLocal:
         case Opcode::AddPrefixOp:
-            typeout(out, OPRAND(string));
+            typeout(out, OPRAND(String));
             break;
 
         case Opcode::AddInfixOp:
         {
-            using type = pair<string, size_t>;
+            using type = pair<String, Size>;
             typeout(out, OPRAND(type));
         }
             break;
 
         case Opcode::LambdaDecl:
         {
-            using type = pair<size_t, size_t>;
+            using type = pair<Size, Size>;
             typeout(out, OPRAND(type));
         }
             break;
@@ -559,7 +561,7 @@ void Code::unserialize(const filesystem::path &path)
 // in should be opened by binary mode
 void Code::unserialize(ifstream &in)
 {
-    size_t constants_size = 0,
+    Size constants_size = 0,
            instructions_size = 0,
            mapping_size = 0;
     typeins(in, constants_size, instructions_size, mapping_size);
@@ -589,7 +591,7 @@ void Code::unserialize(ifstream &in)
 
         case 's':
         {
-            string val;
+            String val;
             typein(in, val);
             constants_literals_.push_back(type + val);
             constants_.push_back(make_shared<StringObject>(val));
@@ -616,7 +618,7 @@ void Code::unserialize(ifstream &in)
         case Opcode::BuildList:
         case Opcode::BuildDict:
         {
-            size_t val;
+            Size val;
             typein(in, val);
             oprand = val;
         }
@@ -633,7 +635,7 @@ void Code::unserialize(ifstream &in)
         case Opcode::StoreLocal:
         case Opcode::AddPrefixOp:
         {
-            string val;
+            String val;
             typein(in, val);
             oprand = val;
         }
@@ -641,7 +643,7 @@ void Code::unserialize(ifstream &in)
 
         case Opcode::AddInfixOp:
         {
-            pair<string, size_t> val;
+            pair<String, Size> val;
             typein(in, val);
             oprand = val;
         }
@@ -649,7 +651,7 @@ void Code::unserialize(ifstream &in)
 
         case Opcode::LambdaDecl:
         {
-            pair<size_t, size_t> val;
+            pair<Size, Size> val;
             typein(in, val);
             oprand = val;
         }
@@ -663,7 +665,7 @@ void Code::unserialize(ifstream &in)
 
     while (mapping_size --> 0)
     {
-        size_t line, pf, ps;
+        Size line, pf, ps;
         typeins(in, line, pf, ps);
         mapping_[line] = { pf, ps };
     }

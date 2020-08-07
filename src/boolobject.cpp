@@ -9,7 +9,7 @@ bool BoolObject::to_bool()
     return value_;
 }
 
-string BoolObject::to_str()
+String BoolObject::to_str()
 {
     return value_ ? "true" : "false";
 }

@@ -10,12 +10,12 @@ bool FloatObject::to_bool()
     return value_;
 }
 
-string FloatObject::to_str()
+String FloatObject::to_str()
 {
     return to_string(value_);
 }
 
-string FloatObject::to_key()
+String FloatObject::to_key()
 {
     return 'f' + to_str();
 }

@@ -9,12 +9,12 @@ using namespace anole;
 
 extern "C"
 {
-vector<string> _FUNCTIONS
+vector<String> _FUNCTIONS
 {
     "__args"s
 };
 
-void __args(size_t n)
+void __args(Size n)
 {
     if (n != 0)
     {
@@ -26,7 +26,7 @@ void __args(size_t n)
     auto args = make_shared<ListObject>();
     for (auto arg : raw_args)
     {
-        args->append(make_shared<StringObject>(string(arg)));
+        args->append(make_shared<StringObject>(String(arg)));
     }
 
     theCurrentContext->push(args);

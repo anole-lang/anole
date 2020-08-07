@@ -12,12 +12,12 @@ bool Object::to_bool()
     throw RuntimeError("cannot translate to bool");
 }
 
-string Object::to_str()
+String Object::to_str()
 {
     return "<no definition of to_str>";
 }
 
-string Object::to_key()
+String Object::to_key()
 {
     return 'p' + to_string(reinterpret_cast<uintptr_t>(this));
 }
@@ -107,12 +107,12 @@ Address Object::index(ObjectPtr)
     throw RuntimeError("not support index");
 }
 
-Address Object::load_member(const string &name)
+Address Object::load_member(const String &name)
 {
     throw RuntimeError("no member named " + name);
 }
 
-void Object::call(std::size_t arg_num)
+void Object::call(Size arg_num)
 {
     throw RuntimeError("failed call with the given non-function");
 }

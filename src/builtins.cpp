@@ -43,7 +43,7 @@ REGISTER_BUILTIN(call_with_current_continuation,
         theCurrentContext = make_shared<Context>(
             theCurrentContext, ptr->scope(), ptr->code(), ptr->base());
         // the base => StoreRef/StoreLocal
-        *theCurrentContext->scope()->create_symbol(any_cast<string>(theCurrentContext->oprand()))
+        *theCurrentContext->scope()->create_symbol(any_cast<String>(theCurrentContext->oprand()))
             = cont_obj;
     }
     else if (theCurrentContext->top()->type() == ObjectType::Cont)
@@ -91,7 +91,7 @@ REGISTER_BUILTIN(println,
 
 REGISTER_BUILTIN(input,
 {
-    string line;
+    String line;
     std::getline(cin, line);
     theCurrentContext->push(make_shared<StringObject>(line));
 });

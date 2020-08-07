@@ -22,7 +22,7 @@ bool ends_with(const string_view &str,
         return false;
     }
 
-    for (size_t i = 0, j = str.size() - target.size();
+    for (Size i = 0, j = str.size() - target.size();
         i < target.size(); ++i, ++j)
     {
         if (target[i] != str[j])

@@ -1,14 +1,14 @@
 #include <set>
 #include <cctype>
+#include "base.hpp"
 #include "error.hpp"
-#include "helper.hpp"
 #include "tokenizer.hpp"
 
 using namespace std;
 
 namespace anole
 {
-Tokenizer::Tokenizer(istream &in, string name_of_in)
+Tokenizer::Tokenizer(istream &in, String name_of_in)
   : cur_line_num_(1), last_line_num_(1)
   , cur_char_at_line_(0), last_char_at_line_(0)
   , input_stream_(in), name_of_in_(move(name_of_in))
@@ -97,7 +97,7 @@ Token Tokenizer::next()
     last_line_num_ = cur_line_num_;
 
     Ptr<Token> token = nullptr;
-    string value;
+    String value;
     while (!token)
     {
         switch (state)
@@ -365,7 +365,7 @@ Token Tokenizer::next()
     return move(*token);
 }
 
-std::string Tokenizer::get_err_info(const string &message)
+String Tokenizer::get_err_info(const String &message)
 {
     auto line = (cur_line_num_ != last_line_num_)
         ? pre_line_ : cur_line_;
@@ -376,7 +376,7 @@ std::string Tokenizer::get_err_info(const string &message)
             + to_string(last_char_at_line_) + ": ") +
         info::warning("error: ") + message + "\n" +
         line + "\n" +
-        string(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ')
+        String(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ')
             + info::warning("^");
 }
 }

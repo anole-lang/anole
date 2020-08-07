@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "base.hpp"
 
 namespace anole
 {
@@ -92,16 +92,16 @@ using token_type::TokenType;
 struct Token
 {
     Token() = default;
-    explicit Token(TokenType type, std::string value = "");
-    explicit Token(std::string value);
+    explicit Token(TokenType type, String value = "");
+    explicit Token(String value);
     Token(Token &&other) noexcept;
     Token(const Token &other);
     Token &operator=(Token &&other) noexcept;
     Token &operator=(const Token &other);
 
-    static TokenType add_token_type(const std::string &str);
+    static TokenType add_token_type(const String &str);
 
     TokenType type;
-    std::string value;
+    String value;
 };
 }

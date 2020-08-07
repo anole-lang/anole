@@ -1,12 +1,12 @@
 #include "error.hpp"
-#include "helper.hpp"
+#include "base.hpp"
 #include "context.hpp"
 
 using namespace std;
 
 namespace anole
 {
-CompileError::CompileError(string err)
+CompileError::CompileError(String err)
   : err_(err)
 {
     while (theCurrentContext and theCurrentContext->pre_context())
@@ -27,7 +27,7 @@ const char *CompileError::what() const noexcept
     return err_.c_str();
 }
 
-RuntimeError::RuntimeError(const string &err)
+RuntimeError::RuntimeError(const String &err)
 {
     auto &mapping = theCurrentContext->code()->mapping();
     if (mapping.count(theCurrentContext->pc()))

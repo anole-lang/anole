@@ -9,7 +9,7 @@ namespace anole
 {
 namespace
 {
-map<string, function<void(SPtr<StringObject> &)>>
+map<String, function<void(SPtr<StringObject> &)>>
 builtin_methods
 {
     {"size", [](SPtr<StringObject> &obj)
@@ -40,12 +40,12 @@ bool StringObject::to_bool()
     return !value_.empty();
 }
 
-string StringObject::to_str()
+String StringObject::to_str()
 {
     return value_;
 }
 
-string StringObject::to_key()
+String StringObject::to_key()
 {
     return "s" + to_str();
 }
@@ -121,7 +121,7 @@ Address StringObject::index(ObjectPtr index)
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(index);
         return make_shared<ObjectPtr>(
-            make_shared<StringObject>(string(1, value_[p->value()]))
+            make_shared<StringObject>(String(1, value_[p->value()]))
         );
     }
     else
@@ -130,7 +130,7 @@ Address StringObject::index(ObjectPtr index)
     }
 }
 
-Address StringObject::load_member(const string &name)
+Address StringObject::load_member(const String &name)
 {
     auto method = builtin_methods.find(name);
     if (method != builtin_methods.end())
@@ -138,7 +138,7 @@ Address StringObject::load_member(const string &name)
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
                 ptr = shared_from_this(),
-                &func = method->second](size_t) mutable
+                &func = method->second](Size) mutable
             {
                 func(ptr);
             })

@@ -45,12 +45,12 @@ void BlockExpr::codegen(Code &code)
 
 void NoneExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::LoadConst, size_t>(0);
+    code.add_ins<Opcode::LoadConst, Size>(0);
 }
 
 void IntegerExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::LoadConst>(
+    code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<IntegerObject>(
             'i' + to_string(value), value
         )
@@ -59,7 +59,7 @@ void IntegerExpr::codegen(Code &code)
 
 void FloatExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::LoadConst>(
+    code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<FloatObject>(
             'f' + to_string(value), value
         )
@@ -68,12 +68,12 @@ void FloatExpr::codegen(Code &code)
 
 void BoolExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::LoadConst, size_t>(value ? 1 : 2);
+    code.add_ins<Opcode::LoadConst, Size>(value ? 1 : 2);
 }
 
 void StringExpr::codegen(Code &code)
 {
-    code.add_ins<Opcode::LoadConst>(
+    code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<StringObject>(
             's' + value, value
         )
@@ -83,7 +83,7 @@ void StringExpr::codegen(Code &code)
 void IdentifierExpr::codegen(Code &code)
 {
     code.mapping(pos);
-    code.add_ins<Opcode::Load>(name);
+    code.add_ins<Opcode::Load, String>(name);
 }
 
 void ParenOperatorExpr::codegen(Code &code)
@@ -125,11 +125,11 @@ void UnaryOperatorExpr::codegen(Code &code)
         expr->codegen(code);
         code.mapping(pos);
         auto o1 = code.add_ins();
-        code.add_ins<Opcode::LoadConst, size_t>(1); // theTrue
+        code.add_ins<Opcode::LoadConst, Size>(1); // theTrue
         auto o2 = code.add_ins();
-        code.set_ins<Opcode::JumpIf>(o1, code.size());
-        code.add_ins<Opcode::LoadConst, size_t>(2); // theFalse
-        code.set_ins<Opcode::Jump>(o2, code.size());
+        code.set_ins<Opcode::JumpIf, Size>(o1, code.size());
+        code.add_ins<Opcode::LoadConst, Size>(2); // theFalse
+        code.set_ins<Opcode::Jump, Size>(o2, code.size());
     }
         break;
 
@@ -143,7 +143,7 @@ void UnaryOperatorExpr::codegen(Code &code)
     {
         code.add_ins<Opcode::CallAc>();
         expr->codegen(code);
-        code.add_ins<Opcode::Load>(op.value);
+        code.add_ins<Opcode::Load, String>(op.value);
         code.add_ins<Opcode::Call>();
     }
         break;
@@ -238,12 +238,12 @@ void BinaryOperatorExpr::codegen(Code &code)
         rhs->codegen(code);
         code.mapping(pos);
         auto o2 = code.add_ins();
-        code.add_ins<Opcode::LoadConst, size_t>(1);
+        code.add_ins<Opcode::LoadConst, Size>(1);
         auto o3 = code.add_ins();
-        code.set_ins<Opcode::JumpIfNot>(o1, code.size());
-        code.set_ins<Opcode::JumpIfNot>(o2, code.size());
-        code.add_ins<Opcode::LoadConst, size_t>(2);
-        code.set_ins<Opcode::Jump>(o3, code.size());
+        code.set_ins<Opcode::JumpIfNot, Size>(o1, code.size());
+        code.set_ins<Opcode::JumpIfNot, Size>(o2, code.size());
+        code.add_ins<Opcode::LoadConst, Size>(2);
+        code.set_ins<Opcode::Jump, Size>(o3, code.size());
     }
         break;
 
@@ -255,12 +255,12 @@ void BinaryOperatorExpr::codegen(Code &code)
         rhs->codegen(code);
         code.mapping(pos);
         auto o2 = code.add_ins();
-        code.add_ins<Opcode::LoadConst, size_t>(2);
+        code.add_ins<Opcode::LoadConst, Size>(2);
         auto o3 = code.add_ins();
-        code.set_ins<Opcode::JumpIf>(o1, code.size());
-        code.set_ins<Opcode::JumpIf>(o2, code.size());
-        code.add_ins<Opcode::LoadConst, size_t>(1);
-        code.set_ins<Opcode::Jump>(o3, code.size());
+        code.set_ins<Opcode::JumpIf, Size>(o1, code.size());
+        code.set_ins<Opcode::JumpIf, Size>(o2, code.size());
+        code.add_ins<Opcode::LoadConst, Size>(1);
+        code.set_ins<Opcode::Jump, Size>(o3, code.size());
     }
         break;
 
@@ -317,7 +317,7 @@ void BinaryOperatorExpr::codegen(Code &code)
         code.add_ins<Opcode::CallAc>();
         rhs->codegen(code);
         lhs->codegen(code);
-        code.add_ins<Opcode::Load>(op.value);
+        code.add_ins<Opcode::Load, String>(op.value);
         code.mapping(pos);
         code.add_ins<Opcode::Call>();
         break;
@@ -342,7 +342,7 @@ void LambdaExpr::codegen(Code &code)
     block->codegen(code);
 
     code.add_ins<Opcode::ReturnNone>();
-    code.set_ins<Opcode::LambdaDecl>(o1, make_pair(parameters.size(), code.size()));
+    code.set_ins<Opcode::LambdaDecl, pair<Size, Size>>(o1, make_pair<Size, Size>(parameters.size(), code.size()));
 }
 
 // [AFTER] [CLASS]
@@ -355,7 +355,7 @@ void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
     code.mapping(pos);
-    code.add_ins<Opcode::LoadMember>(id->name);
+    code.add_ins<Opcode::LoadMember, String>(id->name);
 }
 
 void EnumExpr::codegen(Code &code)
@@ -364,7 +364,7 @@ void EnumExpr::codegen(Code &code)
     for (auto &decl : decls)
     {
         decl->expr->codegen(code);
-        code.add_ins<Opcode::StoreRef>(decl->id->name);
+        code.add_ins<Opcode::StoreRef, String>(decl->id->name);
     }
     code.add_ins<Opcode::BuildEnum>();
 }
@@ -373,10 +373,10 @@ void MatchExpr::codegen(Code &code)
 {
     expr->codegen(code);
 
-    map<size_t, vector<size_t>> matchfroms;
-    vector<size_t> jumpfroms;
+    map<Size, vector<Size>> matchfroms;
+    vector<Size> jumpfroms;
 
-    for (size_t i = 0; i < keylists.size(); ++i)
+    for (Size i = 0; i < keylists.size(); ++i)
     {
         for (auto &key : keylists[i])
         {
@@ -389,11 +389,11 @@ void MatchExpr::codegen(Code &code)
     else_expr ? else_expr->codegen(code) : NoneExpr().codegen(code);
     jumpfroms.push_back(code.add_ins());
 
-    for (size_t i = 0; i < values.size(); ++i)
+    for (Size i = 0; i < values.size(); ++i)
     {
         for (auto where : matchfroms[i])
         {
-            code.set_ins<Opcode::Match>(where, code.size());
+            code.set_ins<Opcode::Match, Size>(where, code.size());
         }
         values[i]->codegen(code);
         jumpfroms.push_back(code.add_ins());
@@ -401,7 +401,7 @@ void MatchExpr::codegen(Code &code)
 
     for (auto where : jumpfroms)
     {
-        code.set_ins<Opcode::Jump>(where, code.size());
+        code.set_ins<Opcode::Jump, Size>(where, code.size());
     }
 }
 
@@ -412,7 +412,7 @@ void ListExpr::codegen(Code &code)
     {
         (*it)->codegen(code);
     }
-    code.add_ins<Opcode::BuildList>(exprs.size());
+    code.add_ins<Opcode::BuildList, Size>(exprs.size());
 }
 
 void IndexExpr::codegen(Code &code)
@@ -432,7 +432,7 @@ void DictExpr::codegen(Code &code)
         values[num]->codegen(code);
         keys[num]->codegen(code);
     }
-    code.add_ins<Opcode::BuildDict>(keys.size());
+    code.add_ins<Opcode::BuildDict, Size>(keys.size());
 }
 
 void DelayExpr::codegen(Code &code)
@@ -450,9 +450,9 @@ void QuesExpr::codegen(Code &code)
     auto o1 = code.add_ins();
     true_expr->codegen(code);
     auto o2 = code.add_ins();
-    code.set_ins<Opcode::JumpIfNot>(o1, code.size());
+    code.set_ins<Opcode::JumpIfNot, Size>(o1, code.size());
     false_expr->codegen(code);
-    code.set_ins<Opcode::Jump>(o2, code.size());
+    code.set_ins<Opcode::Jump, Size>(o2, code.size());
 }
 
 void UseStmt::codegen(Code &code)
@@ -463,13 +463,13 @@ void UseStmt::codegen(Code &code)
         {
             if (alias.first.type == Module::Type::Name)
             {
-                code.add_ins<Opcode::Import>(alias.first.mod);
+                code.add_ins<Opcode::Import, String>(alias.first.mod);
             }
             else
             {
-                code.add_ins<Opcode::ImportPath>(alias.first.mod);
+                code.add_ins<Opcode::ImportPath, String>(alias.first.mod);
             }
-            code.add_ins<Opcode::StoreRef>(alias.second);
+            code.add_ins<Opcode::StoreRef, String>(alias.second);
         }
     }
     else
@@ -479,28 +479,28 @@ void UseStmt::codegen(Code &code)
         {
             if (from.type == Module::Type::Name)
             {
-                code.add_ins<Opcode::ImportAll>(from.mod);
+                code.add_ins<Opcode::ImportAll, String>(from.mod);
             }
             else
             {
-                code.add_ins<Opcode::ImportAllPath>(from.mod);
+                code.add_ins<Opcode::ImportAllPath, String>(from.mod);
             }
         }
         else
         {
             if (from.type == Module::Type::Name)
             {
-                code.add_ins<Opcode::Import>(from.mod);
+                code.add_ins<Opcode::Import, String>(from.mod);
             }
             else
             {
-                code.add_ins<Opcode::ImportPath>(from.mod);
+                code.add_ins<Opcode::ImportPath, String>(from.mod);
             }
 
             for (auto &alias : aliases)
             {
-                code.add_ins<Opcode::ImportPart>(alias.first.mod);
-                code.add_ins<Opcode::StoreRef>(alias.second);
+                code.add_ins<Opcode::ImportPart, String>(alias.first.mod);
+                code.add_ins<Opcode::StoreRef, String>(alias.second);
             }
             code.add_ins<Opcode::Pop>();
         }
@@ -527,11 +527,11 @@ void VariableDeclarationStmt::codegen(Code &code)
 
     if (is_ref)
     {
-        code.add_ins<Opcode::StoreRef>(id->name);
+        code.add_ins<Opcode::StoreRef, String>(id->name);
     }
     else
     {
-        code.add_ins<Opcode::StoreLocal>(id->name);
+        code.add_ins<Opcode::StoreLocal, String>(id->name);
     }
 }
 
@@ -546,7 +546,7 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
     }
     else
     {
-        for (size_t i = 0; i < vars.size(); ++i)
+        for (Size i = 0; i < vars.size(); ++i)
         {
             make_unique<NoneExpr>()->codegen(code);
         }
@@ -556,11 +556,11 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
     {
         if (var.second)
         {
-            code.add_ins<Opcode::StoreRef>(var.first->name);
+            code.add_ins<Opcode::StoreRef, String>(var.first->name);
         }
         else
         {
-            code.add_ins<Opcode::StoreLocal>(var.first->name);
+            code.add_ins<Opcode::StoreLocal, String>(var.first->name);
         }
     }
 }
@@ -568,17 +568,17 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
 void FunctionDeclarationStmt::codegen(Code &code)
 {
     lambda->codegen(code);
-    code.add_ins<Opcode::StoreRef>(id->name);
+    code.add_ins<Opcode::StoreRef, String>(id->name);
 }
 
 void PrefixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddPrefixOp>(id->name);
+    code.add_ins<Opcode::AddPrefixOp, String>(id->name);
 }
 
 void InfixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddInfixOp>(make_pair(id->name, priority));
+    code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(id->name, priority));
 }
 
 void ClassDeclarationStmt::codegen(Code &code)
@@ -615,13 +615,13 @@ void IfElseStmt::codegen(Code &code)
     if (false_branch)
     {
         auto o2 = code.add_ins();
-        code.set_ins<Opcode::JumpIfNot>(o1, code.size());
+        code.set_ins<Opcode::JumpIfNot, Size>(o1, code.size());
         false_branch->codegen(code);
-        code.set_ins<Opcode::Jump>(o2, code.size());
+        code.set_ins<Opcode::Jump, Size>(o2, code.size());
     }
     else
     {
-        code.set_ins<Opcode::JumpIfNot>(o1, code.size());
+        code.set_ins<Opcode::JumpIfNot, Size>(o1, code.size());
     }
 }
 
@@ -633,7 +633,7 @@ void WhileStmt::codegen(Code &code)
     auto o2 = code.add_ins();
     block->codegen(code);
     code.add_ins<Opcode::Jump>(o1);
-    code.set_ins<Opcode::JumpIfNot>(o2, code.size());
+    code.set_ins<Opcode::JumpIfNot, Size>(o2, code.size());
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o1, o1);
 }
@@ -645,7 +645,7 @@ void DoWhileStmt::codegen(Code &code)
     auto o2 = code.size();
     cond->codegen(code);
     code.mapping()[code.size()] = cond->pos;
-    code.add_ins<Opcode::JumpIf>(o1);
+    code.add_ins<Opcode::JumpIf, Size>(o1);
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o2, o1);
 }
@@ -662,9 +662,9 @@ void DoWhileStmt::codegen(Code &code)
 void ForeachStmt::codegen(Code &code)
 {
     expr->codegen(code);
-    code.add_ins<Opcode::LoadMember>("__iterator__"s);
+    code.add_ins<Opcode::LoadMember, String>("__iterator__");
     code.add_ins<Opcode::FastCall>();
-    code.add_ins<Opcode::StoreRef>("__it"s);
+    code.add_ins<Opcode::StoreRef, String>("__it");
 
     auto cond = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),

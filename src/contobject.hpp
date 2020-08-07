@@ -14,7 +14,7 @@ class ContObject : public Object
 
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;
-    void call(std::size_t num) override;
+    void call(Size num) override;
 
     SPtr<Context> resume()
     {

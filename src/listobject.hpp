@@ -12,11 +12,11 @@ class ListObject : public Object, public std::enable_shared_from_this<ListObject
       : Object(ObjectType::List) {}
 
     bool to_bool() override;
-    std::string to_str() override;
-    std::string to_key() override;
+    String to_str() override;
+    String to_key() override;
     ObjectPtr add(ObjectPtr) override;
     Address index(ObjectPtr) override;
-    Address load_member(const std::string &name) override;
+    Address load_member(const String &name) override;
 
     std::list<Address> &objects();
     void append(ObjectPtr obj);
@@ -31,7 +31,7 @@ class ListIteratorObject : public Object, public std::enable_shared_from_this<Li
     ListIteratorObject(SPtr<ListObject> bind)
       : bind_(bind), current_(bind->objects().begin()) {}
 
-    Address load_member(const std::string &name) override;
+    Address load_member(const String &name) override;
 
     bool has_next() { return current_ != bind_->objects().end(); }
     Address next() { return *current_++; }

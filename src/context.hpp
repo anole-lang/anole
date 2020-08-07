@@ -2,12 +2,11 @@
 
 #include <map>
 #include <stack>
-#include <string>
 #include <filesystem>
+#include "base.hpp"
 #include "code.hpp"
 #include "error.hpp"
 #include "scope.hpp"
-#include "helper.hpp"
 
 namespace anole
 {
@@ -42,7 +41,7 @@ class Context : public std::enable_shared_from_this<Context>
       , current_path_(std::move(path)) {}
 
     Context(SPtr<Context> pre, SPtr<Scope> scope,
-        SPtr<Code> code, std::size_t pc = 0)
+        SPtr<Code> code, Size pc = 0)
       : pre_context_(pre)
       , scope_(std::make_shared<Scope>(scope))
       , code_(std::move(code)), pc_(pc)
@@ -56,13 +55,13 @@ class Context : public std::enable_shared_from_this<Context>
 
     static void
     add_not_defined_symbol(
-        const std::string &name,
+        const String &name,
         const Address &ptr);
 
     static void
     rm_not_defined_symbol(const Address &ptr);
 
-    static const std::string
+    static const String
     &get_not_defined_symbol(const Address &ptr);
 
     SPtr<Context> &pre_context()
@@ -80,7 +79,7 @@ class Context : public std::enable_shared_from_this<Context>
         return code_;
     }
 
-    std::size_t &pc()
+    Size &pc()
     {
         return pc_;
     }
@@ -90,7 +89,7 @@ class Context : public std::enable_shared_from_this<Context>
         return code_->ins_at(pc_);
     }
 
-    Instruction &ins_at(std::size_t index)
+    Instruction &ins_at(Size index)
     {
         return code_->ins_at(index);
     }
@@ -153,7 +152,7 @@ class Context : public std::enable_shared_from_this<Context>
         return res;
     }
 
-    std::size_t size() const
+    Size size() const
     {
         return stack_->size();
     }
@@ -169,16 +168,16 @@ class Context : public std::enable_shared_from_this<Context>
     }
 
     void set_call_anchor();
-    std::size_t get_call_args_num();
+    Size get_call_args_num();
 
     void set_return_anchor();
-    std::size_t get_return_vals_num();
+    Size get_return_vals_num();
 
   private:
     SPtr<Context> pre_context_;
     SPtr<Scope> scope_;
     SPtr<Code> code_;
-    std::size_t pc_;
+    Size pc_;
     SPtr<StackType> stack_;
     std::filesystem::path current_path_;
 };

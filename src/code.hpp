@@ -1,13 +1,12 @@
 #pragma once
 
 #include <map>
-#include <string>
 #include <vector>
 #include <iostream>
 #include <filesystem>
 #include <type_traits>
 #include "ast.hpp"
-#include "helper.hpp"
+#include "base.hpp"
 #include "object.hpp"
 #include "instruction.hpp"
 
@@ -16,14 +15,14 @@ namespace anole
 class Code
 {
   public:
-    Code(std::string from = "<stdin>");
+    Code(String from = "<stdin>");
 
-    const std::string &from()
+    const String &from()
     {
         return from_;
     }
 
-    std::map<std::size_t, AST::Position>
+    std::map<Size, AST::Position>
     &mapping()
     {
         return mapping_;
@@ -37,57 +36,57 @@ class Code
         }
     }
 
-    Instruction &ins_at(std::size_t i)
+    Instruction &ins_at(Size i)
     {
         return instructions_[i];
     }
 
-    Opcode &opcode_at(std::size_t i)
+    Opcode &opcode_at(Size i)
     {
         return instructions_[i].opcode;
     }
 
-    std::any &oprand_at(std::size_t i)
+    std::any &oprand_at(Size i)
     {
         return instructions_[i].oprand;
     }
 
     template<Opcode op = Opcode::PlaceHolder>
-    std::size_t add_ins()
+    Size add_ins()
     {
         instructions_.push_back({ op });
         return instructions_.size() - 1;
     }
 
     template<Opcode op, typename T>
-    std::size_t add_ins(const T &value)
+    Size add_ins(const T &value)
     {
         instructions_.push_back({ op, value });
         return instructions_.size() - 1;
     }
 
     template<Opcode op>
-    void set_ins(std::size_t ind)
+    void set_ins(Size ind)
     {
         instructions_[ind] = { op };
     }
 
     template<Opcode op, typename T>
-    void set_ins(std::size_t ind, const T &value)
+    void set_ins(Size ind, const T &value)
     {
         instructions_[ind] = { op, value };
     }
 
-    std::size_t size();
-    void push_break(std::size_t ind);
-    void set_break_to(std::size_t ind, std::size_t base);
-    void push_continue(std::size_t ind);
-    void set_continue_to(std::size_t ind, std::size_t base);
+    Size size();
+    void push_break(Size ind);
+    void set_break_to(Size ind, Size base);
+    void push_continue(Size ind);
+    void set_continue_to(Size ind, Size base);
     bool check();
-    ObjectPtr load_const(std::size_t ind);
+    ObjectPtr load_const(Size ind);
 
     template<typename O, typename T>
-    std::size_t create_const(std::string key, T value)
+    Size create_const(String key, T value)
     {
         if (constants_map_.count(key))
         {
@@ -112,15 +111,15 @@ class Code
     void unserialize(std::ifstream &in);
 
   private:
-    std::string from_;
-    std::map<std::size_t, AST::Position> mapping_;
+    String from_;
+    std::map<Size, AST::Position> mapping_;
 
     std::vector<Instruction> instructions_;
     // these two should be checked is empty or not
-    std::vector<std::size_t> breaks_, continues_;
-    std::vector<std::string> constants_literals_;
+    std::vector<Size> breaks_, continues_;
+    std::vector<String> constants_literals_;
 
-    std::map<std::string, size_t> constants_map_;
+    std::map<String, Size> constants_map_;
     std::vector<ObjectPtr> constants_;
 };
 }

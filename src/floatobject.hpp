@@ -12,8 +12,8 @@ class FloatObject : public Object
       , value_(value) {}
 
     bool to_bool() override;
-    std::string to_str() override;
-    std::string to_key() override;
+    String to_str() override;
+    String to_key() override;
     ObjectPtr neg() override;
     ObjectPtr add(ObjectPtr) override;
     ObjectPtr sub(ObjectPtr) override;

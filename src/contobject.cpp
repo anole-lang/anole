@@ -15,7 +15,7 @@ ObjectPtr ContObject::cne(ObjectPtr obj)
     return (this != obj.get()) ? theTrue : theFalse;
 }
 
-void ContObject::call(size_t n)
+void ContObject::call(Size n)
 {
     if (n != 1)
     {

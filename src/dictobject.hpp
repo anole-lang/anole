@@ -22,10 +22,10 @@ class DictObject : public Object, public std::enable_shared_from_this<DictObject
       : Object(ObjectType::Dict) {}
 
     bool to_bool() override;
-    std::string to_str() override;
-    std::string to_key() override;
+    String to_str() override;
+    String to_key() override;
     Address index(ObjectPtr) override;
-    Address load_member(const std::string &name) override;
+    Address load_member(const String &name) override;
 
     DataType &data();
     void insert(ObjectPtr key, ObjectPtr value);

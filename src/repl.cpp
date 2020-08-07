@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "base.hpp"
 #include "code.hpp"
 #include "repl.hpp"
 #include "parser.hpp"
@@ -12,19 +13,20 @@
 #include "noneobject.hpp"
 
 using namespace std;
+using namespace anole;
 
 namespace
 {
 sigjmp_buf lc_env;
 
-string read_line(const char * str)
+String read_line(const char * str)
 {
     char *temp = readline(str);
     if (!temp)
     {
         exit(0);
     }
-    string line = temp;
+    String line = temp;
     free(temp);
     return line;
 }
@@ -56,7 +58,7 @@ R"(    _                _
 
     AST::interpretive() = true;
 
-    string line;
+    String line;
     istringstream ss;
     Parser parser{ss};
     auto code = make_shared<Code>("<stdin>");

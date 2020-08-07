@@ -4,7 +4,7 @@ using namespace std;
 
 namespace anole
 {
-Address EnumObject::load_member(const std::string &name)
+Address EnumObject::load_member(const String &name)
 {
     if (scope_->symbols().count(name))
     {

@@ -6,7 +6,7 @@ using namespace std;
 
 namespace anole
 {
-Token::Token(TokenType type, string value)
+Token::Token(TokenType type, String value)
   : type(type), value(move(value)) {}
 
 Token::Token(Token &&other) noexcept
@@ -34,7 +34,7 @@ Token &Token::operator=(const Token &other)
 namespace
 {
 int end_of_token_type = TokenType::End;
-map<string, TokenType> mapping
+map<String, TokenType> mapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
@@ -88,13 +88,13 @@ map<string, TokenType> mapping
 };
 }
 
-Token::Token(std::string value)
+Token::Token(String value)
   : type(mapping.count(value)
         ? mapping.at(value)
         : TokenType::Identifier)
   , value(move(value)) {}
 
-TokenType Token::add_token_type(const string &str)
+TokenType Token::add_token_type(const String &str)
 {
     if (!mapping.count(str))
     {

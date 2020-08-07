@@ -11,14 +11,14 @@ class ModuleObject : public Object
     ModuleObject()
       : Object(ObjectType::Module) {}
     virtual ~ModuleObject() = 0;
-    virtual Address load_member(const std::string &name) = 0;
+    virtual Address load_member(const String &name) = 0;
 
     bool good()
     {
         return good_;
     }
 
-    static SPtr<ModuleObject> generate(const std::string &name);
+    static SPtr<ModuleObject> generate(const String &name);
     static SPtr<ModuleObject> generate(const std::filesystem::path &path);
 
   protected:
@@ -28,9 +28,9 @@ class ModuleObject : public Object
 class AnoleModuleObject : public ModuleObject
 {
   public:
-    AnoleModuleObject(const std::string &name);
+    AnoleModuleObject(const String &name);
     AnoleModuleObject(const std::filesystem::path &path);
-    Address load_member(const std::string &name) override;
+    Address load_member(const String &name) override;
 
     const SPtr<Scope> &scope() const
     {
@@ -53,18 +53,18 @@ class CppModuleObject
     public std::enable_shared_from_this<CppModuleObject>
 {
   public:
-    CppModuleObject(const std::string &name);
+    CppModuleObject(const String &name);
     CppModuleObject(const std::filesystem::path &path);
     ~CppModuleObject();
-    Address load_member(const std::string &name) override;
+    Address load_member(const String &name) override;
 
-    const std::vector<std::string> *names()
+    const std::vector<String> *names()
     {
         return names_;
     }
 
   private:
     void *handle_;
-    std::vector<std::string> *names_;
+    std::vector<String> *names_;
 };
 }

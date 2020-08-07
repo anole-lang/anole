@@ -1,8 +1,7 @@
 #pragma once
 
-#include <string>
+#include "base.hpp"
 #include "error.hpp"
-#include "helper.hpp"
 
 namespace anole
 {
@@ -42,8 +41,8 @@ class Object
 
     virtual ~Object() = 0;
     virtual bool to_bool();
-    virtual std::string to_str();
-    virtual std::string to_key();
+    virtual String to_str();
+    virtual String to_key();
     virtual ObjectPtr neg();
     virtual ObjectPtr add(ObjectPtr);
     virtual ObjectPtr sub(ObjectPtr);
@@ -61,8 +60,8 @@ class Object
     virtual ObjectPtr bls(ObjectPtr);
     virtual ObjectPtr brs(ObjectPtr);
     virtual Address index(ObjectPtr);
-    virtual Address load_member(const std::string &name);
-    virtual void call(std::size_t num);
+    virtual Address load_member(const String &name);
+    virtual void call(Size num);
 
   private:
     ObjectType type_;

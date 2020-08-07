@@ -3,8 +3,8 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include "base.hpp"
 #include "token.hpp"
-#include "helper.hpp"
 
 namespace anole
 {
@@ -19,7 +19,7 @@ using ParameterList = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>,
 
 struct AST
 {
-    using Position = std::pair<std::size_t, std::size_t>;
+    using Position = std::pair<Size, Size>;
 
     virtual ~AST() = 0;
     virtual void codegen(Code &) = 0;
@@ -92,9 +92,9 @@ struct BoolExpr : Expr
 
 struct StringExpr : Expr
 {
-    std::string value;
+    String value;
 
-    StringExpr(std::string value)
+    StringExpr(String value)
       : value(std::move(value)) {}
 
     void codegen(Code &) override;
@@ -102,9 +102,9 @@ struct StringExpr : Expr
 
 struct IdentifierExpr : Expr
 {
-    std::string name;
+    String name;
 
-    IdentifierExpr(std::string name)
+    IdentifierExpr(String name)
       : name(std::move(name)) {}
 
     void codegen(Code &) override;
@@ -272,12 +272,12 @@ struct UseStmt : Stmt
             Path,
             Null
         };
-        std::string mod;
+        String mod;
         Type type;
     };
 
-    using Alias = std::pair<Module, std::string>;
-    // second string is the alias
+    using Alias = std::pair<Module, String>;
+    // second String is the alias
     using Aliases = std::vector<Alias>;
 
     // aliases are empty means `use *`
@@ -360,11 +360,11 @@ struct PrefixopDeclarationStmt : Stmt
 
 struct InfixopDeclarationStmt : Stmt
 {
-    size_t priority;
+    Size priority;
     Ptr<IdentifierExpr> id;
 
     InfixopDeclarationStmt(Ptr<IdentifierExpr> &&id,
-        size_t priority)
+        Size priority)
       : priority(priority), id(std::move(id)) {}
 
     void codegen(Code &) override;
