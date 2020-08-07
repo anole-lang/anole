@@ -3,6 +3,7 @@
 #include "code.hpp"
 #include "repl.hpp"
 #include "parser.hpp"
+#include "version.hpp"
 #include "context.hpp"
 #include "argparse.hpp"
 #include "moduleobject.hpp"
@@ -35,7 +36,7 @@ bool ends_with(const string_view &str,
 }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) try
 {
     if (argc == 1)
     {
@@ -62,7 +63,16 @@ int main(int argc, char *argv[])
         parser.add_argument("-r")
               .default_value(false)
               .implict_value(true);
+        parser.add_argument("--version")
+              .default_value(false)
+              .implict_value(true);
         parser.parse(min(file_pos + 1, argc), argv);
+
+        if (parser.get<bool>("version"))
+        {
+            printf("Anole %s\n", theVersion);
+            return 0;
+        }
 
         Context::set_args(argc, argv, file_pos);
 
@@ -94,4 +104,8 @@ int main(int argc, char *argv[])
         }
     }
     return 0;
+}
+catch (...)
+{
+    cout << "invalid command-line argument(s)" << endl;
 }
