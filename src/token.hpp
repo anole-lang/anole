@@ -91,13 +91,13 @@ using token_type::TokenType;
 
 struct Token
 {
-    Token() = default;
-    explicit Token(TokenType type, String value = "");
-    explicit Token(String value);
+    Token() noexcept = default;
+    explicit Token(TokenType type, String value = "") noexcept;
+    explicit Token(String value) noexcept;
     Token(Token &&other) noexcept;
-    Token(const Token &other);
+    Token(const Token &other) noexcept;
     Token &operator=(Token &&other) noexcept;
-    Token &operator=(const Token &other);
+    Token &operator=(const Token &other) noexcept;
 
     static TokenType add_token_type(const String &str);
 

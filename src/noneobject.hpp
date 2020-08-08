@@ -7,7 +7,7 @@ namespace anole
 class NoneObject : public Object
 {
   public:
-    NoneObject()
+    constexpr NoneObject() noexcept
       : Object(ObjectType::None) {}
 
     ObjectPtr ceq(ObjectPtr) override;

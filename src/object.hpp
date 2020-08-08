@@ -34,10 +34,10 @@ using Address = SPtr<ObjectPtr>;
 class Object
 {
   public:
-    Object() : type_(ObjectType::NotDefined) {}
-    Object(ObjectType type) : type_(type) {}
+    constexpr Object() noexcept : type_(ObjectType::NotDefined) {}
+    constexpr Object(ObjectType type) noexcept : type_(type) {}
 
-    ObjectType type() const { return type_; }
+    constexpr ObjectType type() const noexcept { return type_; }
 
     virtual ~Object() = 0;
     virtual bool to_bool();

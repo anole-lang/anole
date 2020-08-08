@@ -7,7 +7,7 @@ namespace anole
 class FloatObject : public Object
 {
   public:
-    FloatObject(double value)
+    constexpr FloatObject(double value) noexcept
       : Object(ObjectType::Float)
       , value_(value) {}
 
@@ -24,7 +24,7 @@ class FloatObject : public Object
     ObjectPtr clt(ObjectPtr) override;
     ObjectPtr cle(ObjectPtr) override;
 
-    double value() const
+    constexpr double value() const noexcept
     {
         return value_;
     }

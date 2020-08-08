@@ -6,14 +6,14 @@ using namespace std;
 
 namespace anole
 {
-Token::Token(TokenType type, String value)
+Token::Token(TokenType type, String value) noexcept
   : type(type), value(move(value)) {}
 
 Token::Token(Token &&other) noexcept
   : type(other.type)
   , value(std::move(other.value)) {}
 
-Token::Token(const Token &other)
+Token::Token(const Token &other) noexcept
   : type(other.type)
   , value(other.value) {}
 
@@ -24,7 +24,7 @@ Token &Token::operator=(Token &&other) noexcept
     return *this;
 }
 
-Token &Token::operator=(const Token &other)
+Token &Token::operator=(const Token &other) noexcept
 {
     type = other.type;
     value = other.value;
@@ -88,7 +88,7 @@ map<String, TokenType> mapping
 };
 }
 
-Token::Token(String value)
+Token::Token(String value) noexcept
   : type(mapping.count(value)
         ? mapping.at(value)
         : TokenType::Identifier)

@@ -21,6 +21,8 @@ struct AST
 {
     using Position = std::pair<Size, Size>;
 
+    constexpr AST() noexcept = default;
+
     virtual ~AST() = 0;
     virtual void codegen(Code &) = 0;
 
@@ -191,7 +193,7 @@ struct EnumExpr : Expr
 {
     DeclList decls;
 
-    EnumExpr() = default;
+    EnumExpr() noexcept = default;
 
     void codegen(Code &) override;
 };
@@ -203,7 +205,7 @@ struct MatchExpr : Expr
     std::vector<Ptr<Expr>> values;
     Ptr<Expr> else_expr;
 
-    MatchExpr() {}
+    MatchExpr() noexcept = default;
 
     void codegen(Code &) override;
 };
@@ -212,7 +214,7 @@ struct ListExpr : Expr
 {
     ExprList exprs;
 
-    ListExpr() = default;
+    ListExpr() noexcept = default;
 
     void codegen(Code &) override;
 };
@@ -233,7 +235,7 @@ struct DictExpr : Expr
 {
     ExprList keys, values;
 
-    DictExpr() = default;
+    DictExpr() noexcept = default;
 
     void codegen(Code &) override;
 };

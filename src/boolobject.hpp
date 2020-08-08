@@ -8,7 +8,7 @@ namespace anole
 class BoolObject : public Object
 {
   public:
-    BoolObject(bool value)
+    constexpr BoolObject(bool value) noexcept
       : Object(ObjectType::Boolean)
       , value_(value) {}
 

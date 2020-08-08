@@ -7,7 +7,7 @@ namespace anole
 class IntegerObject : public Object
 {
   public:
-    IntegerObject(int64_t value)
+    constexpr IntegerObject(int64_t value) noexcept
       : Object(ObjectType::Integer)
       , value_(value) {}
 
@@ -32,7 +32,10 @@ class IntegerObject : public Object
     ObjectPtr brs(ObjectPtr) override;
     Address load_member(const String &name) override;
 
-    int64_t value() const { return value_; }
+    constexpr int64_t value() const noexcept
+    {
+        return value_;
+    }
 
   private:
     int64_t value_;
