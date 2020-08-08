@@ -56,7 +56,7 @@ void replrun::run()
  / ___ \| | | | (_) | |  __/    %s
 /_/   \_\_| |_|\___/|_|\___|
 
-)",                             theVersion);
+)",                             Version::literal);
 
     AST::interpretive() = true;
 

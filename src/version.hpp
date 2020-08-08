@@ -6,16 +6,23 @@ namespace anole
 {
 /**
  * for a released version
- *  theVersion will be like '0.0.16 2020/07/28'
+ *  Version::literal will be like '0.0.16 2020/07/28'
  *
  * for a non-released version
- *  theVersion will contain 'HEAD' before version
+ *  Version::literal will contain 'HEAD' before version
  *   like 'HEAD 0.0.17 2020/08/07'
  *    and '0.0.17' is the next released version
  *
  * YYYY/MM/DD is the date when the last commit is committed
 */
-constexpr auto theVersion = "HEAD 0.0.18 2020/08/08";
+struct Version
+{
+    constexpr static auto literal = "HEAD 0.0.18 2020/08/08";
+
+    constexpr static Size major    = 0;
+    constexpr static Size minor    = 0;
+    constexpr static Size revision = 18;
+};
 
 /**
  * theMagic stands for version of IR

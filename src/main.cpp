@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) try
 
         if (parser.get<bool>("version"))
         {
-            printf("Anole %s\n", theVersion);
+            printf("Anole %s\n", Version::literal);
             return 0;
         }
 
