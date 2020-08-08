@@ -17,6 +17,7 @@ namespace anole
 */
 struct Version
 {
+    // implies inline
     constexpr static auto literal = "HEAD 0.0.18 2020/08/08";
 
     constexpr static Size major    = 0;
@@ -33,5 +34,5 @@ struct Version
  *  for the temporary change after the last release
 */
 using Magic = Size;
-constexpr Magic theMagic = 2020'07'28;
+inline constexpr Magic theMagic = 2020'07'28;
 }
