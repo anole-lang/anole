@@ -37,5 +37,33 @@ struct is_rvalue_reference : false_type {};
 template<typename T>
 struct is_rvalue_reference<T&&> : true_type {};
 
+template<typename T>
+struct is_const : false_type {};
+template<typename T>
+struct is_const<const T> : true_type {};
+template<typename T>
+struct is_volatile : false_type {};
+template<typename T>
+struct is_volatile<volatile T> : true_type {};
 
+template<typename T, typename U>
+struct is_same : false_type {};
+template<typename T>
+struct is_same<T, T> : true_type {};
+template<typename T, typename U>
+inline constexpr bool is_same_v = is_same<T, U>::value;
+
+template<typename T>
+struct remove_cv { using type = T; };
+template<typename T>
+struct remove_cv<const T> { using type = T; };
+template<typename T>
+struct remove_cv<volatile T> { using type = T; };
+template<typename T>
+struct remove_cv<const volatile T> { using type = T; };
+
+template<typename T>
+struct is_void : is_same<void, typename remove_cv<T>::type> {};
+template<typename T>
+inline constexpr bool is_void_v = is_void<T>::value;
 } // namespace light
