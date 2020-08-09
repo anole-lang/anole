@@ -109,7 +109,7 @@ void Parser::add_infixop(const String &str, Size priority)
 
     auto lower = lower_bound(operators::bop_priorities.begin(),
         operators::bop_priorities.end(), priority);
-    if (lower == operators::bop_priorities.end() or *lower != priority)
+    if (lower == operators::bop_priorities.end() || *lower != priority)
     {
         operators::bop_priorities.insert(lower, priority);
     }
@@ -131,7 +131,7 @@ Token &Parser::get_next_token()
 void Parser::try_continue()
 {
     if (current_token_.type == TokenType::End
-        and AST::interpretive())
+        && AST::interpretive())
     {
         continue_action_();
     }
@@ -792,8 +792,8 @@ Ptr<Expr> Parser::gen_expr(int layer)
         get_next_token();
         // gen_expr(layer) if right-associative
         auto rhs = gen_expr(layer + 1);
-        if (lhs->is_integer_expr() and
-            rhs->is_integer_expr())
+        if (lhs->is_integer_expr()
+            && rhs->is_integer_expr())
         {
             auto alias = reinterpret_cast<IntegerExpr *>(lhs.get());
             auto rv = reinterpret_cast<IntegerExpr *>(rhs.get())->value;
@@ -820,11 +820,11 @@ Ptr<Expr> Parser::gen_expr(int layer)
                 break;
 
             case TokenType::And:
-                lhs = make_unique<BoolExpr>(alias->value and rv);
+                lhs = make_unique<BoolExpr>(alias->value && rv);
                 break;
 
             case TokenType::Or:
-                lhs = make_unique<BoolExpr>(alias->value or rv);
+                lhs = make_unique<BoolExpr>(alias->value || rv);
                 break;
 
             case TokenType::Is:

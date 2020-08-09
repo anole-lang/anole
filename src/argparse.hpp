@@ -112,7 +112,7 @@ class ArgumentParser
                 {
                     arg.set_implict_value();
                 }
-                else if (i < argc and argv[i][0] != '-')
+                else if (i < argc && argv[i][0] != '-')
                 {
                     arg.consume(argv[i++]);
                 }

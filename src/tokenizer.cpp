@@ -60,8 +60,8 @@ const set<char> illegal_idchrs
 };
 bool is_legal_idchr(char chr)
 {
-    if (isspace(chr) or isdigit(chr) or isalpha(chr)
-        or illegal_idchrs.count(chr))
+    if (isspace(chr) || isdigit(chr) || isalpha(chr)
+        || illegal_idchrs.count(chr))
     {
         return false;
     }
@@ -250,8 +250,8 @@ Token Tokenizer::next()
 
         case State::InNormalIdentifier:
             if (isdigit(last_input_)
-                or isalpha(last_input_)
-                or last_input_ == '_')
+                || isalpha(last_input_)
+                || last_input_ == '_')
             {
                 value += last_input_;
             }

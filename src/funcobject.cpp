@@ -37,7 +37,7 @@ void FunctionObject::call(Size num)
     auto parameter_num = parameter_num_;
     auto arg_num = num;
     auto &pc = theCurrentContext->pc();
-    while (arg_num and parameter_num)
+    while (arg_num && parameter_num)
     {
         switch (theCurrentContext->opcode())
         {
@@ -120,7 +120,7 @@ void FunctionObject::call(Size num)
     else if (parameter_num)
     {
         if (theCurrentContext->opcode() == Opcode::StoreRef
-            or theCurrentContext->opcode() == Opcode::StoreLocal)
+            || theCurrentContext->opcode() == Opcode::StoreLocal)
         {
             throw RuntimeError("missing the parameter named '" + OPRAND(String) + '\'');
         }

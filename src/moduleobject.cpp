@@ -111,8 +111,8 @@ void AnoleModuleObject::init(const filesystem::path &path)
     theCurrentContext->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
-        and fs::last_write_time(ir_path) >= fs::last_write_time(path)
-        and code_->unserialize(ir_path))
+        && fs::last_write_time(ir_path) >= fs::last_write_time(path)
+        && code_->unserialize(ir_path))
     {
         Context::execute();
     }
