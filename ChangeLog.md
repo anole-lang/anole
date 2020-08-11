@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+- Built-in function `type` to get the type literal of the given value
+
+### Fixed
+
+- Custom objects in module can add their own types and the corresponding literals
+
 ## 0.0.17 - 2020/08/07
 
 ### Added
