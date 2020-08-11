@@ -1,12 +1,13 @@
 #pragma once
 
-#include <map>
-#include <stack>
-#include <filesystem>
 #include "base.hpp"
 #include "code.hpp"
 #include "error.hpp"
 #include "scope.hpp"
+
+#include <map>
+#include <stack>
+#include <filesystem>
 
 namespace anole
 {

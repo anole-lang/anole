@@ -1,12 +1,13 @@
 #pragma once
 
+#include "base.hpp"
+
 #include <any>
 #include <map>
 #include <vector>
 #include <iostream>
 #include <exception>
 #include <functional>
-#include "base.hpp"
 
 namespace anole
 {

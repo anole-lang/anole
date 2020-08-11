@@ -1,8 +1,9 @@
-#include <set>
-#include <algorithm>
 #include "ast.hpp"
 #include "error.hpp"
 #include "parser.hpp"
+
+#include <set>
+#include <algorithm>
 
 using namespace std;
 

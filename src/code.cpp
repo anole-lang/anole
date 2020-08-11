@@ -1,5 +1,3 @@
-#include <set>
-#include <fstream>
 #include "base.hpp"
 #include "code.hpp"
 #include "version.hpp"
@@ -8,6 +6,9 @@
 #include "floatobject.hpp"
 #include "stringobject.hpp"
 #include "integerobject.hpp"
+
+#include <set>
+#include <fstream>
 
 #define OPRAND(TYPE) (any_cast<const TYPE &>(ins.oprand))
 

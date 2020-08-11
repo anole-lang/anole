@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "../src/tokenizer.hpp"
+
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace anole;

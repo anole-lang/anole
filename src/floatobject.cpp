@@ -1,5 +1,5 @@
-#include "floatobject.hpp"
 #include "boolobject.hpp"
+#include "floatobject.hpp"
 
 using namespace std;
 

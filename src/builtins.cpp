@@ -1,6 +1,3 @@
-#include <ctime>
-#include <sstream>
-#include <iostream>
 #include "code.hpp"
 #include "error.hpp"
 #include "parser.hpp"
@@ -12,6 +9,10 @@
 #include "stringobject.hpp"
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
+
+#include <ctime>
+#include <sstream>
+#include <iostream>
 
 using namespace std;
 

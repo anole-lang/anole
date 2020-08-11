@@ -1,7 +1,8 @@
+#include "../../../src/object.hpp"
+
 #include <string>
 #include <vector>
 #include <filesystem>
-#include "../../../src/object.hpp"
 
 namespace anole
 {

@@ -1,13 +1,16 @@
-#include <dlfcn.h>
-#include <fstream>
 #include "parser.hpp"
 #include "context.hpp"
 #include "moduleobject.hpp"
 #include "builtinfuncobject.hpp"
 
+#ifdef __linux__
+#include <dlfcn.h>
+#endif
+
+#include <fstream>
+
 using namespace std;
 namespace fs = filesystem;
-using namespace chrono_literals;
 
 namespace anole
 {

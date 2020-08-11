@@ -1,7 +1,7 @@
 #pragma once
 
-#include "context.hpp"
 #include "object.hpp"
+#include "context.hpp"
 
 namespace anole
 {

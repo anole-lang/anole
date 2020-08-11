@@ -1,6 +1,7 @@
+#include "token.hpp"
+
 #include <map>
 #include <utility>
-#include "token.hpp"
 
 using namespace std;
 

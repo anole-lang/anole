@@ -1,7 +1,8 @@
-#include <map>
 #include "context.hpp"
 #include "noneobject.hpp"
 #include "builtinfuncobject.hpp"
+
+#include <map>
 
 using namespace std;
 

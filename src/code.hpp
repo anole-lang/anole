@@ -1,14 +1,15 @@
 #pragma once
 
+#include "ast.hpp"
+#include "base.hpp"
+#include "object.hpp"
+#include "instruction.hpp"
+
 #include <map>
 #include <vector>
 #include <iostream>
 #include <filesystem>
 #include <type_traits>
-#include "ast.hpp"
-#include "base.hpp"
-#include "object.hpp"
-#include "instruction.hpp"
 
 namespace anole
 {

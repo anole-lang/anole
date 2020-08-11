@@ -1,7 +1,8 @@
-#include <vector>
 #include "../../src/context.hpp"
 #include "../../src/listobject.hpp"
 #include "../../src/stringobject.hpp"
+
+#include <vector>
 
 using namespace std;
 using namespace anole;

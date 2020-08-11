@@ -1,8 +1,9 @@
 #pragma once
 
-#include <map>
 #include "object.hpp"
 #include "builtinfuncobject.hpp"
+
+#include <map>
 
 namespace anole
 {

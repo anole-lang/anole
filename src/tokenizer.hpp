@@ -1,9 +1,10 @@
 #pragma once
 
+#include "token.hpp"
+
 #include <vector>
 #include <istream>
 #include <iostream>
-#include "token.hpp"
 
 namespace anole
 {

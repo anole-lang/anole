@@ -1,9 +1,3 @@
-#ifdef _DEBUG
-#include <iostream>
-#endif
-#include <set>
-#include <fstream>
-#include <filesystem>
 #include "error.hpp"
 #include "parser.hpp"
 #include "context.hpp"
@@ -18,6 +12,14 @@
 #include "moduleobject.hpp"
 #include "integerobject.hpp"
 #include "builtinfuncobject.hpp"
+
+#include <set>
+#include <fstream>
+#include <filesystem>
+
+#ifdef _DEBUG
+#include <iostream>
+#endif
 
 #define OPRAND(T) any_cast<const T &>(theCurrentContext->oprand())
 

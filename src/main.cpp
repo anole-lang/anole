@@ -1,5 +1,3 @@
-#include <fstream>
-#include <algorithm>
 #include "code.hpp"
 #include "repl.hpp"
 #include "parser.hpp"
@@ -7,6 +5,9 @@
 #include "context.hpp"
 #include "argparse.hpp"
 #include "moduleobject.hpp"
+
+#include <fstream>
+#include <algorithm>
 
 using namespace std;
 using namespace anole;

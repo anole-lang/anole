@@ -1,10 +1,11 @@
-#include <string>
-#include <vector>
-#include <filesystem>
 #include "../path/path.hpp"
 #include "../../../src/context.hpp"
 #include "../../../src/listobject.hpp"
 #include "../../../src/stringobject.hpp"
+
+#include <string>
+#include <vector>
+#include <filesystem>
 
 using namespace std;
 namespace fs = filesystem;

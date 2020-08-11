@@ -1,8 +1,9 @@
 #pragma once
 
-#include <functional>
 #include "ast.hpp"
 #include "tokenizer.hpp"
+
+#include <functional>
 
 namespace anole
 {

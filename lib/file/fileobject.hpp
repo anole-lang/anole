@@ -1,6 +1,6 @@
-#include <string>
-#include <fstream>
 #include "../../src/object.hpp"
+
+#include <fstream>
 
 namespace anole
 {

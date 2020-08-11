@@ -1,8 +1,9 @@
-#include <set>
-#include <cctype>
 #include "base.hpp"
 #include "error.hpp"
 #include "tokenizer.hpp"
+
+#include <set>
+#include <cctype>
 
 using namespace std;
 

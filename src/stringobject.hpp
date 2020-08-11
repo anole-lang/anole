@@ -1,7 +1,8 @@
 #pragma once
 
-#include <utility>
 #include "object.hpp"
+
+#include <utility>
 
 namespace anole
 {

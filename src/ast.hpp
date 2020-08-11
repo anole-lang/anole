@@ -1,10 +1,11 @@
 #pragma once
 
+#include "base.hpp"
+#include "token.hpp"
+
 #include <map>
 #include <vector>
 #include <utility>
-#include "base.hpp"
-#include "token.hpp"
 
 namespace anole
 {

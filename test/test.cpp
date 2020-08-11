@@ -1,5 +1,5 @@
-#include "tokenizer-tester.hpp"
 #include "sample-tester.hpp"
+#include "tokenizer-tester.hpp"
 
 int main(int argc, char *argv[])
 {

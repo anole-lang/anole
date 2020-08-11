@@ -1,11 +1,3 @@
-#include <cstdio>
-#include <sstream>
-#include <iostream>
-#include <setjmp.h>
-#include <unistd.h>
-#include <signal.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include "base.hpp"
 #include "code.hpp"
 #include "repl.hpp"
@@ -13,6 +5,16 @@
 #include "version.hpp"
 #include "context.hpp"
 #include "noneobject.hpp"
+
+#include <readline/readline.h>
+#include <readline/history.h>
+
+#include <cstdio>
+#include <sstream>
+#include <iostream>
+#include <setjmp.h>
+#include <unistd.h>
+#include <signal.h>
 
 using namespace std;
 using namespace anole;

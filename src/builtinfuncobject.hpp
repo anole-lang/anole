@@ -1,8 +1,9 @@
 #pragma once
 
+#include "object.hpp"
+
 #include <vector>
 #include <functional>
-#include "object.hpp"
 
 #define REGISTER_BUILTIN(NAME, FUNC) \
     __attribute__((constructor)) static void F_##NAME () \

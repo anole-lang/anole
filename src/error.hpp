@@ -1,7 +1,8 @@
 #pragma once
 
-#include <exception>
 #include "base.hpp"
+
+#include <exception>
 
 namespace anole
 {
