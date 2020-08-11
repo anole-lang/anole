@@ -5,6 +5,8 @@
 
 #ifdef __linux__
 #include <dlfcn.h>
+#else
+#error "only support linux"
 #endif
 
 #include <fstream>

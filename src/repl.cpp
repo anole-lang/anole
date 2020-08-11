@@ -6,15 +6,20 @@
 #include "context.hpp"
 #include "noneobject.hpp"
 
+#ifdef __linux__
 #include <readline/readline.h>
 #include <readline/history.h>
+
+#include <setjmp.h>
+#include <unistd.h>
+#include <signal.h>
+#else
+#error "only support linux"
+#endif
 
 #include <cstdio>
 #include <sstream>
 #include <iostream>
-#include <setjmp.h>
-#include <unistd.h>
-#include <signal.h>
 
 using namespace std;
 using namespace anole;
