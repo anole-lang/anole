@@ -15,7 +15,7 @@ namespace anole
 namespace
 {
 map<String, function<void(SPtr<ListObject> &)>>
-builtin_methods_for_list
+lc_builtin_methods_for_list
 {
     {"empty", [](SPtr<ListObject> &obj)
         {
@@ -74,7 +74,7 @@ builtin_methods_for_list
 };
 
 map<String, function<void(SPtr<ListIteratorObject> &)>>
-builtin_methods_for_listiterator
+lc_builtin_methods_for_listiterator
 {
     // used by foreach
     {"__has_next__", [](SPtr<ListIteratorObject> &obj)
@@ -158,8 +158,8 @@ Address ListObject::index(ObjectPtr index)
 
 Address ListObject::load_member(const String &name)
 {
-    auto method = builtin_methods_for_list.find(name);
-    if (method != builtin_methods_for_list.end())
+    auto method = lc_builtin_methods_for_list.find(name);
+    if (method != lc_builtin_methods_for_list.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
@@ -185,8 +185,8 @@ void ListObject::append(ObjectPtr obj)
 
 Address ListIteratorObject::load_member(const String &name)
 {
-    auto method = builtin_methods_for_listiterator.find(name);
-    if (method != builtin_methods_for_listiterator.end())
+    auto method = lc_builtin_methods_for_listiterator.find(name);
+    if (method != lc_builtin_methods_for_listiterator.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([

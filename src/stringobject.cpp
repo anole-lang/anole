@@ -10,7 +10,7 @@ namespace anole
 namespace
 {
 map<String, function<void(SPtr<StringObject> &)>>
-builtin_methods
+lc_builtin_methods
 {
     {"size", [](SPtr<StringObject> &obj)
         {
@@ -132,8 +132,8 @@ Address StringObject::index(ObjectPtr index)
 
 Address StringObject::load_member(const String &name)
 {
-    auto method = builtin_methods.find(name);
-    if (method != builtin_methods.end())
+    auto method = lc_builtin_methods.find(name);
+    if (method != lc_builtin_methods.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([

@@ -25,9 +25,7 @@ void __open(Size n)
         ->push(
             make_shared<FileObject>(
                 path->to_str(),
-                reinterpret_cast<IntegerObject *>(mode.get())->value()
-            )
-        );
+                reinterpret_cast<IntegerObject *>(mode.get())->value()));
 }
 }
 

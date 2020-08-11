@@ -13,7 +13,7 @@ namespace anole
 namespace
 {
 map<String, function<void(SPtr<DictObject> &)>>
-builtin_methods
+lc_builtin_methods
 {
     {"empty", [](SPtr<DictObject> &obj)
         {
@@ -93,8 +93,8 @@ Address DictObject::index(ObjectPtr index)
 
 Address DictObject::load_member(const String &name)
 {
-    auto method = builtin_methods.find(name);
-    if (method != builtin_methods.end())
+    auto method = lc_builtin_methods.find(name);
+    if (method != lc_builtin_methods.end())
     {
         return make_shared<ObjectPtr>(
             make_shared<BuiltInFunctionObject>([
