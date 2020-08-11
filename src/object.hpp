@@ -34,6 +34,7 @@ class Object
 {
   public:
     constexpr Object(ObjectType type) noexcept : type_(type) {}
+    virtual ~Object() = 0;
 
     static ObjectType add_object_type(const String &literal);
 
@@ -41,10 +42,10 @@ class Object
     constexpr bool is() { return type_ == type; }
     ObjectPtr type();
 
-    virtual ~Object() = 0;
     virtual bool to_bool();
     virtual String to_str();
     virtual String to_key();
+
     virtual ObjectPtr neg();
     virtual ObjectPtr add(ObjectPtr);
     virtual ObjectPtr sub(ObjectPtr);
@@ -61,8 +62,10 @@ class Object
     virtual ObjectPtr band(ObjectPtr);
     virtual ObjectPtr bls(ObjectPtr);
     virtual ObjectPtr brs(ObjectPtr);
+
     virtual Address index(ObjectPtr);
     virtual Address load_member(const String &name);
+
     virtual void call(Size num);
 
   private:
