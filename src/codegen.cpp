@@ -663,10 +663,17 @@ void DoWhileStmt::codegen(Code &code)
 void ForeachStmt::codegen(Code &code)
 {
     expr->codegen(code);
+
+    /**
+     * generate code for: @&__it: expr.__iterator__();
+    */
     code.add_ins<Opcode::LoadMember, String>("__iterator__");
     code.add_ins<Opcode::FastCall>();
     code.add_ins<Opcode::StoreRef, String>("__it");
 
+    /**
+     * generate ast for cond: __it.__has_next__()
+    */
     auto cond = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
             make_unique<IdentifierExpr>("__has_next__")),
