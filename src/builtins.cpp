@@ -36,7 +36,7 @@ REGISTER_BUILTIN(eval,
 
 REGISTER_BUILTIN(call_with_current_continuation,
 {
-    if (theCurrentContext->top()->type() == ObjectType::Func)
+    if (theCurrentContext->top()->is<ObjectType::Func>())
     {
         auto func = theCurrentContext->pop();
         auto ptr = reinterpret_cast<FunctionObject *>(func.get());
@@ -47,7 +47,7 @@ REGISTER_BUILTIN(call_with_current_continuation,
         *theCurrentContext->scope()->create_symbol(any_cast<String>(theCurrentContext->oprand()))
             = cont_obj;
     }
-    else if (theCurrentContext->top()->type() == ObjectType::Cont)
+    else if (theCurrentContext->top()->is<ObjectType::Cont>())
     {
         auto resume = reinterpret_cast<ContObject *>(theCurrentContext->pop().get())->resume();
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
@@ -113,4 +113,10 @@ REGISTER_BUILTIN(str,
 {
     theCurrentContext->push(make_shared<StringObject>(theCurrentContext->pop()->to_str()));
 });
+
+REGISTER_BUILTIN(type,
+{
+    theCurrentContext->push(theCurrentContext->pop()->type());
+}
+)
 }

@@ -1,11 +1,69 @@
 #include "error.hpp"
 #include "object.hpp"
+#include "stringobject.hpp"
+
+#include <map>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
 namespace anole
 {
+namespace
+{
+vector<String> lc_mapping_t_s
+{
+    "none",
+    "boolean",
+    "integer",
+    "float",
+    "string",
+    "enum",
+    "list",
+    "listiterator",
+    "dict",
+    "builtinfunc",
+    "func",
+    "thunk",
+    "cont",
+    "module",
+};
+map<String, ObjectType> lc_mapping_s_t
+{
+    { "none",           ObjectType::None            },
+    { "boolean",        ObjectType::Boolean         },
+    { "integer",        ObjectType::Integer         },
+    { "float",          ObjectType::Float           },
+    { "string",         ObjectType::String          },
+    { "enum",           ObjectType::Enum            },
+    { "list",           ObjectType::List            },
+    { "listiterator",   ObjectType::ListIterator    },
+    { "dict",           ObjectType::Dict            },
+    { "builtinfunc",    ObjectType::BuiltinFunc     },
+    { "func",           ObjectType::Func            },
+    { "thunk",          ObjectType::Thunk           },
+    { "cont",           ObjectType::Cont            },
+    { "module",         ObjectType::Module          }
+};
+}
+
+ObjectType Object::add_object_type(const String &literal)
+{
+    if (!lc_mapping_s_t.count(literal))
+    {
+        lc_mapping_s_t[literal] = ObjectType(lc_mapping_t_s.size());
+        lc_mapping_t_s.push_back(literal);
+    }
+    return lc_mapping_s_t[literal];
+}
+
 Object::~Object() = default;
+
+ObjectPtr Object::type()
+{
+    return make_shared<StringObject>(lc_mapping_t_s[type_]);
+}
 
 bool Object::to_bool()
 {

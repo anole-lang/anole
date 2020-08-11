@@ -9,7 +9,6 @@ namespace object_type
 {
 enum ObjectType : int
 {
-    NotDefined,
     None,
     Boolean,
     Integer,
@@ -34,10 +33,13 @@ using Address = SPtr<ObjectPtr>;
 class Object
 {
   public:
-    constexpr Object() noexcept : type_(ObjectType::NotDefined) {}
     constexpr Object(ObjectType type) noexcept : type_(type) {}
 
-    constexpr ObjectType type() const noexcept { return type_; }
+    static ObjectType add_object_type(const String &literal);
+
+    template<ObjectType type>
+    constexpr bool is() { return type_ == type; }
+    ObjectPtr type();
 
     virtual ~Object() = 0;
     virtual bool to_bool();
