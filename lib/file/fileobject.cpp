@@ -100,6 +100,7 @@ lc_builtin_methods
 }
 
 FileObject::FileObject(const String &path, int64_t mode)
+  : Object(Object::add_object_type("file"))
 {
     static const ios_base::openmode mapping[6]
     {

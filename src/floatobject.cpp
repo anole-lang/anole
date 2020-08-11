@@ -27,7 +27,7 @@ ObjectPtr FloatObject::neg()
 
 ObjectPtr FloatObject::add(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return make_shared<FloatObject>(value_ + p->value_);
@@ -40,7 +40,7 @@ ObjectPtr FloatObject::add(ObjectPtr obj)
 
 ObjectPtr FloatObject::sub(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return make_shared<FloatObject>(value_ - p->value_);
@@ -53,7 +53,7 @@ ObjectPtr FloatObject::sub(ObjectPtr obj)
 
 ObjectPtr FloatObject::mul(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return make_shared<FloatObject>(value_ * p->value_);
@@ -66,7 +66,7 @@ ObjectPtr FloatObject::mul(ObjectPtr obj)
 
 ObjectPtr FloatObject::div(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return make_shared<FloatObject>(value_ / p->value_);
@@ -79,7 +79,7 @@ ObjectPtr FloatObject::div(ObjectPtr obj)
 
 ObjectPtr FloatObject::ceq(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return value_ == p->value_ ? theTrue : theFalse;
@@ -92,7 +92,7 @@ ObjectPtr FloatObject::ceq(ObjectPtr obj)
 
 ObjectPtr FloatObject::cne(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return value_ != p->value_ ? theTrue : theFalse;
@@ -105,7 +105,7 @@ ObjectPtr FloatObject::cne(ObjectPtr obj)
 
 ObjectPtr FloatObject::clt(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return value_ < p->value_ ? theTrue : theFalse;
@@ -118,7 +118,7 @@ ObjectPtr FloatObject::clt(ObjectPtr obj)
 
 ObjectPtr FloatObject::cle(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Float)
+    if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_pointer_cast<FloatObject>(obj);
         return value_ <= p->value_ ? theTrue : theFalse;

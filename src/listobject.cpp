@@ -118,7 +118,7 @@ String ListObject::to_key()
 
 ObjectPtr ListObject::add(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::List)
+    if (obj->is<ObjectType::List>())
     {
         auto p = reinterpret_pointer_cast<ListObject>(obj);
         auto res = make_shared<ListObject>();
@@ -140,7 +140,7 @@ ObjectPtr ListObject::add(ObjectPtr obj)
 
 Address ListObject::index(ObjectPtr index)
 {
-    if (index->type() == ObjectType::Integer)
+    if (index->is<ObjectType::Integer>())
     {
         auto it = objects_.begin();
         auto v = reinterpret_pointer_cast<IntegerObject>(index)->value();

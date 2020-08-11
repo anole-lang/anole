@@ -68,7 +68,8 @@ lc_builtin_methods
 }
 
 PathObject::PathObject(fs::path path)
-  : path_(move(path)) {}
+  : Object(Object::add_object_type("path"))
+  , path_(move(path)) {}
 
 Address PathObject::load_member(const String &name)
 {

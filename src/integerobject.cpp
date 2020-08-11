@@ -32,7 +32,7 @@ ObjectPtr IntegerObject::neg()
 
 ObjectPtr IntegerObject::add(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ + p->value_);
@@ -45,7 +45,7 @@ ObjectPtr IntegerObject::add(ObjectPtr obj)
 
 ObjectPtr IntegerObject::sub(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ - p->value_);
@@ -58,7 +58,7 @@ ObjectPtr IntegerObject::sub(ObjectPtr obj)
 
 ObjectPtr IntegerObject::mul(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ * p->value_);
@@ -71,7 +71,7 @@ ObjectPtr IntegerObject::mul(ObjectPtr obj)
 
 ObjectPtr IntegerObject::div(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ / p->value_);
@@ -84,7 +84,7 @@ ObjectPtr IntegerObject::div(ObjectPtr obj)
 
 ObjectPtr IntegerObject::mod(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ % p->value_);
@@ -97,7 +97,7 @@ ObjectPtr IntegerObject::mod(ObjectPtr obj)
 
 ObjectPtr IntegerObject::ceq(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return value_ == p->value_ ? theTrue : theFalse;
@@ -110,7 +110,7 @@ ObjectPtr IntegerObject::ceq(ObjectPtr obj)
 
 ObjectPtr IntegerObject::cne(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return value_ != p->value_ ? theTrue : theFalse;
@@ -123,7 +123,7 @@ ObjectPtr IntegerObject::cne(ObjectPtr obj)
 
 ObjectPtr IntegerObject::clt(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return value_ < p->value_ ? theTrue : theFalse;
@@ -136,7 +136,7 @@ ObjectPtr IntegerObject::clt(ObjectPtr obj)
 
 ObjectPtr IntegerObject::cle(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return value_ <= p->value_ ? theTrue : theFalse;
@@ -154,7 +154,7 @@ ObjectPtr IntegerObject::bneg()
 
 ObjectPtr IntegerObject::bor(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ | p->value_);
@@ -167,7 +167,7 @@ ObjectPtr IntegerObject::bor(ObjectPtr obj)
 
 ObjectPtr IntegerObject::bxor(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ ^ p->value_);
@@ -180,7 +180,7 @@ ObjectPtr IntegerObject::bxor(ObjectPtr obj)
 
 ObjectPtr IntegerObject::band(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ & p->value_);
@@ -193,7 +193,7 @@ ObjectPtr IntegerObject::band(ObjectPtr obj)
 
 ObjectPtr IntegerObject::bls(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ << p->value_);
@@ -206,7 +206,7 @@ ObjectPtr IntegerObject::bls(ObjectPtr obj)
 
 ObjectPtr IntegerObject::brs(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::Integer)
+    if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(obj);
         return make_shared<IntegerObject>(value_ >> p->value_);

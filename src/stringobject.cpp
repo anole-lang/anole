@@ -52,7 +52,7 @@ String StringObject::to_key()
 
 ObjectPtr StringObject::add(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::String)
+    if (obj->is<ObjectType::String>())
     {
         auto p = reinterpret_pointer_cast<StringObject>(obj);
         return make_shared<StringObject>(value_ + p->value_);
@@ -65,7 +65,7 @@ ObjectPtr StringObject::add(ObjectPtr obj)
 
 ObjectPtr StringObject::ceq(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::String)
+    if (obj->is<ObjectType::String>())
     {
         auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ == p->value_ ? theTrue : theFalse;
@@ -78,7 +78,7 @@ ObjectPtr StringObject::ceq(ObjectPtr obj)
 
 ObjectPtr StringObject::cne(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::String)
+    if (obj->is<ObjectType::String>())
     {
         auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ != p->value_ ? theTrue : theFalse;
@@ -91,7 +91,7 @@ ObjectPtr StringObject::cne(ObjectPtr obj)
 
 ObjectPtr StringObject::clt(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::String)
+    if (obj->is<ObjectType::String>())
     {
         auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ < p->value_ ? theTrue : theFalse;
@@ -104,7 +104,7 @@ ObjectPtr StringObject::clt(ObjectPtr obj)
 
 ObjectPtr StringObject::cle(ObjectPtr obj)
 {
-    if (obj->type() == ObjectType::String)
+    if (obj->is<ObjectType::String>())
     {
         auto p = reinterpret_pointer_cast<StringObject>(obj);
         return value_ <= p->value_ ? theTrue : theFalse;
@@ -117,7 +117,7 @@ ObjectPtr StringObject::cle(ObjectPtr obj)
 
 Address StringObject::index(ObjectPtr index)
 {
-    if (index->type() == ObjectType::Integer)
+    if (index->is<ObjectType::Integer>())
     {
         auto p = reinterpret_pointer_cast<IntegerObject>(index);
         return make_shared<ObjectPtr>(

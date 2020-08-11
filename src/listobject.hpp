@@ -9,8 +9,7 @@ namespace anole
 class ListObject : public Object, public std::enable_shared_from_this<ListObject>
 {
   public:
-    ListObject()
-      : Object(ObjectType::List) {}
+    ListObject() : Object(ObjectType::List) {}
 
     bool to_bool() override;
     String to_str() override;
@@ -30,7 +29,8 @@ class ListIteratorObject : public Object, public std::enable_shared_from_this<Li
 {
   public:
     ListIteratorObject(SPtr<ListObject> bind)
-      : bind_(bind), current_(bind->objects().begin()) {}
+      : Object(ObjectType::ListIterator)
+      , bind_(bind), current_(bind->objects().begin()) {}
 
     Address load_member(const String &name) override;
 

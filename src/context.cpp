@@ -229,7 +229,7 @@ void load_handle()
         theCurrentContext->push_address(obj);
         ++theCurrentContext->pc();
     }
-    else if ((*obj)->type() != ObjectType::Thunk)
+    else if (!(*obj)->is<ObjectType::Thunk>())
     {
         theCurrentContext->push_address(obj);
         ++theCurrentContext->pc();
