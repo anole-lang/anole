@@ -34,8 +34,8 @@ Token &Token::operator=(const Token &other) noexcept
 
 namespace
 {
-int end_of_token_type = TokenType::End;
-map<String, TokenType> mapping
+int lc_end_of_token_type = TokenType::End;
+map<String, TokenType> lc_mapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
@@ -90,17 +90,17 @@ map<String, TokenType> mapping
 }
 
 Token::Token(String value) noexcept
-  : type(mapping.count(value)
-        ? mapping.at(value)
+  : type(lc_mapping.count(value)
+        ? lc_mapping.at(value)
         : TokenType::Identifier)
   , value(move(value)) {}
 
 TokenType Token::add_token_type(const String &str)
 {
-    if (!mapping.count(str))
+    if (!lc_mapping.count(str))
     {
-        mapping[str] = TokenType(++end_of_token_type);
+        lc_mapping[str] = TokenType(++lc_end_of_token_type);
     }
-    return mapping[str];
+    return lc_mapping[str];
 }
 }
