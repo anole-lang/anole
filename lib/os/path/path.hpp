@@ -10,6 +10,7 @@ class PathObject : public Object, public std::enable_shared_from_this<PathObject
 {
   public:
     PathObject(std::filesystem::path path);
+
     Address load_member(const String &name) override;
     String to_str() override;
 

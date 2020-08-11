@@ -1,3 +1,4 @@
 use * from libpath;
 
 @current_path(): __current_path();
+@is_directory(path): __is_directory(path);
