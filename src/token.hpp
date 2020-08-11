@@ -92,10 +92,13 @@ using token_type::TokenType;
 struct Token
 {
     Token() noexcept = default;
+
     explicit Token(TokenType type, String value = "") noexcept;
     explicit Token(String value) noexcept;
+
     Token(Token &&other) noexcept;
     Token(const Token &other) noexcept;
+
     Token &operator=(Token &&other) noexcept;
     Token &operator=(const Token &other) noexcept;
 

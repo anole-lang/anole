@@ -11,12 +11,20 @@ namespace anole
 {
 class Code;
 
-using StmtList  = std::vector<Ptr<struct Stmt>>;
-using ExprList  = std::vector<Ptr<struct Expr>>;
-using DeclList  = std::vector<Ptr<struct VariableDeclarationStmt>>;
-using IdentList = std::vector<Ptr<struct IdentifierExpr>>;
-using ArgumentList = std::vector<std::pair<Ptr<struct Expr>, bool>>; // boolean stands for whether it is unpacked
-using ParameterList = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>; // boolean stands for whether it is packed
+using StmtList
+    = std::vector<Ptr<struct Stmt>>;
+using ExprList
+    = std::vector<Ptr<struct Expr>>;
+using DeclList
+    = std::vector<Ptr<struct VariableDeclarationStmt>>;
+using IdentList
+    = std::vector<Ptr<struct IdentifierExpr>>;
+using ArgumentList
+    = std::vector<std::pair<Ptr<struct Expr>, bool>>;
+    // boolean stands for whether it is unpacked
+using ParameterList
+    = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>;
+    // boolean stands for whether it is packed
 
 struct AST
 {
@@ -325,7 +333,8 @@ struct VariableDeclarationStmt : Stmt
 
 struct MultiVarsDeclarationStmt : Stmt
 {
-    std::vector<std::pair<Ptr<IdentifierExpr>, bool>> vars; // bool stands for whether it's ref
+    // bool stands for whether it's ref
+    std::vector<std::pair<Ptr<IdentifierExpr>, bool>> vars;
     ExprList exprs;
 
     MultiVarsDeclarationStmt(
