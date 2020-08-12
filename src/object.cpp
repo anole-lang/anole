@@ -1,5 +1,6 @@
 #include "error.hpp"
 #include "object.hpp"
+#include "boolobject.hpp"
 #include "stringobject.hpp"
 
 #include <map>
@@ -110,14 +111,17 @@ ObjectPtr Object::mod(ObjectPtr)
     throw RuntimeError("no mod method");
 }
 
-ObjectPtr Object::ceq(ObjectPtr)
+/**
+ * default = will compare the given objects' address
+*/
+ObjectPtr Object::ceq(ObjectPtr ptr)
 {
-    throw RuntimeError("no ceq method");
+    return this == ptr.get() ? theTrue : theFalse;
 }
 
-ObjectPtr Object::cne(ObjectPtr)
+ObjectPtr Object::cne(ObjectPtr ptr)
 {
-    throw RuntimeError("no cne method");
+    return this != ptr.get() ? theTrue : theFalse;
 }
 
 ObjectPtr Object::clt(ObjectPtr)

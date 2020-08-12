@@ -6,6 +6,10 @@
 
 - Built-in function `type` to get the type literal of the given value
 
+### Updated
+
+- Default `=` and `!=` will compare address of given objects directly
+
 ### Fixed
 
 - Custom objects in module can add their own types and the corresponding literals
