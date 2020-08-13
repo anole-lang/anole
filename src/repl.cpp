@@ -57,13 +57,12 @@ void replrun::run()
     rl_bind_key('\t', rl_insert);
     // read_history(NULL);
 
-    printf(R"(    _                _
+    printf("\
+    _                _" R"(
    / \   _ __   ___ | | ___
   / _ \ | '_ \ / _ \| |/ _ \
- / ___ \| | | | (_) | |  __/    %s
-/_/   \_\_| |_|\___/|_|\___|
-
-)",                             Version::literal);
+ / ___ \| | | | (_) | |  __/   %s
+/_/   \_\_| |_|\___/|_|\___|)""\n\n", Version::literal);
 
     AST::interpretive() = true;
 
