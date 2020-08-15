@@ -11,7 +11,8 @@ class Parser
 {
   public:
     Parser(std::istream & = std::cin,
-        String = "<stdin>");
+        String = "<stdin>"
+    );
     void cont();
     void reset();
     void set_continue_action(std::function<void()>);
@@ -21,8 +22,10 @@ class Parser
     // add new prefix operator
     static void add_prefixop(const String &str);
     // add new infix operator with priority
-    static void add_infixop(const String &str,
-        Size priority);
+    static void add_infixop(
+        const String &str,
+        Size priority
+    );
 
   private:
     Token current_token_;

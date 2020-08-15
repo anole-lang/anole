@@ -53,8 +53,7 @@ void IntegerExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<IntegerObject>(
-            'i' + to_string(value), value
-        )
+            'i' + to_string(value), value)
     );
 }
 
@@ -62,8 +61,7 @@ void FloatExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<FloatObject>(
-            'f' + to_string(value), value
-        )
+            'f' + to_string(value), value)
     );
 }
 
@@ -76,8 +74,7 @@ void StringExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<StringObject>(
-            's' + value, value
-        )
+            's' + value, value)
     );
 }
 
@@ -547,21 +544,21 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
     }
     else
     {
-        for (Size i = 0; i < vars.size(); ++i)
+        for (Size i = 0; i < decls.size(); ++i)
         {
             make_unique<NoneExpr>()->codegen(code);
         }
     }
 
-    for (auto &var : vars)
+    for (auto &decl : decls)
     {
-        if (var.second)
+        if (decl.is_ref)
         {
-            code.add_ins<Opcode::StoreRef, String>(var.first->name);
+            code.add_ins<Opcode::StoreRef, String>(decl.id->name);
         }
         else
         {
-            code.add_ins<Opcode::StoreLocal, String>(var.first->name);
+            code.add_ins<Opcode::StoreLocal, String>(decl.id->name);
         }
     }
 }
@@ -677,17 +674,20 @@ void ForeachStmt::codegen(Code &code)
     auto cond = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
             make_unique<IdentifierExpr>("__has_next__")),
-        ArgumentList());
+        ArgumentList()
+    );
 
     block->statements.insert(block->statements.begin(), nullptr);
     auto next = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
             make_unique<IdentifierExpr>("__next__")),
-        ArgumentList());
+        ArgumentList()
+    );
     if (id != nullptr)
     {
-        *block->statements.begin()
-            = make_unique<VariableDeclarationStmt>(move(id), move(next), true);
+        *block->statements.begin() = make_unique<VariableDeclarationStmt>(
+            move(id), move(next), true
+        );
     }
     else
     {

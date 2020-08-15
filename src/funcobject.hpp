@@ -15,7 +15,10 @@ class FunctionObject : public Object
       : Object(ObjectType::Func)
       , scope_(std::make_shared<Scope>(pre_scope))
       , code_(code), base_(base)
-      , parameter_num_(parameter_num) {}
+      , parameter_num_(parameter_num)
+    {
+        // ...
+    }
 
     SPtr<Scope> scope() { return scope_; }
     SPtr<Code>  code()  { return code_; }

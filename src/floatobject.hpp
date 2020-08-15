@@ -9,7 +9,10 @@ class FloatObject : public Object
   public:
     constexpr FloatObject(double value) noexcept
       : Object(ObjectType::Float)
-      , value_(value) {}
+      , value_(value)
+    {
+        // ...
+    }
 
     bool to_bool() override;
     String to_str() override;

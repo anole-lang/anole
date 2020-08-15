@@ -9,7 +9,10 @@ class ModuleObject : public Object
 {
   public:
     ModuleObject()
-      : Object(ObjectType::Module) {}
+      : Object(ObjectType::Module)
+    {
+        // ...
+    }
     virtual ~ModuleObject() = 0;
     virtual Address load_member(const String &name) = 0;
 

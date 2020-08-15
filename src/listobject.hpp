@@ -30,7 +30,10 @@ class ListIteratorObject : public Object, public std::enable_shared_from_this<Li
   public:
     ListIteratorObject(SPtr<ListObject> bind)
       : Object(ObjectType::ListIterator)
-      , bind_(bind), current_(bind->objects().begin()) {}
+      , bind_(bind), current_(bind->objects().begin())
+    {
+        // ...
+    }
 
     Address load_member(const String &name) override;
 

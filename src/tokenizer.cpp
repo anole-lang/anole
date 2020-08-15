@@ -370,7 +370,8 @@ Token Tokenizer::next()
 String Tokenizer::get_err_info(const String &message)
 {
     auto line = (cur_line_num_ != last_line_num_)
-        ? pre_line_ : cur_line_;
+        ? pre_line_ : cur_line_
+    ;
 
     return
         info::strong(name_of_in_ + ":"
@@ -379,6 +380,7 @@ String Tokenizer::get_err_info(const String &message)
         info::warning("error: ") + message + "\n" +
         line + "\n" +
         String(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ')
-            + info::warning("^");
+            + info::warning("^")
+    ;
 }
 }

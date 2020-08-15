@@ -9,7 +9,10 @@ class IntegerObject : public Object
   public:
     constexpr IntegerObject(int64_t value) noexcept
       : Object(ObjectType::Integer)
-      , value_(value) {}
+      , value_(value)
+    {
+        // ...
+    }
 
     bool to_bool() override;
     String to_str() override;

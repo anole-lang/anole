@@ -64,10 +64,12 @@ int main(int argc, char *argv[]) try
         parser.add_argument("file");
         parser.add_argument("-r")
               .default_value(false)
-              .implict_value(true);
+              .implict_value(true)
+        ;
         parser.add_argument("--version")
               .default_value(false)
-              .implict_value(true);
+              .implict_value(true)
+        ;
         parser.parse(min(file_pos + 1, argc), argv);
 
         if (parser.get<bool>("version"))
@@ -84,7 +86,8 @@ int main(int argc, char *argv[]) try
             path /= "__init__.anole";
         }
         theCurrentContext = make_shared<Context>(make_shared<Code>(),
-            path.parent_path().relative_path());
+            path.parent_path().relative_path()
+        );
 
         try
         {

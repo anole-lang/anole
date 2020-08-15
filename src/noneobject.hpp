@@ -8,7 +8,10 @@ class NoneObject : public Object
 {
   public:
     constexpr NoneObject() noexcept
-      : Object(ObjectType::None) {}
+      : Object(ObjectType::None)
+    {
+        // ...
+    }
 
     ObjectPtr ceq(ObjectPtr) override;
     ObjectPtr cne(ObjectPtr) override;

@@ -21,7 +21,8 @@ void BuiltInFunctionObject::call(Size n)
 
 namespace
 {
-map<String, SPtr<BuiltInFunctionObject>> &get_built_in_functions()
+map<String, SPtr<BuiltInFunctionObject>>
+&get_built_in_functions()
 {
     static map<String, SPtr<BuiltInFunctionObject>> built_in_functions;
     return built_in_functions;

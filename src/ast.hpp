@@ -12,19 +12,23 @@ namespace anole
 class Code;
 
 using StmtList
-    = std::vector<Ptr<struct Stmt>>;
+    = std::vector<Ptr<struct Stmt>>
+;
 using ExprList
-    = std::vector<Ptr<struct Expr>>;
+    = std::vector<Ptr<struct Expr>>
+;
 using DeclList
-    = std::vector<Ptr<struct VariableDeclarationStmt>>;
+    = std::vector<Ptr<struct VariableDeclarationStmt>>
+;
 using IdentList
-    = std::vector<Ptr<struct IdentifierExpr>>;
+    = std::vector<Ptr<struct IdentifierExpr>>
+;
 using ArgumentList
-    = std::vector<std::pair<Ptr<struct Expr>, bool>>;
-    // boolean stands for whether it is unpacked
+    = std::vector<std::pair<Ptr<struct Expr>, bool>>
+; // boolean stands for whether it is unpacked
 using ParameterList
-    = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>;
-    // boolean stands for whether it is packed
+    = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>
+; // boolean stands for whether it is packed
 
 struct AST
 {
@@ -106,7 +110,10 @@ struct StringExpr : Expr
     String value;
 
     StringExpr(String value)
-      : value(std::move(value)) {}
+      : value(std::move(value))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -116,7 +123,10 @@ struct IdentifierExpr : Expr
     String name;
 
     IdentifierExpr(String name)
-      : name(std::move(name)) {}
+      : name(std::move(name))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -129,7 +139,10 @@ struct ParenOperatorExpr : Expr
     ParenOperatorExpr(Ptr<Expr> &&expr,
         ArgumentList &&args)
       : expr(std::move(expr))
-      , args(std::move(args)) {}
+      , args(std::move(args))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -141,7 +154,10 @@ struct UnaryOperatorExpr : Expr
 
     UnaryOperatorExpr(Token op,
         Ptr<Expr> &&expr)
-      : op(op), expr(std::move(expr)) {}
+      : op(op), expr(std::move(expr))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -154,7 +170,10 @@ struct BinaryOperatorExpr : Expr
     BinaryOperatorExpr(Ptr<Expr> &&lhs,
         Token op, Ptr<Expr> &&rhs)
       : op(op), lhs(std::move(lhs))
-      , rhs(std::move(rhs)) {}
+      , rhs(std::move(rhs))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -167,7 +186,10 @@ struct LambdaExpr : Expr
     LambdaExpr(ParameterList &&parameters,
         Ptr<BlockExpr> &&block)
       : parameters(std::move(parameters))
-      , block(std::move(block)) {}
+      , block(std::move(block))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -180,7 +202,10 @@ struct NewExpr : Expr
     NewExpr(Ptr<IdentifierExpr> &&id,
         ArgumentList &&args)
       : id(std::move(id))
-      , args(std::move(args)) {}
+      , args(std::move(args))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -193,7 +218,10 @@ struct DotExpr : Expr
     DotExpr(Ptr<Expr> &&left,
         Ptr<IdentifierExpr> &&id)
       : left(std::move(left))
-      , id(std::move(id)) {}
+      , id(std::move(id))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -235,7 +263,10 @@ struct IndexExpr : Expr
     IndexExpr(Ptr<Expr> &&expr,
         Ptr<Expr> &&index)
       : expr(std::move(expr))
-      , index(std::move(index)) {}
+      , index(std::move(index))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -254,7 +285,10 @@ struct DelayExpr : Expr
     Ptr<Expr> expr;
 
     DelayExpr(Ptr<Expr> &&expr)
-      : expr(std::move(expr)) {}
+      : expr(std::move(expr))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -268,7 +302,10 @@ struct QuesExpr : Expr
         Ptr<Expr> &&false_expr)
       : cond(std::move(cond))
       , true_expr(std::move(true_expr))
-      , false_expr(std::move(false_expr)) {}
+      , false_expr(std::move(false_expr))
+    {
+        // ...
+    }
 
     void codegen(Code &code) override;
 };
@@ -298,7 +335,10 @@ struct UseStmt : Stmt
 
     UseStmt(Aliases &&aliases, Module from)
       : aliases(std::move(aliases))
-      , from(std::move(from)) {}
+      , from(std::move(from))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -308,7 +348,10 @@ struct ExprStmt : Stmt
     Ptr<Expr> expr;
 
     ExprStmt(Ptr<Expr> &&expr)
-      : expr(std::move(expr)) {}
+      : expr(std::move(expr))
+    {
+        // ...
+    }
 
     bool is_expr_stmt() override;
     void codegen(Code &) override;
@@ -316,32 +359,38 @@ struct ExprStmt : Stmt
 
 struct VariableDeclarationStmt : Stmt
 {
-    bool is_ref;
     Ptr<IdentifierExpr> id;
     Ptr<Expr> expr;
+    bool is_ref;
 
     VariableDeclarationStmt(
         Ptr<IdentifierExpr> &&id,
         Ptr<Expr> &&expr,
         bool is_ref = false)
-      : is_ref(is_ref)
-      , id(std::move(id))
-      , expr(std::move(expr)) {}
+      : id(std::move(id))
+      , expr(std::move(expr))
+      , is_ref(is_ref)
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
 
 struct MultiVarsDeclarationStmt : Stmt
 {
-    // bool stands for whether it's ref
-    std::vector<std::pair<Ptr<IdentifierExpr>, bool>> vars;
+    // just reuse VariableDeclarationStmt
+    std::vector<VariableDeclarationStmt> decls;
     ExprList exprs;
 
     MultiVarsDeclarationStmt(
-        std::vector<std::pair<Ptr<IdentifierExpr>, bool>> &&vars,
+        std::vector<VariableDeclarationStmt> &&decls,
         ExprList &&exprs)
-      : vars(std::move(vars))
-      , exprs(std::move(exprs)) {}
+      : decls(std::move(decls))
+      , exprs(std::move(exprs))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -355,7 +404,10 @@ struct FunctionDeclarationStmt : Stmt
         Ptr<IdentifierExpr> &&id,
         Ptr<LambdaExpr> &&lambda)
       : id(std::move(id))
-      , lambda(std::move(lambda)) {}
+      , lambda(std::move(lambda))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -365,7 +417,10 @@ struct PrefixopDeclarationStmt : Stmt
     Ptr<IdentifierExpr> id;
 
     PrefixopDeclarationStmt(Ptr<IdentifierExpr> &&id)
-      : id(std::move(id)) {}
+      : id(std::move(id))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -377,7 +432,10 @@ struct InfixopDeclarationStmt : Stmt
 
     InfixopDeclarationStmt(Ptr<IdentifierExpr> &&id,
         Size priority)
-      : priority(priority), id(std::move(id)) {}
+      : priority(priority), id(std::move(id))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -392,7 +450,10 @@ struct ClassDeclarationStmt : Stmt
         IdentList &&bases, Ptr<BlockExpr> &&block)
       : id(std::move(id))
       , bases(std::move(bases))
-      , block(std::move(block)) {}
+      , block(std::move(block))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -412,7 +473,10 @@ struct ReturnStmt : Stmt
     ExprList exprs;
 
     ReturnStmt(ExprList &&exprs)
-      : exprs(std::move(exprs)) {}
+      : exprs(std::move(exprs))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -428,7 +492,10 @@ struct IfElseStmt : Stmt
         Ptr<AST> &&false_branch)
       : cond(std::move(cond))
       , true_block(std::move(true_block))
-      , false_branch(std::move(false_branch)) {}
+      , false_branch(std::move(false_branch))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -441,7 +508,10 @@ struct WhileStmt : Stmt
     WhileStmt(Ptr<Expr> &&cond,
         Ptr<BlockExpr> &&block)
       : cond(std::move(cond))
-      , block(std::move(block)) {}
+      , block(std::move(block))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -454,7 +524,10 @@ struct DoWhileStmt : Stmt
     DoWhileStmt(Ptr<Expr> &&cond,
         Ptr<BlockExpr> &&block)
       : cond(std::move(cond))
-      , block(std::move(block)) {}
+      , block(std::move(block))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -470,7 +543,10 @@ struct ForeachStmt : Stmt
         Ptr<BlockExpr> &&block)
       : expr(std::move(expr))
       , id(std::move(id))
-      , block(std::move(block)) {}
+      , block(std::move(block))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };

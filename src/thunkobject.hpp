@@ -14,7 +14,10 @@ class ThunkObject : public Object
       : Object(ObjectType::Thunk)
       , computed_(false)
       , scope_(std::make_shared<Scope>(pre_scope))
-      , code_(code), base_(base) {}
+      , code_(code), base_(base)
+    {
+        // ...
+    }
 
     void set_result(Address res)
     {

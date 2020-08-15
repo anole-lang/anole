@@ -20,7 +20,10 @@ class DictObject : public Object, public std::enable_shared_from_this<DictObject
     using DataType = std::map<ObjectPtr, Address, ObjectCmp>;
 
     DictObject()
-      : Object(ObjectType::Dict) {}
+      : Object(ObjectType::Dict)
+    {
+        // ...
+    }
 
     bool to_bool() override;
     String to_str() override;

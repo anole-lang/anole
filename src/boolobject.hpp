@@ -11,7 +11,10 @@ class BoolObject : public Object
   public:
     constexpr BoolObject(bool value) noexcept
       : Object(ObjectType::Boolean)
-      , value_(value) {}
+      , value_(value)
+    {
+        // ...
+    }
 
     bool to_bool() override;
     String to_str() override;

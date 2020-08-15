@@ -225,7 +225,8 @@ Address IntegerObject::load_member(const String &name)
             make_shared<BuiltInFunctionObject>([val = value_](Size)
             {
                 theCurrentContext
-                    ->push(make_shared<StringObject>(to_string(val)));
+                    ->push(make_shared<StringObject>(to_string(val)))
+                ;
             })
         );
     }

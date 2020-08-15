@@ -23,7 +23,10 @@ class Context : public std::enable_shared_from_this<Context>
       , scope_(std::make_shared<Scope>(resume->scope_))
       , code_(resume->code_), pc_(resume->pc_)
       , stack_(std::make_shared<StackType>(*resume->stack_))
-      , current_path_(resume->current_path_) {}
+      , current_path_(resume->current_path_)
+    {
+        // ...
+    }
 
     // copy ctor
     Context(const Context &context)
@@ -31,7 +34,10 @@ class Context : public std::enable_shared_from_this<Context>
       , scope_(context.scope_)
       , code_(context.code_), pc_(context.pc_)
       , stack_(std::make_shared<StackType>(*context.stack_))
-      , current_path_(context.current_path_) {}
+      , current_path_(context.current_path_)
+    {
+        // ...
+    }
 
     Context(SPtr<Code> code,
         std::filesystem::path path = std::filesystem::current_path())
@@ -39,7 +45,10 @@ class Context : public std::enable_shared_from_this<Context>
       , scope_(std::make_shared<Scope>(nullptr))
       , code_(code), pc_(0)
       , stack_(std::make_shared<StackType>())
-      , current_path_(std::move(path)) {}
+      , current_path_(std::move(path))
+    {
+        // ...
+    }
 
     Context(SPtr<Context> pre, SPtr<Scope> scope,
         SPtr<Code> code, Size pc = 0)
@@ -47,7 +56,10 @@ class Context : public std::enable_shared_from_this<Context>
       , scope_(std::make_shared<Scope>(scope))
       , code_(std::move(code)), pc_(pc)
       , stack_(pre->stack_)
-      , current_path_(pre->current_path_) {}
+      , current_path_(pre->current_path_)
+    {
+        // ...
+    }
 
     static void set_args(int argc, char *argv[], int start);
     static const std::vector<char *> &get_args();
@@ -57,7 +69,8 @@ class Context : public std::enable_shared_from_this<Context>
     static void
     add_not_defined_symbol(
         const String &name,
-        const Address &ptr);
+        const Address &ptr
+    );
 
     static void
     rm_not_defined_symbol(const Address &ptr);
@@ -122,7 +135,8 @@ class Context : public std::enable_shared_from_this<Context>
         {
             throw RuntimeError(
                 "no such var named " +
-                get_not_defined_symbol(stack_->top()));
+                get_not_defined_symbol(stack_->top())
+            );
         }
         return reinterpret_cast<R *>(stack_->top().get()->get());
     }

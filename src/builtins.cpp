@@ -30,7 +30,8 @@ REGISTER_BUILTIN(eval,
     auto code = make_shared<Code>("<eval>");
     Parser(ss, "<eval>").gen_statement()->codegen(*code);
     theCurrentContext = make_shared<Context>(theCurrentContext,
-        theCurrentContext->scope(), code, -1);
+        theCurrentContext->scope(), code, -1
+    );
     theCurrentContext->scope() = theCurrentContext->scope()->pre();
 });
 
@@ -42,10 +43,14 @@ REGISTER_BUILTIN(call_with_current_continuation,
         auto ptr = reinterpret_cast<FunctionObject *>(func.get());
         auto cont_obj = make_shared<ContObject>(theCurrentContext);
         theCurrentContext = make_shared<Context>(
-            theCurrentContext, ptr->scope(), ptr->code(), ptr->base());
+            theCurrentContext, ptr->scope(), ptr->code(), ptr->base()
+        );
         // the base => StoreRef/StoreLocal
-        *theCurrentContext->scope()->create_symbol(any_cast<String>(theCurrentContext->oprand()))
-            = cont_obj;
+        *theCurrentContext->scope()
+            ->create_symbol(any_cast<String>(
+                theCurrentContext->oprand()))
+                    = cont_obj
+        ;
     }
     else if (theCurrentContext->top()->is<ObjectType::Cont>())
     {
@@ -62,14 +67,11 @@ REGISTER_BUILTIN(call_with_current_continuation,
 
 REGISTER_BUILTIN(id,
 {
-    theCurrentContext
-        ->push(
-            make_shared<IntegerObject>(
-                reinterpret_cast<int64_t>(
-                    theCurrentContext->pop().get()
-                )
-            )
-        );
+    theCurrentContext->push(
+        make_shared<IntegerObject>(
+            reinterpret_cast<int64_t>(
+                theCurrentContext->pop().get()))
+    );
 })
 
 REGISTER_BUILTIN(print,

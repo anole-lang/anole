@@ -36,7 +36,8 @@ RuntimeError::RuntimeError(const String &err)
         err_ = info::strong("  running at "
             + theCurrentContext->code()->from()
             + ":" + to_string(pos.first)
-            + ":" + to_string(pos.second) + ": ");
+            + ":" + to_string(pos.second) + ": "
+        );
     }
     err_ += info::warning("error: ") + err;
 
@@ -57,7 +58,8 @@ RuntimeError::RuntimeError(const String &err)
                     + theCurrentContext->code()->from()
                     + ":" + to_string(pos.first)
                     + ":" + to_string(pos.second) + "\n"
-                    + err_;
+                    + err_
+                ;
             }
         }
     }

@@ -162,7 +162,8 @@ CppModuleObject::CppModuleObject(const String &name)
     good_ = handle_;
     names_ = good_
         ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
-        : nullptr;
+        : nullptr
+    ;
 }
 
 CppModuleObject::CppModuleObject(const fs::path &path)
@@ -171,7 +172,8 @@ CppModuleObject::CppModuleObject(const fs::path &path)
     good_ = handle_;
     names_ = good_
         ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
-        : nullptr;
+        : nullptr
+    ;
 }
 
 CppModuleObject::~CppModuleObject()
@@ -191,7 +193,8 @@ Address CppModuleObject::load_member(const String &name)
         throw RuntimeError(dlerror());
     }
     auto result = make_shared<BuiltInFunctionObject>(
-        [mod = shared_from_this(), func](Size n) { func(n); });
+        [mod = shared_from_this(), func](Size n) { func(n); }
+    );
     return make_shared<ObjectPtr>(result);
 }
 }

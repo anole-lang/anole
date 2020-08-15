@@ -11,7 +11,10 @@ class StringObject : public Object, public std::enable_shared_from_this<StringOb
   public:
     StringObject(String value)
       : Object(ObjectType::String)
-      , value_(std::move(value)) {}
+      , value_(std::move(value))
+    {
+        // ...
+    }
 
     bool to_bool() override;
     String to_str() override;

@@ -12,7 +12,10 @@ class Scope
   public:
     Scope() : pre_scope_(nullptr) {}
     Scope(SPtr<Scope> pre_scope)
-      : pre_scope_(pre_scope) {}
+      : pre_scope_(pre_scope)
+    {
+        // ...
+    }
 
     SPtr<Scope> &pre()
     {

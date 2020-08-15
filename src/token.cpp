@@ -8,15 +8,24 @@ using namespace std;
 namespace anole
 {
 Token::Token(TokenType type, String value) noexcept
-  : type(type), value(move(value)) {}
+  : type(type), value(move(value))
+{
+    // ...
+}
 
 Token::Token(Token &&other) noexcept
   : type(other.type)
-  , value(std::move(other.value)) {}
+  , value(std::move(other.value))
+{
+    // ...
+}
 
 Token::Token(const Token &other) noexcept
   : type(other.type)
-  , value(other.value) {}
+  , value(other.value)
+{
+    // ...
+}
 
 Token &Token::operator=(Token &&other) noexcept
 {
@@ -93,7 +102,10 @@ Token::Token(String value) noexcept
   : type(lc_mapping.count(value)
         ? lc_mapping.at(value)
         : TokenType::Identifier)
-  , value(move(value)) {}
+  , value(move(value))
+{
+    // ...
+}
 
 TokenType Token::add_token_type(const String &str)
 {

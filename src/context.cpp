@@ -148,7 +148,8 @@ void importall_handle()
         for (const auto &name_ptr : anole_mod->scope()->symbols())
         {
             theCurrentContext->scope()->create_symbol(
-                name_ptr.first, name_ptr.second);
+                name_ptr.first, name_ptr.second
+            );
         }
         ++theCurrentContext->pc();
         return;
@@ -167,7 +168,8 @@ void importall_handle()
     for (const auto &name : *names)
     {
         theCurrentContext->scope()->create_symbol(
-            name, cpp_mod->load_member(name));
+            name, cpp_mod->load_member(name)
+        );
     }
     ++theCurrentContext->pc();
 }
@@ -186,7 +188,8 @@ void importallpath_handle()
         for (const auto &name_ptr : anole_mod->scope()->symbols())
         {
             theCurrentContext->scope()->create_symbol(
-                name_ptr.first, name_ptr.second);
+                name_ptr.first, name_ptr.second
+            );
         }
         ++theCurrentContext->pc();
         return;
@@ -205,7 +208,8 @@ void importallpath_handle()
     for (const auto &name : *names)
     {
         theCurrentContext->scope()->create_symbol(
-            name, cpp_mod->load_member(name));
+            name, cpp_mod->load_member(name)
+        );
     }
     ++theCurrentContext->pc();
 }
@@ -214,7 +218,8 @@ void importpart_handle()
 {
     const auto &name = OPRAND(String);
     theCurrentContext->push_address(
-        theCurrentContext->top<ModuleObject>()->load_member(name));
+        theCurrentContext->top<ModuleObject>()->load_member(name)
+    );
     ++theCurrentContext->pc();
 }
 
@@ -281,14 +286,17 @@ void store_handle()
 void storeref_handle()
 {
     theCurrentContext->scope()->create_symbol(
-        OPRAND(String), theCurrentContext->pop_address());
+        OPRAND(String), theCurrentContext->pop_address()
+    );
     ++theCurrentContext->pc();
 }
 
 void storelocal_handle()
 {
-    *theCurrentContext->scope()->create_symbol(OPRAND(String))
-        = theCurrentContext->pop();
+    *theCurrentContext->scope()
+        ->create_symbol(OPRAND(String))
+            = theCurrentContext->pop()
+    ;
     ++theCurrentContext->pc();
 }
 
@@ -437,7 +445,8 @@ void lambdadecl_handle()
     const auto &num_target = OPRAND(type);
     theCurrentContext->push(make_shared<FunctionObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
-        theCurrentContext->pc() + 1, num_target.first));
+        theCurrentContext->pc() + 1, num_target.first)
+    );
     theCurrentContext->pc() = num_target.second;
 }
 
@@ -445,7 +454,8 @@ void thunkdecl_handle()
 {
     theCurrentContext->push(make_shared<ThunkObject>(
         theCurrentContext->scope(), theCurrentContext->code(),
-        theCurrentContext->pc() + 1));
+        theCurrentContext->pc() + 1)
+    );
     theCurrentContext->pc() = OPRAND(Size);
 }
 

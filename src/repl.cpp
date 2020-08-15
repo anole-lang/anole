@@ -107,7 +107,8 @@ void replrun::run()
             args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr), false);
             stmt = make_unique<ParenOperatorExpr>(
                 make_unique<IdentifierExpr>("println"),
-                move(args));
+                move(args)
+            );
         }
         stmt->codegen(*code);
         Context::execute();

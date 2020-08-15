@@ -109,7 +109,8 @@ void Parser::add_infixop(const String &str, Size priority)
     }
 
     auto lower = lower_bound(operators::bop_priorities.begin(),
-        operators::bop_priorities.end(), priority);
+        operators::bop_priorities.end(), priority
+    );
     if (lower == operators::bop_priorities.end() || *lower != priority)
     {
         operators::bop_priorities.insert(lower, priority);
@@ -229,7 +230,8 @@ ParameterList Parser::gen_parameters()
                 need_default = true;
                 get_next_token();
                 decl = make_unique<VariableDeclarationStmt>(
-                    move(ident), gen_expr(), is_ref);
+                    move(ident), gen_expr(), is_ref
+                );
             }
             else if (need_default)
             {
@@ -238,7 +240,8 @@ ParameterList Parser::gen_parameters()
             else
             {
                 decl = make_unique<VariableDeclarationStmt>(
-                    move(ident), nullptr, is_ref);
+                    move(ident), nullptr, is_ref
+                );
             }
 
             parameters.push_back(make_pair(move(decl), false));
@@ -435,8 +438,8 @@ Ptr<Stmt> Parser::gen_declaration()
     {
     case TokenType::Comma:
     {
-        vector<pair<Ptr<IdentifierExpr>, bool>> vars;
-        vars.push_back(make_pair(move(id), is_ref));
+        vector<VariableDeclarationStmt> decls;
+        decls.emplace_back(move(id), nullptr, is_ref);
 
         while (current_token_.type == TokenType::Comma)
         {
@@ -447,13 +450,13 @@ Ptr<Stmt> Parser::gen_declaration()
                 is_ref = true;
                 get_next_token();
             }
-            vars.push_back(make_pair(gen_ident(), is_ref));
+            decls.emplace_back(gen_ident(), nullptr, is_ref);
         }
 
         // @var1, ..., varn
         if (current_token_.type != TokenType::Colon)
         {
-            return make_unique<MultiVarsDeclarationStmt>(move(vars), ExprList{});
+            return make_unique<MultiVarsDeclarationStmt>(move(decls), ExprList{});
         }
 
         // @var1, ..., varn: expr
@@ -465,13 +468,14 @@ Ptr<Stmt> Parser::gen_declaration()
             get_next_token();
             exprs.push_back(gen_delay_expr());
         }
-        return make_unique<MultiVarsDeclarationStmt>(move(vars), move(exprs));
+        return make_unique<MultiVarsDeclarationStmt>(move(decls), move(exprs));
     }
 
     case TokenType::Colon:
         get_next_token();
         return make_unique<VariableDeclarationStmt>(
-            move(id), gen_delay_expr(), is_ref);
+            move(id), gen_delay_expr(), is_ref
+        );
 
     case TokenType::LParen:
     {
@@ -506,7 +510,8 @@ Ptr<Stmt> Parser::gen_declaration()
             block = gen_block();
         }
         return make_unique<FunctionDeclarationStmt>(move(id),
-            make_unique<LambdaExpr>(move(parameters), move(block)));
+            make_unique<LambdaExpr>(move(parameters), move(block))
+        );
     }
 
     default:
@@ -653,7 +658,8 @@ Ptr<Stmt> Parser::gen_if_else()
     try_continue();
     auto false_branch = gen_if_else_tail();
     return make_unique<IfElseStmt>(move(cond),
-        move(true_block), move(false_branch));
+        move(true_block), move(false_branch)
+    );
 }
 
 Ptr<AST> Parser::gen_if_else_tail()
@@ -759,7 +765,8 @@ Ptr<Expr> Parser::gen_expr(int layer)
             eat<TokenType::Comma>("expected ',' here");
             auto false_expr = gen_expr();
             expr = make_unique<QuesExpr>(
-                move(expr), move(true_expr), move(false_expr));
+                move(expr), move(true_expr), move(false_expr)
+            );
             expr->pos = pos;
         }
         return expr;
@@ -958,7 +965,8 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
         auto op = current_token_;
         get_next_token();
         return make_unique<BinaryOperatorExpr>(
-            move(expr), op, gen_delay_expr());
+            move(expr), op, gen_delay_expr()
+        );
     }
 
     return expr;
@@ -997,7 +1005,8 @@ Ptr<Expr> Parser::gen_boolean()
 {
     auto bool_expr = make_unique<BoolExpr>(
         ((current_token_.type == TokenType::True)
-          ? true : false));
+          ? true : false)
+    );
     get_next_token();
     return bool_expr;
 }
@@ -1037,7 +1046,8 @@ Ptr<Expr> Parser::gen_enum_expr()
         }
         enum_expr->decls.push_back(
             make_unique<VariableDeclarationStmt>(move(ident),
-                make_unique<IntegerExpr>(base++), true));
+                make_unique<IntegerExpr>(base++), true)
+        );
 
         if (current_token_.type == TokenType::Comma)
         {

@@ -10,7 +10,10 @@ class EnumObject : public Object
   public:
     EnumObject(SPtr<Scope> scope)
       : Object(ObjectType::Enum)
-      , scope_(scope) {}
+      , scope_(scope)
+    {
+        // ...
+    }
 
     Address load_member(const String &name) override;
 

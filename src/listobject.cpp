@@ -68,7 +68,8 @@ lc_builtin_methods_for_list
     {"__iterator__", [](SPtr<ListObject> &obj)
         {
             theCurrentContext
-                ->push(make_shared<ListIteratorObject>(obj));
+                ->push(make_shared<ListIteratorObject>(obj))
+            ;
         }
     }
 };
@@ -80,13 +81,15 @@ lc_builtin_methods_for_listiterator
     {"__has_next__", [](SPtr<ListIteratorObject> &obj)
         {
             theCurrentContext
-                ->push(obj->has_next() ? theTrue : theFalse);
+                ->push(obj->has_next() ? theTrue : theFalse)
+            ;
         }
     },
     {"__next__", [](SPtr<ListIteratorObject> &obj)
         {
             theCurrentContext
-                ->push_address(obj->next());
+                ->push_address(obj->next())
+            ;
         }
     }
 };

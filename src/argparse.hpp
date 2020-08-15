@@ -14,8 +14,9 @@ namespace anole
 class Argument
 {
   public:
-    using ActionType =
-        std::function<std::any(const String &)>;
+    using ActionType
+        = std::function<std::any(const String &)>
+    ;
 
     Argument()
       : action_([](const String &value) { return value; })
@@ -88,7 +89,10 @@ class ArgumentParser
     ArgumentParser() = default;
 
     ArgumentParser(String program)
-      : program_(std::move(program)) {}
+      : program_(std::move(program))
+    {
+        // ...
+    }
 
     void parse(int argc, char *argv[])
     {
@@ -140,7 +144,8 @@ class ArgumentParser
         {
             out << ind_key.second << "\t"
                 << arguments_[ind_key.first].help_info()
-                << std::endl;
+                << std::endl
+            ;
         }
 
         out << "\nOptional arguments:" << std::endl;

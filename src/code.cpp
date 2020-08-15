@@ -475,7 +475,8 @@ void Code::serialize(ostream &out)
 
     typeouts(out, constants_literals_.size(),
                   instructions_.size(),
-                  mapping_.size());
+                  mapping_.size()
+    );
 
     for (Size i = 0; i < constants_literals_.size(); ++i)
     {
@@ -551,7 +552,9 @@ void Code::serialize(ostream &out)
     for (auto &line_pos : mapping_)
     {
         typeouts(out, line_pos.first,
-            line_pos.second.first, line_pos.second.second);
+            line_pos.second.first,
+            line_pos.second.second
+        );
     }
 }
 
@@ -570,8 +573,9 @@ bool Code::unserialize(ifstream &in)
     }
 
     Size constants_size = 0,
-        instructions_size = 0,
-        mapping_size = 0;
+         instructions_size = 0,
+         mapping_size = 0
+    ;
     typeins(in, constants_size, instructions_size, mapping_size);
 
     while (constants_size --> 0)

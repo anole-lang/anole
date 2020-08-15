@@ -12,9 +12,11 @@ struct default_delete
     void operator()(T *ptr) const
     {
         static_assert(!is_void_v<T>,
-            "can't delete pointer to incomplete type");
+            "can't delete pointer to incomplete type")
+        ;
         static_assert(sizeof(T) > 0,
             "can't delete pointer to incomplete type")
+        ;
         delete ptr;
     }
 };

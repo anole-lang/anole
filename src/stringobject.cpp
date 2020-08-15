@@ -15,21 +15,17 @@ lc_builtin_methods
     {"size", [](SPtr<StringObject> &obj)
         {
             theCurrentContext
-                ->push(
-                    make_shared<IntegerObject>(
-                        int64_t(obj->value().size())
-                    )
-                );
+                ->push(make_shared<IntegerObject>(
+                    int64_t(obj->value().size())))
+            ;
         }
     },
     {"to_int", [](SPtr<StringObject> &obj)
         {
             theCurrentContext
-                ->push(
-                    make_shared<IntegerObject>(
-                        int64_t(stoll(obj->value()))
-                    )
-                );
+                ->push(make_shared<IntegerObject>(
+                    int64_t(stoll(obj->value()))))
+            ;
         }
     },
 };

@@ -32,7 +32,8 @@ Address FunctionObject::load_member(const String &name)
 void FunctionObject::call(Size num)
 {
     theCurrentContext = make_shared<Context>(
-        theCurrentContext, scope_, code_, base_);
+        theCurrentContext, scope_, code_, base_
+    );
 
     auto parameter_num = parameter_num_;
     auto arg_num = num;
@@ -62,8 +63,10 @@ void FunctionObject::call(Size num)
                     --arg_num;
                 }
             }
-            *theCurrentContext->scope()->create_symbol(OPRAND(String))
-                = list;
+            *theCurrentContext->scope()
+                ->create_symbol(OPRAND(String))
+                    = list
+            ;
         }
             ++pc;
             --parameter_num;
@@ -71,15 +74,18 @@ void FunctionObject::call(Size num)
 
         case Opcode::StoreRef:
             theCurrentContext->scope()->create_symbol(OPRAND(String),
-                theCurrentContext->pop_address());
+                theCurrentContext->pop_address()
+            );
             ++pc;
             --arg_num;
             --parameter_num;
             break;
 
         case Opcode::StoreLocal:
-            *theCurrentContext->scope()->create_symbol(OPRAND(String))
-                = theCurrentContext->pop();
+            *theCurrentContext->scope()
+                ->create_symbol(OPRAND(String))
+                    = theCurrentContext->pop()
+            ;
             ++pc;
             --arg_num;
             --parameter_num;
