@@ -5,6 +5,14 @@
 
 namespace anole
 {
+/**
+ * use enum (without class/struct) with namespace
+ *  and using object_type::ObjectType in order to
+ *  make the enum must be accessed using scope
+ *  resolution operator and then we can enable
+ *  static cast from the enum to its underlying
+ *  type
+*/
 namespace object_type
 {
 enum ObjectType : int

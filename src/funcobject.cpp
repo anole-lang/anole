@@ -112,6 +112,7 @@ void FunctionObject::call(Size num)
     /**
      * if there were some parameters not meeting arguments
      *  check whether they have default values or not
+     *
      * we can check this because parameters without default value
      *  cannot follow parameters with default value,
      *  so if the following instruction is StoreRef/StoreLocal

@@ -1083,6 +1083,7 @@ Ptr<Expr> Parser::gen_dict_expr()
  *   @(): expr
  *   @(), stmt
  *   @() {}
+ *
  * '()' cannot be ignored because anole enable '@var: expr and @var()...',
  *   so '()' is viewed as the component of lambda
 */
@@ -1126,12 +1127,12 @@ Ptr<Expr> Parser::gen_new_expr()
     return make_unique<NewExpr>(gen_ident(), gen_arguments());
 }
 
-/* Ptr<Expr> SyntaxAnalyzer::gen_match_expr()
-generate match expr as follow:
-    match value {
-        1, 2, 3, 4 => "smaller than five",
-        5 => "five"
-    } else "bigger than five"
+/**
+ * generate match expr as the following:
+ *  match value {
+ *      1, 2, 3, 4 => "smaller than five",
+ *      5 => "five"
+ *  } else "bigger than five"
 */
 Ptr<Expr> Parser::gen_match_expr()
 {

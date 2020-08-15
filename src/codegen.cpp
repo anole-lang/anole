@@ -652,13 +652,13 @@ void DoWhileStmt::codegen(Code &code)
 }
 
 /** foreach expr as ident { stmts }
- *    is equivalent to:
+ *   is equivalent to:
  *
- *    @&__it: expr.__iterator__();
- *    while __it.__has_next__() {
- *      @&ident: __it.__next__();
- *      ... stmts ...
- *    }
+ *  @&__it: expr.__iterator__();
+ *  while __it.__has_next__() {
+ *    @&ident: __it.__next__();
+ *    ... stmts ...
+ *  }
 */
 void ForeachStmt::codegen(Code &code)
 {

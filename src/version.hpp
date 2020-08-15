@@ -10,8 +10,8 @@ namespace anole
  *
  * for a non-released version
  *  Version::literal will contain 'HEAD' before version
- *   like 'HEAD 0.0.17 2020/08/07'
- *    and '0.0.17' is the next released version
+ *  like 'HEAD 0.0.17 2020/08/07'
+ *  and '0.0.17' is the next released version
  *
  * YYYY/MM/DD is the date when the last commit is committed
 */
@@ -26,6 +26,7 @@ struct Version
 
 /**
  * theMagic stands for version of IR
+ *
  * each version of IR has an unique magic number,
  *  which is same as the time date IR is released
  *

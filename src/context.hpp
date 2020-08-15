@@ -139,8 +139,10 @@ class Context : public std::enable_shared_from_this<Context>
 
     ObjectPtr pop()
     {
-        // use copy ctor,
-        // because the object ptr may be pointed by other address
+        /**
+         * use copy ctor, because the object ptr
+         *  may be pointed by other address
+        */
         auto res = *stack_->top();
         stack_->pop();
         return res;

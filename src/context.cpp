@@ -408,8 +408,9 @@ void addinfixop_handle()
 void pack_handle()
 {
     /**
-     * if pack_handle is called
-     * means that no arguments now
+     * that pack_handle is called
+     *  means no arguments now
+     *
      * a empty list will be the packed result
     */
    theCurrentContext->push(make_shared<ListObject>());
