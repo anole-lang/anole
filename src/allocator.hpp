@@ -10,7 +10,7 @@ namespace anole
 {
 /**
  * by allocator,
- *  we can allocate memories for variables/objects/scopes/contexts
+ *  we can allocate memories for variables/objects/scopes/contexts/stacks
 */
 template<typename T>
 class Allocator
@@ -27,7 +27,15 @@ class Allocator
     template<typename U = Value, typename ...Ts>
     static U *alloc(Ts &&...values)
     {
-        Allocator::allocator().allocate<U>(std::forward<Ts>(values)...);
+        if constexpr (light::is_same_v<Value, Scope>)
+        {
+            if (allocated_.size() > 100)
+            {
+                Collector::collector().gc();
+            }
+        }
+
+        return Allocator::allocator().template allocate<U>(std::forward<Ts>(values)...);
     }
 
     static void dealloc(Pointer ptr)
