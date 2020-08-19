@@ -47,6 +47,7 @@ class Collector
         recorded<T>().insert(ptr);
     }
 
+    // TODO
     void gc()
     {
         // ...
