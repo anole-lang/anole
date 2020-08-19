@@ -1,4 +1,5 @@
 #include "context.hpp"
+#include "allocator.hpp"
 #include "boolobject.hpp"
 #include "stringobject.hpp"
 #include "integerobject.hpp"
@@ -9,21 +10,21 @@ namespace anole
 {
 namespace
 {
-map<String, function<void(SPtr<StringObject> &)>>
+map<String, function<void(StringObject *)>>
 lc_builtin_methods
 {
-    {"size", [](SPtr<StringObject> &obj)
+    {"size", [](StringObject *obj)
         {
-            theCurrentContext
-                ->push(make_shared<IntegerObject>(
+            Context::current()
+                ->push(Allocator<Object>::alloc<IntegerObject>(
                     int64_t(obj->value().size())))
             ;
         }
     },
-    {"to_int", [](SPtr<StringObject> &obj)
+    {"to_int", [](StringObject *obj)
         {
-            theCurrentContext
-                ->push(make_shared<IntegerObject>(
+            Context::current()
+                ->push(Allocator<Object>::alloc<IntegerObject>(
                     int64_t(stoll(obj->value()))))
             ;
         }
@@ -46,12 +47,12 @@ String StringObject::to_key()
     return "s" + to_str();
 }
 
-ObjectPtr StringObject::add(ObjectPtr obj)
+Object *StringObject::add(Object *obj)
 {
     if (obj->is<ObjectType::String>())
     {
-        auto p = reinterpret_pointer_cast<StringObject>(obj);
-        return make_shared<StringObject>(value_ + p->value_);
+        auto p = reinterpret_cast<StringObject *>(obj);
+        return Allocator<Object>::alloc<StringObject>(value_ + p->value_);
     }
     else
     {
@@ -59,12 +60,12 @@ ObjectPtr StringObject::add(ObjectPtr obj)
     }
 }
 
-ObjectPtr StringObject::ceq(ObjectPtr obj)
+Object *StringObject::ceq(Object *obj)
 {
     if (obj->is<ObjectType::String>())
     {
-        auto p = reinterpret_pointer_cast<StringObject>(obj);
-        return value_ == p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<StringObject *>(obj);
+        return value_ == p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -72,12 +73,12 @@ ObjectPtr StringObject::ceq(ObjectPtr obj)
     }
 }
 
-ObjectPtr StringObject::cne(ObjectPtr obj)
+Object *StringObject::cne(Object *obj)
 {
     if (obj->is<ObjectType::String>())
     {
-        auto p = reinterpret_pointer_cast<StringObject>(obj);
-        return value_ != p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<StringObject *>(obj);
+        return value_ != p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -85,12 +86,12 @@ ObjectPtr StringObject::cne(ObjectPtr obj)
     }
 }
 
-ObjectPtr StringObject::clt(ObjectPtr obj)
+Object *StringObject::clt(Object *obj)
 {
     if (obj->is<ObjectType::String>())
     {
-        auto p = reinterpret_pointer_cast<StringObject>(obj);
-        return value_ < p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<StringObject *>(obj);
+        return value_ < p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -98,12 +99,12 @@ ObjectPtr StringObject::clt(ObjectPtr obj)
     }
 }
 
-ObjectPtr StringObject::cle(ObjectPtr obj)
+Object *StringObject::cle(Object *obj)
 {
     if (obj->is<ObjectType::String>())
     {
-        auto p = reinterpret_pointer_cast<StringObject>(obj);
-        return value_ <= p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<StringObject *>(obj);
+        return value_ <= p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -111,13 +112,14 @@ ObjectPtr StringObject::cle(ObjectPtr obj)
     }
 }
 
-Address StringObject::index(ObjectPtr index)
+Address StringObject::index(Object *index)
 {
     if (index->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(index);
-        return make_shared<ObjectPtr>(
-            make_shared<StringObject>(String(1, value_[p->value()]))
+        auto p = reinterpret_cast<IntegerObject *>(index);
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<StringObject>(
+                String(1, value_[p->value()]))
         );
     }
     else
@@ -131,13 +133,13 @@ Address StringObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([
-                ptr = shared_from_this(),
-                &func = method->second](Size) mutable
-            {
-                func(ptr);
-            })
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+                    &func = method->second](Size) mutable
+                {
+                    func(this);
+                },
+                this)
         );
     }
     return Object::load_member(name);

@@ -19,9 +19,13 @@ namespace anole
 class BuiltInFunctionObject : public Object
 {
   public:
-    BuiltInFunctionObject(std::function<void(Size)> func)
+    friend class Collector;
+
+    BuiltInFunctionObject(std::function<void(Size)> func,
+        Object *bind_obj = nullptr)
       : Object(ObjectType::BuiltinFunc)
       , func_(std::move(func))
+      , bind_obj_(bind_obj)
     {
         // ...
     }
@@ -29,7 +33,7 @@ class BuiltInFunctionObject : public Object
     String to_str() override;
     void call(Size num) override;
 
-    static ObjectPtr load_built_in_function(const String &);
+    static Object *load_built_in_function(const String &);
 
     static void register_built_in_function(
         const String &,
@@ -38,5 +42,6 @@ class BuiltInFunctionObject : public Object
 
   private:
     std::function<void(Size)> func_;
+    Object *bind_obj_;
 };
 }

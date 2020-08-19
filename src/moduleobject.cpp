@@ -18,31 +18,32 @@ namespace anole
 {
 ModuleObject::~ModuleObject() = default;
 
-SPtr<ModuleObject> ModuleObject::generate(const String &name)
+ModuleObject *ModuleObject::generate(const String &name)
 {
-    SPtr<ModuleObject> mod = make_shared<AnoleModuleObject>(name);
+    ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
     if (!mod->good())
     {
-        mod = make_shared<CppModuleObject>(name);
+        mod = Allocator<Object>::alloc<CppModuleObject>(name);
     }
     return mod;
 }
 
-SPtr<ModuleObject> ModuleObject::generate(const fs::path &path)
+ModuleObject *ModuleObject::generate(const fs::path &path)
 {
-    SPtr<ModuleObject> mod;
+    ModuleObject *mod;
     if (path.extension() == ".so")
     {
-        mod = make_shared<CppModuleObject>(path);
+        mod = Allocator<Object>::alloc<CppModuleObject>(path);
     }
     else
     {
-        mod = make_shared<AnoleModuleObject>(path);
+        mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
     }
     return mod;
 }
 
 AnoleModuleObject::AnoleModuleObject(const String &name)
+  : ModuleObject(ObjectType::AnoleModule)
 {
     good_ = true;
 
@@ -51,7 +52,7 @@ AnoleModuleObject::AnoleModuleObject(const String &name)
      *  and then look up in "/usr/local/lib/anole/" if not find
     */
 
-    auto cpath = theCurrentContext->current_path();
+    auto cpath = Context::current()->current_path();
     if (fs::is_regular_file(cpath / (name + ".anole")))
     {
         init(cpath / (name + ".anole"));
@@ -75,6 +76,7 @@ AnoleModuleObject::AnoleModuleObject(const String &name)
 }
 
 AnoleModuleObject::AnoleModuleObject(const fs::path &path)
+  : ModuleObject(ObjectType::AnoleModule)
 {
     good_ = true;
 
@@ -111,9 +113,9 @@ void AnoleModuleObject::init(const filesystem::path &path)
     auto ir_path = path.string() + ".ir";
 
     code_ = make_shared<Code>(path.filename().string());
-    auto origin = theCurrentContext;
-    theCurrentContext = make_shared<Context>(code_, dir);
-    theCurrentContext->pre_context() = origin;
+    auto origin = Context::current();
+    Context::current() = Allocator<Context>::alloc(code_, dir);
+    Context::current()->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
         && fs::last_write_time(ir_path) >= fs::last_write_time(path)
@@ -146,13 +148,14 @@ void AnoleModuleObject::init(const filesystem::path &path)
     code_->print(rd_path);
     #endif
 
-    scope_ = theCurrentContext->scope();
-    theCurrentContext = origin;
+    scope_ = Context::current()->scope();
+    Context::current() = origin;
 }
 
 CppModuleObject::CppModuleObject(const String &name)
+  : ModuleObject(ObjectType::CppModule)
 {
-    auto path = theCurrentContext->current_path() / (name + ".so");
+    auto path = Context::current()->current_path() / (name + ".so");
     handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
     if (!handle_)
     {
@@ -167,6 +170,7 @@ CppModuleObject::CppModuleObject(const String &name)
 }
 
 CppModuleObject::CppModuleObject(const fs::path &path)
+  : ModuleObject(ObjectType::CppModule)
 {
     handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
     good_ = handle_;
@@ -187,14 +191,17 @@ CppModuleObject::~CppModuleObject()
 Address CppModuleObject::load_member(const String &name)
 {
     using FuncType = void (*)(Size);
+
     auto func = reinterpret_cast<FuncType>(dlsym(handle_, name.c_str()));
     if (!func)
     {
         throw RuntimeError(dlerror());
     }
-    auto result = make_shared<BuiltInFunctionObject>(
-        [mod = shared_from_this(), func](Size n) { func(n); }
+
+    auto result = Allocator<Object>::alloc<BuiltInFunctionObject>(
+        [func](Size n) { func(n); }, this
     );
-    return make_shared<ObjectPtr>(result);
+
+    return Allocator<Variable>::alloc(result);
 }
 }

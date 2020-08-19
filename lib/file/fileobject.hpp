@@ -4,7 +4,7 @@
 
 namespace anole
 {
-class FileObject : public Object, public std::enable_shared_from_this<FileObject>
+class FileObject : public Object
 {
   public:
     FileObject(const String &, std::int64_t mode);

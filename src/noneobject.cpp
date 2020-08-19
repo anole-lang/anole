@@ -1,3 +1,4 @@
+#include "allocator.hpp"
 #include "noneobject.hpp"
 #include "boolobject.hpp"
 
@@ -5,13 +6,9 @@ using namespace std;
 
 namespace anole
 {
-ObjectPtr NoneObject::ceq(ObjectPtr obj)
+NoneObject *NoneObject::one()
 {
-    return (this == obj.get()) ? theTrue : theFalse;
-}
-
-ObjectPtr NoneObject::cne(ObjectPtr obj)
-{
-    return (this != obj.get()) ? theTrue : theFalse;
+    static auto the_none = Allocator<Object>::alloc<NoneObject>();
+    return the_none;
 }
 }

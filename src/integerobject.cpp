@@ -25,17 +25,17 @@ String IntegerObject::to_key()
     return 'i' + to_str();
 }
 
-ObjectPtr IntegerObject::neg()
+Object *IntegerObject::neg()
 {
-    return make_shared<IntegerObject>(-value_);
+    return Allocator<Object>::alloc<IntegerObject>(-value_);
 }
 
-ObjectPtr IntegerObject::add(ObjectPtr obj)
+Object *IntegerObject::add(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ + p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ + p->value_);
     }
     else
     {
@@ -43,12 +43,12 @@ ObjectPtr IntegerObject::add(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::sub(ObjectPtr obj)
+Object *IntegerObject::sub(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ - p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ - p->value_);
     }
     else
     {
@@ -56,12 +56,12 @@ ObjectPtr IntegerObject::sub(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::mul(ObjectPtr obj)
+Object *IntegerObject::mul(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ * p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ * p->value_);
     }
     else
     {
@@ -69,12 +69,12 @@ ObjectPtr IntegerObject::mul(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::div(ObjectPtr obj)
+Object *IntegerObject::div(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ / p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ / p->value_);
     }
     else
     {
@@ -82,12 +82,12 @@ ObjectPtr IntegerObject::div(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::mod(ObjectPtr obj)
+Object *IntegerObject::mod(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ % p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ % p->value_);
     }
     else
     {
@@ -95,12 +95,12 @@ ObjectPtr IntegerObject::mod(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::ceq(ObjectPtr obj)
+Object *IntegerObject::ceq(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return value_ == p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return value_ == p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -108,12 +108,12 @@ ObjectPtr IntegerObject::ceq(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::cne(ObjectPtr obj)
+Object *IntegerObject::cne(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return value_ != p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return value_ != p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -121,12 +121,12 @@ ObjectPtr IntegerObject::cne(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::clt(ObjectPtr obj)
+Object *IntegerObject::clt(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return value_ < p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return value_ < p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -134,12 +134,12 @@ ObjectPtr IntegerObject::clt(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::cle(ObjectPtr obj)
+Object *IntegerObject::cle(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return value_ <= p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return value_ <= p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -147,17 +147,17 @@ ObjectPtr IntegerObject::cle(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::bneg()
+Object *IntegerObject::bneg()
 {
-    return make_shared<IntegerObject>(~value_);
+    return Allocator<Object>::alloc<IntegerObject>(~value_);
 }
 
-ObjectPtr IntegerObject::bor(ObjectPtr obj)
+Object *IntegerObject::bor(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ | p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ | p->value_);
     }
     else
     {
@@ -165,12 +165,12 @@ ObjectPtr IntegerObject::bor(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::bxor(ObjectPtr obj)
+Object *IntegerObject::bxor(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ ^ p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ ^ p->value_);
     }
     else
     {
@@ -178,12 +178,12 @@ ObjectPtr IntegerObject::bxor(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::band(ObjectPtr obj)
+Object *IntegerObject::band(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ & p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ & p->value_);
     }
     else
     {
@@ -191,12 +191,12 @@ ObjectPtr IntegerObject::band(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::bls(ObjectPtr obj)
+Object *IntegerObject::bls(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ << p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ << p->value_);
     }
     else
     {
@@ -204,12 +204,12 @@ ObjectPtr IntegerObject::bls(ObjectPtr obj)
     }
 }
 
-ObjectPtr IntegerObject::brs(ObjectPtr obj)
+Object *IntegerObject::brs(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_pointer_cast<IntegerObject>(obj);
-        return make_shared<IntegerObject>(value_ >> p->value_);
+        auto p = reinterpret_cast<IntegerObject *>(obj);
+        return Allocator<Object>::alloc<IntegerObject>(value_ >> p->value_);
     }
     else
     {
@@ -221,13 +221,14 @@ Address IntegerObject::load_member(const String &name)
 {
     if (name == "to_str")
     {
-        return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([val = value_](Size)
-            {
-                theCurrentContext
-                    ->push(make_shared<StringObject>(to_string(val)))
-                ;
-            })
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<BuiltInFunctionObject>(
+                    [val = value_](Size)
+                {
+                    Context::current()
+                        ->push(Allocator<Object>::alloc<StringObject>(to_string(val)))
+                    ;
+                })
         );
     }
     return Object::load_member(name);

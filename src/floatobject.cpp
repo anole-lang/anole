@@ -1,3 +1,4 @@
+#include "allocator.hpp"
 #include "boolobject.hpp"
 #include "floatobject.hpp"
 
@@ -20,17 +21,17 @@ String FloatObject::to_key()
     return 'f' + to_str();
 }
 
-ObjectPtr FloatObject::neg()
+Object *FloatObject::neg()
 {
-    return make_shared<FloatObject>(-value_);
+    return Allocator<Object>::alloc<FloatObject>(-value_);
 }
 
-ObjectPtr FloatObject::add(ObjectPtr obj)
+Object *FloatObject::add(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return make_shared<FloatObject>(value_ + p->value_);
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return Allocator<Object>::alloc<FloatObject>(value_ + p->value_);
     }
     else
     {
@@ -38,12 +39,12 @@ ObjectPtr FloatObject::add(ObjectPtr obj)
     }
 }
 
-ObjectPtr FloatObject::sub(ObjectPtr obj)
+Object *FloatObject::sub(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return make_shared<FloatObject>(value_ - p->value_);
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return Allocator<Object>::alloc<FloatObject>(value_ - p->value_);
     }
     else
     {
@@ -51,12 +52,12 @@ ObjectPtr FloatObject::sub(ObjectPtr obj)
     }
 }
 
-ObjectPtr FloatObject::mul(ObjectPtr obj)
+Object *FloatObject::mul(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return make_shared<FloatObject>(value_ * p->value_);
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return Allocator<Object>::alloc<FloatObject>(value_ * p->value_);
     }
     else
     {
@@ -64,12 +65,12 @@ ObjectPtr FloatObject::mul(ObjectPtr obj)
     }
 }
 
-ObjectPtr FloatObject::div(ObjectPtr obj)
+Object *FloatObject::div(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return make_shared<FloatObject>(value_ / p->value_);
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return Allocator<Object>::alloc<FloatObject>(value_ / p->value_);
     }
     else
     {
@@ -77,12 +78,12 @@ ObjectPtr FloatObject::div(ObjectPtr obj)
     }
 }
 
-ObjectPtr FloatObject::ceq(ObjectPtr obj)
+Object *FloatObject::ceq(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return value_ == p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return value_ == p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -90,12 +91,12 @@ ObjectPtr FloatObject::ceq(ObjectPtr obj)
     }
 }
 
-ObjectPtr FloatObject::cne(ObjectPtr obj)
+Object *FloatObject::cne(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return value_ != p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return value_ != p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -103,12 +104,12 @@ ObjectPtr FloatObject::cne(ObjectPtr obj)
     }
 }
 
-ObjectPtr FloatObject::clt(ObjectPtr obj)
+Object *FloatObject::clt(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return value_ < p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return value_ < p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {
@@ -116,12 +117,12 @@ ObjectPtr FloatObject::clt(ObjectPtr obj)
     }
 }
 
-ObjectPtr FloatObject::cle(ObjectPtr obj)
+Object *FloatObject::cle(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
-        auto p = reinterpret_pointer_cast<FloatObject>(obj);
-        return value_ <= p->value_ ? theTrue : theFalse;
+        auto p = reinterpret_cast<FloatObject *>(obj);
+        return value_ <= p->value_ ? BoolObject::the_true() : BoolObject::the_false();
     }
     else
     {

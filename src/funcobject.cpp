@@ -3,7 +3,7 @@
 #include "boolobject.hpp"
 #include "listobject.hpp"
 
-#define OPRAND(T) any_cast<const T &>(theCurrentContext->oprand())
+#define OPRAND(T) any_cast<const T &>(Context::current()->oprand())
 
 using namespace std;
 
@@ -14,16 +14,6 @@ String FunctionObject::to_str()
     return "<function>"s;
 }
 
-ObjectPtr FunctionObject::ceq(ObjectPtr obj)
-{
-    return (this == obj.get()) ? theTrue : theFalse;
-}
-
-ObjectPtr FunctionObject::cne(ObjectPtr obj)
-{
-    return (this != obj.get()) ? theTrue : theFalse;
-}
-
 Address FunctionObject::load_member(const String &name)
 {
     return scope_->load_symbol(name);
@@ -31,26 +21,26 @@ Address FunctionObject::load_member(const String &name)
 
 void FunctionObject::call(Size num)
 {
-    theCurrentContext = make_shared<Context>(
-        theCurrentContext, scope_, code_, base_
+    Context::current() = Allocator<Context>::alloc(
+        Context::current(), scope_, code_, base_
     );
 
     auto parameter_num = parameter_num_;
     auto arg_num = num;
-    auto &pc = theCurrentContext->pc();
+    auto &pc = Context::current()->pc();
     while (arg_num && parameter_num)
     {
-        switch (theCurrentContext->opcode())
+        switch (Context::current()->opcode())
         {
         case Opcode::Pack:
         {
             ++pc;
-            auto list = make_shared<ListObject>();
-            if (theCurrentContext->opcode() == Opcode::StoreRef)
+            auto list = Allocator<Object>::alloc<ListObject>();
+            if (Context::current()->opcode() == Opcode::StoreRef)
             {
                 while (arg_num)
                 {
-                    list->objects().push_back(theCurrentContext->pop_address());
+                    list->objects().push_back(Context::current()->pop_address());
                     --arg_num;
                 }
             }
@@ -59,11 +49,11 @@ void FunctionObject::call(Size num)
             {
                 while (arg_num)
                 {
-                    list->append(theCurrentContext->pop());
+                    list->append(Context::current()->pop());
                     --arg_num;
                 }
             }
-            *theCurrentContext->scope()
+            *Context::current()->scope()
                 ->create_symbol(OPRAND(String))
                     = list
             ;
@@ -73,8 +63,8 @@ void FunctionObject::call(Size num)
             break;
 
         case Opcode::StoreRef:
-            theCurrentContext->scope()->create_symbol(OPRAND(String),
-                theCurrentContext->pop_address()
+            Context::current()->scope()->create_symbol(OPRAND(String),
+                Context::current()->pop_address()
             );
             ++pc;
             --arg_num;
@@ -82,9 +72,9 @@ void FunctionObject::call(Size num)
             break;
 
         case Opcode::StoreLocal:
-            *theCurrentContext->scope()
+            *Context::current()->scope()
                 ->create_symbol(OPRAND(String))
-                    = theCurrentContext->pop()
+                    = Context::current()->pop()
             ;
             ++pc;
             --arg_num;
@@ -126,8 +116,8 @@ void FunctionObject::call(Size num)
     */
     else if (parameter_num)
     {
-        if (theCurrentContext->opcode() == Opcode::StoreRef
-            || theCurrentContext->opcode() == Opcode::StoreLocal)
+        if (Context::current()->opcode() == Opcode::StoreRef
+            || Context::current()->opcode() == Opcode::StoreLocal)
         {
             throw RuntimeError("missing the parameter named '" + OPRAND(String) + '\'');
         }

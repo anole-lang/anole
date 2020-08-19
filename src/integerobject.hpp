@@ -17,22 +17,22 @@ class IntegerObject : public Object
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
-    ObjectPtr neg() override;
-    ObjectPtr add(ObjectPtr) override;
-    ObjectPtr sub(ObjectPtr) override;
-    ObjectPtr mul(ObjectPtr) override;
-    ObjectPtr div(ObjectPtr) override;
-    ObjectPtr mod(ObjectPtr) override;
-    ObjectPtr ceq(ObjectPtr) override;
-    ObjectPtr cne(ObjectPtr) override;
-    ObjectPtr clt(ObjectPtr) override;
-    ObjectPtr cle(ObjectPtr) override;
-    ObjectPtr bneg() override;
-    ObjectPtr bor(ObjectPtr) override;
-    ObjectPtr bxor(ObjectPtr) override;
-    ObjectPtr band(ObjectPtr) override;
-    ObjectPtr bls(ObjectPtr) override;
-    ObjectPtr brs(ObjectPtr) override;
+    Object *neg() override;
+    Object *add(Object *) override;
+    Object *sub(Object *) override;
+    Object *mul(Object *) override;
+    Object *div(Object *) override;
+    Object *mod(Object *) override;
+    Object *ceq(Object *) override;
+    Object *cne(Object *) override;
+    Object *clt(Object *) override;
+    Object *cle(Object *) override;
+    Object *bneg() override;
+    Object *bor(Object *) override;
+    Object *bxor(Object *) override;
+    Object *band(Object *) override;
+    Object *bls(Object *) override;
+    Object *brs(Object *) override;
     Address load_member(const String &name) override;
 
     constexpr int64_t value() const noexcept

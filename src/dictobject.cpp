@@ -12,42 +12,42 @@ namespace anole
 {
 namespace
 {
-map<String, function<void(SPtr<DictObject> &)>>
+map<String, function<void(DictObject *)>>
 lc_builtin_methods
 {
-    {"empty", [](SPtr<DictObject> &obj)
+    {"empty", [](DictObject *obj)
         {
-            theCurrentContext->push(obj->data().empty() ? theTrue : theFalse);
+            Context::current()->push(obj->data().empty() ? BoolObject::the_true() : BoolObject::the_false());
         }
     },
-    {"size", [](SPtr<DictObject> &obj)
+    {"size", [](DictObject *obj)
         {
-            theCurrentContext->push(make_shared<IntegerObject>(int64_t(obj->data().size())));
+            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->data().size())));
         }
     },
-    {"at", [](SPtr<DictObject> &obj)
+    {"at", [](DictObject *obj)
         {
-            theCurrentContext->push(*(obj->index(theCurrentContext->pop())));
+            Context::current()->push(obj->index(Context::current()->pop())->obj());
         }
     },
-    {"insert", [](SPtr<DictObject> &obj)
+    {"insert", [](DictObject *obj)
         {
-            auto p1 = theCurrentContext->pop();
-            auto p2 = theCurrentContext->pop();
+            auto p1 = Context::current()->pop();
+            auto p2 = Context::current()->pop();
             obj->insert(p1, p2);
-            theCurrentContext->push(theNone);
+            Context::current()->push(NoneObject::one());
         }
     },
-    {"erase", [](SPtr<DictObject> &obj)
+    {"erase", [](DictObject *obj)
         {
-            obj->data().erase(theCurrentContext->pop());
-            theCurrentContext->push(theNone);
+            obj->data().erase(Context::current()->pop());
+            Context::current()->push(NoneObject::one());
         }
     },
-    {"clear", [](SPtr<DictObject> &obj)
+    {"clear", [](DictObject *obj)
         {
             obj->data().clear();
-            theCurrentContext->push(theNone);
+            Context::current()->push(NoneObject::one());
         }
     }
 };
@@ -68,7 +68,7 @@ String DictObject::to_str()
         {
             res += ",";
         }
-        res += " " + it->first->to_str() + " => " + (*it->second)->to_str();
+        res += " " + it->first->to_str() + " => " + it->second->obj()->to_str();
     }
     return res + " }";
 }
@@ -78,7 +78,7 @@ String DictObject::to_key()
     return 'd' + to_str();
 }
 
-Address DictObject::index(ObjectPtr index)
+Address DictObject::index(Object *index)
 {
     auto it = data_.find(index);
     if (it != data_.end())
@@ -88,7 +88,7 @@ Address DictObject::index(ObjectPtr index)
     /**
      * dict will create an empty target if the key is not recorded
     */
-    return data_[index] = make_shared<ObjectPtr>(nullptr);
+    return data_[index] = Allocator<Variable>::alloc(nullptr);
 }
 
 Address DictObject::load_member(const String &name)
@@ -96,16 +96,16 @@ Address DictObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([
-                ptr = shared_from_this(),
-                &func = method->second](Size) mutable
-            {
-                func(ptr);
-            })
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+                    &func = method->second](Size) mutable
+                {
+                    func(this);
+                },
+                this)
         );
     }
-    return index(make_shared<StringObject>(name));
+    return index(Allocator<Object>::alloc<StringObject>(name));
 }
 
 DictObject::DataType &DictObject::data()
@@ -113,8 +113,8 @@ DictObject::DataType &DictObject::data()
     return data_;
 }
 
-void DictObject::insert(ObjectPtr key, ObjectPtr value)
+void DictObject::insert(Object *key, Object *value)
 {
-    data_[key] = make_shared<ObjectPtr>(value);
+    data_[key] = Allocator<Variable>::alloc(value);
 }
 }

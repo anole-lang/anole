@@ -1,12 +1,13 @@
 #pragma once
 
 #include "object.hpp"
+#include "collector.hpp"
 
 #include <list>
 
 namespace anole
 {
-class ListObject : public Object, public std::enable_shared_from_this<ListObject>
+class ListObject : public Object
 {
   public:
     ListObject() : Object(ObjectType::List) {}
@@ -14,23 +15,26 @@ class ListObject : public Object, public std::enable_shared_from_this<ListObject
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
-    ObjectPtr add(ObjectPtr) override;
-    Address index(ObjectPtr) override;
+    Object *add(Object *) override;
+    Address index(Object *) override;
     Address load_member(const String &name) override;
 
     std::list<Address> &objects();
-    void append(ObjectPtr obj);
+    void append(Object *obj);
 
   private:
     std::list<Address> objects_;
 };
 
-class ListIteratorObject : public Object, public std::enable_shared_from_this<ListIteratorObject>
+class ListIteratorObject : public Object, public EnableCollect<Object>
 {
   public:
-    ListIteratorObject(SPtr<ListObject> bind)
+    friend class Collector;
+
+    ListIteratorObject(ListObject *bind)
       : Object(ObjectType::ListIterator)
-      , bind_(bind), current_(bind->objects().begin())
+      , EnableCollect(bind), bind_(bind)
+      , current_(bind->objects().begin())
     {
         // ...
     }
@@ -41,7 +45,7 @@ class ListIteratorObject : public Object, public std::enable_shared_from_this<Li
     Address next() { return *current_++; }
 
   private:
-    SPtr<ListObject> bind_;
+    ListObject *bind_;
     std::list<Address>::iterator current_;
 };
 }

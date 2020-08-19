@@ -8,7 +8,7 @@ Address EnumObject::load_member(const String &name)
 {
     if (scope_->symbols().count(name))
     {
-        return make_shared<ObjectPtr>(*scope_->load_symbol(name));
+        return Allocator<Variable>::alloc(scope_->load_symbol(name)->obj());
     }
     return Object::load_member(name);
 }

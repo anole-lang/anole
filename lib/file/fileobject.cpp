@@ -18,82 +18,86 @@ void __open(Size n)
         throw RuntimeError("function open need 2 arguments");
     }
 
-    auto path = theCurrentContext->pop();
-    auto mode = theCurrentContext->pop();
+    auto path = Context::current()->pop();
+    auto mode = Context::current()->pop();
 
-    theCurrentContext
+    Context::current()
         ->push(
-            make_shared<FileObject>(
+            Allocator<Object>::alloc<FileObject>(
                 path->to_str(),
-                reinterpret_cast<IntegerObject *>(mode.get())->value()));
+                reinterpret_cast<IntegerObject *>(mode)->value()))
+    ;
 }
 }
 
 namespace
 {
-map<String, function<void(SPtr<FileObject> &)>>
+map<String, function<void(FileObject *)>>
 lc_builtin_methods
 {
-    {"good", [](SPtr<FileObject> &obj)
+    {"good", [](FileObject *obj)
         {
-            theCurrentContext->push(obj->file().good() ? theTrue : theFalse);
+            Context::current()->push(obj->file().good() ? BoolObject::the_true() : BoolObject::the_false());
         }
     },
-    {"eof", [](SPtr<FileObject> &obj)
+    {"eof", [](FileObject *obj)
         {
-            theCurrentContext->push(obj->file().eof() ? theTrue : theFalse);
+            Context::current()->push(obj->file().eof() ? BoolObject::the_true() : BoolObject::the_false());
         }
     },
-    {"close", [](SPtr<FileObject> &obj)
+    {"close", [](FileObject *obj)
         {
             obj->file().close();
         }
     },
-    {"flush", [](SPtr<FileObject> &obj)
+    {"flush", [](FileObject *obj)
         {
             obj->file().flush();
         }
     },
-    {"read", [](SPtr<FileObject> &obj)
+    {"read", [](FileObject *obj)
         {
-            theCurrentContext->push(
-                make_shared<StringObject>(
-                    String(1, obj->file().get())));
+            Context::current()->push(
+                Allocator<Object>::alloc<StringObject>(
+                    String(1, obj->file().get()))
+            );
         }
     },
-    {"readline", [](SPtr<FileObject> &obj)
+    {"readline", [](FileObject *obj)
         {
             String line;
             std::getline(obj->file(), line);
-            theCurrentContext->push(
-                make_shared<StringObject>(line));
+            Context::current()->push(
+                Allocator<Object>::alloc<StringObject>(line)
+            );
         }
     },
-    {"write", [](SPtr<FileObject> &obj)
+    {"write", [](FileObject *obj)
         {
             const auto &str
-                = reinterpret_cast<StringObject *>(theCurrentContext->pop().get())->to_str();
+                = reinterpret_cast<StringObject *>(Context::current()->pop())->to_str()
+            ;
             obj->file().write(str.c_str(), str.size());
         }
     },
-    {"tellg", [](SPtr<FileObject> &obj)
+    {"tellg", [](FileObject *obj)
         {
-            theCurrentContext->push(make_shared<IntegerObject>(obj->file().tellg()));
+            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellg()));
         }
     },
-    {"tellp", [](SPtr<FileObject> &obj)
+    {"tellp", [](FileObject *obj)
         {
-            theCurrentContext->push(make_shared<IntegerObject>(obj->file().tellp()));
+            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellp()));
         }
     },
-    {"seekg", [](SPtr<FileObject> &obj)
+    {"seekg", [](FileObject *obj)
         {
-            obj->file().seekg(reinterpret_cast<IntegerObject *>(theCurrentContext->pop().get())->value());
+            obj->file().seekg(reinterpret_cast<IntegerObject *>(Context::current()->pop())->value());
         }
     },
-    {"seekp", [](SPtr<FileObject> &obj)
+    {"seekp", [](FileObject *obj)
         {
-            obj->file().seekp(reinterpret_cast<IntegerObject *>(theCurrentContext->pop().get())->value());
+            obj->file().seekp(reinterpret_cast<IntegerObject *>(Context::current()->pop())->value());
         }
     }
 };
@@ -138,13 +142,13 @@ Address FileObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([
-                ptr = shared_from_this(),
-                &func = method->second](Size) mutable
-            {
-                func(ptr);
-            })
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+                    &func = method->second](Size) mutable
+                {
+                    func(this);
+                },
+                this)
         );
     }
     return Object::load_member(name);

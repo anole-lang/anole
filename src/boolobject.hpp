@@ -9,6 +9,9 @@ namespace anole
 class BoolObject : public Object
 {
   public:
+    static BoolObject *the_true();
+    static BoolObject *the_false();
+
     constexpr BoolObject(bool value) noexcept
       : Object(ObjectType::Boolean)
       , value_(value)
@@ -19,13 +22,7 @@ class BoolObject : public Object
     bool to_bool() override;
     String to_str() override;
 
-    ObjectPtr ceq(ObjectPtr) override;
-    ObjectPtr cne(ObjectPtr) override;
-
   private:
     bool value_;
 };
-
-inline auto theTrue = std::make_shared<BoolObject>(true);
-inline auto theFalse = std::make_shared<BoolObject>(false);
 }

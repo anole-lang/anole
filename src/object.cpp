@@ -1,5 +1,6 @@
 #include "error.hpp"
 #include "object.hpp"
+#include "allocator.hpp"
 #include "boolobject.hpp"
 #include "stringobject.hpp"
 
@@ -28,7 +29,8 @@ vector<String> lc_mapping_t_s
     "func",
     "thunk",
     "cont",
-    "module",
+    "anolemodule",
+    "cppmodule"
 };
 map<String, ObjectType> lc_mapping_s_t
 {
@@ -45,7 +47,8 @@ map<String, ObjectType> lc_mapping_s_t
     { "func",           ObjectType::Func            },
     { "thunk",          ObjectType::Thunk           },
     { "cont",           ObjectType::Cont            },
-    { "module",         ObjectType::Module          }
+    { "anolemodule",    ObjectType::AnoleModule     },
+    { "cppmodule",      ObjectType::CppModule       }
 };
 }
 
@@ -61,9 +64,11 @@ ObjectType Object::add_object_type(const String &literal)
 
 Object::~Object() = default;
 
-ObjectPtr Object::type()
+Object *Object::type()
 {
-    return make_shared<StringObject>(lc_mapping_t_s[type_]);
+    return Allocator<Object>::alloc<StringObject>(
+        lc_mapping_t_s[type_]
+    );
 }
 
 bool Object::to_bool()
@@ -81,32 +86,32 @@ String Object::to_key()
     return 'p' + to_string(reinterpret_cast<uintptr_t>(this));
 }
 
-ObjectPtr Object::neg()
+Object *Object::neg()
 {
     throw RuntimeError("no neg method");
 }
 
-ObjectPtr Object::add(ObjectPtr)
+Object *Object::add(Object *)
 {
     throw RuntimeError("no add method");
 }
 
-ObjectPtr Object::sub(ObjectPtr)
+Object *Object::sub(Object *)
 {
     throw RuntimeError("no sub method");
 }
 
-ObjectPtr Object::mul(ObjectPtr)
+Object *Object::mul(Object *)
 {
     throw RuntimeError("no mul method");
 }
 
-ObjectPtr Object::div(ObjectPtr)
+Object *Object::div(Object *)
 {
     throw RuntimeError("no div method");
 }
 
-ObjectPtr Object::mod(ObjectPtr)
+Object *Object::mod(Object *)
 {
     throw RuntimeError("no mod method");
 }
@@ -114,57 +119,57 @@ ObjectPtr Object::mod(ObjectPtr)
 /**
  * default = will compare the given objects' address
 */
-ObjectPtr Object::ceq(ObjectPtr ptr)
+Object *Object::ceq(Object *ptr)
 {
-    return this == ptr.get() ? theTrue : theFalse;
+    return this == ptr ? BoolObject::the_true() : BoolObject::the_false();
 }
 
-ObjectPtr Object::cne(ObjectPtr ptr)
+Object *Object::cne(Object *ptr)
 {
-    return this != ptr.get() ? theTrue : theFalse;
+    return this != ptr ? BoolObject::the_true() : BoolObject::the_false();
 }
 
-ObjectPtr Object::clt(ObjectPtr)
+Object *Object::clt(Object *)
 {
     throw RuntimeError("no clt method");
 }
 
-ObjectPtr Object::cle(ObjectPtr)
+Object *Object::cle(Object *)
 {
     throw RuntimeError("no cle method");
 }
 
-ObjectPtr Object::bneg()
+Object *Object::bneg()
 {
     throw RuntimeError("no bneg method");
 }
 
-ObjectPtr Object::bor(ObjectPtr)
+Object *Object::bor(Object *)
 {
     throw RuntimeError("no bor method");
 }
 
-ObjectPtr Object::bxor(ObjectPtr)
+Object *Object::bxor(Object *)
 {
     throw RuntimeError("no bxor method");
 }
 
-ObjectPtr Object::band(ObjectPtr)
+Object *Object::band(Object *)
 {
     throw RuntimeError("no band method");
 }
 
-ObjectPtr Object::bls(ObjectPtr)
+Object *Object::bls(Object *)
 {
     throw RuntimeError("no bls method");
 }
 
-ObjectPtr Object::brs(ObjectPtr)
+Object *Object::brs(Object *)
 {
     throw RuntimeError("no brs method");
 }
 
-Address Object::index(ObjectPtr)
+Address Object::index(Object *)
 {
     throw RuntimeError("not support index");
 }

@@ -20,12 +20,12 @@ class StringObject : public Object, public std::enable_shared_from_this<StringOb
     String to_str() override;
     String to_key() override;
 
-    ObjectPtr add(ObjectPtr) override;
-    ObjectPtr ceq(ObjectPtr) override;
-    ObjectPtr cne(ObjectPtr) override;
-    ObjectPtr clt(ObjectPtr) override;
-    ObjectPtr cle(ObjectPtr) override;
-    Address index(ObjectPtr) override;
+    Object *add(Object *) override;
+    Object *ceq(Object *) override;
+    Object *cne(Object *) override;
+    Object *clt(Object *) override;
+    Object *cle(Object *) override;
+    Address index(Object *) override;
     Address load_member(const String &name) override;
 
     const String &value() const

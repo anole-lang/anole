@@ -14,80 +14,80 @@ namespace anole
 {
 namespace
 {
-map<String, function<void(SPtr<ListObject> &)>>
+map<String, function<void(ListObject *)>>
 lc_builtin_methods_for_list
 {
-    {"empty", [](SPtr<ListObject> &obj)
+    {"empty", [](ListObject *obj)
         {
-            theCurrentContext->push(obj->objects().empty() ? theTrue : theFalse);
+            Context::current()->push(obj->objects().empty() ? BoolObject::the_true() : BoolObject::the_false());
         }
     },
-    {"size", [](SPtr<ListObject> &obj)
+    {"size", [](ListObject *obj)
         {
-            theCurrentContext->push(make_shared<IntegerObject>(int64_t(obj->objects().size())));
+            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->objects().size())));
         }
     },
-    {"push", [](SPtr<ListObject> &obj)
+    {"push", [](ListObject *obj)
         {
-            obj->append(theCurrentContext->pop());
-            theCurrentContext->push(theNone);
+            obj->append(Context::current()->pop());
+            Context::current()->push(NoneObject::one());
         }
     },
-    {"pop", [](SPtr<ListObject> &obj)
+    {"pop", [](ListObject *obj)
         {
             auto res = obj->objects().back();
             obj->objects().pop_back();
-            theCurrentContext->push_address(res);
+            Context::current()->push_address(res);
         }
     },
-    {"pop_front", [](SPtr<ListObject> &obj)
+    {"pop_front", [](ListObject *obj)
         {
             auto res = obj->objects().front();
             obj->objects().pop_front();
-            theCurrentContext->push_address(res);
+            Context::current()->push_address(res);
         }
     },
-    {"front", [](SPtr<ListObject> &obj)
+    {"front", [](ListObject *obj)
         {
-            theCurrentContext->push_address(obj->objects().front());
+            Context::current()->push_address(obj->objects().front());
         }
     },
-    {"back", [](SPtr<ListObject> &obj)
+    {"back", [](ListObject *obj)
         {
-            theCurrentContext->push_address(obj->objects().back());
+            Context::current()->push_address(obj->objects().back());
         }
     },
-    {"clear", [](SPtr<ListObject> &obj)
+    {"clear", [](ListObject *obj)
         {
             obj->objects().clear();
-            theCurrentContext->push(theNone);
+            Context::current()->push(NoneObject::one());
         }
     },
 
     // used by foreach
-    {"__iterator__", [](SPtr<ListObject> &obj)
+    {"__iterator__", [](ListObject *obj)
         {
-            theCurrentContext
-                ->push(make_shared<ListIteratorObject>(obj))
+            Context::current()
+                ->push(Allocator<Object>::alloc<ListIteratorObject>(obj))
             ;
         }
     }
 };
 
-map<String, function<void(SPtr<ListIteratorObject> &)>>
+map<String, function<void(ListIteratorObject *)>>
 lc_builtin_methods_for_listiterator
 {
     // used by foreach
-    {"__has_next__", [](SPtr<ListIteratorObject> &obj)
+    {"__has_next__", [](ListIteratorObject *obj)
         {
-            theCurrentContext
-                ->push(obj->has_next() ? theTrue : theFalse)
+            Context::current()
+                ->push(obj->has_next() ? BoolObject::the_true() : BoolObject::the_false())
             ;
         }
     },
-    {"__next__", [](SPtr<ListIteratorObject> &obj)
+    {"__next__", [](ListIteratorObject *obj)
         {
-            theCurrentContext
+            Context::current()
                 ->push_address(obj->next())
             ;
         }
@@ -109,7 +109,7 @@ String ListObject::to_str()
         {
             res += ", ";
         }
-        res += (**it)->to_str();
+        res += (*it)->obj()->to_str();
     }
     return res + "]";
 }
@@ -119,12 +119,12 @@ String ListObject::to_key()
     return 'l' + to_str();
 }
 
-ObjectPtr ListObject::add(ObjectPtr obj)
+Object *ListObject::add(Object *obj)
 {
     if (obj->is<ObjectType::List>())
     {
-        auto p = reinterpret_pointer_cast<ListObject>(obj);
-        auto res = make_shared<ListObject>();
+        auto p = reinterpret_cast<ListObject *>(obj);
+        auto res = Allocator<Object>::alloc<ListObject>();
         for (auto &obj : objects_)
         {
             res->objects().push_back(obj);
@@ -141,12 +141,12 @@ ObjectPtr ListObject::add(ObjectPtr obj)
     }
 }
 
-Address ListObject::index(ObjectPtr index)
+Address ListObject::index(Object *index)
 {
     if (index->is<ObjectType::Integer>())
     {
         auto it = objects_.begin();
-        auto v = reinterpret_pointer_cast<IntegerObject>(index)->value();
+        auto v = reinterpret_cast<IntegerObject *>(index)->value();
         while (v--)
         {
             ++it;
@@ -164,13 +164,13 @@ Address ListObject::load_member(const String &name)
     auto method = lc_builtin_methods_for_list.find(name);
     if (method != lc_builtin_methods_for_list.end())
     {
-        return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([
-                ptr = shared_from_this(),
-                &func = method->second](Size) mutable
-            {
-                func(ptr);
-            })
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+                    &func = method->second](Size) mutable
+                {
+                    func(this);
+                },
+                this)
         );
     }
     return Object::load_member(name);
@@ -181,9 +181,9 @@ list<Address> &ListObject::objects()
     return objects_;
 }
 
-void ListObject::append(ObjectPtr obj)
+void ListObject::append(Object *obj)
 {
-    objects_.push_back(make_shared<ObjectPtr>(obj));
+    objects_.push_back(Allocator<Variable>::alloc(obj));
 }
 
 Address ListIteratorObject::load_member(const String &name)
@@ -191,13 +191,13 @@ Address ListIteratorObject::load_member(const String &name)
     auto method = lc_builtin_methods_for_listiterator.find(name);
     if (method != lc_builtin_methods_for_listiterator.end())
     {
-        return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([
-                ptr = shared_from_this(),
-                &func = method->second](Size) mutable
-            {
-                func(ptr);
-            })
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+                    &func = method->second](Size) mutable
+                {
+                    func(this);
+                },
+                this)
         );
     }
     return Object::load_member(name);

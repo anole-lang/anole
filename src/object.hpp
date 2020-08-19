@@ -2,6 +2,7 @@
 
 #include "base.hpp"
 #include "error.hpp"
+#include "variable.hpp"
 
 namespace anole
 {
@@ -30,13 +31,11 @@ enum ObjectType : int
     Func,
     Thunk,
     Cont,
-    Module,
+    AnoleModule,
+    CppModule
 };
 }
-
 using object_type::ObjectType;
-using ObjectPtr = SPtr<class Object>;
-using Address = SPtr<ObjectPtr>;
 
 class Object
 {
@@ -48,30 +47,30 @@ class Object
 
     template<ObjectType type>
     constexpr bool is() { return type_ == type; }
-    ObjectPtr type();
+    Object *type();
 
     virtual bool to_bool();
     virtual String to_str();
     virtual String to_key();
 
-    virtual ObjectPtr neg();
-    virtual ObjectPtr add(ObjectPtr);
-    virtual ObjectPtr sub(ObjectPtr);
-    virtual ObjectPtr mul(ObjectPtr);
-    virtual ObjectPtr div(ObjectPtr);
-    virtual ObjectPtr mod(ObjectPtr);
-    virtual ObjectPtr ceq(ObjectPtr);
-    virtual ObjectPtr cne(ObjectPtr);
-    virtual ObjectPtr clt(ObjectPtr);
-    virtual ObjectPtr cle(ObjectPtr);
-    virtual ObjectPtr bneg();
-    virtual ObjectPtr bor(ObjectPtr);
-    virtual ObjectPtr bxor(ObjectPtr);
-    virtual ObjectPtr band(ObjectPtr);
-    virtual ObjectPtr bls(ObjectPtr);
-    virtual ObjectPtr brs(ObjectPtr);
+    virtual Object *neg();
+    virtual Object *add(Object *);
+    virtual Object *sub(Object *);
+    virtual Object *mul(Object *);
+    virtual Object *div(Object *);
+    virtual Object *mod(Object *);
+    virtual Object *ceq(Object *);
+    virtual Object *cne(Object *);
+    virtual Object *clt(Object *);
+    virtual Object *cle(Object *);
+    virtual Object *bneg();
+    virtual Object *bor(Object *);
+    virtual Object *bxor(Object *);
+    virtual Object *band(Object *);
+    virtual Object *bls(Object *);
+    virtual Object *brs(Object *);
 
-    virtual Address index(ObjectPtr);
+    virtual Address index(Object *);
     virtual Address load_member(const String &name);
 
     virtual void call(Size num);

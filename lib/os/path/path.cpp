@@ -21,10 +21,10 @@ void __current_path(Size n)
         throw RuntimeError("function current_path need no arguments");
     }
 
-    theCurrentContext
-        ->push(
-            make_shared<PathObject>(
-                fs::current_path()));
+    Context::current()->push(
+        Allocator<Object>::alloc<PathObject>(
+            fs::current_path())
+    );
 }
 
 void __is_directory(Size n)
@@ -34,9 +34,9 @@ void __is_directory(Size n)
         throw RuntimeError("function current_path need 1 argument");
     }
 
-    auto path_obj = theCurrentContext->pop();
+    auto path_obj = Context::current()->pop();
     fs::path path;
-    if (auto ptr = dynamic_cast<PathObject*>(path_obj.get()))
+    if (auto ptr = dynamic_cast<PathObject*>(path_obj))
     {
         path = ptr->path();
     }
@@ -47,21 +47,21 @@ void __is_directory(Size n)
 
     if (path.is_relative())
     {
-        path = theCurrentContext->current_path() / path;
+        path = Context::current()->current_path() / path;
     }
 
-    theCurrentContext->push(fs::is_directory(path) ? theTrue : theFalse);
+    Context::current()->push(fs::is_directory(path) ? BoolObject::the_true() : BoolObject::the_false());
 }
 }
 
 namespace
 {
-map<String, function<void(SPtr<PathObject> &)>>
+map<String, function<void(PathObject *)>>
 lc_builtin_methods
 {
-    {"is_directory", [](SPtr<PathObject> &obj)
+    {"is_directory", [](PathObject *obj)
         {
-            theCurrentContext->push(fs::is_directory(obj->path()) ? theTrue : theFalse);
+            Context::current()->push(fs::is_directory(obj->path()) ? BoolObject::the_true() : BoolObject::the_false());
         }
     }
 };
@@ -76,13 +76,13 @@ Address PathObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<ObjectPtr>(
-            make_shared<BuiltInFunctionObject>([
-                ptr = shared_from_this(),
-                &func = method->second](Size) mutable
-            {
-                func(ptr);
-            })
+        return Allocator<Variable>::alloc(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+                    &func = method->second](Size) mutable
+                {
+                    func(this);
+                },
+                this)
         );
     }
     return Object::load_member(name);
