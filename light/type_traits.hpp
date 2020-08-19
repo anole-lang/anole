@@ -21,6 +21,13 @@ using true_type = bool_constant<true>;
 using false_type = bool_constant<false>;
 
 template<typename T>
+struct is_pointer : false_type {};
+template<typename T>
+struct is_pointer<T *> : true_type {};
+template<typename T>
+inline constexpr bool is_pointer_v = is_pointer<T>::value;
+
+template<typename T>
 struct is_reference : false_type {};
 template<typename T>
 struct is_reference<T&> : true_type {};
@@ -66,4 +73,14 @@ template<typename T>
 struct is_void : is_same<void, typename remove_cv<T>::type> {};
 template<typename T>
 inline constexpr bool is_void_v = is_void<T>::value;
+
+template<bool B, typename T = void>
+struct enable_if {};
+template<typename T>
+struct enable_if<true, T>
+{
+    using type = T;
+};
+template<bool B, typename T>
+using enable_if_t = typename enable_if<B, T>::type;
 } // namespace light
