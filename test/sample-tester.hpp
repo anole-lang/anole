@@ -1,5 +1,6 @@
 #include "../src/parser.hpp"
 #include "../src/context.hpp"
+#include "../src/allocator.hpp"
 #include "../src/boolobject.hpp"
 
 #include <gtest/gtest.h>
@@ -19,7 +20,7 @@ inline String execute(const String &input)
 
     istringstream ss{input};
     auto code = make_shared<Code>();
-    theCurrentContext = make_shared<Context>(code);
+    Context::current() = Allocator<Context>::alloc(code);
     Parser parser{ss};
     while (auto ast = parser.gen_statement())
     {
