@@ -102,7 +102,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
     set_target_properties (anole PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
     install (TARGETS anole DESTINATION bin)
 ELSE ()
-    set (CMAKE_CXX_FLAGS "-O3 -Wall")
+    set (CMAKE_CXX_FLAGS "-O3 -Wall -Wno-unused-private-field")
 
     file (GLOB SOURCES "src/*.cpp")
     add_executable (anole ${SOURCES})
