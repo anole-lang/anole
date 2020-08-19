@@ -1,4 +1,5 @@
 #include "../../src/context.hpp"
+#include "../../src/allocator.hpp"
 #include "../../src/listobject.hpp"
 #include "../../src/stringobject.hpp"
 
@@ -23,12 +24,12 @@ void __args(Size n)
 
     auto raw_args = Context::get_args();
 
-    auto args = make_shared<ListObject>();
+    auto args = Allocator<Object>::alloc<ListObject>();
     for (auto arg : raw_args)
     {
-        args->append(make_shared<StringObject>(String(arg)));
+        args->append(Allocator<Object>::alloc<StringObject>(String(arg)));
     }
 
-    theCurrentContext->push(args);
+    Context::current()->push(args);
 }
 }

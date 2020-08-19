@@ -1,5 +1,6 @@
 #include "../path/path.hpp"
 #include "../../../src/context.hpp"
+#include "../../../src/allocator.hpp"
 #include "../../../src/listobject.hpp"
 #include "../../../src/stringobject.hpp"
 
@@ -25,9 +26,9 @@ void __read_dir(Size n)
         throw RuntimeError("function read_dir need only one argument");
     }
 
-    auto path_obj = theCurrentContext->pop();
+    auto path_obj = Context::current()->pop();
     fs::path path;
-    if (auto ptr = dynamic_cast<PathObject*>(path_obj.get()))
+    if (auto ptr = dynamic_cast<PathObject*>(path_obj))
     {
         path = ptr->path();
     }
@@ -38,15 +39,15 @@ void __read_dir(Size n)
 
     if (path.is_relative())
     {
-        path = theCurrentContext->current_path() / path;
+        path = Context::current()->current_path() / path;
     }
 
-    auto paths = make_shared<ListObject>();
+    auto paths = Allocator<Object>::alloc<ListObject>();
     for (auto &p : fs::directory_iterator(path))
     {
-        paths->append(make_shared<PathObject>(p.path().lexically_normal()));
+        paths->append(Allocator<Object>::alloc<PathObject>(p.path().lexically_normal()));
     }
 
-    theCurrentContext->push(paths);
+    Context::current()->push(paths);
 }
 }
