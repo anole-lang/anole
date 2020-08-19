@@ -184,7 +184,7 @@ namespace anole
 {
 Code::Code(String from)
   : from_(move(from))
-  , constants_{ theNone, theTrue, theFalse }
+  , constants_{ NoneObject::one(), BoolObject::the_true(), BoolObject::the_false() }
 {
     // ...
 }
@@ -248,7 +248,7 @@ bool Code::check()
     return true;
 }
 
-ObjectPtr Code::load_const(Size ind)
+Object *Code::load_const(Size ind)
 {
     return constants_[ind];
 }
@@ -487,10 +487,10 @@ void Code::serialize(ostream &out)
         switch (cl[0])
         {
         case 'i':
-            typeout(out, reinterpret_pointer_cast<IntegerObject>(obj)->value());
+            typeout(out, reinterpret_cast<IntegerObject *>(obj)->value());
             break;
         case 'f':
-            typeout(out, reinterpret_pointer_cast<FloatObject>(obj)->value());
+            typeout(out, reinterpret_cast<FloatObject *>(obj)->value());
             break;
         case 's':
             typeout(out, cl.substr(1));
@@ -588,7 +588,7 @@ bool Code::unserialize(ifstream &in)
             int64_t val;
             typein(in, val);
             constants_literals_.push_back(type + to_string(val));
-            constants_.push_back(make_shared<IntegerObject>(val));
+            constants_.push_back(Allocator<Object>::alloc<IntegerObject>(val));
         }
             break;
 
@@ -597,7 +597,7 @@ bool Code::unserialize(ifstream &in)
             double val;
             typein(in, val);
             constants_literals_.push_back(type + to_string(val));
-            constants_.push_back(make_shared<FloatObject>(val));
+            constants_.push_back(Allocator<Object>::alloc<FloatObject>(val));
         }
             break;
 
@@ -606,7 +606,7 @@ bool Code::unserialize(ifstream &in)
             String val;
             typein(in, val);
             constants_literals_.push_back(type + val);
-            constants_.push_back(make_shared<StringObject>(val));
+            constants_.push_back(Allocator<Object>::alloc<StringObject>(val));
         }
             break;
 

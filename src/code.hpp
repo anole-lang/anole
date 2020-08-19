@@ -3,6 +3,7 @@
 #include "ast.hpp"
 #include "base.hpp"
 #include "object.hpp"
+#include "allocator.hpp"
 #include "instruction.hpp"
 
 #include <map>
@@ -16,6 +17,8 @@ namespace anole
 class Code
 {
   public:
+    friend class Collector;
+
     Code(String from = "<stdin>");
 
     const String &from()
@@ -84,11 +87,13 @@ class Code
     void push_continue(Size ind);
     void set_continue_to(Size ind, Size base);
     bool check();
-    ObjectPtr load_const(Size ind);
+    Object *load_const(Size ind);
 
     template<typename O, typename T>
     Size create_const(String key, T value)
     {
+        static_assert(std::is_base_of_v<Object, O>);
+
         if (constants_map_.count(key))
         {
             return constants_map_[key];
@@ -97,7 +102,7 @@ class Code
         {
             constants_map_[key] = constants_.size();
             constants_literals_.push_back(key);
-            constants_.push_back(std::make_shared<O>(value));
+            constants_.push_back(Allocator<Object>::alloc<O>(value));
             return constants_.size() - 1;
         }
     }
@@ -123,6 +128,6 @@ class Code
     std::vector<String> constants_literals_;
 
     std::map<String, Size> constants_map_;
-    std::vector<ObjectPtr> constants_;
+    std::vector<Object *> constants_;
 };
 }

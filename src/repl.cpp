@@ -4,6 +4,7 @@
 #include "parser.hpp"
 #include "version.hpp"
 #include "context.hpp"
+#include "allocator.hpp"
 #include "noneobject.hpp"
 
 #ifdef __linux__
@@ -70,7 +71,7 @@ void replrun::run()
     istringstream ss;
     Parser parser{ss};
     auto code = make_shared<Code>("<stdin>");
-    theCurrentContext = make_shared<Context>(code);
+    Context::current() = Allocator<Context>::alloc(code);
 
     parser.set_continue_action([&ss, &parser]
     {
@@ -98,7 +99,7 @@ void replrun::run()
         ss.str(line + '\n');
         parser.reset();
 
-        theCurrentContext->pc() = code->size();
+        Context::current()->pc() = code->size();
 
         auto stmt = parser.gen_statement();
         if (stmt->is_expr_stmt())

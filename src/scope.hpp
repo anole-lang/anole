@@ -1,6 +1,8 @@
 #pragma once
 
 #include "object.hpp"
+#include "variable.hpp"
+#include "allocator.hpp"
 #include "builtinfuncobject.hpp"
 
 #include <map>
@@ -11,29 +13,29 @@ class Scope
 {
   public:
     Scope() : pre_scope_(nullptr) {}
-    Scope(SPtr<Scope> pre_scope)
+    Scope(Scope *pre_scope)
       : pre_scope_(pre_scope)
     {
         // ...
     }
 
-    SPtr<Scope> &pre()
+    Scope *pre()
     {
         return pre_scope_;
     }
 
-    Address &create_symbol(const String &name)
+    Address create_symbol(const String &name)
     {
         if (!symbols_.count(name))
         {
-            symbols_[name] = std::make_shared<ObjectPtr>(nullptr);
+            symbols_[name] = Allocator<Variable>::alloc();
         }
         return symbols_[name];
     }
 
     void create_symbol(const String &name, Address value)
     {
-        symbols_[name] = std::move(value);
+        symbols_[name] = value;
     }
 
     Address load_symbol(const String &name)
@@ -47,12 +49,12 @@ class Scope
     {
         if (auto func = BuiltInFunctionObject::load_built_in_function(name))
         {
-            return std::make_shared<ObjectPtr>(func);
+            return Allocator<Variable>::alloc(func);
         }
         return nullptr;
     }
 
-    const std::map<String, Address> &symbols()
+    const std::map<String, Address> &symbols() const
     {
         return symbols_;
     }
@@ -75,7 +77,7 @@ class Scope
         }
     }
 
-    SPtr<Scope> pre_scope_;
+    Scope *pre_scope_;
     std::map<String, Address> symbols_;
 };
 }

@@ -4,6 +4,7 @@
 #include "code.hpp"
 #include "error.hpp"
 #include "scope.hpp"
+#include "allocator.hpp"
 
 #include <map>
 #include <stack>
@@ -12,17 +13,38 @@
 namespace anole
 {
 // Context should be contructed by make_shared
-class Context : public std::enable_shared_from_this<Context>
+class Context
 {
   public:
-    using StackType = std::stack<Address>;
+    using Stack = std::stack<Address>;
 
+  public:
+    static Context *&current();
+
+    static void set_args(int argc, char *argv[], int start);
+    static const std::vector<char *> &get_args();
+
+    static void execute();
+
+    static void
+    add_not_defined_symbol(
+        const String &name,
+        const Address addr
+    );
+
+    static void
+    rm_not_defined_symbol(const Address addr);
+
+    static const String
+    &get_not_defined_symbol(const Address addr);
+
+  public:
     // this for resume from ContObject
-    Context(SPtr<Context> resume)
+    Context(Context *resume)
       : pre_context_(resume->pre_context_)
-      , scope_(std::make_shared<Scope>(resume->scope_))
+      , scope_(Allocator<Scope>::alloc(resume->scope_))
       , code_(resume->code_), pc_(resume->pc_)
-      , stack_(std::make_shared<StackType>(*resume->stack_))
+      , stack_(Allocator<Stack>::alloc(*resume->stack_))
       , current_path_(resume->current_path_)
     {
         // ...
@@ -33,7 +55,7 @@ class Context : public std::enable_shared_from_this<Context>
       : pre_context_(context.pre_context_)
       , scope_(context.scope_)
       , code_(context.code_), pc_(context.pc_)
-      , stack_(std::make_shared<StackType>(*context.stack_))
+      , stack_(Allocator<Stack>::alloc(*context.stack_))
       , current_path_(context.current_path_)
     {
         // ...
@@ -42,18 +64,18 @@ class Context : public std::enable_shared_from_this<Context>
     Context(SPtr<Code> code,
         std::filesystem::path path = std::filesystem::current_path())
       : pre_context_(nullptr)
-      , scope_(std::make_shared<Scope>(nullptr))
+      , scope_(Allocator<Scope>::alloc(nullptr))
       , code_(code), pc_(0)
-      , stack_(std::make_shared<StackType>())
+      , stack_(Allocator<Stack>::alloc())
       , current_path_(std::move(path))
     {
         // ...
     }
 
-    Context(SPtr<Context> pre, SPtr<Scope> scope,
+    Context(Context *pre, Scope *scope,
         SPtr<Code> code, Size pc = 0)
       : pre_context_(pre)
-      , scope_(std::make_shared<Scope>(scope))
+      , scope_(Allocator<Scope>::alloc(scope))
       , code_(std::move(code)), pc_(pc)
       , stack_(pre->stack_)
       , current_path_(pre->current_path_)
@@ -61,29 +83,12 @@ class Context : public std::enable_shared_from_this<Context>
         // ...
     }
 
-    static void set_args(int argc, char *argv[], int start);
-    static const std::vector<char *> &get_args();
-
-    static void execute();
-
-    static void
-    add_not_defined_symbol(
-        const String &name,
-        const Address &ptr
-    );
-
-    static void
-    rm_not_defined_symbol(const Address &ptr);
-
-    static const String
-    &get_not_defined_symbol(const Address &ptr);
-
-    SPtr<Context> &pre_context()
+    Context *&pre_context()
     {
         return pre_context_;
     }
 
-    SPtr<Scope> &scope()
+    Scope *&scope()
     {
         return scope_;
     }
@@ -118,27 +123,28 @@ class Context : public std::enable_shared_from_this<Context>
         return code_->oprand_at(pc_);
     }
 
-    void push(ObjectPtr value)
+    void push(Object *obj)
     {
-        stack_->push(std::make_shared<ObjectPtr>(std::move(value)));
+        stack_->push(Allocator<Variable>::alloc(obj));
     }
 
-    void push_address(Address ptr)
+    void push_address(Address addr)
     {
-        stack_->push(move(ptr));
+        stack_->push(addr);
     }
 
     template<typename R = Object>
     R *top()
     {
-        if (*stack_->top() == nullptr)
+        if (stack_->top()->obj() == nullptr)
         {
             throw RuntimeError(
-                "no such var named " +
-                get_not_defined_symbol(stack_->top())
+                "var named " +
+                get_not_defined_symbol(stack_->top()) +
+                " doesn't reference to any object"
             );
         }
-        return reinterpret_cast<R *>(stack_->top().get()->get());
+        return reinterpret_cast<R *>((*stack_->top()).obj());
     }
 
     Address &top_address()
@@ -146,25 +152,21 @@ class Context : public std::enable_shared_from_this<Context>
         return stack_->top();
     }
 
-    void set_top(ObjectPtr ptr)
+    void set_top(Object *obj)
     {
-        stack_->top() = std::make_shared<ObjectPtr>(std::move(ptr));
+        stack_->top() = Allocator<Variable>::alloc(obj);
     }
 
-    ObjectPtr pop()
+    Object *pop()
     {
-        /**
-         * use copy ctor, because the object ptr
-         *  may be pointed by other address
-        */
-        auto res = *stack_->top();
+        auto &var = *stack_->top();
         stack_->pop();
-        return res;
+        return var.obj();
     }
 
     Address pop_address()
     {
-        auto res = std::move(top_address());
+        auto res = top_address();
         stack_->pop();
         return res;
     }
@@ -174,7 +176,7 @@ class Context : public std::enable_shared_from_this<Context>
         return stack_->size();
     }
 
-    SPtr<StackType> &get_stack()
+    Stack *get_stack()
     {
         return stack_;
     }
@@ -191,13 +193,11 @@ class Context : public std::enable_shared_from_this<Context>
     Size get_return_vals_num();
 
   private:
-    SPtr<Context> pre_context_;
-    SPtr<Scope> scope_;
+    Context *pre_context_;
+    Scope *scope_;
     SPtr<Code> code_;
     Size pc_;
-    SPtr<StackType> stack_;
+    Stack *stack_;
     std::filesystem::path current_path_;
 };
-
-extern SPtr<Context> theCurrentContext;
 }

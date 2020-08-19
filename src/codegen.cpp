@@ -123,10 +123,10 @@ void UnaryOperatorExpr::codegen(Code &code)
         expr->codegen(code);
         code.mapping(pos);
         auto o1 = code.add_ins();
-        code.add_ins<Opcode::LoadConst, Size>(1); // theTrue
+        code.add_ins<Opcode::LoadConst, Size>(1); // BoolObject::the_true()
         auto o2 = code.add_ins();
         code.set_ins<Opcode::JumpIf, Size>(o1, code.size());
-        code.add_ins<Opcode::LoadConst, Size>(2); // theFalse
+        code.add_ins<Opcode::LoadConst, Size>(2); // BoolObject::the_false()
         code.set_ins<Opcode::Jump, Size>(o2, code.size());
     }
         break;

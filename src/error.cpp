@@ -9,9 +9,9 @@ namespace anole
 CompileError::CompileError(String err)
   : err_(err)
 {
-    while (theCurrentContext && theCurrentContext->pre_context())
+    while (Context::current() && Context::current()->pre_context())
     {
-        theCurrentContext = theCurrentContext->pre_context();
+        Context::current() = Context::current()->pre_context();
     }
 }
 
@@ -29,12 +29,12 @@ const char *CompileError::what() const noexcept
 
 RuntimeError::RuntimeError(const String &err)
 {
-    auto &mapping = theCurrentContext->code()->mapping();
-    if (mapping.count(theCurrentContext->pc()))
+    auto &mapping = Context::current()->code()->mapping();
+    if (mapping.count(Context::current()->pc()))
     {
-        auto pos = mapping[theCurrentContext->pc()];
+        auto pos = mapping[Context::current()->pc()];
         err_ = info::strong("  running at "
-            + theCurrentContext->code()->from()
+            + Context::current()->code()->from()
             + ":" + to_string(pos.first)
             + ":" + to_string(pos.second) + ": "
         );
@@ -42,20 +42,20 @@ RuntimeError::RuntimeError(const String &err)
     err_ += info::warning("error: ") + err;
 
     int trace_count = 0;
-    while (theCurrentContext->pre_context())
+    while (Context::current()->pre_context())
     {
-        theCurrentContext = theCurrentContext->pre_context();
+        Context::current() = Context::current()->pre_context();
 
         if (trace_count < 66)
         {
             ++trace_count;
 
-            auto &mapping = theCurrentContext->code()->mapping();
-            if (mapping.count(theCurrentContext->pc()))
+            auto &mapping = Context::current()->code()->mapping();
+            if (mapping.count(Context::current()->pc()))
             {
-                auto pos = mapping[theCurrentContext->pc()];
+                auto pos = mapping[Context::current()->pc()];
                 err_ = "  running at "
-                    + theCurrentContext->code()->from()
+                    + Context::current()->code()->from()
                     + ":" + to_string(pos.first)
                     + ":" + to_string(pos.second) + "\n"
                     + err_
