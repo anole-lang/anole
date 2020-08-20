@@ -17,8 +17,8 @@ class ModuleObject : public Object
         return good_;
     }
 
-    static ModuleObject *generate(const String &name);
-    static ModuleObject *generate(const std::filesystem::path &path);
+    static SPtr<ModuleObject> generate(const String &name);
+    static SPtr<ModuleObject> generate(const std::filesystem::path &path);
 
   protected:
     bool good_;
@@ -33,7 +33,7 @@ class AnoleModuleObject : public ModuleObject
     AnoleModuleObject(const std::filesystem::path &path);
     Address load_member(const String &name) override;
 
-    const Scope *scope() const
+    const SPtr<Scope> &scope() const
     {
         return scope_;
     }
@@ -45,11 +45,11 @@ class AnoleModuleObject : public ModuleObject
   private:
     void init(const std::filesystem::path &path);
 
-    Scope *scope_;
+    SPtr<Scope> scope_;
     SPtr<Code> code_;
 };
 
-class CppModuleObject : public ModuleObject
+class CppModuleObject : public ModuleObject, public std::enable_shared_from_this<CppModuleObject>
 {
   public:
     CppModuleObject(const String &name);

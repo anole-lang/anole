@@ -1,35 +1,38 @@
 #pragma once
 
+#include <memory>
+#include "object.hpp"
+
 namespace anole
 {
 class Object;
-
 class Variable
 {
   public:
-    using Pointer = Object *;
+    Variable() : sptr_(nullptr) {}
+    Variable(ObjectSPtr sptr) : sptr_(sptr) {}
 
-    Variable() : obj_(nullptr) {}
-    Variable(Pointer obj) : obj_(obj) {}
-
-    void bind(Pointer obj)
+    void bind(ObjectSPtr sptr)
     {
-        obj_ = obj;
+        sptr_.swap(sptr);
     }
 
-    Pointer obj()
+    ObjectSPtr &sptr()
     {
-        return obj_;
+        return sptr_;
+    }
+
+    ObjectRawPtr rptr()
+    {
+        return sptr_.get();
     }
 
     operator bool()
     {
-        return obj_ != nullptr;
+        return sptr_ != nullptr;
     }
 
   private:
-    Pointer obj_;
+    ObjectSPtr sptr_;
 };
-
-using Address = Variable *;
 } // namespace anole

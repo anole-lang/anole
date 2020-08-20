@@ -22,7 +22,7 @@ void __current_path(Size n)
     }
 
     Context::current()->push(
-        Allocator<Object>::alloc<PathObject>(
+        make_shared<PathObject>(
             fs::current_path())
     );
 }
@@ -36,7 +36,7 @@ void __is_directory(Size n)
 
     auto path_obj = Context::current()->pop();
     fs::path path;
-    if (auto ptr = dynamic_cast<PathObject*>(path_obj))
+    if (auto ptr = dynamic_cast<PathObject*>(path_obj.get()))
     {
         path = ptr->path();
     }
@@ -77,12 +77,12 @@ Address PathObject::load_member(const String &name)
     if (method != lc_builtin_methods.end())
     {
         return Allocator<Variable>::alloc(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+            make_shared<BuiltInFunctionObject>([
+                    sptr = shared_from_this(),
                     &func = method->second](Size) mutable
                 {
-                    func(this);
-                },
-                this)
+                    func(sptr.get());
+                })
         );
     }
     return Object::load_member(name);

@@ -16,7 +16,7 @@ lc_builtin_methods
     {"size", [](StringObject *obj)
         {
             Context::current()
-                ->push(Allocator<Object>::alloc<IntegerObject>(
+                ->push(make_shared<IntegerObject>(
                     int64_t(obj->value().size())))
             ;
         }
@@ -24,7 +24,7 @@ lc_builtin_methods
     {"to_int", [](StringObject *obj)
         {
             Context::current()
-                ->push(Allocator<Object>::alloc<IntegerObject>(
+                ->push(make_shared<IntegerObject>(
                     int64_t(stoll(obj->value()))))
             ;
         }
@@ -47,12 +47,12 @@ String StringObject::to_key()
     return "s" + to_str();
 }
 
-Object *StringObject::add(Object *obj)
+ObjectSPtr StringObject::add(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::String>())
     {
         auto p = reinterpret_cast<StringObject *>(obj);
-        return Allocator<Object>::alloc<StringObject>(value_ + p->value_);
+        return make_shared<StringObject>(value_ + p->value_);
     }
     else
     {
@@ -60,7 +60,7 @@ Object *StringObject::add(Object *obj)
     }
 }
 
-Object *StringObject::ceq(Object *obj)
+ObjectSPtr StringObject::ceq(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::String>())
     {
@@ -73,7 +73,7 @@ Object *StringObject::ceq(Object *obj)
     }
 }
 
-Object *StringObject::cne(Object *obj)
+ObjectSPtr StringObject::cne(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::String>())
     {
@@ -86,7 +86,7 @@ Object *StringObject::cne(Object *obj)
     }
 }
 
-Object *StringObject::clt(Object *obj)
+ObjectSPtr StringObject::clt(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::String>())
     {
@@ -99,7 +99,7 @@ Object *StringObject::clt(Object *obj)
     }
 }
 
-Object *StringObject::cle(Object *obj)
+ObjectSPtr StringObject::cle(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::String>())
     {
@@ -112,13 +112,13 @@ Object *StringObject::cle(Object *obj)
     }
 }
 
-Address StringObject::index(Object *index)
+Address StringObject::index(ObjectSPtr index)
 {
     if (index->is<ObjectType::Integer>())
     {
-        auto p = reinterpret_cast<IntegerObject *>(index);
+        auto p = reinterpret_cast<IntegerObject *>(index.get());
         return Allocator<Variable>::alloc(
-            Allocator<Object>::alloc<StringObject>(
+            make_shared<StringObject>(
                 String(1, value_[p->value()]))
         );
     }
@@ -134,12 +134,12 @@ Address StringObject::load_member(const String &name)
     if (method != lc_builtin_methods.end())
     {
         return Allocator<Variable>::alloc(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+            make_shared<BuiltInFunctionObject>([
+                    sptr = shared_from_this(),
                     &func = method->second](Size) mutable
                 {
-                    func(this);
-                },
-                this)
+                    func(sptr.get());
+                })
         );
     }
     return Object::load_member(name);

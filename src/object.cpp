@@ -64,9 +64,9 @@ ObjectType Object::add_object_type(const String &literal)
 
 Object::~Object() = default;
 
-Object *Object::type()
+ObjectSPtr Object::type()
 {
-    return Allocator<Object>::alloc<StringObject>(
+    return make_shared<StringObject>(
         lc_mapping_t_s[type_]
     );
 }
@@ -86,32 +86,32 @@ String Object::to_key()
     return 'p' + to_string(reinterpret_cast<uintptr_t>(this));
 }
 
-Object *Object::neg()
+ObjectSPtr Object::neg()
 {
     throw RuntimeError("no neg method");
 }
 
-Object *Object::add(Object *)
+ObjectSPtr Object::add(ObjectRawPtr)
 {
     throw RuntimeError("no add method");
 }
 
-Object *Object::sub(Object *)
+ObjectSPtr Object::sub(ObjectRawPtr)
 {
     throw RuntimeError("no sub method");
 }
 
-Object *Object::mul(Object *)
+ObjectSPtr Object::mul(ObjectRawPtr)
 {
     throw RuntimeError("no mul method");
 }
 
-Object *Object::div(Object *)
+ObjectSPtr Object::div(ObjectRawPtr)
 {
     throw RuntimeError("no div method");
 }
 
-Object *Object::mod(Object *)
+ObjectSPtr Object::mod(ObjectRawPtr)
 {
     throw RuntimeError("no mod method");
 }
@@ -119,57 +119,57 @@ Object *Object::mod(Object *)
 /**
  * default = will compare the given objects' address
 */
-Object *Object::ceq(Object *ptr)
+ObjectSPtr Object::ceq(ObjectRawPtr rptr)
 {
-    return this == ptr ? BoolObject::the_true() : BoolObject::the_false();
+    return this == rptr ? BoolObject::the_true() : BoolObject::the_false();
 }
 
-Object *Object::cne(Object *ptr)
+ObjectSPtr Object::cne(ObjectRawPtr rptr)
 {
-    return this != ptr ? BoolObject::the_true() : BoolObject::the_false();
+    return this != rptr ? BoolObject::the_true() : BoolObject::the_false();
 }
 
-Object *Object::clt(Object *)
+ObjectSPtr Object::clt(ObjectRawPtr)
 {
     throw RuntimeError("no clt method");
 }
 
-Object *Object::cle(Object *)
+ObjectSPtr Object::cle(ObjectRawPtr)
 {
     throw RuntimeError("no cle method");
 }
 
-Object *Object::bneg()
+ObjectSPtr Object::bneg()
 {
     throw RuntimeError("no bneg method");
 }
 
-Object *Object::bor(Object *)
+ObjectSPtr Object::bor(ObjectRawPtr)
 {
     throw RuntimeError("no bor method");
 }
 
-Object *Object::bxor(Object *)
+ObjectSPtr Object::bxor(ObjectRawPtr)
 {
     throw RuntimeError("no bxor method");
 }
 
-Object *Object::band(Object *)
+ObjectSPtr Object::band(ObjectRawPtr)
 {
     throw RuntimeError("no band method");
 }
 
-Object *Object::bls(Object *)
+ObjectSPtr Object::bls(ObjectRawPtr)
 {
     throw RuntimeError("no bls method");
 }
 
-Object *Object::brs(Object *)
+ObjectSPtr Object::brs(ObjectRawPtr)
 {
     throw RuntimeError("no brs method");
 }
 
-Address Object::index(Object *)
+Address Object::index(ObjectSPtr)
 {
     throw RuntimeError("not support index");
 }

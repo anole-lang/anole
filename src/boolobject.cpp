@@ -5,15 +5,15 @@ using namespace std;
 
 namespace anole
 {
-BoolObject *BoolObject::the_true()
+ObjectSPtr BoolObject::the_true()
 {
-    static auto a_true = Allocator<Object>::alloc<BoolObject>(true);
+    static auto a_true = make_shared<BoolObject>(true);
     return a_true;
 }
 
-BoolObject *BoolObject::the_false()
+ObjectSPtr BoolObject::the_false()
 {
-    static auto a_false = Allocator<Object>::alloc<BoolObject>(false);
+    static auto a_false = make_shared<BoolObject>(false);
     return a_false;
 }
 

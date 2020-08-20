@@ -21,7 +21,7 @@ Address FunctionObject::load_member(const String &name)
 
 void FunctionObject::call(Size num)
 {
-    Context::current() = Allocator<Context>::alloc(
+    Context::current() = make_shared<Context>(
         Context::current(), scope_, code_, base_
     );
 
@@ -35,7 +35,7 @@ void FunctionObject::call(Size num)
         case Opcode::Pack:
         {
             ++pc;
-            auto list = Allocator<Object>::alloc<ListObject>();
+            auto list = make_shared<ListObject>();
             if (Context::current()->opcode() == Opcode::StoreRef)
             {
                 while (arg_num)
@@ -53,9 +53,9 @@ void FunctionObject::call(Size num)
                     --arg_num;
                 }
             }
-            *Context::current()->scope()
+            Context::current()->scope()
                 ->create_symbol(OPRAND(String))
-                    = list
+                    ->bind(list)
             ;
         }
             ++pc;

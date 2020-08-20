@@ -6,7 +6,7 @@
 
 namespace anole
 {
-class PathObject : public Object
+class PathObject : public Object, public std::enable_shared_from_this<PathObject>
 {
   public:
     PathObject(std::filesystem::path path);

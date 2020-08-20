@@ -25,17 +25,17 @@ String IntegerObject::to_key()
     return 'i' + to_str();
 }
 
-Object *IntegerObject::neg()
+ObjectSPtr IntegerObject::neg()
 {
-    return Allocator<Object>::alloc<IntegerObject>(-value_);
+    return make_shared<IntegerObject>(-value_);
 }
 
-Object *IntegerObject::add(Object *obj)
+ObjectSPtr IntegerObject::add(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ + p->value_);
+        return make_shared<IntegerObject>(value_ + p->value_);
     }
     else
     {
@@ -43,12 +43,12 @@ Object *IntegerObject::add(Object *obj)
     }
 }
 
-Object *IntegerObject::sub(Object *obj)
+ObjectSPtr IntegerObject::sub(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ - p->value_);
+        return make_shared<IntegerObject>(value_ - p->value_);
     }
     else
     {
@@ -56,12 +56,12 @@ Object *IntegerObject::sub(Object *obj)
     }
 }
 
-Object *IntegerObject::mul(Object *obj)
+ObjectSPtr IntegerObject::mul(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ * p->value_);
+        return make_shared<IntegerObject>(value_ * p->value_);
     }
     else
     {
@@ -69,12 +69,12 @@ Object *IntegerObject::mul(Object *obj)
     }
 }
 
-Object *IntegerObject::div(Object *obj)
+ObjectSPtr IntegerObject::div(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ / p->value_);
+        return make_shared<IntegerObject>(value_ / p->value_);
     }
     else
     {
@@ -82,12 +82,12 @@ Object *IntegerObject::div(Object *obj)
     }
 }
 
-Object *IntegerObject::mod(Object *obj)
+ObjectSPtr IntegerObject::mod(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ % p->value_);
+        return make_shared<IntegerObject>(value_ % p->value_);
     }
     else
     {
@@ -95,7 +95,7 @@ Object *IntegerObject::mod(Object *obj)
     }
 }
 
-Object *IntegerObject::ceq(Object *obj)
+ObjectSPtr IntegerObject::ceq(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -108,7 +108,7 @@ Object *IntegerObject::ceq(Object *obj)
     }
 }
 
-Object *IntegerObject::cne(Object *obj)
+ObjectSPtr IntegerObject::cne(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -121,7 +121,7 @@ Object *IntegerObject::cne(Object *obj)
     }
 }
 
-Object *IntegerObject::clt(Object *obj)
+ObjectSPtr IntegerObject::clt(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -134,7 +134,7 @@ Object *IntegerObject::clt(Object *obj)
     }
 }
 
-Object *IntegerObject::cle(Object *obj)
+ObjectSPtr IntegerObject::cle(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -147,17 +147,17 @@ Object *IntegerObject::cle(Object *obj)
     }
 }
 
-Object *IntegerObject::bneg()
+ObjectSPtr IntegerObject::bneg()
 {
-    return Allocator<Object>::alloc<IntegerObject>(~value_);
+    return make_shared<IntegerObject>(~value_);
 }
 
-Object *IntegerObject::bor(Object *obj)
+ObjectSPtr IntegerObject::bor(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ | p->value_);
+        return make_shared<IntegerObject>(value_ | p->value_);
     }
     else
     {
@@ -165,12 +165,12 @@ Object *IntegerObject::bor(Object *obj)
     }
 }
 
-Object *IntegerObject::bxor(Object *obj)
+ObjectSPtr IntegerObject::bxor(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ ^ p->value_);
+        return make_shared<IntegerObject>(value_ ^ p->value_);
     }
     else
     {
@@ -178,12 +178,12 @@ Object *IntegerObject::bxor(Object *obj)
     }
 }
 
-Object *IntegerObject::band(Object *obj)
+ObjectSPtr IntegerObject::band(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ & p->value_);
+        return make_shared<IntegerObject>(value_ & p->value_);
     }
     else
     {
@@ -191,12 +191,12 @@ Object *IntegerObject::band(Object *obj)
     }
 }
 
-Object *IntegerObject::bls(Object *obj)
+ObjectSPtr IntegerObject::bls(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ << p->value_);
+        return make_shared<IntegerObject>(value_ << p->value_);
     }
     else
     {
@@ -204,12 +204,12 @@ Object *IntegerObject::bls(Object *obj)
     }
 }
 
-Object *IntegerObject::brs(Object *obj)
+ObjectSPtr IntegerObject::brs(ObjectRawPtr obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return Allocator<Object>::alloc<IntegerObject>(value_ >> p->value_);
+        return make_shared<IntegerObject>(value_ >> p->value_);
     }
     else
     {
@@ -222,11 +222,11 @@ Address IntegerObject::load_member(const String &name)
     if (name == "to_str")
     {
         return Allocator<Variable>::alloc(
-            Allocator<Object>::alloc<BuiltInFunctionObject>(
+            make_shared<BuiltInFunctionObject>(
                     [val = value_](Size)
                 {
                     Context::current()
-                        ->push(Allocator<Object>::alloc<StringObject>(to_string(val)))
+                        ->push(make_shared<StringObject>(to_string(val)))
                     ;
                 })
         );

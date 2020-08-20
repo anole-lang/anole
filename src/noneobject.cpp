@@ -6,9 +6,9 @@ using namespace std;
 
 namespace anole
 {
-NoneObject *NoneObject::one()
+ObjectSPtr NoneObject::one()
 {
-    static auto the_none = Allocator<Object>::alloc<NoneObject>();
+    static auto the_none = make_shared<NoneObject>();
     return the_none;
 }
 }

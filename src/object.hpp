@@ -2,7 +2,8 @@
 
 #include "base.hpp"
 #include "error.hpp"
-#include "variable.hpp"
+
+#include <memory>
 
 namespace anole
 {
@@ -37,6 +38,13 @@ enum ObjectType : int
 }
 using object_type::ObjectType;
 
+class Object;
+using ObjectSPtr = SPtr<Object>;
+using ObjectRawPtr = Object *;
+
+class Variable;
+using Address = Variable *;
+
 class Object
 {
   public:
@@ -47,30 +55,30 @@ class Object
 
     template<ObjectType type>
     constexpr bool is() { return type_ == type; }
-    Object *type();
+    ObjectSPtr type();
 
     virtual bool to_bool();
     virtual String to_str();
     virtual String to_key();
 
-    virtual Object *neg();
-    virtual Object *add(Object *);
-    virtual Object *sub(Object *);
-    virtual Object *mul(Object *);
-    virtual Object *div(Object *);
-    virtual Object *mod(Object *);
-    virtual Object *ceq(Object *);
-    virtual Object *cne(Object *);
-    virtual Object *clt(Object *);
-    virtual Object *cle(Object *);
-    virtual Object *bneg();
-    virtual Object *bor(Object *);
-    virtual Object *bxor(Object *);
-    virtual Object *band(Object *);
-    virtual Object *bls(Object *);
-    virtual Object *brs(Object *);
+    virtual ObjectSPtr neg();
+    virtual ObjectSPtr add(ObjectRawPtr);
+    virtual ObjectSPtr sub(ObjectRawPtr);
+    virtual ObjectSPtr mul(ObjectRawPtr);
+    virtual ObjectSPtr div(ObjectRawPtr);
+    virtual ObjectSPtr mod(ObjectRawPtr);
+    virtual ObjectSPtr ceq(ObjectRawPtr);
+    virtual ObjectSPtr cne(ObjectRawPtr);
+    virtual ObjectSPtr clt(ObjectRawPtr);
+    virtual ObjectSPtr cle(ObjectRawPtr);
+    virtual ObjectSPtr bneg();
+    virtual ObjectSPtr bor(ObjectRawPtr);
+    virtual ObjectSPtr bxor(ObjectRawPtr);
+    virtual ObjectSPtr band(ObjectRawPtr);
+    virtual ObjectSPtr bls(ObjectRawPtr);
+    virtual ObjectSPtr brs(ObjectRawPtr);
 
-    virtual Address index(Object *);
+    virtual Address index(ObjectSPtr);
     virtual Address load_member(const String &name);
 
     virtual void call(Size num);

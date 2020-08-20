@@ -7,7 +7,7 @@ namespace anole
 class NoneObject : public Object
 {
   public:
-    static NoneObject *one();
+    static ObjectSPtr one();
 
     constexpr NoneObject() noexcept
       : Object(ObjectType::None)

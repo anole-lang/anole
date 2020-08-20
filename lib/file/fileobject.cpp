@@ -23,9 +23,9 @@ void __open(Size n)
 
     Context::current()
         ->push(
-            Allocator<Object>::alloc<FileObject>(
+            make_shared<FileObject>(
                 path->to_str(),
-                reinterpret_cast<IntegerObject *>(mode)->value()))
+                reinterpret_cast<IntegerObject *>(mode.get())->value()))
     ;
 }
 }
@@ -58,7 +58,7 @@ lc_builtin_methods
     {"read", [](FileObject *obj)
         {
             Context::current()->push(
-                Allocator<Object>::alloc<StringObject>(
+                make_shared<StringObject>(
                     String(1, obj->file().get()))
             );
         }
@@ -68,36 +68,36 @@ lc_builtin_methods
             String line;
             std::getline(obj->file(), line);
             Context::current()->push(
-                Allocator<Object>::alloc<StringObject>(line)
+                make_shared<StringObject>(line)
             );
         }
     },
     {"write", [](FileObject *obj)
         {
             const auto &str
-                = reinterpret_cast<StringObject *>(Context::current()->pop())->to_str()
+                = reinterpret_cast<StringObject *>(Context::current()->pop().get())->to_str()
             ;
             obj->file().write(str.c_str(), str.size());
         }
     },
     {"tellg", [](FileObject *obj)
         {
-            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellg()));
+            Context::current()->push(make_shared<IntegerObject>(obj->file().tellg()));
         }
     },
     {"tellp", [](FileObject *obj)
         {
-            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellp()));
+            Context::current()->push(make_shared<IntegerObject>(obj->file().tellp()));
         }
     },
     {"seekg", [](FileObject *obj)
         {
-            obj->file().seekg(reinterpret_cast<IntegerObject *>(Context::current()->pop())->value());
+            obj->file().seekg(reinterpret_cast<IntegerObject *>(Context::current()->pop().get())->value());
         }
     },
     {"seekp", [](FileObject *obj)
         {
-            obj->file().seekp(reinterpret_cast<IntegerObject *>(Context::current()->pop())->value());
+            obj->file().seekp(reinterpret_cast<IntegerObject *>(Context::current()->pop().get())->value());
         }
     }
 };
@@ -143,12 +143,12 @@ Address FileObject::load_member(const String &name)
     if (method != lc_builtin_methods.end())
     {
         return Allocator<Variable>::alloc(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+            make_shared<BuiltInFunctionObject>([
+                    sptr = shared_from_this(),
                     &func = method->second](Size) mutable
                 {
-                    func(this);
-                },
-                this)
+                    func(sptr.get());
+                })
         );
     }
     return Object::load_member(name);

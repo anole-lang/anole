@@ -28,7 +28,7 @@ void __read_dir(Size n)
 
     auto path_obj = Context::current()->pop();
     fs::path path;
-    if (auto ptr = dynamic_cast<PathObject*>(path_obj))
+    if (auto ptr = dynamic_cast<PathObject*>(path_obj.get()))
     {
         path = ptr->path();
     }
@@ -42,10 +42,10 @@ void __read_dir(Size n)
         path = Context::current()->current_path() / path;
     }
 
-    auto paths = Allocator<Object>::alloc<ListObject>();
+    auto paths = make_shared<ListObject>();
     for (auto &p : fs::directory_iterator(path))
     {
-        paths->append(Allocator<Object>::alloc<PathObject>(p.path().lexically_normal()));
+        paths->append(make_shared<PathObject>(p.path().lexically_normal()));
     }
 
     Context::current()->push(paths);

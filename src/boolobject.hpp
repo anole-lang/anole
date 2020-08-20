@@ -9,8 +9,8 @@ namespace anole
 class BoolObject : public Object
 {
   public:
-    static BoolObject *the_true();
-    static BoolObject *the_false();
+    static ObjectSPtr the_true();
+    static ObjectSPtr the_false();
 
     constexpr BoolObject(bool value) noexcept
       : Object(ObjectType::Boolean)

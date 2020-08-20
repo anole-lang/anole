@@ -18,26 +18,26 @@ namespace anole
 {
 ModuleObject::~ModuleObject() = default;
 
-ModuleObject *ModuleObject::generate(const String &name)
+SPtr<ModuleObject> ModuleObject::generate(const String &name)
 {
-    ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
+    SPtr<ModuleObject> mod = make_shared<AnoleModuleObject>(name);
     if (!mod->good())
     {
-        mod = Allocator<Object>::alloc<CppModuleObject>(name);
+        mod = make_shared<CppModuleObject>(name);
     }
     return mod;
 }
 
-ModuleObject *ModuleObject::generate(const fs::path &path)
+SPtr<ModuleObject> ModuleObject::generate(const fs::path &path)
 {
-    ModuleObject *mod;
+    SPtr<ModuleObject> mod;
     if (path.extension() == ".so")
     {
-        mod = Allocator<Object>::alloc<CppModuleObject>(path);
+        mod = make_shared<CppModuleObject>(path);
     }
     else
     {
-        mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
+        mod = make_shared<AnoleModuleObject>(path);
     }
     return mod;
 }
@@ -114,7 +114,7 @@ void AnoleModuleObject::init(const filesystem::path &path)
 
     code_ = make_shared<Code>(path.filename().string());
     auto origin = Context::current();
-    Context::current() = Allocator<Context>::alloc(code_, dir);
+    Context::current() = make_shared<Context>(code_, dir);
     Context::current()->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
@@ -198,8 +198,8 @@ Address CppModuleObject::load_member(const String &name)
         throw RuntimeError(dlerror());
     }
 
-    auto result = Allocator<Object>::alloc<BuiltInFunctionObject>(
-        [func](Size n) { func(n); }, this
+    auto result = make_shared<BuiltInFunctionObject>(
+        [sptr = shared_from_this(), func](Size n) { func(n); }
     );
 
     return Allocator<Variable>::alloc(result);

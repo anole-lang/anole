@@ -17,15 +17,15 @@ class FloatObject : public Object
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
-    Object *neg() override;
-    Object *add(Object *) override;
-    Object *sub(Object *) override;
-    Object *mul(Object *) override;
-    Object *div(Object *) override;
-    Object *ceq(Object *) override;
-    Object *cne(Object *) override;
-    Object *clt(Object *) override;
-    Object *cle(Object *) override;
+    ObjectSPtr neg() override;
+    ObjectSPtr add(ObjectRawPtr) override;
+    ObjectSPtr sub(ObjectRawPtr) override;
+    ObjectSPtr mul(ObjectRawPtr) override;
+    ObjectSPtr div(ObjectRawPtr) override;
+    ObjectSPtr ceq(ObjectRawPtr) override;
+    ObjectSPtr cne(ObjectRawPtr) override;
+    ObjectSPtr clt(ObjectRawPtr) override;
+    ObjectSPtr cle(ObjectRawPtr) override;
 
     constexpr double value() const noexcept
     {

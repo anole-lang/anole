@@ -8,9 +8,9 @@ namespace anole
 class EnumObject : public Object
 {
   public:
-    EnumObject(Scope *scope)
+    EnumObject(SPtr<Scope> scope)
       : Object(ObjectType::Enum)
-      , scope_(scope)
+      , scope_(std::move(scope))
     {
         // ...
     }
@@ -18,6 +18,6 @@ class EnumObject : public Object
     Address load_member(const String &name) override;
 
   private:
-    Scope *scope_;
+    SPtr<Scope> scope_;
 };
 }

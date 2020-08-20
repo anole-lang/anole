@@ -24,10 +24,10 @@ void __args(Size n)
 
     auto raw_args = Context::get_args();
 
-    auto args = Allocator<Object>::alloc<ListObject>();
+    auto args = make_shared<ListObject>();
     for (auto arg : raw_args)
     {
-        args->append(Allocator<Object>::alloc<StringObject>(String(arg)));
+        args->append(make_shared<StringObject>(String(arg)));
     }
 
     Context::current()->push(args);

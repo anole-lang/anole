@@ -7,7 +7,7 @@
 
 namespace anole
 {
-class ListObject : public Object
+class ListObject : public Object, public std::enable_shared_from_this<ListObject>
 {
   public:
     ListObject() : Object(ObjectType::List) {}
@@ -15,25 +15,23 @@ class ListObject : public Object
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
-    Object *add(Object *) override;
-    Address index(Object *) override;
+    ObjectSPtr add(ObjectRawPtr) override;
+    Address index(ObjectSPtr) override;
     Address load_member(const String &name) override;
 
     std::list<Address> &objects();
-    void append(Object *obj);
+    void append(ObjectSPtr sptr);
 
   private:
     std::list<Address> objects_;
 };
 
-class ListIteratorObject : public Object, public EnableCollect<Object>
+class ListIteratorObject : public Object, public std::enable_shared_from_this<ListIteratorObject>
 {
   public:
-    friend class Collector;
-
-    ListIteratorObject(ListObject *bind)
+    ListIteratorObject(SPtr<ListObject> bind)
       : Object(ObjectType::ListIterator)
-      , EnableCollect(bind), bind_(bind)
+      , bind_(bind)
       , current_(bind->objects().begin())
     {
         // ...
@@ -45,7 +43,7 @@ class ListIteratorObject : public Object, public EnableCollect<Object>
     Address next() { return *current_++; }
 
   private:
-    ListObject *bind_;
+    SPtr<ListObject> bind_;
     std::list<Address>::iterator current_;
 };
 }

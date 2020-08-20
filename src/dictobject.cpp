@@ -22,12 +22,12 @@ lc_builtin_methods
     },
     {"size", [](DictObject *obj)
         {
-            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->data().size())));
+            Context::current()->push(make_shared<IntegerObject>(int64_t(obj->data().size())));
         }
     },
     {"at", [](DictObject *obj)
         {
-            Context::current()->push(obj->index(Context::current()->pop())->obj());
+            Context::current()->push(obj->index(Context::current()->pop())->sptr());
         }
     },
     {"insert", [](DictObject *obj)
@@ -68,7 +68,7 @@ String DictObject::to_str()
         {
             res += ",";
         }
-        res += " " + it->first->to_str() + " => " + it->second->obj()->to_str();
+        res += " " + it->first->to_str() + " => " + it->second->rptr()->to_str();
     }
     return res + " }";
 }
@@ -78,7 +78,7 @@ String DictObject::to_key()
     return 'd' + to_str();
 }
 
-Address DictObject::index(Object *index)
+Address DictObject::index(ObjectSPtr index)
 {
     auto it = data_.find(index);
     if (it != data_.end())
@@ -97,15 +97,15 @@ Address DictObject::load_member(const String &name)
     if (method != lc_builtin_methods.end())
     {
         return Allocator<Variable>::alloc(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([this,
+            make_shared<BuiltInFunctionObject>([
+                    sptr = shared_from_this(),
                     &func = method->second](Size) mutable
                 {
-                    func(this);
-                },
-                this)
+                    func(sptr.get());
+                })
         );
     }
-    return index(Allocator<Object>::alloc<StringObject>(name));
+    return index(make_shared<StringObject>(name));
 }
 
 DictObject::DataType &DictObject::data()
@@ -113,7 +113,7 @@ DictObject::DataType &DictObject::data()
     return data_;
 }
 
-void DictObject::insert(Object *key, Object *value)
+void DictObject::insert(ObjectSPtr key, ObjectSPtr value)
 {
     data_[key] = Allocator<Variable>::alloc(value);
 }

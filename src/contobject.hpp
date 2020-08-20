@@ -11,21 +11,21 @@ class ContObject : public Object
   public:
     friend class Collector;
 
-    ContObject(Context *resume)
+    ContObject(SPtr<Context> resume)
       : Object(ObjectType::Cont)
-      , resume_(Allocator<Context>::alloc(*resume))
+      , resume_(std::make_shared<Context>(*resume))
     {
         // ...
     }
 
     void call(Size num) override;
 
-    Context *resume()
+    SPtr<Context> resume()
     {
         return resume_;
     }
 
   private:
-    Context *resume_;
+    SPtr<Context> resume_;
 };
 }
