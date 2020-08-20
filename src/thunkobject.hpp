@@ -13,11 +13,20 @@ class ThunkObject : public Object
     ThunkObject(SPtr<Scope> pre_scope,
         SPtr<Code> code, Size base)
       : Object(ObjectType::Thunk)
-      , computed_(false)
+      , computed_(false), result_(nullptr)
       , scope_(std::make_shared<Scope>(pre_scope))
       , code_(code), base_(base)
     {
         // ...
+    }
+
+    void collect(std::function<void(Scope *)> func) override
+    {
+        func(scope_.get());
+    }
+    void collect(std::function<void(Variable *)> func) override
+    {
+        func(result_);
     }
 
     void set_result(Address res)

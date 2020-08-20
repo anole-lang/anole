@@ -11,6 +11,8 @@ namespace anole
 {
 class Scope
 {
+    friend class Collector;
+
   public:
     Scope() : pre_scope_(nullptr) {}
     Scope(SPtr<Scope> pre_scope)

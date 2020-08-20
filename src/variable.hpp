@@ -12,6 +12,8 @@ class Variable
     Variable() : sptr_(nullptr) {}
     Variable(ObjectSPtr sptr) : sptr_(sptr) {}
 
+    Variable &operator=(ObjectSPtr) = delete;
+
     void bind(ObjectSPtr sptr)
     {
         sptr_.swap(sptr);
