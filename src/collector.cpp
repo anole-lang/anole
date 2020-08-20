@@ -9,21 +9,23 @@ namespace anole
 // TODO
 void Collector::gc()
 {
-    auto &mkd_vars = marked<Variable>();
-    light::remove_reference_t<decltype(mkd_vars)> collected;
+    light::remove_reference_t<decltype(marked<Variable>())> collected;
 
     /**
      * collect variables from Context::current()
     */
 
-    for (auto &addr : mkd_vars)
+    /*
+    auto temp_marked = marked<Variable>();
+    for (auto &addr : temp_marked)
     {
         // if cannot visit variable the variable
         if (!collected.count(addr))
         {
-            mkd_vars.erase(addr);
+            marked<Variable>().erase(addr);
             Allocator<Variable>::dealloc(addr);
         }
     }
+    */
 }
 }
