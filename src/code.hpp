@@ -87,7 +87,7 @@ class Code
     void push_continue(Size ind);
     void set_continue_to(Size ind, Size base);
     bool check();
-    Object *load_const(Size ind);
+    ObjectSPtr load_const(Size ind);
 
     template<typename O, typename T>
     Size create_const(String key, T value)
@@ -102,7 +102,7 @@ class Code
         {
             constants_map_[key] = constants_.size();
             constants_literals_.push_back(key);
-            constants_.push_back(Allocator<Object>::alloc<O>(value));
+            constants_.push_back(std::make_shared<O>(value));
             return constants_.size() - 1;
         }
     }
@@ -128,6 +128,6 @@ class Code
     std::vector<String> constants_literals_;
 
     std::map<String, Size> constants_map_;
-    std::vector<Object *> constants_;
+    std::vector<ObjectSPtr> constants_;
 };
 }

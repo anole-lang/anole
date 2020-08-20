@@ -35,9 +35,9 @@ stack<Size> lc_call_anchors;
 stack<Size> lc_return_anchors;
 }
 
-Context *&Context::current()
+SPtr<Context> &Context::current()
 {
-    static Context *the_current = nullptr;
+    static SPtr<Context> the_current = nullptr;
     return the_current;
 }
 
@@ -146,7 +146,7 @@ void importall_handle()
 {
     const auto &name = OPRAND(String);
 
-    auto anole_mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
+    auto anole_mod = make_shared<AnoleModuleObject>(name);
     if (anole_mod->good())
     {
         for (const auto &name_ptr : anole_mod->scope()->symbols())
@@ -159,7 +159,7 @@ void importall_handle()
         return;
     }
 
-    auto cpp_mod = Allocator<Object>::alloc<CppModuleObject>(name);
+    auto cpp_mod = make_shared<CppModuleObject>(name);
     if (!cpp_mod->good())
     {
         throw RuntimeError("no module named " + name);
@@ -186,7 +186,7 @@ void importallpath_handle()
         path = Context::current()->current_path() / path;
     }
 
-    auto anole_mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
+    auto anole_mod = make_shared<AnoleModuleObject>(path);
     if (anole_mod->good())
     {
         for (const auto &name_ptr : anole_mod->scope()->symbols())
@@ -199,7 +199,7 @@ void importallpath_handle()
         return;
     }
 
-    auto cpp_mod = Allocator<Object>::alloc<CppModuleObject>(path);
+    auto cpp_mod = make_shared<CppModuleObject>(path);
     if (!cpp_mod->good())
     {
         throw RuntimeError("no such module: " + path.string());
@@ -238,14 +238,14 @@ void load_handle()
         Context::current()->push_address(addr);
         ++Context::current()->pc();
     }
-    else if (!addr->obj()->is<ObjectType::Thunk>())
+    else if (!addr->rptr()->is<ObjectType::Thunk>())
     {
         Context::current()->push_address(addr);
         ++Context::current()->pc();
     }
     else
     {
-        auto thunk = reinterpret_cast<ThunkObject *>(addr->obj());
+        auto thunk = reinterpret_cast<ThunkObject *>(addr->rptr());
         if (thunk->computed())
         {
             Context::current()->push_address(thunk->result());
@@ -254,7 +254,7 @@ void load_handle()
         else
         {
             Context::current()->push_address(addr);
-            Context::current() = Allocator<Context>::alloc(
+            Context::current() = make_shared<Context>(
                 Context::current(), thunk->scope(), thunk->code(), thunk->base()
             );
         }
@@ -307,7 +307,7 @@ void storelocal_handle()
 
 void newscope_handle()
 {
-    Context::current()->scope() = Allocator<Scope>::alloc(
+    Context::current()->scope() = make_shared<Scope>(
         Context::current()->scope()
     );
     ++Context::current()->pc();
@@ -395,7 +395,7 @@ void jumpifnot_handle()
 void match_handle()
 {
     auto key = Context::current()->pop();
-    if (Context::current()->top()->ceq(key)->to_bool())
+    if (Context::current()->top()->ceq(key.get())->to_bool())
     {
         Context::current()->pop();
         Context::current()->pc() = OPRAND(Size);
@@ -428,7 +428,7 @@ void pack_handle()
      *
      * a empty list will be the packed result
     */
-   Context::current()->push(Allocator<Object>::alloc<ListObject>());
+   Context::current()->push(make_shared<ListObject>());
     ++Context::current()->pc();
 }
 
@@ -450,7 +450,7 @@ void lambdadecl_handle()
 {
     using type = pair<Size, Size>;
     const auto &num_target = OPRAND(type);
-    Context::current()->push(Allocator<Object>::alloc<FunctionObject>(
+    Context::current()->push(make_shared<FunctionObject>(
         Context::current()->scope(), Context::current()->code(),
         Context::current()->pc() + 1, num_target.first)
     );
@@ -459,7 +459,7 @@ void lambdadecl_handle()
 
 void thunkdecl_handle()
 {
-    Context::current()->push(Allocator<Object>::alloc<ThunkObject>(
+    Context::current()->push(make_shared<ThunkObject>(
         Context::current()->scope(), Context::current()->code(),
         Context::current()->pc() + 1)
     );
@@ -485,7 +485,7 @@ void add_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->add(rhs));
+    Context::current()->set_top(lhs->add(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -493,7 +493,7 @@ void sub_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->sub(rhs));
+    Context::current()->set_top(lhs->sub(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -501,7 +501,7 @@ void mul_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->mul(rhs));
+    Context::current()->set_top(lhs->mul(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -509,7 +509,7 @@ void div_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->div(rhs));
+    Context::current()->set_top(lhs->div(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -517,14 +517,14 @@ void mod_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->mod(rhs));
+    Context::current()->set_top(lhs->mod(rhs.get()));
     ++Context::current()->pc();
 }
 
 void is_handle()
 {
     auto rhs = Context::current()->pop();
-    Context::current()->set_top(Context::current()->top() == rhs ? BoolObject::the_true() : BoolObject::the_false());
+    Context::current()->set_top(Context::current()->top() == rhs.get() ? BoolObject::the_true() : BoolObject::the_false());
     ++Context::current()->pc();
 }
 
@@ -532,7 +532,7 @@ void ceq_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->ceq(rhs));
+    Context::current()->set_top(lhs->ceq(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -540,7 +540,7 @@ void cne_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->cne(rhs));
+    Context::current()->set_top(lhs->cne(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -548,7 +548,7 @@ void clt_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->clt(rhs));
+    Context::current()->set_top(lhs->clt(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -556,7 +556,7 @@ void cle_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->cle(rhs));
+    Context::current()->set_top(lhs->cle(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -570,7 +570,7 @@ void bor_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->bor(rhs));
+    Context::current()->set_top(lhs->bor(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -578,7 +578,7 @@ void bxor_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->bxor(rhs));
+    Context::current()->set_top(lhs->bxor(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -586,7 +586,7 @@ void band_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->band(rhs));
+    Context::current()->set_top(lhs->band(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -594,7 +594,7 @@ void bls_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->bls(rhs));
+    Context::current()->set_top(lhs->bls(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -602,7 +602,7 @@ void brs_handle()
 {
     auto rhs = Context::current()->pop();
     auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->brs(rhs));
+    Context::current()->set_top(lhs->brs(rhs.get()));
     ++Context::current()->pc();
 }
 
@@ -616,7 +616,7 @@ void index_handle()
 
 void buildenum_handle()
 {
-    Context::current()->push(Allocator<Object>::alloc<EnumObject>(
+    Context::current()->push(make_shared<EnumObject>(
         Context::current()->scope())
     );
     Context::current()->scope() = Context::current()->scope()->pre();
@@ -625,7 +625,7 @@ void buildenum_handle()
 
 void buildlist_handle()
 {
-    auto list = Allocator<Object>::alloc<ListObject>();
+    auto list = make_shared<ListObject>();
     auto size = OPRAND(Size);
     while (size--)
     {
@@ -637,7 +637,7 @@ void buildlist_handle()
 
 void builddict_handle()
 {
-    auto dict = Allocator<Object>::alloc<DictObject>();
+    auto dict = make_shared<DictObject>();
     auto size = OPRAND(Size);
     while (size--)
     {

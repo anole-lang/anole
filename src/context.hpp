@@ -19,7 +19,7 @@ class Context
     using Stack = std::stack<Address>;
 
   public:
-    static Context *&current();
+    static SPtr<Context> &current();
 
     static void set_args(int argc, char *argv[], int start);
     static const std::vector<char *> &get_args();
@@ -40,11 +40,11 @@ class Context
 
   public:
     // this for resume from ContObject
-    Context(Context *resume)
+    Context(SPtr<Context> resume)
       : pre_context_(resume->pre_context_)
-      , scope_(Allocator<Scope>::alloc(resume->scope_))
+      , scope_(std::make_shared<Scope>(resume->scope_))
       , code_(resume->code_), pc_(resume->pc_)
-      , stack_(Allocator<Stack>::alloc(*resume->stack_))
+      , stack_(std::make_shared<Stack>(*resume->stack_))
       , current_path_(resume->current_path_)
     {
         // ...
@@ -55,7 +55,7 @@ class Context
       : pre_context_(context.pre_context_)
       , scope_(context.scope_)
       , code_(context.code_), pc_(context.pc_)
-      , stack_(Allocator<Stack>::alloc(*context.stack_))
+      , stack_(std::make_shared<Stack>(*context.stack_))
       , current_path_(context.current_path_)
     {
         // ...
@@ -64,18 +64,18 @@ class Context
     Context(SPtr<Code> code,
         std::filesystem::path path = std::filesystem::current_path())
       : pre_context_(nullptr)
-      , scope_(Allocator<Scope>::alloc(nullptr))
+      , scope_(std::make_shared<Scope>(nullptr))
       , code_(code), pc_(0)
-      , stack_(Allocator<Stack>::alloc())
+      , stack_(std::make_shared<Stack>())
       , current_path_(std::move(path))
     {
         // ...
     }
 
-    Context(Context *pre, Scope *scope,
+    Context(SPtr<Context> pre, SPtr<Scope> scope,
         SPtr<Code> code, Size pc = 0)
       : pre_context_(pre)
-      , scope_(Allocator<Scope>::alloc(scope))
+      , scope_(std::make_shared<Scope>(scope))
       , code_(std::move(code)), pc_(pc)
       , stack_(pre->stack_)
       , current_path_(pre->current_path_)
@@ -83,12 +83,12 @@ class Context
         // ...
     }
 
-    Context *&pre_context()
+    SPtr<Context> &pre_context()
     {
         return pre_context_;
     }
 
-    Scope *&scope()
+    SPtr<Scope> &scope()
     {
         return scope_;
     }
@@ -123,9 +123,9 @@ class Context
         return code_->oprand_at(pc_);
     }
 
-    void push(Object *obj)
+    void push(ObjectSPtr sptr)
     {
-        stack_->push(Allocator<Variable>::alloc(obj));
+        stack_->push(Allocator<Variable>::alloc(move(sptr)));
     }
 
     void push_address(Address addr)
@@ -136,7 +136,7 @@ class Context
     template<typename R = Object>
     R *top()
     {
-        if (stack_->top()->obj() == nullptr)
+        if (stack_->top()->rptr() == nullptr)
         {
             throw RuntimeError(
                 "var named " +
@@ -144,7 +144,7 @@ class Context
                 " doesn't reference to any object"
             );
         }
-        return reinterpret_cast<R *>((*stack_->top()).obj());
+        return reinterpret_cast<R *>(stack_->top()->rptr());
     }
 
     Address &top_address()
@@ -152,16 +152,16 @@ class Context
         return stack_->top();
     }
 
-    void set_top(Object *obj)
+    void set_top(ObjectSPtr sptr)
     {
-        stack_->top() = Allocator<Variable>::alloc(obj);
+        stack_->top() = Allocator<Variable>::alloc(move(sptr));
     }
 
-    Object *pop()
+    ObjectSPtr pop()
     {
         auto &var = *stack_->top();
         stack_->pop();
-        return var.obj();
+        return var.sptr();
     }
 
     Address pop_address()
@@ -178,7 +178,7 @@ class Context
 
     Stack *get_stack()
     {
-        return stack_;
+        return stack_.get();
     }
 
     std::filesystem::path &current_path()
@@ -193,11 +193,11 @@ class Context
     Size get_return_vals_num();
 
   private:
-    Context *pre_context_;
-    Scope *scope_;
+    SPtr<Context> pre_context_;
+    SPtr<Scope> scope_;
     SPtr<Code> code_;
     Size pc_;
-    Stack *stack_;
+    SPtr<Stack> stack_;
     std::filesystem::path current_path_;
 };
 }
