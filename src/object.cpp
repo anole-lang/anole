@@ -183,4 +183,19 @@ void Object::call(Size arg_num)
 {
     throw RuntimeError("failed call with the given non-function");
 }
+
+void Object::collect(function<void(Scope *)>)
+{
+    // ...
+}
+
+void Object::collect(function<void(Context *)>)
+{
+    // ...
+}
+
+void Object::collect(function<void(Variable *)>)
+{
+    // ...
+}
 }

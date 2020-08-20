@@ -107,6 +107,11 @@ Address AnoleModuleObject::load_member(const String &name)
     return Object::load_member(name);
 }
 
+void AnoleModuleObject::collect(function<void(Scope *)> func)
+{
+    func(scope_.get());
+}
+
 void AnoleModuleObject::init(const filesystem::path &path)
 {
     auto dir = path.parent_path();

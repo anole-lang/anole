@@ -12,4 +12,9 @@ Address EnumObject::load_member(const String &name)
     }
     return Object::load_member(name);
 }
+
+void EnumObject::collect(function<void(Scope *)> func)
+{
+    func(scope_.get());
+}
 }

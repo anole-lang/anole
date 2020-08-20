@@ -17,4 +17,9 @@ void ContObject::call(Size n)
     Context::current()->push(retval);
     ++Context::current()->pc();
 }
+
+void ContObject::collect(function<void(Context *)> func)
+{
+    func(resume_.get());
+}
 }

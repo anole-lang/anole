@@ -19,6 +19,8 @@ class ListObject : public Object, public std::enable_shared_from_this<ListObject
     Address index(ObjectSPtr) override;
     Address load_member(const String &name) override;
 
+    void collect(std::function<void(Variable *)>) override;
+
     std::list<Address> &objects();
     void append(ObjectSPtr sptr);
 
@@ -38,6 +40,8 @@ class ListIteratorObject : public Object, public std::enable_shared_from_this<Li
     }
 
     Address load_member(const String &name) override;
+
+    void collect(std::function<void(Variable *)>) override;
 
     bool has_next() { return current_ != bind_->objects().end(); }
     Address next() { return *current_++; }

@@ -17,6 +17,10 @@ class DictObject : public Object, public std::enable_shared_from_this<DictObject
         }
     };
 
+    /**
+     * TODO:
+     * ObjectSPtr as key may cause circular reference
+    */
     using DataType = std::map<ObjectSPtr, Address, ObjectCmp>;
 
     DictObject() : Object(ObjectType::Dict)
@@ -27,8 +31,11 @@ class DictObject : public Object, public std::enable_shared_from_this<DictObject
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
+
     Address index(ObjectSPtr) override;
     Address load_member(const String &name) override;
+
+    void collect(std::function<void(Variable *)>) override;
 
     DataType &data();
     void insert(ObjectSPtr key, ObjectSPtr value);

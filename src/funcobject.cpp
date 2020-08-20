@@ -63,18 +63,23 @@ void FunctionObject::call(Size num)
             break;
 
         case Opcode::StoreRef:
+            /**
+             * use top_address instead of pop_address directly
+             *  to ensure the variable be collected
+            */
             Context::current()->scope()->create_symbol(OPRAND(String),
-                Context::current()->pop_address()
+                Context::current()->top_address()
             );
+            Context::current()->get_stack()->pop_back();
             ++pc;
             --arg_num;
             --parameter_num;
             break;
 
         case Opcode::StoreLocal:
-            *Context::current()->scope()
+            Context::current()->scope()
                 ->create_symbol(OPRAND(String))
-                    = Context::current()->pop()
+                    ->bind(Context::current()->pop())
             ;
             ++pc;
             --arg_num;
@@ -122,5 +127,10 @@ void FunctionObject::call(Size num)
             throw RuntimeError("missing the parameter named '" + OPRAND(String) + '\'');
         }
     }
+}
+
+void FunctionObject::collect(function<void(Scope *)> func)
+{
+    func(scope_.get());
 }
 }

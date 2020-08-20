@@ -9,8 +9,6 @@ namespace anole
 class ContObject : public Object
 {
   public:
-    friend class Collector;
-
     ContObject(SPtr<Context> resume)
       : Object(ObjectType::Cont)
       , resume_(std::make_shared<Context>(*resume))
@@ -19,6 +17,8 @@ class ContObject : public Object
     }
 
     void call(Size num) override;
+
+    void collect(std::function<void(Context *)>) override;
 
     SPtr<Context> resume()
     {

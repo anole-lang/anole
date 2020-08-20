@@ -33,6 +33,8 @@ class AnoleModuleObject : public ModuleObject
     AnoleModuleObject(const std::filesystem::path &path);
     Address load_member(const String &name) override;
 
+    void collect(std::function<void(Scope *)>) override;
+
     const SPtr<Scope> &scope() const
     {
         return scope_;

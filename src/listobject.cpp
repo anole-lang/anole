@@ -176,6 +176,14 @@ Address ListObject::load_member(const String &name)
     return Object::load_member(name);
 }
 
+void ListObject::collect(function<void(Variable *)> func)
+{
+    for (auto &addr : objects_)
+    {
+        func(addr);
+    }
+}
+
 list<Address> &ListObject::objects()
 {
     return objects_;
@@ -201,5 +209,13 @@ Address ListIteratorObject::load_member(const String &name)
         );
     }
     return Object::load_member(name);
+}
+
+void ListIteratorObject::collect(function<void(Variable *)> func)
+{
+    for (auto &addr : bind_->objects())
+    {
+        func(addr);
+    }
 }
 }

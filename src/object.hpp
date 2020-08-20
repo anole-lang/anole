@@ -2,8 +2,10 @@
 
 #include "base.hpp"
 #include "error.hpp"
+#include "collector.hpp"
 
 #include <memory>
+#include <functional>
 
 namespace anole
 {
@@ -82,6 +84,10 @@ class Object
     virtual Address load_member(const String &name);
 
     virtual void call(Size num);
+
+    virtual void collect(std::function<void(Scope *)>);
+    virtual void collect(std::function<void(Context *)>);
+    virtual void collect(std::function<void(Variable *)>);
 
   private:
     ObjectType type_;

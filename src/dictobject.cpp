@@ -88,7 +88,7 @@ Address DictObject::index(ObjectSPtr index)
     /**
      * dict will create an empty target if the key is not recorded
     */
-    return data_[index] = Allocator<Variable>::alloc(nullptr);
+    return data_[index] = Allocator<Variable>::alloc();
 }
 
 Address DictObject::load_member(const String &name)
@@ -106,6 +106,14 @@ Address DictObject::load_member(const String &name)
         );
     }
     return index(make_shared<StringObject>(name));
+}
+
+void DictObject::collect(function<void(Variable *)> func)
+{
+    for (auto &key_addr : data_)
+    {
+        func(key_addr.second);
+    }
 }
 
 DictObject::DataType &DictObject::data()
