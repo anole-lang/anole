@@ -70,6 +70,15 @@ template<typename T>
 struct remove_cv<const volatile T> { using type = T; };
 
 template<typename T>
+struct remove_reference { using type = T; };
+template<typename T>
+struct remove_reference<T&> { using type = T; };
+template<typename T>
+struct remove_reference<T&&> { using type = T; };
+template<typename T>
+using remove_reference_t = typename remove_reference<T>::type;
+
+template<typename T>
 struct is_void : is_same<void, typename remove_cv<T>::type> {};
 template<typename T>
 inline constexpr bool is_void_v = is_void<T>::value;
