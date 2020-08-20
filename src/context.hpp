@@ -7,7 +7,7 @@
 #include "allocator.hpp"
 
 #include <map>
-#include <stack>
+#include <list>
 #include <filesystem>
 
 namespace anole
@@ -15,8 +15,10 @@ namespace anole
 // Context should be contructed by make_shared
 class Context
 {
+    friend class Collector;
+
   public:
-    using Stack = std::stack<Address>;
+    using Stack = std::list<Address>;
 
   public:
     static SPtr<Context> &current();
@@ -125,49 +127,49 @@ class Context
 
     void push(ObjectSPtr sptr)
     {
-        stack_->push(Allocator<Variable>::alloc(move(sptr)));
+        stack_->push_back(Allocator<Variable>::alloc(move(sptr)));
     }
 
     void push_address(Address addr)
     {
-        stack_->push(addr);
+        stack_->push_back(addr);
     }
 
     template<typename R = Object>
     R *top()
     {
-        if (stack_->top()->rptr() == nullptr)
+        if (stack_->back()->rptr() == nullptr)
         {
             throw RuntimeError(
                 "var named " +
-                get_not_defined_symbol(stack_->top()) +
+                get_not_defined_symbol(stack_->back()) +
                 " doesn't reference to any object"
             );
         }
-        return reinterpret_cast<R *>(stack_->top()->rptr());
+        return reinterpret_cast<R *>(stack_->back()->rptr());
     }
 
     Address &top_address()
     {
-        return stack_->top();
+        return stack_->back();
     }
 
     void set_top(ObjectSPtr sptr)
     {
-        stack_->top() = Allocator<Variable>::alloc(move(sptr));
+        stack_->back() = Allocator<Variable>::alloc(move(sptr));
     }
 
     ObjectSPtr pop()
     {
-        auto &var = *stack_->top();
-        stack_->pop();
+        auto &var = *stack_->back();
+        stack_->pop_back();
         return var.sptr();
     }
 
     Address pop_address()
     {
         auto res = top_address();
-        stack_->pop();
+        stack_->pop_back();
         return res;
     }
 

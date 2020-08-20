@@ -14,6 +14,7 @@
 #include "builtinfuncobject.hpp"
 
 #include <set>
+#include <stack>
 #include <fstream>
 #include <filesystem>
 
@@ -108,7 +109,7 @@ namespace op_handles
 {
 void pop_handle()
 {
-    Context::current()->get_stack()->pop();
+    Context::current()->get_stack()->pop_back();
     ++Context::current()->pc();
 }
 
@@ -282,7 +283,7 @@ void loadmember_handle()
 void store_handle()
 {
     auto p = Context::current()->pop_address();
-    *p = Context::current()->pop();
+    p->bind(Context::current()->pop());
     Context::current()->push_address(p);
     Context::rm_not_defined_symbol(p);
     ++Context::current()->pc();
@@ -290,17 +291,22 @@ void store_handle()
 
 void storeref_handle()
 {
+    /**
+     * use top_address instead of pop_address directly
+     *  to ensure the variable be collected
+    */
     Context::current()->scope()->create_symbol(
-        OPRAND(String), Context::current()->pop_address()
+        OPRAND(String), Context::current()->top_address()
     );
+    Context::current()->get_stack()->pop_back();
     ++Context::current()->pc();
 }
 
 void storelocal_handle()
 {
-    *Context::current()->scope()
+    Context::current()->scope()
         ->create_symbol(OPRAND(String))
-            = Context::current()->pop()
+            ->bind(Context::current()->pop())
     ;
     ++Context::current()->pc();
 }
@@ -341,16 +347,21 @@ void return_handle()
     auto pre_context = Context::current()->pre_context();
     if (Context::current()->get_stack() != pre_context->get_stack())
     {
-        Context::Stack temp;
-        for (Size i = 0; i < n; ++i)
+        auto pre_stack = pre_context->get_stack();
+        auto cur_stack = Context::current()->get_stack();
+
+        auto begin = cur_stack->begin();
+        n = cur_stack->size() - n;
+        while (n--)
         {
-            temp.push(Context::current()->pop_address());
+            ++begin;
         }
-        for (Size i = 0; i < n; ++i)
-        {
-            pre_context->push_address(temp.top());
-            temp.pop();
-        }
+
+        pre_stack->insert(pre_stack->end(),
+            begin, cur_stack->end()
+        );
+
+        cur_stack->erase(begin, cur_stack->end());
     }
     Context::current() = pre_context;
     ++Context::current()->pc();
