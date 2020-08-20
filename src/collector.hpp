@@ -6,8 +6,12 @@
 
 namespace anole
 {
+class Scope;
+class Context;
+class Variable;
+
 /**
- * Collector will find variables/objects/scopes/contexts/stacks
+ * Collector will find variables
  *  which are referenced and then deallocate others
 */
 class Collector
@@ -27,13 +31,30 @@ class Collector
     template<typename T>
     void mark(T *ptr)
     {
-        marked<T>().insert(ptr);
         ++count_;
-        if (count_ > 1000)
+        if (count_ > 10000)
         {
-            gc();
             count_ = 0;
+            gc();
         }
+
+        /**
+         * the new allocated variable
+         *  must be marked after gc
+         *  to ensure it be collected
+        */
+        marked<T>().insert(ptr);
+    }
+
+    template<typename T>
+    void collect(T *p)
+    {
+        if (p == nullptr || visited_.count(p))
+        {
+            return;
+        }
+        visited_.insert(p);
+        collect_impl(p);
     }
 
     void gc();
@@ -47,6 +68,16 @@ class Collector
     }
 
     Size count_;
+
+  private:
+    /**
+     * collect variables
+    */
+    std::set<void *> visited_;
+    std::set<Variable *> collected_;
+    void collect_impl(Scope *);
+    void collect_impl(Context *);
+    void collect_impl(Variable *);
 };
 
 inline Collector &Collector::collector()
