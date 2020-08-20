@@ -11,7 +11,7 @@ set (CMAKE_EXE_LINKER_FLAGS "-rdynamic")
 set (CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)
-    set (CMAKE_CXX_FLAGS "-g -Wall")
+    set (CMAKE_CXX_FLAGS "-g -Wall -Wno-unused-private-field")
     ADD_DEFINITIONS (-D_DEBUG)
 
     file (GLOB SOURCES "src/*.cpp")
