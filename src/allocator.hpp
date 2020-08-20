@@ -10,7 +10,7 @@ namespace anole
 {
 /**
  * by allocator,
- *  we can allocate memories for variables/objects/scopes/contexts/stacks
+ *  we can allocate memories for variables
 */
 template<typename T>
 class Allocator
@@ -27,14 +27,6 @@ class Allocator
     template<typename U = Value, typename ...Ts>
     static U *alloc(Ts &&...values)
     {
-        if constexpr (light::is_same_v<Value, Scope>)
-        {
-            if (allocated_.size() > 100)
-            {
-                Collector::collector().gc();
-            }
-        }
-
         return Allocator::allocator().template allocate<U>(std::forward<Ts>(values)...);
     }
 
@@ -46,11 +38,6 @@ class Allocator
     static void dealloc(void *ptr)
     {
         dealloc(reinterpret_cast<Pointer>(ptr));
-    }
-
-    static const std::set<Pointer> &alloced()
-    {
-        return Allocator::allocator().allocated();
     }
 
   public:
@@ -65,32 +52,21 @@ class Allocator
         static_assert(std::is_convertible_v<U *, Pointer>);
 
         auto ptr = new U(std::forward<Ts>(values)...);
-        allocated_.insert(ptr);
 
-        Collector::collector().record(Pointer(ptr));
+        Collector::collector().mark(Pointer(ptr));
 
         return ptr;
     }
 
     void deallocate(Pointer ptr)
     {
-        assert(allocated_.count(ptr));
         delete ptr;
-        allocated_.erase(ptr);
     }
 
     void deallocate(void *ptr)
     {
         deallocate(reinterpret_cast<Pointer>(ptr));
     }
-
-    const std::set<Pointer> &allocated()
-    {
-        return allocated_;
-    }
-
-  private:
-    std::set<Pointer> allocated_;
 };
 
 template<typename T>

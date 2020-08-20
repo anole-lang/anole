@@ -1,28 +1,11 @@
 #pragma once
 
+#include "base.hpp"
+
 #include <set>
 
 namespace anole
 {
-template<typename T>
-class EnableCollect
-{
-  public:
-    EnableCollect(T *bind)
-      : bind_(bind)
-    {
-        // ...
-    }
-
-    T *binded()
-    {
-        return bind_;
-    }
-
-  private:
-    T *bind_;
-};
-
 /**
  * Collector will find variables/objects/scopes/contexts/stacks
  *  which are referenced and then deallocate others
@@ -33,7 +16,7 @@ class Collector
     static Collector &collector();
 
   public:
-    Collector() = default;
+    Collector() : count_(0) {}
 
     /**
      * record allocated address
@@ -42,24 +25,28 @@ class Collector
      * void record(address);
     */
     template<typename T>
-    void record(T *ptr)
+    void mark(T *ptr)
     {
-        recorded<T>().insert(ptr);
+        marked<T>().insert(ptr);
+        ++count_;
+        if (count_ > 1000)
+        {
+            gc();
+            count_ = 0;
+        }
     }
 
-    // TODO
-    void gc()
-    {
-        // ...
-    }
+    void gc();
 
   private:
     template<typename T>
-    std::set<T *> &recorded()
+    std::set<T *> &marked()
     {
-        static std::set<T *> rcod;
-        return rcod;
+        static std::set<T *> mkd;
+        return mkd;
     }
+
+    Size count_;
 };
 
 inline Collector &Collector::collector()
