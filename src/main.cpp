@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) try
         {
             path /= "__init__.anole";
         }
-        Context::current() = Allocator<Context>::alloc(make_shared<Code>(),
+        Context::current() = make_shared<Context>(make_shared<Code>(),
             path.parent_path().relative_path()
         );
 

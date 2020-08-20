@@ -13,13 +13,13 @@ class Scope
 {
   public:
     Scope() : pre_scope_(nullptr) {}
-    Scope(Scope *pre_scope)
-      : pre_scope_(pre_scope)
+    Scope(SPtr<Scope> pre_scope)
+      : pre_scope_(std::move(pre_scope))
     {
         // ...
     }
 
-    Scope *pre()
+    SPtr<Scope> &pre()
     {
         return pre_scope_;
     }
@@ -77,7 +77,7 @@ class Scope
         }
     }
 
-    Scope *pre_scope_;
+    SPtr<Scope> pre_scope_;
     std::map<String, Address> symbols_;
 };
 }

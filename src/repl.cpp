@@ -71,7 +71,7 @@ void replrun::run()
     istringstream ss;
     Parser parser{ss};
     auto code = make_shared<Code>("<stdin>");
-    Context::current() = Allocator<Context>::alloc(code);
+    Context::current() = make_shared<Context>(code);
 
     parser.set_continue_action([&ss, &parser]
     {
