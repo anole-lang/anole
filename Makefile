@@ -6,7 +6,7 @@ LDS = -ldl -lstdc++fs -lreadline
 
 DIR_TMP = tmp
 
-OBJ = tmp/error.so tmp/tokenizer.so tmp/parser.so tmp/code.so tmp/objects.so tmp/context.so tmp/repl.so
+OBJ = tmp/error.so tmp/tokenizer.so tmp/parser.so tmp/code.so tmp/objects.so tmp/context.so tmp/repl.so tmp/collector.so
 FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 
 test: tmp/test
@@ -24,6 +24,9 @@ tmp/parser.so: src/parser.cpp
 
 tmp/code.so: src/codegen.cpp \
 			 src/code.cpp
+	${CC} ${FLAGS} $^ -shared -fPIC -o $@
+
+tmp/collector.so: src/collector.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 tmp/objects.so: src/object.cpp \
