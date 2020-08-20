@@ -1,9 +1,10 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.18 - 2020/08/20
 
 ### Added
 
+- Anole has GC now!!!
 - Built-in function `type` to get the type literal of the given value
 
 ### Updated
