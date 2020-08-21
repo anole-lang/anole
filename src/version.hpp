@@ -17,7 +17,7 @@ namespace anole
 */
 struct Version
 {
-    constexpr static auto literal = "0.0.18 2020/08/08";
+    constexpr static auto literal = "0.0.18 2020/08/20";
 
     constexpr static Size major    = 0;
     constexpr static Size minor    = 0;
