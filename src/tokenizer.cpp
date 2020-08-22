@@ -351,6 +351,7 @@ Token Tokenizer::next()
             {
                 get_next_input();
             }
+            get_next_input();
             return next();
 
         case State::InBlockComment:
@@ -358,6 +359,7 @@ Token Tokenizer::next()
             {
                 get_next_input();
             }
+            get_next_input();
             return next();
 
         default:
