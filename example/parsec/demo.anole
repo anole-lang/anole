@@ -1,5 +1,9 @@
 use * from parsec;
 
+$
+` simple demo of the parsec
+$
+
 blank
 :   token.by(@(ch): ch = " ")
 ;
