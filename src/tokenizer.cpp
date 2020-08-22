@@ -57,8 +57,8 @@ namespace
 {
 const set<char> illegal_idchrs
 {
-    '_', '#', '@', '.', ',', ':', ';', '?',
-    '(', ')', '[', ']', '{', '}', '"'
+    '_', '@', '#', '$', '.', ',', ':', ';',
+    '?', '(', ')', '[', ']', '{', '}', '"'
 };
 bool is_legal_idchr(char chr)
 {
@@ -81,7 +81,9 @@ Token Tokenizer::next()
         InDot,
         InDoot,
 
-        InComment,
+        InLineComment,
+        InBlockComment,
+
         InInteger,
         InDouble,
         InNormalIdentifier,
@@ -107,12 +109,12 @@ Token Tokenizer::next()
         case State::Begin:
             switch (last_input_)
             {
-            case '$':
-                token = make_unique<Token>(TokenType::End);
+            case '#':
+                state = State::InLineComment;
                 break;
 
-            case '#':
-                state = State::InComment;
+            case '$':
+                state = State::InBlockComment;
                 break;
 
             case '@':
@@ -344,8 +346,15 @@ Token Tokenizer::next()
             state = State::InString;
             break;
 
-        case State::InComment:
+        case State::InLineComment:
             while (last_input_ != '\n')
+            {
+                get_next_input();
+            }
+            return next();
+
+        case State::InBlockComment:
+            while (last_input_ != '$')
             {
                 get_next_input();
             }

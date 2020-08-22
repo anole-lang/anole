@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Support block comment by using a pair of '$'
+
 ## 0.0.18 - 2020/08/20
 
 ### Added
