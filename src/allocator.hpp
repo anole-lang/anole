@@ -22,7 +22,11 @@ class Allocator
     using Pointer = T *;
 
   public:
-    static Allocator &allocator();
+    static Allocator &allocator()
+    {
+        static Allocator<T> alctor;
+        return alctor;
+    }
 
     template<typename U = Value, typename ...Ts>
     static U *alloc(Ts &&...values)
@@ -68,11 +72,4 @@ class Allocator
         deallocate(reinterpret_cast<Pointer>(ptr));
     }
 };
-
-template<typename T>
-inline Allocator<T> &Allocator<T>::allocator()
-{
-    static Allocator<T> alctor;
-    return alctor;
-}
 } // namespace anole
