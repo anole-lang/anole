@@ -105,22 +105,22 @@ class Context
         return pc_;
     }
 
-    Instruction &ins()
+    const Instruction &ins()
     {
         return code_->ins_at(pc_);
     }
 
-    Instruction &ins_at(Size index)
+    const Instruction &ins_at(Size index)
     {
         return code_->ins_at(index);
     }
 
-    Opcode &opcode()
+    const Opcode opcode()
     {
         return code_->opcode_at(pc_);
     }
 
-    std::any &oprand()
+    const std::any &oprand()
     {
         return code_->oprand_at(pc_);
     }
