@@ -17,11 +17,13 @@ class Variable;
 class Collector
 {
   public:
-    static Collector &collector();
+    static Collector &collector()
+    {
+        static Collector clctor;
+        return clctor;
+    }
 
   public:
-    Collector() : count_(0) {}
-
     /**
      * record allocated address
      *  and only recorded address could be deallocated
@@ -60,9 +62,18 @@ class Collector
     void gc();
 
   private:
+    /**
+     * default ctor is private
+     *  in order that we can only use the static collector
+    */
+    Collector() : count_(0) {}
+
     template<typename T>
     std::set<T *> &marked()
     {
+        /**
+         * static mkd for non-static member function
+        */
         static std::set<T *> mkd;
         return mkd;
     }
@@ -79,10 +90,4 @@ class Collector
     void collect_impl(Context *);
     void collect_impl(Variable *);
 };
-
-inline Collector &Collector::collector()
-{
-    static Collector clctor;
-    return clctor;
-}
 } // namespace anole
