@@ -99,6 +99,11 @@ using token_type::TokenType;
 
 struct Token
 {
+    TokenType type;
+    String value;
+
+    static TokenType add_token_type(const String &str);
+
     Token() noexcept = default;
 
     explicit Token(TokenType type, String value = "") noexcept;
@@ -109,10 +114,5 @@ struct Token
 
     Token &operator=(Token &&other) noexcept;
     Token &operator=(const Token &other) noexcept;
-
-    static TokenType add_token_type(const String &str);
-
-    TokenType type;
-    String value;
 };
 }

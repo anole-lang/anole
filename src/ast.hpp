@@ -33,6 +33,8 @@ using ParameterList
 struct AST
 {
     using Position = std::pair<Size, Size>;
+    // pos not be uesd in each node
+    Position pos = {0, 0};
 
     constexpr AST() noexcept = default;
 
@@ -48,9 +50,6 @@ struct AST
         static bool mode = false;
         return mode;
     }
-
-    // pos not be uesd in each node
-    Position pos = {0, 0};
 };
 
 struct Stmt : AST
