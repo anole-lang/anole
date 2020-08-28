@@ -939,25 +939,33 @@ Ptr<Expr> Parser::gen_term()
 Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 {
     try_continue();
-    while (current_token_.type == TokenType::Dot
-      || current_token_.type == TokenType::LParen
-      || current_token_.type == TokenType::LBracket)
+    for (bool cond = true; cond;)
     {
-        if (current_token_.type == TokenType::Dot)
+        try_continue();
+        switch (current_token_.type)
         {
+        case TokenType::Dot:
             expr = gen_dot_expr(move(expr));
-        }
-        else if (current_token_.type == TokenType::LParen)
+            break;
+
+        case TokenType::LParen:
         {
             auto pos = tokenizer_.last_pos();
             expr = make_unique<ParenOperatorExpr>(move(expr), gen_arguments());
             expr->pos = pos;
         }
-        else // if token is LBracket
+            break;
+
+        case TokenType::LBracket:
         {
             expr = gen_index_expr(move(expr));
         }
-        try_continue();
+            break;
+
+        default:
+            cond = false;
+            break;
+        }
     }
 
     if (current_token_.type == TokenType::Colon)
