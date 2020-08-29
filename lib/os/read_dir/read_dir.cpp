@@ -26,9 +26,9 @@ void __read_dir(Size n)
         throw RuntimeError("function read_dir need only one argument");
     }
 
-    auto path_obj = Context::current()->pop();
+    auto path_obj = Context::current()->pop_rptr();
     fs::path path;
-    if (auto ptr = dynamic_cast<PathObject*>(path_obj.get()))
+    if (auto ptr = dynamic_cast<PathObject *>(path_obj))
     {
         path = ptr->path();
     }

@@ -34,11 +34,11 @@ void __is_directory(Size n)
         throw RuntimeError("function current_path need 1 argument");
     }
 
-    auto path_obj = Context::current()->pop();
+    auto path_obj = Context::current()->pop_rptr();
     fs::path path;
-    if (auto ptr = dynamic_cast<PathObject*>(path_obj.get()))
+    if (path_obj->is(Object::add_object_type("path")))
     {
-        path = ptr->path();
+        path = static_cast<PathObject *>(path_obj)->path();
     }
     else
     {

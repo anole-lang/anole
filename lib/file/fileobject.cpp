@@ -18,14 +18,14 @@ void __open(Size n)
         throw RuntimeError("function open need 2 arguments");
     }
 
-    auto path = Context::current()->pop();
-    auto mode = Context::current()->pop();
+    auto path = Context::current()->pop_rptr();
+    auto mode = Context::current()->pop_rptr();
 
     Context::current()
         ->push(
             make_shared<FileObject>(
                 path->to_str(),
-                reinterpret_cast<IntegerObject *>(mode.get())->value()))
+                dynamic_cast<IntegerObject *>(mode)->value()))
     ;
 }
 }
@@ -75,7 +75,7 @@ lc_builtin_methods
     {"write", [](FileObject *obj)
         {
             const auto &str
-                = reinterpret_cast<StringObject *>(Context::current()->pop().get())->to_str()
+                = dynamic_cast<StringObject *>(Context::current()->pop_rptr())->to_str()
             ;
             obj->file().write(str.c_str(), str.size());
         }
@@ -92,12 +92,12 @@ lc_builtin_methods
     },
     {"seekg", [](FileObject *obj)
         {
-            obj->file().seekg(reinterpret_cast<IntegerObject *>(Context::current()->pop().get())->value());
+            obj->file().seekg(dynamic_cast<IntegerObject *>(Context::current()->pop_rptr())->value());
         }
     },
     {"seekp", [](FileObject *obj)
         {
-            obj->file().seekp(reinterpret_cast<IntegerObject *>(Context::current()->pop().get())->value());
+            obj->file().seekp(dynamic_cast<IntegerObject *>(Context::current()->pop_rptr())->value());
         }
     }
 };
