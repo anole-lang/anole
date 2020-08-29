@@ -130,13 +130,13 @@ class Context
         stack_->push_back(Allocator<Variable>::alloc(move(sptr)));
     }
 
-    void push_address(Address addr)
+    void push(Address addr)
     {
         stack_->push_back(addr);
     }
 
     template<typename R = Object>
-    R *top()
+    R *top_rptr()
     {
         if (stack_->back()->rptr() == nullptr)
         {
@@ -149,9 +149,14 @@ class Context
         return reinterpret_cast<R *>(stack_->back()->rptr());
     }
 
-    Address &top_address()
+    Address top_address()
     {
         return stack_->back();
+    }
+
+    void set_top(Address addr)
+    {
+        stack_->back() = addr;
     }
 
     void set_top(ObjectSPtr sptr)
@@ -159,7 +164,23 @@ class Context
         stack_->back() = Allocator<Variable>::alloc(move(sptr));
     }
 
-    ObjectSPtr pop()
+    void pop()
+    {
+        stack_->pop_back();
+    }
+
+    template<typename R = Object>
+    R *pop_rptr()
+    {
+        auto &var = *stack_->back();
+        stack_->pop_back();
+        return reinterpret_cast<R *>(var.rptr());
+    }
+
+    /**
+     * use pop_sptr when binding it with other variables
+    */
+    ObjectSPtr pop_sptr()
     {
         auto &var = *stack_->back();
         stack_->pop_back();
