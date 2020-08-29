@@ -109,7 +109,7 @@ namespace op_handles
 {
 void pop_handle()
 {
-    Context::current()->get_stack()->pop_back();
+    Context::current()->pop();
     ++Context::current()->pc();
 }
 
@@ -222,8 +222,8 @@ void importallpath_handle()
 void importpart_handle()
 {
     const auto &name = OPRAND(String);
-    Context::current()->push_address(
-        Context::current()->top<ModuleObject>()->load_member(name)
+    Context::current()->push(
+        Context::current()->top_rptr<ModuleObject>()->load_member(name)
     );
     ++Context::current()->pc();
 }
@@ -236,12 +236,12 @@ void load_handle()
     if (!*addr)
     {
         Context::add_not_defined_symbol(name, addr);
-        Context::current()->push_address(addr);
+        Context::current()->push(addr);
         ++Context::current()->pc();
     }
     else if (!addr->rptr()->is<ObjectType::Thunk>())
     {
-        Context::current()->push_address(addr);
+        Context::current()->push(addr);
         ++Context::current()->pc();
     }
     else
@@ -249,12 +249,12 @@ void load_handle()
         auto thunk = reinterpret_cast<ThunkObject *>(addr->rptr());
         if (thunk->computed())
         {
-            Context::current()->push_address(thunk->result());
+            Context::current()->push(thunk->result());
             ++Context::current()->pc();
         }
         else
         {
-            Context::current()->push_address(addr);
+            Context::current()->push(addr);
             Context::current() = make_shared<Context>(
                 Context::current(), thunk->scope(), thunk->code(), thunk->base()
             );
@@ -271,20 +271,20 @@ void loadconst_handle()
 void loadmember_handle()
 {
     const auto &name = OPRAND(String);
-    auto address = Context::current()->pop()->load_member(name);
+    auto address = Context::current()->pop_rptr()->load_member(name);
     if (!*address)
     {
         Context::add_not_defined_symbol(name, address);
     }
-    Context::current()->push_address(address);
+    Context::current()->push(address);
     ++Context::current()->pc();
 }
 
 void store_handle()
 {
     auto p = Context::current()->pop_address();
-    p->bind(Context::current()->pop());
-    Context::current()->push_address(p);
+    p->bind(Context::current()->pop_sptr());
+    Context::current()->push(p);
     Context::rm_not_defined_symbol(p);
     ++Context::current()->pc();
 }
@@ -298,7 +298,7 @@ void storeref_handle()
     Context::current()->scope()->create_symbol(
         OPRAND(String), Context::current()->top_address()
     );
-    Context::current()->get_stack()->pop_back();
+    Context::current()->pop();
     ++Context::current()->pc();
 }
 
@@ -306,7 +306,7 @@ void storelocal_handle()
 {
     Context::current()->scope()
         ->create_symbol(OPRAND(String))
-            ->bind(Context::current()->pop())
+            ->bind(Context::current()->pop_sptr())
     ;
     ++Context::current()->pc();
 }
@@ -327,12 +327,12 @@ void callac_handle()
 
 void call_handle()
 {
-    Context::current()->pop()->call(Context::current()->get_call_args_num());
+    Context::current()->pop_rptr()->call(Context::current()->get_call_args_num());
 }
 
 void fastcall_handle()
 {
-    Context::current()->pop()->call(0);
+    Context::current()->pop_rptr()->call(0);
 }
 
 void returnac_handle()
@@ -381,7 +381,7 @@ void jump_handle()
 
 void jumpif_handle()
 {
-    if (Context::current()->pop()->to_bool())
+    if (Context::current()->pop_rptr()->to_bool())
     {
         Context::current()->pc() = OPRAND(Size);
     }
@@ -393,7 +393,7 @@ void jumpif_handle()
 
 void jumpifnot_handle()
 {
-    if (!Context::current()->pop()->to_bool())
+    if (!Context::current()->pop_rptr()->to_bool())
     {
         Context::current()->pc() = OPRAND(Size);
     }
@@ -405,8 +405,8 @@ void jumpifnot_handle()
 
 void match_handle()
 {
-    auto key = Context::current()->pop();
-    if (Context::current()->top()->ceq(key.get())->to_bool())
+    auto key = Context::current()->pop_rptr();
+    if (Context::current()->top_rptr()->ceq(key)->to_bool())
     {
         Context::current()->pop();
         Context::current()->pc() = OPRAND(Size);
@@ -445,13 +445,14 @@ void pack_handle()
 
 void unpack_handle()
 {
-    if (auto l = dynamic_cast<ListObject*>(Context::current()->top()))
+    if (Context::current()->top_rptr()->is<ObjectType::List>())
     {
+        auto l = Context::current()->top_rptr<ListObject>();
         Context::current()->pop();
         for (auto it = l->objects().rbegin();
             it != l->objects().rend(); ++it)
         {
-            Context::current()->push_address(*it);
+            Context::current()->push(*it);
         }
     }
     ++Context::current()->pc();
@@ -480,148 +481,152 @@ void thunkdecl_handle()
 void thunkover_handle()
 {
     auto result = Context::current()->pop_address();
-    Context::current()->top<ThunkObject>()->set_result(result);
-    Context::current()->top_address() = result;
+    Context::current()->top_rptr<ThunkObject>()->set_result(result);
+    Context::current()->set_top(result);
     Context::current() = Context::current()->pre_context();
     ++Context::current()->pc();
 }
 
 void neg_handle()
 {
-    Context::current()->push(Context::current()->pop()->neg());
+    Context::current()->push(Context::current()->pop_rptr()->neg());
     ++Context::current()->pc();
 }
 
 void add_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->add(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->add(rhs));
     ++Context::current()->pc();
 }
 
 void sub_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->sub(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->sub(rhs));
     ++Context::current()->pc();
 }
 
 void mul_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->mul(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->mul(rhs));
     ++Context::current()->pc();
 }
 
 void div_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->div(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->div(rhs));
     ++Context::current()->pc();
 }
 
 void mod_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->mod(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->mod(rhs));
     ++Context::current()->pc();
 }
 
 void is_handle()
 {
-    auto rhs = Context::current()->pop();
-    Context::current()->set_top(Context::current()->top() == rhs.get() ? BoolObject::the_true() : BoolObject::the_false());
+    auto rhs = Context::current()->pop_rptr();
+    Context::current()->set_top(
+        Context::current()->top_rptr() == rhs
+        ? BoolObject::the_true()
+        : BoolObject::the_false()
+    );
     ++Context::current()->pc();
 }
 
 void ceq_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->ceq(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->ceq(rhs));
     ++Context::current()->pc();
 }
 
 void cne_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->cne(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->cne(rhs));
     ++Context::current()->pc();
 }
 
 void clt_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->clt(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->clt(rhs));
     ++Context::current()->pc();
 }
 
 void cle_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->cle(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->cle(rhs));
     ++Context::current()->pc();
 }
 
 void bneg_handle()
 {
-    Context::current()->push(Context::current()->pop()->bneg());
+    Context::current()->push(Context::current()->pop_rptr()->bneg());
     ++Context::current()->pc();
 }
 
 void bor_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->bor(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->bor(rhs));
     ++Context::current()->pc();
 }
 
 void bxor_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->bxor(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->bxor(rhs));
     ++Context::current()->pc();
 }
 
 void band_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->band(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->band(rhs));
     ++Context::current()->pc();
 }
 
 void bls_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->bls(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->bls(rhs));
     ++Context::current()->pc();
 }
 
 void brs_handle()
 {
-    auto rhs = Context::current()->pop();
-    auto lhs = Context::current()->top();
-    Context::current()->set_top(lhs->brs(rhs.get()));
+    auto rhs = Context::current()->pop_rptr();
+    auto lhs = Context::current()->top_rptr();
+    Context::current()->set_top(lhs->brs(rhs));
     ++Context::current()->pc();
 }
 
 void index_handle()
 {
-    auto obj = Context::current()->pop();
-    auto index = Context::current()->pop();
-    Context::current()->push_address(obj->index(index));
+    auto obj = Context::current()->pop_rptr();
+    auto index = Context::current()->pop_sptr();
+    Context::current()->push(obj->index(index));
     ++Context::current()->pc();
 }
 
@@ -640,7 +645,7 @@ void buildlist_handle()
     auto size = OPRAND(Size);
     while (size--)
     {
-        list->append(Context::current()->pop());
+        list->append(Context::current()->pop_sptr());
     }
     Context::current()->push(list);
     ++Context::current()->pc();
@@ -652,8 +657,8 @@ void builddict_handle()
     auto size = OPRAND(Size);
     while (size--)
     {
-        auto key = Context::current()->pop();
-        dict->insert(key, Context::current()->pop());
+        auto key = Context::current()->pop_sptr();
+        dict->insert(key, Context::current()->pop_sptr());
     }
     Context::current()->push(dict);
     ++Context::current()->pc();
