@@ -6,6 +6,10 @@
 
 - Support block comment by using a pair of '$'
 
+### Updated
+
+- Context uses clearer interfaces `push*/pop*`
+
 ## 0.0.18 - 2020/08/20
 
 ### Added
