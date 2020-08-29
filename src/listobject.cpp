@@ -29,7 +29,7 @@ lc_builtin_methods_for_list
     },
     {"push", [](SPtr<ListObject> &obj)
         {
-            obj->append(Context::current()->pop());
+            obj->append(Context::current()->pop_sptr());
             Context::current()->push(NoneObject::one());
         }
     },
@@ -37,24 +37,24 @@ lc_builtin_methods_for_list
         {
             auto res = obj->objects().back();
             obj->objects().pop_back();
-            Context::current()->push_address(res);
+            Context::current()->push(res);
         }
     },
     {"pop_front", [](SPtr<ListObject> &obj)
         {
             auto res = obj->objects().front();
             obj->objects().pop_front();
-            Context::current()->push_address(res);
+            Context::current()->push(res);
         }
     },
     {"front", [](SPtr<ListObject> &obj)
         {
-            Context::current()->push_address(obj->objects().front());
+            Context::current()->push(obj->objects().front());
         }
     },
     {"back", [](SPtr<ListObject> &obj)
         {
-            Context::current()->push_address(obj->objects().back());
+            Context::current()->push(obj->objects().back());
         }
     },
     {"clear", [](SPtr<ListObject> &obj)
@@ -87,9 +87,7 @@ lc_builtin_methods_for_listiterator
     },
     {"__next__", [](ListIteratorObject *obj)
         {
-            Context::current()
-                ->push_address(obj->next())
-            ;
+            Context::current()->push(obj->next());
         }
     }
 };

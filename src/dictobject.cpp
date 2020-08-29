@@ -27,20 +27,20 @@ lc_builtin_methods
     },
     {"at", [](DictObject *obj)
         {
-            Context::current()->push(obj->index(Context::current()->pop())->sptr());
+            Context::current()->push(obj->index(Context::current()->pop_sptr())->sptr());
         }
     },
     {"insert", [](DictObject *obj)
         {
-            auto p1 = Context::current()->pop();
-            auto p2 = Context::current()->pop();
+            auto p1 = Context::current()->pop_sptr();
+            auto p2 = Context::current()->pop_sptr();
             obj->insert(p1, p2);
             Context::current()->push(NoneObject::one());
         }
     },
     {"erase", [](DictObject *obj)
         {
-            obj->data().erase(Context::current()->pop());
+            obj->data().erase(Context::current()->pop_sptr());
             Context::current()->push(NoneObject::one());
         }
     },

@@ -57,6 +57,7 @@ class Object
 
     template<ObjectType type>
     constexpr bool is() { return type_ == type; }
+    bool is(ObjectType type) { return type_ == type; }
     ObjectSPtr type();
 
     virtual bool to_bool();

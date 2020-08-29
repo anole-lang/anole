@@ -23,7 +23,7 @@ REGISTER_BUILTIN(eval,
     istringstream ss
     {
       "return " +
-        reinterpret_cast<StringObject *>(Context::current()->pop().get())->value() +
+        dynamic_cast<StringObject *>(Context::current()->pop_rptr())->value() +
       ";"
     };
 
@@ -37,13 +37,12 @@ REGISTER_BUILTIN(eval,
 
 REGISTER_BUILTIN(call_with_current_continuation,
 {
-    if (Context::current()->top()->is<ObjectType::Func>())
+    if (Context::current()->top_rptr()->is<ObjectType::Func>())
     {
-        auto func = Context::current()->pop();
-        auto ptr = reinterpret_cast<FunctionObject *>(func.get());
+        auto func = Context::current()->pop_rptr<FunctionObject>();
         auto cont_obj = make_shared<ContObject>(Context::current());
         Context::current() = make_shared<Context>(
-            Context::current(), ptr->scope(), ptr->code(), ptr->base()
+            Context::current(), func->scope(), func->code(), func->base()
         );
         // the base => StoreRef/StoreLocal
         Context::current()->scope()
@@ -52,9 +51,9 @@ REGISTER_BUILTIN(call_with_current_continuation,
                     ->bind(cont_obj)
         ;
     }
-    else if (Context::current()->top()->is<ObjectType::Cont>())
+    else if (Context::current()->top_rptr()->is<ObjectType::Cont>())
     {
-        auto resume = reinterpret_cast<ContObject *>(Context::current()->pop().get())->resume();
+        auto resume = Context::current()->pop_rptr<ContObject>()->resume();
         auto cont_obj = make_shared<ContObject>(Context::current());
         Context::current() = make_shared<Context>(resume);
         Context::current()->push(cont_obj);
@@ -70,24 +69,24 @@ REGISTER_BUILTIN(id,
     Context::current()->push(
         make_shared<IntegerObject>(
             reinterpret_cast<int64_t>(
-                Context::current()->pop().get()))
+                Context::current()->pop_rptr()))
     );
 });
 
 REGISTER_BUILTIN(print,
 {
-    if (Context::current()->top() != NoneObject::one().get())
+    if (Context::current()->top_rptr() != NoneObject::one().get())
     {
-        cout << Context::current()->pop()->to_str();
+        cout << Context::current()->pop_rptr()->to_str();
     }
     Context::current()->push(NoneObject::one());
 });
 
 REGISTER_BUILTIN(println,
 {
-    if (Context::current()->top() != NoneObject::one().get())
+    if (Context::current()->top_rptr() != NoneObject::one().get())
     {
-        cout << Context::current()->pop()->to_str() << endl;
+        cout << Context::current()->pop_rptr()->to_str() << endl;
     }
     Context::current()->push(NoneObject::one());
 });
@@ -113,11 +112,11 @@ REGISTER_BUILTIN(time,
 
 REGISTER_BUILTIN(str,
 {
-    Context::current()->push(make_shared<StringObject>(Context::current()->pop()->to_str()));
+    Context::current()->push(make_shared<StringObject>(Context::current()->pop_rptr()->to_str()));
 });
 
 REGISTER_BUILTIN(type,
 {
-    Context::current()->push(Context::current()->pop()->type());
+    Context::current()->push(Context::current()->pop_rptr()->type());
 });
 }

@@ -49,7 +49,7 @@ void FunctionObject::call(Size num)
             {
                 while (arg_num)
                 {
-                    list->append(Context::current()->pop());
+                    list->append(Context::current()->pop_sptr());
                     --arg_num;
                 }
             }
@@ -70,7 +70,7 @@ void FunctionObject::call(Size num)
             Context::current()->scope()->create_symbol(OPRAND(String),
                 Context::current()->top_address()
             );
-            Context::current()->get_stack()->pop_back();
+            Context::current()->pop();
             ++pc;
             --arg_num;
             --parameter_num;
@@ -79,7 +79,7 @@ void FunctionObject::call(Size num)
         case Opcode::StoreLocal:
             Context::current()->scope()
                 ->create_symbol(OPRAND(String))
-                    ->bind(Context::current()->pop())
+                    ->bind(Context::current()->pop_sptr())
             ;
             ++pc;
             --arg_num;
