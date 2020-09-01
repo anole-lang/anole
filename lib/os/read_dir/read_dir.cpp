@@ -1,8 +1,4 @@
 #include "../path/path.hpp"
-#include "../../../src/context.hpp"
-#include "../../../src/allocator.hpp"
-#include "../../../src/listobject.hpp"
-#include "../../../src/stringobject.hpp"
 
 #include <string>
 #include <vector>

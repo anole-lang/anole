@@ -1,6 +1,4 @@
 #include "path.hpp"
-#include "../../../src/context.hpp"
-#include "../../../src/boolobject.hpp"
 
 using namespace std;
 namespace fs = filesystem;

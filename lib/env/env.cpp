@@ -1,7 +1,4 @@
-#include "../../src/context.hpp"
-#include "../../src/allocator.hpp"
-#include "../../src/listobject.hpp"
-#include "../../src/stringobject.hpp"
+#include "../../src/anole.hpp"
 
 #include <vector>
 

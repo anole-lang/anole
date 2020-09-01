@@ -1,8 +1,4 @@
 #include "fileobject.hpp"
-#include "../../src/context.hpp"
-#include "../../src/boolobject.hpp"
-#include "../../src/stringobject.hpp"
-#include "../../src/integerobject.hpp"
 
 #include <fstream>
 
