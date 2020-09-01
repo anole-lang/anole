@@ -14,6 +14,10 @@
 
 - Modify the directory structure of Anole
 
+### Fixed
+
+- Fix bug about GC when calling function-like objects
+
 ## 0.0.18 - 2020/08/20
 
 ### Added
