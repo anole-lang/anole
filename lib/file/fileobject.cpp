@@ -14,14 +14,14 @@ void __open(Size n)
         throw RuntimeError("function open need 2 arguments");
     }
 
-    auto path = Context::current()->pop_rptr();
-    auto mode = Context::current()->pop_rptr();
+    auto path = Context::current()->pop_sptr();
+    auto mode = Context::current()->pop_sptr();
 
     Context::current()
         ->push(
             make_shared<FileObject>(
                 path->to_str(),
-                dynamic_cast<IntegerObject *>(mode)->value()))
+                dynamic_cast<IntegerObject *>(mode.get())->value()))
     ;
 }
 }
