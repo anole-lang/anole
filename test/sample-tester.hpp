@@ -1,7 +1,4 @@
-#include "../src/parser.hpp"
-#include "../src/context.hpp"
-#include "../src/allocator.hpp"
-#include "../src/boolobject.hpp"
+#include "../src/anole.hpp"
 
 #include <gtest/gtest.h>
 

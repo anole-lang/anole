@@ -1,4 +1,4 @@
-#include "../src/tokenizer.hpp"
+#include "../src/compiler/compiler.hpp"
 
 #include <gtest/gtest.h>
 
