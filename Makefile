@@ -6,49 +6,22 @@ LDS = -ldl -lstdc++fs -lreadline
 
 DIR_TMP = tmp
 
-OBJ = tmp/error.so tmp/tokenizer.so tmp/parser.so tmp/code.so tmp/objects.so tmp/context.so tmp/repl.so tmp/collector.so
+OBJ = tmp/error.so tmp/objects.so tmp/runtime.so tmp/compiler.so
 FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 
 test: tmp/test
 	tmp/test
 
-tmp/error.so: src/error.cpp | ${DIR_TMP}
+tmp/error.so: src/error.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/tokenizer.so: src/token.cpp \
-				  src/tokenizer.cpp
+tmp/objects.so: src/objects/*.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/parser.so: src/parser.cpp
+tmp/runtime.so: src/runtime/*.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/code.so: src/codegen.cpp \
-			 src/code.cpp
-	${CC} ${FLAGS} $^ -shared -fPIC -o $@
-
-tmp/collector.so: src/collector.cpp
-	${CC} ${FLAGS} $^ -shared -fPIC -o $@
-
-tmp/objects.so: src/object.cpp \
-				src/noneobject.cpp \
-				src/boolobject.cpp \
-				src/listobject.cpp \
-				src/enumobject.cpp \
-				src/dictobject.cpp \
-				src/funcobject.cpp \
-				src/contobject.cpp \
-				src/floatobject.cpp \
-				src/moduleobject.cpp \
-				src/stringobject.cpp \
-				src/integerobject.cpp \
-				src/builtinfuncobject.cpp
-	${CC} ${FLAGS} $^ -shared -fPIC -o $@
-
-tmp/context.so: src/context.cpp \
-				src/builtins.cpp
-	${CC} ${FLAGS} $^ -shared -fPIC -o $@
-
-tmp/repl.so: src/repl.cpp
+tmp/compiler.so: src/compiler/*.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 tmp/test: test/test.cpp ${OBJ} | ${DIR_TMP}

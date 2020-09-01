@@ -10,12 +10,16 @@ set (CMAKE_CXX_STANDARD_REQUIRED True)
 set (CMAKE_EXE_LINKER_FLAGS "-rdynamic")
 set (CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 
+file (GLOB SRC_MAIN "src/*.cpp")
+file (GLOB SRC_OBJECTS "src/objects/*.cpp")
+file (GLOB SRC_RUNTIME "src/runtime/*.cpp")
+file (GLOB SRC_COMPILER "src/compiler/*.cpp")
+
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)
-    set (CMAKE_CXX_FLAGS "-g -Wall -Wno-unused-private-field")
+    set (CMAKE_CXX_FLAGS "-g -Wall")
     ADD_DEFINITIONS (-D_DEBUG)
 
-    file (GLOB SOURCES "src/*.cpp")
-    add_executable (anole ${SOURCES})
+    add_executable (anole ${SRC_MAIN} ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER})
 
     target_link_libraries (anole PRIVATE
         dl
@@ -23,11 +27,11 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
         readline
     )
     install (TARGETS anole DESTINATION bin)
+
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
     set (CMAKE_CXX_FLAGS "-pg -O3 -Wall")
 
-    file (GLOB SOURCES "src/*.cpp")
-    add_executable (anole ${SOURCES})
+    add_executable (anole ${SRC_MAIN} ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER})
 
     target_link_libraries (anole PRIVATE
         dl
@@ -35,65 +39,38 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
         readline
     )
     install (TARGETS anole DESTINATION bin)
+
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
     set (CMAKE_CXX_FLAGS "-O3 -Wall")
 
-    add_library (error SHARED
-        src/error.cpp
-    )
-
-    add_library (tokenizer SHARED
-        src/token.cpp
-        src/tokenizer.cpp
-    )
-
-    add_library (parser SHARED
-        src/parser.cpp
-    )
-
-    add_library (code SHARED
-        src/code.cpp
-        src/codegen.cpp
-    )
-
-    file (GLOB OBJECTS "src/*object.cpp")
-
     add_library (objects SHARED
-        ${OBJECTS}
+        ${SRC_OBJECTS}
     )
 
-    add_library (context SHARED
-        src/context.cpp
-        src/builtins.cpp
+    add_library (runtime SHARED
+        ${SRC_RUNTIME}
     )
 
-    add_library (repl SHARED
-        src/repl.cpp
+    add_library (compiler SHARED
+        ${SRC_COMPILER}
     )
 
     install (
         TARGETS
-            error
-            tokenizer
-            parser
-            code
             objects
-            context
-            repl
+            runtime
+            compiler
         DESTINATION "lib/anole"
     )
 
     link_directories (${CMAKE_INSTALL_PREFIX}/lib/anole)
 
-    add_executable (anole src/main.cpp)
+    add_executable (anole ${SRC_MAIN})
     target_link_libraries (anole PRIVATE
-        error
-        tokenizer
-        parser
-        code
         objects
-        context
-        repl
+        runtime
+        compiler
+
         dl
         stdc++fs
         readline
@@ -101,11 +78,11 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
 
     set_target_properties (anole PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
     install (TARGETS anole DESTINATION bin)
-ELSE ()
-    set (CMAKE_CXX_FLAGS "-O3 -Wall -Wno-unused-private-field")
 
-    file (GLOB SOURCES "src/*.cpp")
-    add_executable (anole ${SOURCES})
+ELSE ()
+    set (CMAKE_CXX_FLAGS "-O3 -Wall")
+
+    add_executable (anole ${SRC_MAIN} ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER})
     target_link_libraries (anole PRIVATE
         dl
         stdc++fs
@@ -114,12 +91,13 @@ ELSE ()
     install (TARGETS anole
         DESTINATION bin
     )
+
 ENDIF ()
 
-# install headers of anole
-file (GLOB HEADERS "src/*.hpp")
+# -- install lib ----------------
 
-install (FILES ${HEADERS}
+# install header `anole.hpp`
+install (FILES "src/anole.hpp"
     DESTINATION "include/anole"
 )
 
