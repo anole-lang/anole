@@ -33,7 +33,9 @@ REGISTER_BUILTIN(call_with_current_continuation,
 {
     if (Context::current()->top_rptr()->is<ObjectType::Func>())
     {
-        auto func = Context::current()->pop_rptr<FunctionObject>();
+        auto handle = Context::current()->pop_sptr();
+        auto func = reinterpret_cast<FunctionObject *>(handle.get());
+        // copy current context
         auto cont_obj = make_shared<ContObject>(Context::current());
         Context::current() = make_shared<Context>(
             Context::current(), func->scope(), func->code(), func->base()

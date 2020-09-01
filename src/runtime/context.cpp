@@ -23,8 +23,6 @@ namespace
 {
 vector<char *> lc_args;
 map<Address, String> lc_not_defineds;
-stack<Size> lc_call_anchors;
-stack<Size> lc_return_anchors;
 }
 
 SPtr<Context> &Context::current()
@@ -72,12 +70,20 @@ const String
     return lc_not_defineds[addr];
 }
 
+/**
+ * that each continuation continues will
+ *  create a new scope pointing to the scope of the resume,
+ *  so changes to variables which in the previous scope
+ *  may occur when different continuations continue
+*/
 Context::Context(SPtr<Context> resume)
   : pre_context_(resume->pre_context_)
   , scope_(std::make_shared<Scope>(resume->scope_))
   , code_(resume->code_), pc_(resume->pc_)
   , stack_(std::make_shared<Stack>(*resume->stack_))
   , current_path_(resume->current_path_)
+  , call_anchors_(resume->call_anchors_)
+  , return_anchor_(resume->return_anchor_)
 {
     // ...
 }
@@ -88,6 +94,8 @@ Context::Context(const Context &context)
   , code_(context.code_), pc_(context.pc_)
   , stack_(std::make_shared<Stack>(*context.stack_))
   , current_path_(context.current_path_)
+  , call_anchors_(context.call_anchors_)
+  , return_anchor_(context.return_anchor_)
 {
     // ...
 }
@@ -99,6 +107,7 @@ Context::Context(SPtr<Code> code,
   , code_(code), pc_(0)
   , stack_(std::make_shared<Stack>())
   , current_path_(std::move(path))
+  , return_anchor_(0)
 {
     // ...
 }
@@ -110,6 +119,7 @@ Context::Context(SPtr<Context> pre, SPtr<Scope> scope,
   , code_(std::move(code)), pc_(pc)
   , stack_(pre->stack_)
   , current_path_(pre->current_path_)
+  , return_anchor_(0)
 {
     // ...
 }
@@ -166,26 +176,24 @@ void Context::push(Address addr)
 
 void Context::set_call_anchor()
 {
-    lc_call_anchors.push(stack_->size());
+    call_anchors_.push(stack_->size());
 }
 
 Size Context::get_call_args_num()
 {
-    auto n = stack_->size() - lc_call_anchors.top();
-    lc_call_anchors.pop();
+    auto n = stack_->size() - call_anchors_.top();
+    call_anchors_.pop();
     return n;
 }
 
 void Context::set_return_anchor()
 {
-    lc_return_anchors.push(stack_->size());
+    return_anchor_ = stack_->size();
 }
 
 Size Context::get_return_vals_num()
 {
-    auto n = stack_->size() - lc_return_anchors.top();
-    lc_return_anchors.pop();
-    return n;
+    return stack_->size() - return_anchor_;
 }
 
 namespace op_handles
@@ -410,12 +418,26 @@ void callac_handle()
 
 void call_handle()
 {
-    Context::current()->pop_rptr()->call(Context::current()->get_call_args_num());
+    /**
+     * callee should be collected
+     *  before call it because variables
+     *  linked to callee may not be collected
+    */
+    auto callee = Context::current()->pop_address();
+    Collector::collector().collect(callee);
+    callee->rptr()->call(Context::current()->get_call_args_num());
 }
 
 void fastcall_handle()
 {
-    Context::current()->pop_rptr()->call(0);
+    /**
+     * callee should be collected
+     *  before call it because variables
+     *  linked to callee may not be collected
+    */
+    auto callee = Context::current()->pop_address();
+    Collector::collector().collect(callee);
+    callee->rptr()->call(0);
 }
 
 void returnac_handle()

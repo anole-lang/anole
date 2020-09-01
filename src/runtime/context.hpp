@@ -10,6 +10,7 @@
 #include <any>
 #include <map>
 #include <list>
+#include <stack>
 #include <filesystem>
 
 namespace anole
@@ -158,5 +159,8 @@ class Context
     Size pc_;
     SPtr<Stack> stack_;
     std::filesystem::path current_path_;
+
+    std::stack<Size> call_anchors_;
+    Size return_anchor_;
 };
 }
