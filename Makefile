@@ -12,7 +12,7 @@ FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 test: tmp/test
 	tmp/test
 
-tmp/error.so: src/error.cpp
+tmp/error.so: src/error.cpp | ${DIR_TMP}
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 tmp/objects.so: src/objects/*.cpp
@@ -24,7 +24,7 @@ tmp/runtime.so: src/runtime/*.cpp
 tmp/compiler.so: src/compiler/*.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/test: test/test.cpp ${OBJ} | ${DIR_TMP}
+tmp/test: test/test.cpp ${OBJ}
 	${CC} ${FLAGS} $< ${FPOBJ} ${LDS} -lgtest -lpthread -o $@
 
 ${DIR_TMP}:
