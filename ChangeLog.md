@@ -10,6 +10,10 @@
 
 - Context uses clearer interfaces `push*/pop*`
 
+### Changed
+
+- Modify the directory structure of Anole
+
 ## 0.0.18 - 2020/08/20
 
 ### Added
