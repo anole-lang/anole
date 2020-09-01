@@ -1,17 +1,21 @@
 #pragma once
 
-#include "base.hpp"
-#include "code.hpp"
-#include "error.hpp"
 #include "scope.hpp"
 #include "allocator.hpp"
 
+#include "../base.hpp"
+#include "../error.hpp"
+#include "../compiler/instruction.hpp"
+
+#include <any>
 #include <map>
 #include <list>
 #include <filesystem>
 
 namespace anole
 {
+class Code;
+
 // Context should be contructed by make_shared
 class Context
 {
@@ -29,8 +33,7 @@ class Context
     static void execute();
 
     static void
-    add_not_defined_symbol(
-        const String &name,
+    add_not_defined_symbol(const String &name,
         const Address addr
     );
 
@@ -42,98 +45,31 @@ class Context
 
   public:
     // this for resume from ContObject
-    Context(SPtr<Context> resume)
-      : pre_context_(resume->pre_context_)
-      , scope_(std::make_shared<Scope>(resume->scope_))
-      , code_(resume->code_), pc_(resume->pc_)
-      , stack_(std::make_shared<Stack>(*resume->stack_))
-      , current_path_(resume->current_path_)
-    {
-        // ...
-    }
+    Context(SPtr<Context> resume);
 
     // copy ctor
-    Context(const Context &context)
-      : pre_context_(context.pre_context_)
-      , scope_(context.scope_)
-      , code_(context.code_), pc_(context.pc_)
-      , stack_(std::make_shared<Stack>(*context.stack_))
-      , current_path_(context.current_path_)
-    {
-        // ...
-    }
+    Context(const Context &context);
 
     Context(SPtr<Code> code,
-        std::filesystem::path path = std::filesystem::current_path())
-      : pre_context_(nullptr)
-      , scope_(std::make_shared<Scope>(nullptr))
-      , code_(code), pc_(0)
-      , stack_(std::make_shared<Stack>())
-      , current_path_(std::move(path))
-    {
-        // ...
-    }
+        std::filesystem::path path = std::filesystem::current_path()
+    );
 
     Context(SPtr<Context> pre, SPtr<Scope> scope,
-        SPtr<Code> code, Size pc = 0)
-      : pre_context_(pre)
-      , scope_(std::make_shared<Scope>(scope))
-      , code_(std::move(code)), pc_(pc)
-      , stack_(pre->stack_)
-      , current_path_(pre->current_path_)
-    {
-        // ...
-    }
+        SPtr<Code> code, Size pc = 0
+    );
 
-    SPtr<Context> &pre_context()
-    {
-        return pre_context_;
-    }
+    SPtr<Context> &pre_context();
+    SPtr<Scope> &scope();
+    SPtr<Code> &code();
+    Size &pc();
 
-    SPtr<Scope> &scope()
-    {
-        return scope_;
-    }
+    const Instruction &ins();
+    const Instruction &ins_at(Size index);
+    const Opcode opcode();
+    const std::any &oprand();
 
-    SPtr<Code> &code()
-    {
-        return code_;
-    }
-
-    Size &pc()
-    {
-        return pc_;
-    }
-
-    const Instruction &ins()
-    {
-        return code_->ins_at(pc_);
-    }
-
-    const Instruction &ins_at(Size index)
-    {
-        return code_->ins_at(index);
-    }
-
-    const Opcode opcode()
-    {
-        return code_->opcode_at(pc_);
-    }
-
-    const std::any &oprand()
-    {
-        return code_->oprand_at(pc_);
-    }
-
-    void push(ObjectSPtr sptr)
-    {
-        stack_->push_back(Allocator<Variable>::alloc(move(sptr)));
-    }
-
-    void push(Address addr)
-    {
-        stack_->push_back(addr);
-    }
+    void push(ObjectSPtr sptr);
+    void push(Address addr);
 
     template<typename R = Object>
     R *top_rptr()

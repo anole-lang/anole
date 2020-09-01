@@ -1,10 +1,11 @@
 #pragma once
 
+#include "collector.hpp"
+
+#include "../../light/type_traits.hpp"
+
 #include <set>
 #include <cassert>
-
-#include "collector.hpp"
-#include "../light/type_traits.hpp"
 
 namespace anole
 {

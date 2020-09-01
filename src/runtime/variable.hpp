@@ -1,11 +1,11 @@
 #pragma once
 
+#include "../objects/object.hpp"
+
 #include <memory>
-#include "object.hpp"
 
 namespace anole
 {
-class Object;
 class Variable
 {
   public:

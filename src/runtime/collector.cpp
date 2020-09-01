@@ -1,8 +1,6 @@
-#include "context.hpp"
-#include "variable.hpp"
-#include "collector.hpp"
-#include "contobject.hpp"
-#include "../light/type_traits.hpp"
+#include "runtime.hpp"
+
+#include "../objects/objects.hpp"
 
 using namespace std;
 

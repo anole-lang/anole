@@ -1,11 +1,5 @@
-#include "base.hpp"
-#include "code.hpp"
 #include "repl.hpp"
-#include "parser.hpp"
-#include "version.hpp"
-#include "context.hpp"
-#include "allocator.hpp"
-#include "noneobject.hpp"
+#include "anole.hpp"
 
 #ifdef __linux__
 #include <readline/readline.h>

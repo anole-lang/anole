@@ -1,10 +1,6 @@
-#include "code.hpp"
 #include "repl.hpp"
-#include "parser.hpp"
-#include "version.hpp"
-#include "context.hpp"
+#include "anole.hpp"
 #include "argparse.hpp"
-#include "moduleobject.hpp"
 
 #include <fstream>
 #include <algorithm>

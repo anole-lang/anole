@@ -1,17 +1,8 @@
-#include "error.hpp"
-#include "parser.hpp"
-#include "context.hpp"
-#include "noneobject.hpp"
-#include "boolobject.hpp"
-#include "listobject.hpp"
-#include "enumobject.hpp"
-#include "dictobject.hpp"
-#include "funcobject.hpp"
-#include "contobject.hpp"
-#include "thunkobject.hpp"
-#include "moduleobject.hpp"
-#include "integerobject.hpp"
-#include "builtinfuncobject.hpp"
+#include "runtime.hpp"
+
+#include "../error.hpp"
+#include "../objects/objects.hpp"
+#include "../compiler/compiler.hpp"
 
 #include <set>
 #include <stack>
@@ -79,6 +70,98 @@ const String
     const Address addr)
 {
     return lc_not_defineds[addr];
+}
+
+Context::Context(SPtr<Context> resume)
+  : pre_context_(resume->pre_context_)
+  , scope_(std::make_shared<Scope>(resume->scope_))
+  , code_(resume->code_), pc_(resume->pc_)
+  , stack_(std::make_shared<Stack>(*resume->stack_))
+  , current_path_(resume->current_path_)
+{
+    // ...
+}
+
+Context::Context(const Context &context)
+  : pre_context_(context.pre_context_)
+  , scope_(context.scope_)
+  , code_(context.code_), pc_(context.pc_)
+  , stack_(std::make_shared<Stack>(*context.stack_))
+  , current_path_(context.current_path_)
+{
+    // ...
+}
+
+Context::Context(SPtr<Code> code,
+    std::filesystem::path path)
+  : pre_context_(nullptr)
+  , scope_(std::make_shared<Scope>(nullptr))
+  , code_(code), pc_(0)
+  , stack_(std::make_shared<Stack>())
+  , current_path_(std::move(path))
+{
+    // ...
+}
+
+Context::Context(SPtr<Context> pre, SPtr<Scope> scope,
+    SPtr<Code> code, Size pc)
+  : pre_context_(pre)
+  , scope_(std::make_shared<Scope>(scope))
+  , code_(std::move(code)), pc_(pc)
+  , stack_(pre->stack_)
+  , current_path_(pre->current_path_)
+{
+    // ...
+}
+
+SPtr<Context> &Context::pre_context()
+{
+    return pre_context_;
+}
+
+SPtr<Scope> &Context::scope()
+{
+    return scope_;
+}
+
+SPtr<Code> &Context::code()
+{
+    return code_;
+}
+
+Size &Context::pc()
+{
+    return pc_;
+}
+
+const Instruction &Context::ins()
+{
+    return code_->ins_at(pc_);
+}
+
+const Instruction &Context::ins_at(Size index)
+{
+    return code_->ins_at(index);
+}
+
+const Opcode Context::opcode()
+{
+    return code_->opcode_at(pc_);
+}
+
+const std::any &Context::oprand()
+{
+    return code_->oprand_at(pc_);
+}
+
+void Context::push(ObjectSPtr sptr)
+{
+    stack_->push_back(Allocator<Variable>::alloc(move(sptr)));
+}
+
+void Context::push(Address addr)
+{
+    stack_->push_back(addr);
 }
 
 void Context::set_call_anchor()

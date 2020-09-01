@@ -1,14 +1,8 @@
-#include "code.hpp"
-#include "error.hpp"
-#include "parser.hpp"
-#include "context.hpp"
-#include "noneobject.hpp"
-#include "boolobject.hpp"
-#include "funcobject.hpp"
-#include "contobject.hpp"
-#include "stringobject.hpp"
-#include "integerobject.hpp"
-#include "builtinfuncobject.hpp"
+#include "runtime.hpp"
+
+#include "../error.hpp"
+#include "../objects/objects.hpp"
+#include "../compiler/compiler.hpp"
 
 #include <ctime>
 #include <sstream>
