@@ -13,17 +13,58 @@ class Variable;
 /**
  * Collector will find variables
  *  which are referenced and then deallocate others
+ *
+ * there is only one global Collector
 */
 class Collector
 {
   public:
+    template<typename T>
+    static void mark(T *ptr)
+    {
+        collector().mark_impl(ptr);
+    }
+
+    template<typename T>
+    static void collect(T *p)
+    {
+        auto &ref = collector();
+        if (p == nullptr || ref.visited_.count(p))
+        {
+            return;
+        }
+        ref.visited_.insert(p);
+        ref.collect_impl(p);
+    }
+
+  private:
     static Collector &collector()
     {
         static Collector clctor;
         return clctor;
     }
 
-  public:
+    /**
+     * default ctor is private
+     *  in order that we can only use the static collector
+    */
+    Collector() : count_(0) {}
+
+    /**
+     * gc can only be called by the collector self
+    */
+    void gc();
+
+    template<typename T>
+    std::set<T *> &marked()
+    {
+        /**
+         * static mkd for non-static member function
+        */
+        static std::set<T *> mkd;
+        return mkd;
+    }
+
     /**
      * record allocated address
      *  and only recorded address could be deallocated
@@ -31,7 +72,7 @@ class Collector
      * void record(address);
     */
     template<typename T>
-    void mark(T *ptr)
+    void mark_impl(T *ptr)
     {
         ++count_;
         if (count_ > 10000)
@@ -48,46 +89,16 @@ class Collector
         marked<T>().insert(ptr);
     }
 
-    template<typename T>
-    void collect(T *p)
-    {
-        if (p == nullptr || visited_.count(p))
-        {
-            return;
-        }
-        visited_.insert(p);
-        collect_impl(p);
-    }
-
-    void gc();
-
-  private:
-    /**
-     * default ctor is private
-     *  in order that we can only use the static collector
-    */
-    Collector() : count_(0) {}
-
-    template<typename T>
-    std::set<T *> &marked()
-    {
-        /**
-         * static mkd for non-static member function
-        */
-        static std::set<T *> mkd;
-        return mkd;
-    }
-
     Size count_;
 
   private:
     /**
      * collect variables
     */
-    std::set<void *> visited_;
-    std::set<Variable *> collected_;
     void collect_impl(Scope *);
     void collect_impl(Context *);
     void collect_impl(Variable *);
+    std::set<void *> visited_;
+    std::set<Variable *> collected_;
 };
 } // namespace anole

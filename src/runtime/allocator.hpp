@@ -12,6 +12,8 @@ namespace anole
 /**
  * by allocator,
  *  we can allocate memories for variables
+ *
+ * there is only one global Allocator for each given T
 */
 template<typename T>
 class Allocator
@@ -23,21 +25,15 @@ class Allocator
     using Pointer = T *;
 
   public:
-    static Allocator &allocator()
-    {
-        static Allocator<T> alctor;
-        return alctor;
-    }
-
     template<typename U = Value, typename ...Ts>
     static U *alloc(Ts &&...values)
     {
-        return Allocator::allocator().template allocate<U>(std::forward<Ts>(values)...);
+        return allocator().template allocate<U>(std::forward<Ts>(values)...);
     }
 
     static void dealloc(Pointer ptr)
     {
-        Allocator::allocator().deallocate(ptr);
+        allocator().deallocate(ptr);
     }
 
     static void dealloc(void *ptr)
@@ -45,7 +41,13 @@ class Allocator
         dealloc(reinterpret_cast<Pointer>(ptr));
     }
 
-  public:
+  private:
+    static Allocator &allocator()
+    {
+        static Allocator<T> alctor;
+        return alctor;
+    }
+
     Allocator() = default;
 
     /**
@@ -58,7 +60,7 @@ class Allocator
 
         auto ptr = new U(std::forward<Ts>(values)...);
 
-        Collector::collector().mark(Pointer(ptr));
+        Collector::mark(Pointer(ptr));
 
         return ptr;
     }

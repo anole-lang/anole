@@ -421,10 +421,15 @@ void call_handle()
     /**
      * callee should be collected
      *  before call it because variables
-     *  linked to callee may not be collected
+     *  linked to callee and the callee self
+     *  may not be collected
+     *
+     * in particular when calling contobject
+     *  variables linked to the resume context
+     *  may be ignored
     */
     auto callee = Context::current()->pop_address();
-    Collector::collector().collect(callee);
+    Collector::collect(callee);
     callee->rptr()->call(Context::current()->get_call_args_num());
 }
 
@@ -433,10 +438,11 @@ void fastcall_handle()
     /**
      * callee should be collected
      *  before call it because variables
-     *  linked to callee may not be collected
+     *  linked to callee and the callee self
+     *  may not be collected
     */
     auto callee = Context::current()->pop_address();
-    Collector::collector().collect(callee);
+    Collector::collect(callee);
     callee->rptr()->call(0);
 }
 
