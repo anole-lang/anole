@@ -81,7 +81,7 @@ void replrun::run()
     });
 
     sigsetjmp(lc_env, 1);
-    for(;;) try
+    for (;;) try
     {
         do
         {
