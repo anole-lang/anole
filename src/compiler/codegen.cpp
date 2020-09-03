@@ -421,11 +421,13 @@ void IndexExpr::codegen(Code &code)
 
 void DictExpr::codegen(Code &code)
 {
-    auto num = keys.size();
-    while (num--)
+    auto rbegin_values = values.rbegin();
+    auto rbegin_keys = keys.rbegin();
+    while (rbegin_values != values.rend())
     {
-        values[num]->codegen(code);
-        keys[num]->codegen(code);
+        (*rbegin_values)->codegen(code);
+        (*rbegin_keys)->codegen(code);
+        ++rbegin_values; ++rbegin_keys;
     }
     code.add_ins<Opcode::BuildDict, Size>(keys.size());
 }
@@ -674,7 +676,7 @@ void ForeachStmt::codegen(Code &code)
         ArgumentList()
     );
 
-    block->statements.insert(block->statements.begin(), nullptr);
+    block->statements.push_front(nullptr);
     auto next = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
             make_unique<IdentifierExpr>("__next__")),

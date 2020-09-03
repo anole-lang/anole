@@ -3,6 +3,7 @@
 #include "token.hpp"
 
 #include <map>
+#include <list>
 #include <vector>
 #include <utility>
 
@@ -11,22 +12,22 @@ namespace anole
 class Code;
 
 using StmtList
-    = std::vector<Ptr<struct Stmt>>
+    = std::list<Ptr<struct Stmt>>
 ;
 using ExprList
-    = std::vector<Ptr<struct Expr>>
+    = std::list<Ptr<struct Expr>>
 ;
 using DeclList
-    = std::vector<Ptr<struct VariableDeclarationStmt>>
+    = std::list<Ptr<struct VariableDeclarationStmt>>
 ;
 using IdentList
-    = std::vector<Ptr<struct IdentifierExpr>>
+    = std::list<Ptr<struct IdentifierExpr>>
 ;
 using ArgumentList
-    = std::vector<std::pair<Ptr<struct Expr>, bool>>
+    = std::list<std::pair<Ptr<struct Expr>, bool>>
 ; // boolean stands for whether it is unpacked
 using ParameterList
-    = std::vector<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>
+    = std::list<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>
 ; // boolean stands for whether it is packed
 
 struct AST
@@ -324,7 +325,7 @@ struct UseStmt : Stmt
 
     using Alias = std::pair<Module, String>;
     // second String is the alias
-    using Aliases = std::vector<Alias>;
+    using Aliases = std::list<Alias>;
 
     // aliases are empty means `use *`
     Aliases aliases;
@@ -378,11 +379,11 @@ struct VariableDeclarationStmt : Stmt
 struct MultiVarsDeclarationStmt : Stmt
 {
     // just reuse VariableDeclarationStmt
-    std::vector<VariableDeclarationStmt> decls;
+    std::list<VariableDeclarationStmt> decls;
     ExprList exprs;
 
     MultiVarsDeclarationStmt(
-        std::vector<VariableDeclarationStmt> &&decls,
+        std::list<VariableDeclarationStmt> &&decls,
         ExprList &&exprs)
       : decls(std::move(decls))
       , exprs(std::move(exprs))
