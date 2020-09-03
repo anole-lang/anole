@@ -438,7 +438,7 @@ Ptr<Stmt> Parser::gen_declaration()
     {
     case TokenType::Comma:
     {
-        vector<VariableDeclarationStmt> decls;
+        list<VariableDeclarationStmt> decls;
         decls.emplace_back(move(id), nullptr, is_ref);
 
         while (current_token_.type == TokenType::Comma)
