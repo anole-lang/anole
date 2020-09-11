@@ -11,7 +11,7 @@ class Context;
 class Variable;
 
 /**
- * Collector will find variables
+ * Collector will collect objects
  *  which are referenced and then deallocate others
  *
  * there is only one global Collector
@@ -37,11 +37,28 @@ class Collector
         ref.collect_impl(p);
     }
 
+    static void try_gc()
+    {
+        auto &ref = collector();
+        if (ref.count_ > 10000)
+        {
+            ref.count_ = 0;
+            ref.gc();
+        }
+    }
+
   private:
     static Collector &collector()
     {
         static Collector clctor;
         return clctor;
+    }
+
+    template<typename T>
+    static std::set<T *> &marked()
+    {
+        static std::set<T *> mkd;
+        return mkd;
     }
 
     /**
@@ -55,16 +72,6 @@ class Collector
     */
     void gc();
 
-    template<typename T>
-    std::set<T *> &marked()
-    {
-        /**
-         * static mkd for non-static member function
-        */
-        static std::set<T *> mkd;
-        return mkd;
-    }
-
     /**
      * record allocated address
      *  and only recorded address could be deallocated
@@ -75,17 +82,6 @@ class Collector
     void mark_impl(T *ptr)
     {
         ++count_;
-        if (count_ > 10000)
-        {
-            count_ = 0;
-            gc();
-        }
-
-        /**
-         * the new allocated variable
-         *  must be marked after gc
-         *  to ensure it be collected
-        */
         marked<T>().insert(ptr);
     }
 
@@ -96,9 +92,9 @@ class Collector
      * collect variables
     */
     void collect_impl(Scope *);
+    void collect_impl(Object *);
     void collect_impl(Context *);
-    void collect_impl(Variable *);
     std::set<void *> visited_;
-    std::set<Variable *> collected_;
+    std::set<Object *> collected_;
 };
 } // namespace anole

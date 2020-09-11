@@ -35,14 +35,14 @@ class Context
 
     static void
     add_not_defined_symbol(const String &name,
-        const Address addr
+        const Variable *addr
     );
 
     static void
-    rm_not_defined_symbol(const Address addr);
+    rm_not_defined_symbol(const Variable *addr);
 
     static const String
-    &get_not_defined_symbol(const Address addr);
+    &get_not_defined_symbol(const Variable *addr);
 
   public:
     // this for resume from ContObject
@@ -69,26 +69,21 @@ class Context
     const Opcode opcode();
     const std::any &oprand();
 
-    void push(ObjectSPtr sptr);
+    void push(Object *ptr);
     void push(Address addr);
 
     template<typename R = Object>
-    R *top_rptr()
+    R *top_ptr()
     {
-        if (stack_->back()->rptr() == nullptr)
+        if (stack_->back()->ptr() == nullptr)
         {
             throw RuntimeError(
                 "var named " +
-                get_not_defined_symbol(stack_->back()) +
+                get_not_defined_symbol(stack_->back().get()) +
                 " doesn't reference to any object"
             );
         }
-        return reinterpret_cast<R *>(stack_->back()->rptr());
-    }
-
-    Address top_address()
-    {
-        return stack_->back();
+        return reinterpret_cast<R *>(stack_->back()->ptr());
     }
 
     void set_top(Address addr)
@@ -96,9 +91,9 @@ class Context
         stack_->back() = addr;
     }
 
-    void set_top(ObjectSPtr sptr)
+    void set_top(Object *ptr)
     {
-        stack_->back() = Allocator<Variable>::alloc(move(sptr));
+        stack_->back() = std::make_shared<Variable>(ptr);
     }
 
     void pop()
@@ -107,26 +102,16 @@ class Context
     }
 
     template<typename R = Object>
-    R *pop_rptr()
+    R *pop_ptr()
     {
-        auto &var = *stack_->back();
+        auto ptr = stack_->back()->ptr();
         stack_->pop_back();
-        return reinterpret_cast<R *>(var.rptr());
-    }
-
-    /**
-     * use pop_sptr when binding it with other variables
-    */
-    ObjectSPtr pop_sptr()
-    {
-        auto &var = *stack_->back();
-        stack_->pop_back();
-        return var.sptr();
+        return reinterpret_cast<R *>(ptr);
     }
 
     Address pop_address()
     {
-        auto res = top_address();
+        auto res = stack_->back();
         stack_->pop_back();
         return res;
     }

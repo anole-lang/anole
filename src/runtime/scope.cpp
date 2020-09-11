@@ -27,7 +27,7 @@ Address Scope::create_symbol(const String &name)
 {
     if (!symbols_.count(name))
     {
-        symbols_[name] = Allocator<Variable>::alloc();
+        symbols_[name] = make_shared<Variable>();
     }
     return symbols_[name];
 }
@@ -48,7 +48,7 @@ Address Scope::load_builtin(const String &name)
 {
     if (auto func = BuiltInFunctionObject::load_built_in_function(name))
     {
-        return Allocator<Variable>::alloc(func);
+        return make_shared<Variable>(func);
     }
     return nullptr;
 }
