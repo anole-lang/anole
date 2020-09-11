@@ -11,7 +11,7 @@ namespace anole
 {
 /**
  * by allocator,
- *  we can allocate memories for variables
+ *  we can allocate memories for objects
  *
  * there is only one global Allocator for each given T
 */

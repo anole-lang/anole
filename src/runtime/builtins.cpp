@@ -17,7 +17,7 @@ REGISTER_BUILTIN(eval,
     istringstream ss
     {
       "return " +
-        dynamic_cast<StringObject *>(Context::current()->pop_rptr())->value() +
+        dynamic_cast<StringObject *>(Context::current()->pop_ptr())->value() +
       ";"
     };
 
@@ -31,26 +31,28 @@ REGISTER_BUILTIN(eval,
 
 REGISTER_BUILTIN(call_with_current_continuation,
 {
-    if (Context::current()->top_rptr()->is<ObjectType::Func>())
+    if (Context::current()->top_ptr()->is<ObjectType::Func>())
     {
-        auto handle = Context::current()->pop_sptr();
-        auto func = reinterpret_cast<FunctionObject *>(handle.get());
+        /**
+         * TODO: check the collectable
+        */
+        auto func = reinterpret_cast<FunctionObject *>(Context::current()->pop_ptr());
         // copy current context
-        auto cont_obj = make_shared<ContObject>(Context::current());
+        auto cont_obj = Allocator<Object>::alloc<ContObject>(Context::current());
         Context::current() = make_shared<Context>(
             Context::current(), func->scope(), func->code(), func->base()
         );
         // the base => StoreRef/StoreLocal
         Context::current()->scope()
             ->create_symbol(any_cast<String>(
-                Context::current()->oprand()))
-                    ->bind(cont_obj)
+                Context::current()->oprand())
+            )->bind(cont_obj)
         ;
     }
-    else if (Context::current()->top_rptr()->is<ObjectType::Cont>())
+    else if (Context::current()->top_ptr()->is<ObjectType::Cont>())
     {
-        auto resume = Context::current()->pop_rptr<ContObject>()->resume();
-        auto cont_obj = make_shared<ContObject>(Context::current());
+        auto resume = Context::current()->pop_ptr<ContObject>()->resume();
+        auto cont_obj = Allocator<Object>::alloc<ContObject>(Context::current());
         Context::current() = make_shared<Context>(resume);
         Context::current()->push(cont_obj);
     }
@@ -63,26 +65,28 @@ REGISTER_BUILTIN(call_with_current_continuation,
 REGISTER_BUILTIN(id,
 {
     Context::current()->push(
-        make_shared<IntegerObject>(
+        Allocator<Object>::alloc<IntegerObject>(
             reinterpret_cast<int64_t>(
-                Context::current()->pop_rptr()))
+                Context::current()->pop_ptr()
+            )
+        )
     );
 });
 
 REGISTER_BUILTIN(print,
 {
-    if (Context::current()->top_rptr() != NoneObject::one().get())
+    if (Context::current()->top_ptr() != NoneObject::one())
     {
-        cout << Context::current()->pop_rptr()->to_str();
+        cout << Context::current()->pop_ptr()->to_str();
     }
     Context::current()->push(NoneObject::one());
 });
 
 REGISTER_BUILTIN(println,
 {
-    if (Context::current()->top_rptr() != NoneObject::one().get())
+    if (Context::current()->top_ptr() != NoneObject::one())
     {
-        cout << Context::current()->pop_rptr()->to_str() << endl;
+        cout << Context::current()->pop_ptr()->to_str() << endl;
     }
     Context::current()->push(NoneObject::one());
 });
@@ -91,7 +95,7 @@ REGISTER_BUILTIN(input,
 {
     String line;
     std::getline(cin, line);
-    Context::current()->push(make_shared<StringObject>(line));
+    Context::current()->push(Allocator<Object>::alloc<StringObject>(line));
 });
 
 REGISTER_BUILTIN(exit,
@@ -103,16 +107,16 @@ REGISTER_BUILTIN(exit,
 REGISTER_BUILTIN(time,
 {
     time_t result = time(nullptr);
-    Context::current()->push(make_shared<IntegerObject>(result));
+    Context::current()->push(Allocator<Object>::alloc<IntegerObject>(result));
 });
 
 REGISTER_BUILTIN(str,
 {
-    Context::current()->push(make_shared<StringObject>(Context::current()->pop_rptr()->to_str()));
+    Context::current()->push(Allocator<Object>::alloc<StringObject>(Context::current()->pop_ptr()->to_str()));
 });
 
 REGISTER_BUILTIN(type,
 {
-    Context::current()->push(Context::current()->pop_rptr()->type());
+    Context::current()->push(Context::current()->pop_ptr()->type());
 });
 }

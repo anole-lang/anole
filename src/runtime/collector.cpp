@@ -13,14 +13,14 @@ void Collector::gc()
     */
     collect(Context::current().get());
 
-    auto temp_marked = marked<Variable>();
-    for (auto &addr : temp_marked)
+    auto temp_marked = marked<Object>();
+    for (auto ptr : temp_marked)
     {
-        // if cannot visit variable the variable
-        if (!collected_.count(addr))
+        // if cannot visit the object
+        if (!collected_.count(ptr))
         {
-            marked<Variable>().erase(addr);
-            Allocator<Variable>::dealloc(addr);
+            marked<Object>().erase(ptr);
+            Allocator<Object>::dealloc(ptr);
         }
     }
 
@@ -34,35 +34,34 @@ void Collector::collect_impl(Scope *scp)
 
     for (auto &name_addr : scp->symbols_)
     {
-        collect(name_addr.second);
+        collect(name_addr.second->ptr());
     }
+}
+
+void Collector::collect_impl(Object *ptr)
+{
+    collected_.insert(ptr);
+
+    ptr->collect([this](Scope *scp) { this->collect(scp); });
+    ptr->collect([this](Object *obj) { this->collect(obj); });
+    ptr->collect([this](Context *ctx) { this->collect(ctx); });
 }
 
 void Collector::collect_impl(Context *ctx)
 {
     collect(ctx->pre_context_.get());
     collect(ctx->scope_.get());
+
     // different context may share one same stack
+    if (visited_.count(ctx->stack_.get()))
+    {
+        return;
+    }
     visited_.insert(ctx->stack_.get());
 
     for (auto &addr : *ctx->stack_)
     {
-        collect(addr);
+        collect(addr->ptr());
     }
-}
-
-void Collector::collect_impl(Variable *addr)
-{
-    collected_.insert(addr);
-
-    auto rptr = addr->rptr();
-    if (!rptr)
-    {
-        return;
-    }
-
-    rptr->collect([this](Scope *scp) { this->collect(scp); });
-    rptr->collect([this](Context *ctx) { this->collect(ctx); });
-    rptr->collect([this](Variable *var) { this->collect(var); });
 }
 }

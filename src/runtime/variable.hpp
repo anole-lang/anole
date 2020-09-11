@@ -9,32 +9,27 @@ namespace anole
 class Variable
 {
   public:
-    Variable() : sptr_(nullptr) {}
-    Variable(ObjectSPtr sptr) : sptr_(sptr) {}
+    Variable() : ptr_(nullptr) {}
+    Variable(Object *ptr) : ptr_(ptr) {}
 
-    Variable &operator=(ObjectSPtr) = delete;
+    Variable &operator=(Object *) = delete;
 
-    void bind(ObjectSPtr sptr)
+    void bind(Object *ptr)
     {
-        sptr_.swap(sptr);
+        ptr_ = ptr;
     }
 
-    ObjectSPtr &sptr()
+    Object *ptr()
     {
-        return sptr_;
-    }
-
-    ObjectRawPtr rptr()
-    {
-        return sptr_.get();
+        return ptr_;
     }
 
     operator bool()
     {
-        return sptr_ != nullptr;
+        return ptr_ != nullptr;
     }
 
   private:
-    ObjectSPtr sptr_;
+    Object *ptr_;
 };
 } // namespace anole
