@@ -20,8 +20,9 @@ void __current_path(Size n)
     }
 
     Context::current()->push(
-        make_shared<PathObject>(
-            fs::current_path())
+        Allocator<Object>::alloc<PathObject>(
+            fs::current_path()
+        )
     );
 }
 
@@ -32,7 +33,7 @@ void __is_directory(Size n)
         throw RuntimeError("function current_path need 1 argument");
     }
 
-    auto path_obj = Context::current()->pop_rptr();
+    auto path_obj = Context::current()->pop_ptr();
     fs::path path;
     if (path_obj->is(Object::add_object_type("path")))
     {
@@ -74,13 +75,15 @@ Address PathObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return Allocator<Variable>::alloc(
-            make_shared<BuiltInFunctionObject>([
-                    sptr = shared_from_this(),
+        return make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([
+                    this,
                     &func = method->second](Size) mutable
                 {
-                    func(sptr.get());
-                })
+                    func(this);
+                },
+                this
+            )
         );
     }
     return Object::load_member(name);

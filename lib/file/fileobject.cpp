@@ -14,14 +14,16 @@ void __open(Size n)
         throw RuntimeError("function open need 2 arguments");
     }
 
-    auto path = Context::current()->pop_sptr();
-    auto mode = Context::current()->pop_sptr();
+    auto path = Context::current()->pop_ptr();
+    auto mode = Context::current()->pop_ptr();
 
     Context::current()
         ->push(
-            make_shared<FileObject>(
+            Allocator<Object>::alloc<FileObject>(
                 path->to_str(),
-                dynamic_cast<IntegerObject *>(mode.get())->value()))
+                dynamic_cast<IntegerObject *>(mode)->value()
+            )
+        )
     ;
 }
 }
@@ -54,8 +56,9 @@ lc_builtin_methods
     {"read", [](FileObject *obj)
         {
             Context::current()->push(
-                make_shared<StringObject>(
-                    String(1, obj->file().get()))
+                Allocator<Object>::alloc<StringObject>(
+                    String(1, obj->file().get())
+                )
             );
         }
     },
@@ -64,36 +67,36 @@ lc_builtin_methods
             String line;
             std::getline(obj->file(), line);
             Context::current()->push(
-                make_shared<StringObject>(line)
+                Allocator<Object>::alloc<StringObject>(line)
             );
         }
     },
     {"write", [](FileObject *obj)
         {
             const auto &str
-                = dynamic_cast<StringObject *>(Context::current()->pop_rptr())->to_str()
+                = dynamic_cast<StringObject *>(Context::current()->pop_ptr())->to_str()
             ;
             obj->file().write(str.c_str(), str.size());
         }
     },
     {"tellg", [](FileObject *obj)
         {
-            Context::current()->push(make_shared<IntegerObject>(obj->file().tellg()));
+            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellg()));
         }
     },
     {"tellp", [](FileObject *obj)
         {
-            Context::current()->push(make_shared<IntegerObject>(obj->file().tellp()));
+            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellp()));
         }
     },
     {"seekg", [](FileObject *obj)
         {
-            obj->file().seekg(dynamic_cast<IntegerObject *>(Context::current()->pop_rptr())->value());
+            obj->file().seekg(dynamic_cast<IntegerObject *>(Context::current()->pop_ptr())->value());
         }
     },
     {"seekp", [](FileObject *obj)
         {
-            obj->file().seekp(dynamic_cast<IntegerObject *>(Context::current()->pop_rptr())->value());
+            obj->file().seekp(dynamic_cast<IntegerObject *>(Context::current()->pop_ptr())->value());
         }
     }
 };
@@ -138,13 +141,15 @@ Address FileObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return Allocator<Variable>::alloc(
-            make_shared<BuiltInFunctionObject>([
-                    sptr = shared_from_this(),
+        return make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([
+                    this,
                     &func = method->second](Size) mutable
                 {
-                    func(sptr.get());
-                })
+                    func(this);
+                },
+                this
+            )
         );
     }
     return Object::load_member(name);
