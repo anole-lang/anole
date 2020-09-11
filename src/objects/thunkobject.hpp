@@ -14,7 +14,7 @@ class ThunkObject : public Object
     );
 
     void collect(std::function<void(Scope *)> func) override;
-    void collect(std::function<void(Variable *)> func) override;
+    void collect(std::function<void(Object *)> func) override;
 
     void set_result(Address res);
     bool computed() { return computed_; }

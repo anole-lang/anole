@@ -9,18 +9,20 @@ namespace anole
 class BoolObject : public Object
 {
   public:
-    static ObjectSPtr the_true();
-    static ObjectSPtr the_false();
+    static Object *the_true();
+    static Object *the_false();
 
+  public:
+    bool to_bool() override;
+    String to_str() override;
+
+  private:
     constexpr BoolObject(bool value) noexcept
       : Object(ObjectType::Boolean)
       , value_(value)
     {
         // ...
     }
-
-    bool to_bool() override;
-    String to_str() override;
 
   private:
     bool value_;

@@ -6,12 +6,12 @@
 
 namespace anole
 {
-class DictObject : public Object, public std::enable_shared_from_this<DictObject>
+class DictObject : public Object
 {
   public:
     struct ObjectCmp
     {
-        bool operator()(const ObjectSPtr &lhs, const ObjectSPtr &rhs) const
+        bool operator()(Object *lhs, Object *rhs) const
         {
             return lhs->to_key() < rhs->to_key();
         }
@@ -19,9 +19,9 @@ class DictObject : public Object, public std::enable_shared_from_this<DictObject
 
     /**
      * TODO:
-     * ObjectSPtr as key may cause circular reference
+     * Object *as key may cause circular reference
     */
-    using DataType = std::map<ObjectSPtr, Address, ObjectCmp>;
+    using DataType = std::map<Object *, Address, ObjectCmp>;
 
     DictObject() : Object(ObjectType::Dict)
     {
@@ -32,13 +32,13 @@ class DictObject : public Object, public std::enable_shared_from_this<DictObject
     String to_str() override;
     String to_key() override;
 
-    Address index(ObjectSPtr) override;
+    Address index(Object *) override;
     Address load_member(const String &name) override;
 
-    void collect(std::function<void(Variable *)>) override;
+    void collect(std::function<void(Object *)>) override;
 
     DataType &data();
-    void insert(ObjectSPtr key, ObjectSPtr value);
+    void insert(Object *key, Object *value);
 
   private:
     DataType data_;

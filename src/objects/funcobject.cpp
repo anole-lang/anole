@@ -46,7 +46,7 @@ void FunctionObject::call(Size num)
         case Opcode::Pack:
         {
             ++pc;
-            auto list = make_shared<ListObject>();
+            auto list = Allocator<Object>::alloc<ListObject>();
             if (Context::current()->opcode() == Opcode::StoreRef)
             {
                 while (arg_num)
@@ -60,7 +60,7 @@ void FunctionObject::call(Size num)
             {
                 while (arg_num)
                 {
-                    list->append(Context::current()->pop_sptr());
+                    list->append(Context::current()->pop_ptr());
                     --arg_num;
                 }
             }
@@ -74,14 +74,9 @@ void FunctionObject::call(Size num)
             break;
 
         case Opcode::StoreRef:
-            /**
-             * use top_address instead of pop_address directly
-             *  to ensure the variable be collected
-            */
             Context::current()->scope()->create_symbol(OPRAND(String),
-                Context::current()->top_address()
+                Context::current()->pop_address()
             );
-            Context::current()->pop();
             ++pc;
             --arg_num;
             --parameter_num;
@@ -90,7 +85,7 @@ void FunctionObject::call(Size num)
         case Opcode::StoreLocal:
             Context::current()->scope()
                 ->create_symbol(OPRAND(String))
-                    ->bind(Context::current()->pop_sptr())
+                    ->bind(Context::current()->pop_ptr())
             ;
             ++pc;
             --arg_num;

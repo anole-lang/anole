@@ -21,15 +21,15 @@ void BuiltInFunctionObject::call(Size n)
 
 namespace
 {
-map<String, SPtr<BuiltInFunctionObject>>
+map<String, BuiltInFunctionObject *>
 &get_built_in_functions()
 {
-    static map<String, SPtr<BuiltInFunctionObject>> built_in_functions;
+    static map<String, BuiltInFunctionObject *> built_in_functions;
     return built_in_functions;
 }
 }
 
-ObjectSPtr
+Object *
 BuiltInFunctionObject::load_built_in_function(const String &name)
 {
     if (get_built_in_functions().count(name))
@@ -42,8 +42,15 @@ BuiltInFunctionObject::load_built_in_function(const String &name)
 void BuiltInFunctionObject::register_built_in_function(
     const String &name, function<void(Size)> func)
 {
-    get_built_in_functions()[name]
-        = make_shared<BuiltInFunctionObject>(func)
-    ;
+    /**
+     * builtin functions won't be marked
+     *  and always live until the program exits
+    */
+    get_built_in_functions()[name] = new BuiltInFunctionObject(func);
+}
+
+void BuiltInFunctionObject::collect(function<void(Object *)> func)
+{
+    func(bind_);
 }
 }

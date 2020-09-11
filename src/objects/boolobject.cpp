@@ -1,18 +1,20 @@
 #include "objects.hpp"
 
+#include "../runtime/allocator.hpp"
+
 using namespace std;
 
 namespace anole
 {
-ObjectSPtr BoolObject::the_true()
+Object *BoolObject::the_true()
 {
-    static auto a_true = make_shared<BoolObject>(true);
+    static auto a_true = new BoolObject(true);
     return a_true;
 }
 
-ObjectSPtr BoolObject::the_false()
+Object *BoolObject::the_false()
 {
-    static auto a_false = make_shared<BoolObject>(false);
+    static auto a_false = new BoolObject(false);
     return a_false;
 }
 

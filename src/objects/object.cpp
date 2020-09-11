@@ -1,5 +1,7 @@
 #include "objects.hpp"
 
+#include "../runtime/allocator.hpp"
+
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -60,9 +62,9 @@ ObjectType Object::add_object_type(const String &literal)
 
 Object::~Object() = default;
 
-ObjectSPtr Object::type()
+Object *Object::type()
 {
-    return make_shared<StringObject>(
+    return Allocator<Object>::alloc<StringObject>(
         lc_mapping_t_s[type_]
     );
 }
@@ -82,32 +84,32 @@ String Object::to_key()
     return 'p' + to_string(reinterpret_cast<uintptr_t>(this));
 }
 
-ObjectSPtr Object::neg()
+Object *Object::neg()
 {
     throw RuntimeError("no neg method");
 }
 
-ObjectSPtr Object::add(ObjectRawPtr)
+Object *Object::add(Object *)
 {
     throw RuntimeError("no add method");
 }
 
-ObjectSPtr Object::sub(ObjectRawPtr)
+Object *Object::sub(Object *)
 {
     throw RuntimeError("no sub method");
 }
 
-ObjectSPtr Object::mul(ObjectRawPtr)
+Object *Object::mul(Object *)
 {
     throw RuntimeError("no mul method");
 }
 
-ObjectSPtr Object::div(ObjectRawPtr)
+Object *Object::div(Object *)
 {
     throw RuntimeError("no div method");
 }
 
-ObjectSPtr Object::mod(ObjectRawPtr)
+Object *Object::mod(Object *)
 {
     throw RuntimeError("no mod method");
 }
@@ -115,57 +117,57 @@ ObjectSPtr Object::mod(ObjectRawPtr)
 /**
  * default = will compare the given objects' address
 */
-ObjectSPtr Object::ceq(ObjectRawPtr rptr)
+Object *Object::ceq(Object *rptr)
 {
     return this == rptr ? BoolObject::the_true() : BoolObject::the_false();
 }
 
-ObjectSPtr Object::cne(ObjectRawPtr rptr)
+Object *Object::cne(Object *rptr)
 {
     return this != rptr ? BoolObject::the_true() : BoolObject::the_false();
 }
 
-ObjectSPtr Object::clt(ObjectRawPtr)
+Object *Object::clt(Object *)
 {
     throw RuntimeError("no clt method");
 }
 
-ObjectSPtr Object::cle(ObjectRawPtr)
+Object *Object::cle(Object *)
 {
     throw RuntimeError("no cle method");
 }
 
-ObjectSPtr Object::bneg()
+Object *Object::bneg()
 {
     throw RuntimeError("no bneg method");
 }
 
-ObjectSPtr Object::bor(ObjectRawPtr)
+Object *Object::bor(Object *)
 {
     throw RuntimeError("no bor method");
 }
 
-ObjectSPtr Object::bxor(ObjectRawPtr)
+Object *Object::bxor(Object *)
 {
     throw RuntimeError("no bxor method");
 }
 
-ObjectSPtr Object::band(ObjectRawPtr)
+Object *Object::band(Object *)
 {
     throw RuntimeError("no band method");
 }
 
-ObjectSPtr Object::bls(ObjectRawPtr)
+Object *Object::bls(Object *)
 {
     throw RuntimeError("no bls method");
 }
 
-ObjectSPtr Object::brs(ObjectRawPtr)
+Object *Object::brs(Object *)
 {
     throw RuntimeError("no brs method");
 }
 
-Address Object::index(ObjectSPtr)
+Address Object::index(Object *)
 {
     throw RuntimeError("not support index");
 }
@@ -185,12 +187,12 @@ void Object::collect(function<void(Scope *)>)
     // ...
 }
 
-void Object::collect(function<void(Context *)>)
+void Object::collect(function<void(Object *)>)
 {
     // ...
 }
 
-void Object::collect(function<void(Variable *)>)
+void Object::collect(function<void(Context *)>)
 {
     // ...
 }

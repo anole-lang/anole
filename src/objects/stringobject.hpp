@@ -6,7 +6,7 @@
 
 namespace anole
 {
-class StringObject : public Object, public std::enable_shared_from_this<StringObject>
+class StringObject : public Object
 {
   public:
     StringObject(String value)
@@ -20,12 +20,12 @@ class StringObject : public Object, public std::enable_shared_from_this<StringOb
     String to_str() override;
     String to_key() override;
 
-    ObjectSPtr add(ObjectRawPtr) override;
-    ObjectSPtr ceq(ObjectRawPtr) override;
-    ObjectSPtr cne(ObjectRawPtr) override;
-    ObjectSPtr clt(ObjectRawPtr) override;
-    ObjectSPtr cle(ObjectRawPtr) override;
-    Address index(ObjectSPtr) override;
+    Object *add(Object *) override;
+    Object *ceq(Object *) override;
+    Object *cne(Object *) override;
+    Object *clt(Object *) override;
+    Object *cle(Object *) override;
+    Address index(Object *) override;
     Address load_member(const String &name) override;
 
     const String &value() const
