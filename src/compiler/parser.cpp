@@ -1012,8 +1012,8 @@ Ptr<Expr> Parser::gen_none()
 Ptr<Expr> Parser::gen_boolean()
 {
     auto bool_expr = make_unique<BoolExpr>(
-        ((current_token_.type == TokenType::True)
-          ? true : false)
+        current_token_.type == TokenType::True
+        ? true : false
     );
     get_next_token();
     return bool_expr;
@@ -1054,7 +1054,8 @@ Ptr<Expr> Parser::gen_enum_expr()
         }
         enum_expr->decls.push_back(
             make_unique<VariableDeclarationStmt>(move(ident),
-                make_unique<IntegerExpr>(base++), true)
+                make_unique<IntegerExpr>(base++), true
+            )
         );
 
         if (current_token_.type == TokenType::Comma)
@@ -1186,6 +1187,8 @@ Ptr<Expr> Parser::gen_match_expr()
         {
             check<TokenType::RBrace>("expected '}'");
         }
+
+        try_continue();
     }
 
     get_next_token(); // eat '}'

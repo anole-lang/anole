@@ -4,6 +4,7 @@
 #include "instruction.hpp"
 
 #include "../objects/object.hpp"
+#include "../runtime/allocator.hpp"
 
 #include <map>
 #include <vector>
@@ -15,9 +16,9 @@ namespace anole
 {
 class Code
 {
-  public:
     friend class Collector;
 
+  public:
     Code(String from = "<stdin>");
 
     const String &from()
@@ -86,7 +87,7 @@ class Code
     void push_continue(Size ind);
     void set_continue_to(Size ind, Size base);
     bool check();
-    ObjectSPtr load_const(Size ind);
+    Object *load_const(Size ind);
 
     template<typename O, typename T>
     Size create_const(String key, T value)
@@ -101,7 +102,13 @@ class Code
         {
             constants_map_[key] = constants_.size();
             constants_literals_.push_back(key);
-            constants_.push_back(std::make_shared<O>(value));
+            /**
+             * TODO:
+             *
+             * constants won't be deallocated now
+             *  although the code is released
+            */
+            constants_.push_back(new O(value));
             return constants_.size() - 1;
         }
     }
@@ -127,6 +134,6 @@ class Code
     std::vector<String> constants_literals_;
 
     std::map<String, Size> constants_map_;
-    std::vector<ObjectSPtr> constants_;
+    std::vector<Object *> constants_;
 };
 }
