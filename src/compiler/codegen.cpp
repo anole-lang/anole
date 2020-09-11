@@ -50,7 +50,8 @@ void IntegerExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<IntegerObject>(
-            'i' + to_string(value), value)
+            'i' + to_string(value), value
+        )
     );
 }
 
@@ -58,7 +59,8 @@ void FloatExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<FloatObject>(
-            'f' + to_string(value), value)
+            'f' + to_string(value), value
+        )
     );
 }
 
@@ -71,7 +73,8 @@ void StringExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<StringObject>(
-            's' + value, value)
+            's' + value, value
+        )
     );
 }
 
@@ -672,14 +675,16 @@ void ForeachStmt::codegen(Code &code)
     */
     auto cond = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
-            make_unique<IdentifierExpr>("__has_next__")),
+            make_unique<IdentifierExpr>("__has_next__")
+        ),
         ArgumentList()
     );
 
     block->statements.push_front(nullptr);
     auto next = make_unique<ParenOperatorExpr>(
         make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
-            make_unique<IdentifierExpr>("__next__")),
+            make_unique<IdentifierExpr>("__next__")
+        ),
         ArgumentList()
     );
     if (id != nullptr)
