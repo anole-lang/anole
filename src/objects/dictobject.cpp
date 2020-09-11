@@ -18,25 +18,25 @@ lc_builtin_methods
     },
     {"size", [](DictObject *obj)
         {
-            Context::current()->push(make_shared<IntegerObject>(int64_t(obj->data().size())));
+            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->data().size())));
         }
     },
     {"at", [](DictObject *obj)
         {
-            Context::current()->push(obj->index(Context::current()->pop_sptr())->sptr());
+            Context::current()->push(obj->index(Context::current()->pop_ptr())->ptr());
         }
     },
     {"insert", [](DictObject *obj)
         {
-            auto p1 = Context::current()->pop_sptr();
-            auto p2 = Context::current()->pop_sptr();
+            auto p1 = Context::current()->pop_ptr();
+            auto p2 = Context::current()->pop_ptr();
             obj->insert(p1, p2);
             Context::current()->push(NoneObject::one());
         }
     },
     {"erase", [](DictObject *obj)
         {
-            obj->data().erase(Context::current()->pop_sptr());
+            obj->data().erase(Context::current()->pop_ptr());
             Context::current()->push(NoneObject::one());
         }
     },
@@ -64,7 +64,7 @@ String DictObject::to_str()
         {
             res += ",";
         }
-        res += " " + it->first->to_str() + " => " + it->second->rptr()->to_str();
+        res += " " + it->first->to_str() + " => " + it->second->ptr()->to_str();
     }
     return res + " }";
 }
@@ -74,7 +74,7 @@ String DictObject::to_key()
     return 'd' + to_str();
 }
 
-Address DictObject::index(ObjectSPtr index)
+Address DictObject::index(Object *index)
 {
     auto it = data_.find(index);
     if (it != data_.end())
@@ -84,7 +84,7 @@ Address DictObject::index(ObjectSPtr index)
     /**
      * dict will create an empty target if the key is not recorded
     */
-    return data_[index] = Allocator<Variable>::alloc();
+    return data_[index] = make_shared<Variable>();
 }
 
 Address DictObject::load_member(const String &name)
@@ -92,23 +92,26 @@ Address DictObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return Allocator<Variable>::alloc(
-            make_shared<BuiltInFunctionObject>([
-                    sptr = shared_from_this(),
+        return make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([
+                    this,
                     &func = method->second](Size) mutable
                 {
-                    func(sptr.get());
-                })
+                    func(this);
+                },
+                this
+            )
         );
     }
-    return index(make_shared<StringObject>(name));
+    return index(Allocator<Object>::alloc<StringObject>(name));
 }
 
-void DictObject::collect(function<void(Variable *)> func)
+void DictObject::collect(function<void(Object *)> func)
 {
     for (auto &key_addr : data_)
     {
-        func(key_addr.second);
+        func(key_addr.first);
+        func(key_addr.second->ptr());
     }
 }
 
@@ -117,8 +120,8 @@ DictObject::DataType &DictObject::data()
     return data_;
 }
 
-void DictObject::insert(ObjectSPtr key, ObjectSPtr value)
+void DictObject::insert(Object *key, Object *value)
 {
-    data_[key] = Allocator<Variable>::alloc(value);
+    data_[key] = make_shared<Variable>(value);
 }
 }

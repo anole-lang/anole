@@ -18,26 +18,26 @@ namespace anole
 {
 ModuleObject::~ModuleObject() = default;
 
-SPtr<ModuleObject> ModuleObject::generate(const String &name)
+ModuleObject *ModuleObject::generate(const String &name)
 {
-    SPtr<ModuleObject> mod = make_shared<AnoleModuleObject>(name);
+    ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
     if (!mod->good())
     {
-        mod = make_shared<CppModuleObject>(name);
+        mod = Allocator<Object>::alloc<CppModuleObject>(name);
     }
     return mod;
 }
 
-SPtr<ModuleObject> ModuleObject::generate(const fs::path &path)
+ModuleObject *ModuleObject::generate(const fs::path &path)
 {
-    SPtr<ModuleObject> mod;
+    ModuleObject *mod;
     if (path.extension() == ".so")
     {
-        mod = make_shared<CppModuleObject>(path);
+        mod = Allocator<Object>::alloc<CppModuleObject>(path);
     }
     else
     {
-        mod = make_shared<AnoleModuleObject>(path);
+        mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
     }
     return mod;
 }
@@ -203,10 +203,10 @@ Address CppModuleObject::load_member(const String &name)
         throw RuntimeError(dlerror());
     }
 
-    auto result = make_shared<BuiltInFunctionObject>(
-        [sptr = shared_from_this(), func](Size n) { func(n); }
+    auto result = Allocator<Object>::alloc<BuiltInFunctionObject>(
+        [func](Size n) { func(n); }, this
     );
 
-    return Allocator<Variable>::alloc(result);
+    return make_shared<Variable>(result);
 }
 }

@@ -1,5 +1,7 @@
 #include "objects.hpp"
 
+#include "../runtime/allocator.hpp"
+
 using namespace std;
 
 namespace anole
@@ -19,17 +21,17 @@ String FloatObject::to_key()
     return 'f' + to_str();
 }
 
-ObjectSPtr FloatObject::neg()
+Object *FloatObject::neg()
 {
-    return make_shared<FloatObject>(-value_);
+    return Allocator<Object>::alloc<FloatObject>(-value_);
 }
 
-ObjectSPtr FloatObject::add(ObjectRawPtr obj)
+Object *FloatObject::add(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_cast<FloatObject *>(obj);
-        return make_shared<FloatObject>(value_ + p->value_);
+        return Allocator<Object>::alloc<FloatObject>(value_ + p->value_);
     }
     else
     {
@@ -37,12 +39,12 @@ ObjectSPtr FloatObject::add(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr FloatObject::sub(ObjectRawPtr obj)
+Object *FloatObject::sub(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_cast<FloatObject *>(obj);
-        return make_shared<FloatObject>(value_ - p->value_);
+        return Allocator<Object>::alloc<FloatObject>(value_ - p->value_);
     }
     else
     {
@@ -50,12 +52,12 @@ ObjectSPtr FloatObject::sub(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr FloatObject::mul(ObjectRawPtr obj)
+Object *FloatObject::mul(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_cast<FloatObject *>(obj);
-        return make_shared<FloatObject>(value_ * p->value_);
+        return Allocator<Object>::alloc<FloatObject>(value_ * p->value_);
     }
     else
     {
@@ -63,12 +65,12 @@ ObjectSPtr FloatObject::mul(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr FloatObject::div(ObjectRawPtr obj)
+Object *FloatObject::div(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
         auto p = reinterpret_cast<FloatObject *>(obj);
-        return make_shared<FloatObject>(value_ / p->value_);
+        return Allocator<Object>::alloc<FloatObject>(value_ / p->value_);
     }
     else
     {
@@ -76,7 +78,7 @@ ObjectSPtr FloatObject::div(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr FloatObject::ceq(ObjectRawPtr obj)
+Object *FloatObject::ceq(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
@@ -89,7 +91,7 @@ ObjectSPtr FloatObject::ceq(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr FloatObject::cne(ObjectRawPtr obj)
+Object *FloatObject::cne(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
@@ -102,7 +104,7 @@ ObjectSPtr FloatObject::cne(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr FloatObject::clt(ObjectRawPtr obj)
+Object *FloatObject::clt(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {
@@ -115,7 +117,7 @@ ObjectSPtr FloatObject::clt(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr FloatObject::cle(ObjectRawPtr obj)
+Object *FloatObject::cle(Object *obj)
 {
     if (obj->is<ObjectType::Float>())
     {

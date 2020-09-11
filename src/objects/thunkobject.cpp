@@ -22,9 +22,12 @@ void ThunkObject::collect(std::function<void(Scope *)> func)
     func(scope_.get());
 }
 
-void ThunkObject::collect(std::function<void(Variable *)> func)
+void ThunkObject::collect(std::function<void(Object *)> func)
 {
-    func(result_);
+    if (result_)
+    {
+        func(result_->ptr());
+    }
 }
 
 void ThunkObject::set_result(Address res)

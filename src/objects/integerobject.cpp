@@ -23,17 +23,17 @@ String IntegerObject::to_key()
     return 'i' + to_str();
 }
 
-ObjectSPtr IntegerObject::neg()
+Object *IntegerObject::neg()
 {
-    return make_shared<IntegerObject>(-value_);
+    return Allocator<Object>::alloc<IntegerObject>(-value_);
 }
 
-ObjectSPtr IntegerObject::add(ObjectRawPtr obj)
+Object *IntegerObject::add(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ + p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ + p->value_);
     }
     else
     {
@@ -41,12 +41,12 @@ ObjectSPtr IntegerObject::add(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::sub(ObjectRawPtr obj)
+Object *IntegerObject::sub(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ - p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ - p->value_);
     }
     else
     {
@@ -54,12 +54,12 @@ ObjectSPtr IntegerObject::sub(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::mul(ObjectRawPtr obj)
+Object *IntegerObject::mul(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ * p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ * p->value_);
     }
     else
     {
@@ -67,12 +67,12 @@ ObjectSPtr IntegerObject::mul(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::div(ObjectRawPtr obj)
+Object *IntegerObject::div(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ / p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ / p->value_);
     }
     else
     {
@@ -80,12 +80,12 @@ ObjectSPtr IntegerObject::div(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::mod(ObjectRawPtr obj)
+Object *IntegerObject::mod(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ % p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ % p->value_);
     }
     else
     {
@@ -93,7 +93,7 @@ ObjectSPtr IntegerObject::mod(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::ceq(ObjectRawPtr obj)
+Object *IntegerObject::ceq(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -106,7 +106,7 @@ ObjectSPtr IntegerObject::ceq(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::cne(ObjectRawPtr obj)
+Object *IntegerObject::cne(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -119,7 +119,7 @@ ObjectSPtr IntegerObject::cne(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::clt(ObjectRawPtr obj)
+Object *IntegerObject::clt(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -132,7 +132,7 @@ ObjectSPtr IntegerObject::clt(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::cle(ObjectRawPtr obj)
+Object *IntegerObject::cle(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
@@ -145,17 +145,17 @@ ObjectSPtr IntegerObject::cle(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::bneg()
+Object *IntegerObject::bneg()
 {
-    return make_shared<IntegerObject>(~value_);
+    return Allocator<Object>::alloc<IntegerObject>(~value_);
 }
 
-ObjectSPtr IntegerObject::bor(ObjectRawPtr obj)
+Object *IntegerObject::bor(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ | p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ | p->value_);
     }
     else
     {
@@ -163,12 +163,12 @@ ObjectSPtr IntegerObject::bor(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::bxor(ObjectRawPtr obj)
+Object *IntegerObject::bxor(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ ^ p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ ^ p->value_);
     }
     else
     {
@@ -176,12 +176,12 @@ ObjectSPtr IntegerObject::bxor(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::band(ObjectRawPtr obj)
+Object *IntegerObject::band(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ & p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ & p->value_);
     }
     else
     {
@@ -189,12 +189,12 @@ ObjectSPtr IntegerObject::band(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::bls(ObjectRawPtr obj)
+Object *IntegerObject::bls(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ << p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ << p->value_);
     }
     else
     {
@@ -202,12 +202,12 @@ ObjectSPtr IntegerObject::bls(ObjectRawPtr obj)
     }
 }
 
-ObjectSPtr IntegerObject::brs(ObjectRawPtr obj)
+Object *IntegerObject::brs(Object *obj)
 {
     if (obj->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(obj);
-        return make_shared<IntegerObject>(value_ >> p->value_);
+        return Allocator<Object>::alloc<IntegerObject>(value_ >> p->value_);
     }
     else
     {
@@ -219,14 +219,15 @@ Address IntegerObject::load_member(const String &name)
 {
     if (name == "to_str")
     {
-        return Allocator<Variable>::alloc(
-            make_shared<BuiltInFunctionObject>(
+        return make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>(
                     [val = value_](Size)
                 {
                     Context::current()
-                        ->push(make_shared<StringObject>(to_string(val)))
+                        ->push(Allocator<Object>::alloc<StringObject>(to_string(val)))
                     ;
-                })
+                }
+            )
         );
     }
     return Object::load_member(name);

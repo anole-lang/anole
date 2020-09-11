@@ -19,7 +19,7 @@ void ContObject::call(Size n)
     {
         throw RuntimeError("continuation need a argument");
     }
-    auto retval = Context::current()->pop_sptr();
+    auto retval = Context::current()->pop_ptr();
     Context::current() = make_shared<Context>(resume_);
     Context::current()->push(retval);
     ++Context::current()->pc();
