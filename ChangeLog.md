@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Apply the new design of GC mentioned in [issue-13](https://github.com/anole-lang/anole/issues/13) and fix the bug mentioned in [issue-14](https://github.com/anole-lang/anole/issues/14) in consequence
+
 ## 0.0.19 - 2020/09/02
 
 ### Added
