@@ -1,6 +1,6 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.20 - 2020/09/20
 
 ### Changed
 
