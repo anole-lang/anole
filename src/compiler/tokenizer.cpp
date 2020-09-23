@@ -77,7 +77,6 @@ Token Tokenizer::next()
     {
         Begin,
 
-        InAT,
         InDot,
         InDoot,
 
@@ -118,7 +117,7 @@ Token Tokenizer::next()
                 break;
 
             case '@':
-                state = State::InAT;
+                token = make_unique<Token>(TokenType::At);
                 break;
 
             case '"':
@@ -186,17 +185,6 @@ Token Tokenizer::next()
                     value += last_input_;
                 }
                 break;
-            }
-            break;
-
-        case State::InAT:
-            if (last_input_ == '@')
-            {
-                token = make_unique<Token>(TokenType::AtAt);
-            }
-            else
-            {
-                return Token(TokenType::At);
             }
             break;
 

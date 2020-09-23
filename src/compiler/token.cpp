@@ -63,7 +63,6 @@ map<String, TokenType> lc_mapping
     { "match",      TokenType::Match    },
     { "delay",      TokenType::Delay    },
 
-    { "new",        TokenType::New      },
     { "enum",       TokenType::Enum     },
     { "dict",       TokenType::Dict     },
 

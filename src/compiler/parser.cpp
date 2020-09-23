@@ -359,9 +359,6 @@ Ptr<Stmt> Parser::gen_stmt()
         }
         break;
 
-    case TokenType::AtAt:
-        return gen_class_decl();
-
     case TokenType::Use:
         return gen_use_stmt();
 
@@ -403,7 +400,6 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::False:
     case TokenType::String:
     case TokenType::LParen:
-    case TokenType::New:
     case TokenType::Enum:
     case TokenType::Dict:
     case TokenType::Match:
@@ -542,23 +538,6 @@ Ptr<Stmt> Parser::gen_infixop_decl()
     }
     check<TokenType::Identifier>("expected an identifier here");
     return make_unique<InfixopDeclarationStmt>(gen_ident(), priority);
-}
-
-Ptr<Stmt> Parser::gen_class_decl()
-{
-    get_next_token();
-
-    auto id = gen_ident();
-
-    check<TokenType::LParen>("expected '('");
-    get_next_token();
-
-    auto bases = gen_idents();
-    eat<TokenType::RParen>("expected ')' here");
-
-    auto block = gen_block();
-
-    return make_unique<ClassDeclarationStmt>(move(id), move(bases), move(block));
 }
 
 UseStmt::Module Parser::gen_module()
@@ -912,9 +891,6 @@ Ptr<Expr> Parser::gen_term()
         get_next_token();
         return gen_lambda_expr();
 
-    case TokenType::New:
-        return gen_new_expr();
-
     case TokenType::Match:
         return gen_match_expr();
 
@@ -1137,13 +1113,6 @@ Ptr<Expr> Parser::gen_lambda_expr()
     }
 
     return gen_term_tail(make_unique<LambdaExpr>(move(parameters), move(block)));
-}
-
-// generate new expr as @instance: new Class()
-Ptr<Expr> Parser::gen_new_expr()
-{
-    get_next_token();
-    return make_unique<NewExpr>(gen_ident(), gen_arguments());
 }
 
 /**

@@ -193,22 +193,6 @@ struct LambdaExpr : Expr
     void codegen(Code &) override;
 };
 
-struct NewExpr : Expr
-{
-    Ptr<IdentifierExpr> id;
-    ArgumentList args;
-
-    NewExpr(Ptr<IdentifierExpr> &&id,
-        ArgumentList &&args)
-      : id(std::move(id))
-      , args(std::move(args))
-    {
-        // ...
-    }
-
-    void codegen(Code &) override;
-};
-
 struct DotExpr : Expr
 {
     Ptr<Expr> left;
@@ -432,24 +416,6 @@ struct InfixopDeclarationStmt : Stmt
     InfixopDeclarationStmt(Ptr<IdentifierExpr> &&id,
         Size priority)
       : priority(priority), id(std::move(id))
-    {
-        // ...
-    }
-
-    void codegen(Code &) override;
-};
-
-struct ClassDeclarationStmt : Stmt
-{
-    Ptr<IdentifierExpr> id;
-    IdentList bases;
-    Ptr<BlockExpr> block;
-
-    ClassDeclarationStmt(Ptr<IdentifierExpr> &&id,
-        IdentList &&bases, Ptr<BlockExpr> &&block)
-      : id(std::move(id))
-      , bases(std::move(bases))
-      , block(std::move(block))
     {
         // ...
     }

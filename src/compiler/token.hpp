@@ -17,7 +17,6 @@ namespace token_type
 enum TokenType : int
 {
     At,        // @
-    AtAt,      // @@
 
     Use,       // use
     From,      // from
@@ -36,7 +35,6 @@ enum TokenType : int
     Match,     // match
     Delay,     // delay
 
-    New,       // new
     Enum,      // enum
     Dict,      // dict
 
