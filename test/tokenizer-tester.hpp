@@ -19,10 +19,10 @@ struct TokenizerTester : testing::Test
 
 TEST_F(TokenizerTester, Origin)
 {
-    ss.str(R"(@ @@
+    ss.str(R"(@
 use from prefixop infixop if elif else
 while do foreach as break continue return
-match delay new enum dict none true false
+match delay enum dict none true false
 identifier 0123456789 0123456789.0123456789 "String"
 , . ... () [] {} : ; + - * / % & | ^ ~ << >>
 and or not ! is = != < <= > >= => ?)");

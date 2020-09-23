@@ -343,12 +343,6 @@ void LambdaExpr::codegen(Code &code)
     code.set_ins<Opcode::LambdaDecl, pair<Size, Size>>(o1, make_pair<Size, Size>(parameters.size(), code.size()));
 }
 
-// [AFTER] [CLASS]
-void NewExpr::codegen(Code &code)
-{
-
-}
-
 void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
@@ -579,11 +573,6 @@ void PrefixopDeclarationStmt::codegen(Code &code)
 void InfixopDeclarationStmt::codegen(Code &code)
 {
     code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(id->name, priority));
-}
-
-void ClassDeclarationStmt::codegen(Code &code)
-{
-
 }
 
 void BreakStmt::codegen(Code &code)

@@ -66,7 +66,6 @@ class Parser
     Ptr<Stmt> gen_declaration();
     Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();
-    Ptr<Stmt> gen_class_decl();
     UseStmt::Module gen_module();
     UseStmt::Alias gen_alias();
     Ptr<Stmt> gen_use_stmt();
