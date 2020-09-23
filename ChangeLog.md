@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Removed
+
+- Remove OLD things about class such as class-declaration, new-expression and so on
+
 ## 0.0.20 - 2020/09/20
 
 ### Changed
