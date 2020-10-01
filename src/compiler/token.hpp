@@ -37,6 +37,7 @@ enum TokenType : int
 
     Enum,      // enum
     Dict,      // dict
+    Class,     // class
 
     None,      // none
     True,      // true
