@@ -89,8 +89,8 @@ class Parser
     Ptr<Expr> gen_index_expr(Ptr<Expr> expr);
     Ptr<Expr> gen_enum_expr();
     Ptr<Expr> gen_dict_expr();
+    Ptr<Expr> gen_class_expr();
     Ptr<Expr> gen_lambda_expr();
-    Ptr<Expr> gen_new_expr();
     Ptr<Expr> gen_match_expr();
     Ptr<Expr> gen_list_expr();
 };

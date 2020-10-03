@@ -402,6 +402,7 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::LParen:
     case TokenType::Enum:
     case TokenType::Dict:
+    case TokenType::Class:
     case TokenType::Match:
     case TokenType::LBracket:
     case TokenType::LBrace:
@@ -903,6 +904,9 @@ Ptr<Expr> Parser::gen_term()
     case TokenType::Dict:
         return gen_dict_expr();
 
+    case TokenType::Class:
+        return gen_class_expr();
+
     case TokenType::LBrace:
         return make_unique<LambdaExpr>(ParameterList{}, gen_block());
 
@@ -1050,7 +1054,7 @@ Ptr<Expr> Parser::gen_enum_expr()
 
 Ptr<Expr> Parser::gen_dict_expr()
 {
-    get_next_token(); // skip `dict`
+    get_next_token(); // eat `dict`
     eat<TokenType::LBrace>("expected '{'");
     auto dict_expr = make_unique<DictExpr>();
 
@@ -1071,6 +1075,17 @@ Ptr<Expr> Parser::gen_dict_expr()
     }
     get_next_token();
     return dict_expr;
+}
+
+Ptr<Expr> Parser::gen_class_expr()
+{
+    get_next_token(); // eat 'class'
+
+    /**
+     * TODO: COMPLETE GEN_CLASS_EXPR
+    */
+
+    return nullptr;
 }
 
 /**
