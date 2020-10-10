@@ -263,6 +263,13 @@ struct DictExpr : Expr
     void codegen(Code &) override;
 };
 
+struct ClassExpr : Expr
+{
+    /**
+     * TODO:
+    */
+};
+
 struct DelayExpr : Expr
 {
     Ptr<Expr> expr;
