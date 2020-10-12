@@ -268,6 +268,16 @@ struct ClassExpr : Expr
     /**
      * TODO:
     */
+
+    using Members
+        = std::map<std::string, Ptr<Expr>>;
+
+    IdentList bases;
+    Members members;
+
+    // ClassExpr(...)
+
+    void codegen(Code &) override;
 };
 
 struct DelayExpr : Expr
@@ -314,8 +324,8 @@ struct UseStmt : Stmt
         Type type;
     };
 
-    using Alias = std::pair<Module, String>;
     // second String is the alias
+    using Alias = std::pair<Module, String>;
     using Aliases = std::list<Alias>;
 
     // aliases are empty means `use *`
