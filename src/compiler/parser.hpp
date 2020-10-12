@@ -80,11 +80,12 @@ class Parser
     Ptr<Expr> gen_expr(int layer = -1);
     Ptr<Expr> gen_term();
     Ptr<Expr> gen_term_tail(Ptr<Expr> expr);
-    Ptr<IdentifierExpr> gen_ident();
-    Ptr<Expr> gen_numeric();
-    Ptr<Expr> gen_none();
-    Ptr<Expr> gen_boolean();
-    Ptr<Expr> gen_string();
+    std::string gen_ident_rawstr();
+    Ptr<IdentifierExpr> gen_ident_expr();
+    Ptr<Expr> gen_numeric_expr();
+    Ptr<Expr> gen_none_expr();
+    Ptr<Expr> gen_boolean_expr();
+    Ptr<Expr> gen_string_expr();
     Ptr<Expr> gen_dot_expr(Ptr<Expr> left);
     Ptr<Expr> gen_index_expr(Ptr<Expr> expr);
     Ptr<Expr> gen_enum_expr();

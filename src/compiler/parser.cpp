@@ -149,7 +149,7 @@ IdentList Parser::gen_idents()
     IdentList idents;
     while (current_token_.type != TokenType::RParen)
     {
-        idents.push_back(gen_ident());
+        idents.push_back(gen_ident_expr());
         if (current_token_.type == TokenType::Comma)
         {
             get_next_token();
@@ -210,7 +210,7 @@ ParameterList Parser::gen_parameters()
             }
 
             auto decl = make_unique<VariableDeclarationStmt>(
-                gen_ident(), nullptr, is_ref
+                gen_ident_expr(), nullptr, is_ref
             );
             parameters.push_back(make_pair(move(decl), true));
         }
@@ -223,7 +223,7 @@ ParameterList Parser::gen_parameters()
                 get_next_token();
             }
 
-            auto ident = gen_ident();
+            auto ident = gen_ident_expr();
             Ptr<VariableDeclarationStmt> decl = nullptr;
             if (current_token_.type == TokenType::Colon)
             {
@@ -430,7 +430,7 @@ Ptr<Stmt> Parser::gen_declaration()
         get_next_token();
     }
 
-    auto id = gen_ident();
+    auto id = gen_ident_expr();
     switch (current_token_.type)
     {
     case TokenType::Comma:
@@ -447,7 +447,7 @@ Ptr<Stmt> Parser::gen_declaration()
                 is_ref = true;
                 get_next_token();
             }
-            decls.emplace_back(gen_ident(), nullptr, is_ref);
+            decls.emplace_back(gen_ident_expr(), nullptr, is_ref);
         }
 
         // @var1, ..., varn
@@ -525,7 +525,7 @@ Ptr<Stmt> Parser::gen_prefixop_decl()
 {
     get_next_token();
     check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<PrefixopDeclarationStmt>(gen_ident());
+    return make_unique<PrefixopDeclarationStmt>(gen_ident_expr());
 }
 
 Ptr<Stmt> Parser::gen_infixop_decl()
@@ -538,7 +538,7 @@ Ptr<Stmt> Parser::gen_infixop_decl()
         get_next_token();
     }
     check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<InfixopDeclarationStmt>(gen_ident(), priority);
+    return make_unique<InfixopDeclarationStmt>(gen_ident_expr(), priority);
 }
 
 UseStmt::Module Parser::gen_module()
@@ -695,7 +695,7 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
     {
         get_next_token();
         check<TokenType::Identifier>("expected an identifier here");
-        id = gen_ident();
+        id = gen_ident_expr();
     }
 
     auto block = gen_block();
@@ -866,21 +866,21 @@ Ptr<Expr> Parser::gen_term()
     switch (current_token_.type)
     {
     case TokenType::Identifier:
-        return gen_ident();
+        return gen_ident_expr();
 
     case TokenType::Integer:
     case TokenType::Double:
-        return gen_numeric();
+        return gen_numeric_expr();
 
     case TokenType::None:
-        return gen_none();
+        return gen_none_expr();
 
     case TokenType::True:
     case TokenType::False:
-        return gen_boolean();
+        return gen_boolean_expr();
 
     case TokenType::String:
-        return gen_string();
+        return gen_string_expr();
 
     case TokenType::LParen:
         get_next_token();
@@ -960,15 +960,20 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
     return expr;
 }
 
-Ptr<IdentifierExpr> Parser::gen_ident()
+string Parser::gen_ident_rawstr()
 {
     check<TokenType::Identifier>("expect an identifier here");
-    auto ident_expr = make_unique<IdentifierExpr>(current_token_.value);
+    auto result = current_token_.value;
     get_next_token();
-    return ident_expr;
+    return result;
 }
 
-Ptr<Expr> Parser::gen_numeric()
+Ptr<IdentifierExpr> Parser::gen_ident_expr()
+{
+    return make_unique<IdentifierExpr>(gen_ident_rawstr());
+}
+
+Ptr<Expr> Parser::gen_numeric_expr()
 {
     Ptr<Expr> numeric_expr = nullptr;
     if (current_token_.type == TokenType::Integer)
@@ -983,13 +988,13 @@ Ptr<Expr> Parser::gen_numeric()
     return numeric_expr;
 }
 
-Ptr<Expr> Parser::gen_none()
+Ptr<Expr> Parser::gen_none_expr()
 {
     get_next_token();
     return make_unique<NoneExpr>();
 }
 
-Ptr<Expr> Parser::gen_boolean()
+Ptr<Expr> Parser::gen_boolean_expr()
 {
     auto bool_expr = make_unique<BoolExpr>(
         current_token_.type == TokenType::True
@@ -999,7 +1004,7 @@ Ptr<Expr> Parser::gen_boolean()
     return bool_expr;
 }
 
-Ptr<Expr> Parser::gen_string()
+Ptr<Expr> Parser::gen_string_expr()
 {
     auto string_expr = make_unique<StringExpr>(current_token_.value);
     get_next_token();
@@ -1010,7 +1015,7 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
     auto pos = tokenizer_.last_pos();
     get_next_token();
-    auto dot_expr = make_unique<DotExpr>(move(left), gen_ident());
+    auto dot_expr = make_unique<DotExpr>(move(left), gen_ident_expr());
     dot_expr->pos = pos;
     return dot_expr;
 }
@@ -1024,7 +1029,7 @@ Ptr<Expr> Parser::gen_enum_expr()
     int64_t base = 0;
     while (current_token_.type != TokenType::RBrace)
     {
-        auto ident = gen_ident();
+        auto ident = gen_ident_expr();
         if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
