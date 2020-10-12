@@ -32,7 +32,7 @@ class Parser
     Tokenizer tokenizer_;
     std::function<void()> continue_action_;
 
-    void throw_err(const String &err_info);
+    CompileError parse_error(const String &err_info);
 
     template<TokenType type>
     void check(const String &err_info)
@@ -40,7 +40,7 @@ class Parser
         try_continue();
         if (current_token_.type != type)
         {
-            throw_err(err_info);
+            parse_error(err_info);
         }
     }
 

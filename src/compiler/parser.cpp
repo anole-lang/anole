@@ -119,9 +119,9 @@ void Parser::add_infixop(const String &str, Size priority)
     operators::bops_at_priority(priority).insert(type);
 }
 
-void Parser::throw_err(const String &err_info)
+CompileError Parser::parse_error(const String &err_info)
 {
-    throw CompileError(get_err_info(err_info));
+    return CompileError(get_err_info(err_info));
 }
 
 // update current token when cannot find the next token
@@ -235,7 +235,7 @@ ParameterList Parser::gen_parameters()
             }
             else if (need_default)
             {
-                throw_err("parameter without default argument cannot follow parameter with default argument");
+                throw parse_error("parameter without default argument cannot follow parameter with default argument");
             }
             else
             {
@@ -251,7 +251,7 @@ ParameterList Parser::gen_parameters()
         {
             if (packed)
             {
-                throw_err("packed parameter should be the last parameter");
+                throw parse_error("packed parameter should be the last parameter");
             }
             get_next_token();
         }
@@ -318,7 +318,7 @@ Ptr<BlockExpr> Parser::gen_block()
     }
     else
     {
-        throw_err("expected '{' or ',' here");
+        throw parse_error("expected '{' or ',' here");
     }
 
     return block;
@@ -416,8 +416,7 @@ Ptr<Stmt> Parser::gen_stmt()
         }
         break;
     }
-    throw_err("wrong token here");
-    return nullptr;
+    throw parse_error("wrong token here");
 }
 
 // generate declaration or assignment (@var:)
@@ -478,7 +477,7 @@ Ptr<Stmt> Parser::gen_declaration()
     {
         if (is_ref)
         {
-            throw_err("& cannot be here");
+            throw parse_error("& cannot be here");
         }
 
         get_next_token();
@@ -514,7 +513,7 @@ Ptr<Stmt> Parser::gen_declaration()
     default:
         if (is_ref)
         {
-            throw_err("reference should be binded with other variable");
+            throw parse_error("reference should be binded with other variable");
         }
         break;
     }
@@ -554,7 +553,7 @@ UseStmt::Module Parser::gen_module()
     }
     else
     {
-        throw_err("need name or path of the source module after from");
+        throw parse_error("need name or path of the source module after from");
     }
     // eat `<module>`
     get_next_token();
@@ -576,7 +575,7 @@ UseStmt::Alias Parser::gen_alias()
     {
         if (alias.first.type == UseStmt::Module::Type::Path)
         {
-            throw_err("use direct path of module need an alias");
+            throw parse_error("use direct path of module need an alias");
         }
         else
         {
@@ -615,7 +614,7 @@ Ptr<Stmt> Parser::gen_use_stmt()
     {
         if (use_direct)
         {
-            throw_err("path of module cannot appear before from");
+            throw parse_error("path of module cannot appear before from");
         }
         get_next_token();
         from = gen_module();
@@ -911,8 +910,7 @@ Ptr<Expr> Parser::gen_term()
         return make_unique<LambdaExpr>(ParameterList{}, gen_block());
 
     default:
-        throw_err("expected an expr here");
-        return nullptr;
+        throw parse_error("expected an expr here");
     }
 }
 
