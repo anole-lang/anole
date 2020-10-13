@@ -17,10 +17,6 @@ class DictObject : public Object
         }
     };
 
-    /**
-     * TODO:
-     * Object *as key may cause circular reference
-    */
     using DataType = std::map<Object *, Address, ObjectCmp>;
 
     DictObject() : Object(ObjectType::Dict)
