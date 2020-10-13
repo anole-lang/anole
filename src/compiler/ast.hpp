@@ -278,9 +278,10 @@ struct ClassExpr : Expr
     Members members;
 
     ClassExpr(Ptr<IdentifierExpr> &&name,
-        ExprList &&bases)
+        ExprList &&bases, Members &&members)
       : name(std::move(name))
       , bases(std::move(bases))
+      , members(std::move(members))
     {
         // ...
     }

@@ -1096,9 +1096,17 @@ Ptr<Expr> Parser::gen_class_expr()
         name = gen_ident_expr();
     }
 
+    ClassExpr::Members members;
     eat<TokenType::LBrace>("expected '{'");
+    while (current_token_.type != TokenType::RBrace)
+    {
+        /**
+         * TODO: parse members
+        */
+    }
+    get_next_token();
 
-    return make_unique<ClassExpr>(move(name), move(bases));
+    return make_unique<ClassExpr>(move(name), move(bases), move(members));
 }
 
 /**
