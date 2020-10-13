@@ -1084,11 +1084,21 @@ Ptr<Expr> Parser::gen_class_expr()
 {
     get_next_token(); // eat 'class'
 
-    /**
-     * TODO: COMPLETE GEN_CLASS_EXPR
-    */
+    ArgumentList bases;
+    if (current_token_.type == TokenType::LParen)
+    {
+        bases = gen_arguments();
+    }
 
-    return nullptr;
+    Ptr<IdentifierExpr> name = nullptr;
+    if (current_token_.type == TokenType::Identifier)
+    {
+        name = gen_ident_expr();
+    }
+
+    eat<TokenType::LBrace>("expected '{'");
+
+    return make_unique<ClassExpr>(move(name), move(bases));
 }
 
 /**

@@ -6,6 +6,7 @@
 #include <list>
 #include <vector>
 #include <utility>
+#include <optional>
 
 namespace anole
 {
@@ -272,10 +273,17 @@ struct ClassExpr : Expr
     using Members
         = std::map<std::string, Ptr<Expr>>;
 
-    IdentList bases;
+    Ptr<IdentifierExpr> name;
+    ExprList bases;
     Members members;
 
-    // ClassExpr(...)
+    ClassExpr(Ptr<IdentifierExpr> &&name,
+        ExprList &&bases)
+      : name(std::move(name))
+      , bases(std::move(bases))
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
