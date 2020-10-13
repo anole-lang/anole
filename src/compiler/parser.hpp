@@ -3,6 +3,8 @@
 #include "ast.hpp"
 #include "tokenizer.hpp"
 
+#include "../error.hpp"
+
 #include <functional>
 
 namespace anole
