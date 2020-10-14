@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Updated
+
+- Improve AST and parser
+
 ### Removed
 
 - Remove OLD things about class such as class-declaration, new-expression and so on
