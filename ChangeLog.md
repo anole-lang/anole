@@ -4,7 +4,7 @@
 
 ### Updated
 
-- Improve AST and parser
+- Improve AST and parser by modifying a few redundant structures
 
 ### Removed
 
