@@ -19,10 +19,7 @@ using ExprList
     = std::list<Ptr<struct Expr>>
 ;
 using DeclList
-    = std::list<Ptr<struct VariableDeclarationStmt>>
-;
-using IdentList
-    = std::list<Ptr<struct IdentifierExpr>>
+    = std::list<Ptr<struct DeclarationStmt>>
 ;
 using ArgumentList
     = std::list<std::pair<Ptr<struct Expr>, bool>>
@@ -197,12 +194,11 @@ struct LambdaExpr : Expr
 struct DotExpr : Expr
 {
     Ptr<Expr> left;
-    Ptr<IdentifierExpr> id;
+    std::string name;
 
-    DotExpr(Ptr<Expr> &&left,
-        Ptr<IdentifierExpr> &&id)
+    DotExpr(Ptr<Expr> &&left, std::string name)
       : left(std::move(left))
-      , id(std::move(id))
+      , name(std::move(name))
     {
         // ...
     }
@@ -212,7 +208,7 @@ struct DotExpr : Expr
 
 struct EnumExpr : Expr
 {
-    DeclList decls;
+    std::list<struct VariableDeclarationStmt> decls;
 
     EnumExpr() noexcept = default;
 
@@ -266,19 +262,13 @@ struct DictExpr : Expr
 
 struct ClassExpr : Expr
 {
-    /**
-     * TODO:
-    */
+    std::string name;
+    ArgumentList bases;
+    DeclList members;
 
-    using Members
-        = std::map<std::string, Ptr<Expr>>;
-
-    Ptr<IdentifierExpr> name;
-    ExprList bases;
-    Members members;
-
-    ClassExpr(Ptr<IdentifierExpr> &&name,
-        ExprList &&bases, Members &&members)
+    ClassExpr(std::string name,
+        ArgumentList &&bases,
+        DeclList &&members)
       : name(std::move(name))
       , bases(std::move(bases))
       , members(std::move(members))
@@ -366,17 +356,21 @@ struct ExprStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct VariableDeclarationStmt : Stmt
+struct DeclarationStmt : Stmt
 {
-    Ptr<IdentifierExpr> id;
+    virtual ~DeclarationStmt() = 0;
+    virtual void codegen(Code &) = 0;
+};
+
+struct VariableDeclarationStmt : DeclarationStmt
+{
+    std::string name;
     Ptr<Expr> expr;
     bool is_ref;
 
-    VariableDeclarationStmt(
-        Ptr<IdentifierExpr> &&id,
-        Ptr<Expr> &&expr,
-        bool is_ref = false)
-      : id(std::move(id))
+    VariableDeclarationStmt(std::string name,
+        Ptr<Expr> &&expr, bool is_ref = false)
+      : name(std::move(name))
       , expr(std::move(expr))
       , is_ref(is_ref)
     {
@@ -386,7 +380,7 @@ struct VariableDeclarationStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct MultiVarsDeclarationStmt : Stmt
+struct MultiVarsDeclarationStmt : DeclarationStmt
 {
     // just reuse VariableDeclarationStmt
     std::list<VariableDeclarationStmt> decls;
@@ -404,29 +398,12 @@ struct MultiVarsDeclarationStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct FunctionDeclarationStmt : Stmt
-{
-    Ptr<IdentifierExpr> id;
-    Ptr<LambdaExpr> lambda;
-
-    FunctionDeclarationStmt(
-        Ptr<IdentifierExpr> &&id,
-        Ptr<LambdaExpr> &&lambda)
-      : id(std::move(id))
-      , lambda(std::move(lambda))
-    {
-        // ...
-    }
-
-    void codegen(Code &) override;
-};
-
 struct PrefixopDeclarationStmt : Stmt
 {
-    Ptr<IdentifierExpr> id;
+    std::string op;
 
-    PrefixopDeclarationStmt(Ptr<IdentifierExpr> &&id)
-      : id(std::move(id))
+    PrefixopDeclarationStmt(std::string op)
+      : op(std::move(op))
     {
         // ...
     }
@@ -437,11 +414,10 @@ struct PrefixopDeclarationStmt : Stmt
 struct InfixopDeclarationStmt : Stmt
 {
     Size priority;
-    Ptr<IdentifierExpr> id;
+    std::string op;
 
-    InfixopDeclarationStmt(Ptr<IdentifierExpr> &&id,
-        Size priority)
-      : priority(priority), id(std::move(id))
+    InfixopDeclarationStmt(std::string op, Size priority)
+      : priority(priority), op(std::move(op))
     {
         // ...
     }
@@ -526,14 +502,14 @@ struct DoWhileStmt : Stmt
 struct ForeachStmt : Stmt
 {
     Ptr<Expr> expr;
-    Ptr<IdentifierExpr> id;
+    std::string varname;
     Ptr<BlockExpr> block;
 
     ForeachStmt(Ptr<Expr> &&expr,
-        Ptr<IdentifierExpr> &&id,
+        std::string varname,
         Ptr<BlockExpr> &&block)
       : expr(std::move(expr))
-      , id(std::move(id))
+      , varname(std::move(varname))
       , block(std::move(block))
     {
         // ...
