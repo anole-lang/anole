@@ -12,6 +12,7 @@ namespace anole
 AST::~AST() = default;
 Stmt::~Stmt() = default;
 Expr::~Expr() = default;
+DeclarationStmt::~DeclarationStmt() = default;
 
 bool AST::is_integer_expr()
 {
@@ -347,7 +348,7 @@ void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
     code.mapping(pos);
-    code.add_ins<Opcode::LoadMember, String>(id->name);
+    code.add_ins<Opcode::LoadMember, String>(name);
 }
 
 void EnumExpr::codegen(Code &code)
@@ -355,8 +356,8 @@ void EnumExpr::codegen(Code &code)
     code.add_ins<Opcode::NewScope>();
     for (auto &decl : decls)
     {
-        decl->expr->codegen(code);
-        code.add_ins<Opcode::StoreRef, String>(decl->id->name);
+        decl.expr->codegen(code);
+        code.add_ins<Opcode::StoreRef, String>(decl.name);
     }
     code.add_ins<Opcode::BuildEnum>();
 }
@@ -427,6 +428,13 @@ void DictExpr::codegen(Code &code)
         ++rbegin_values; ++rbegin_keys;
     }
     code.add_ins<Opcode::BuildDict, Size>(keys.size());
+}
+
+void ClassExpr::codegen(Code &code)
+{
+    /**
+     * TODO:
+    */
 }
 
 void DelayExpr::codegen(Code &code)
@@ -521,11 +529,11 @@ void VariableDeclarationStmt::codegen(Code &code)
 
     if (is_ref)
     {
-        code.add_ins<Opcode::StoreRef, String>(id->name);
+        code.add_ins<Opcode::StoreRef, String>(name);
     }
     else
     {
-        code.add_ins<Opcode::StoreLocal, String>(id->name);
+        code.add_ins<Opcode::StoreLocal, String>(name);
     }
 }
 
@@ -550,29 +558,23 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
     {
         if (decl.is_ref)
         {
-            code.add_ins<Opcode::StoreRef, String>(decl.id->name);
+            code.add_ins<Opcode::StoreRef, String>(decl.name);
         }
         else
         {
-            code.add_ins<Opcode::StoreLocal, String>(decl.id->name);
+            code.add_ins<Opcode::StoreLocal, String>(decl.name);
         }
     }
 }
 
-void FunctionDeclarationStmt::codegen(Code &code)
-{
-    lambda->codegen(code);
-    code.add_ins<Opcode::StoreRef, String>(id->name);
-}
-
 void PrefixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddPrefixOp, String>(id->name);
+    code.add_ins<Opcode::AddPrefixOp, String>(op);
 }
 
 void InfixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(id->name, priority));
+    code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(op, priority));
 }
 
 void BreakStmt::codegen(Code &code)
@@ -663,23 +665,23 @@ void ForeachStmt::codegen(Code &code)
      * generate ast for cond: __it.__has_next__()
     */
     auto cond = make_unique<ParenOperatorExpr>(
-        make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
-            make_unique<IdentifierExpr>("__has_next__")
+        make_unique<DotExpr>(
+            make_unique<IdentifierExpr>("__it"), "__has_next__"
         ),
         ArgumentList()
     );
 
     block->statements.push_front(nullptr);
     auto next = make_unique<ParenOperatorExpr>(
-        make_unique<DotExpr>(make_unique<IdentifierExpr>("__it"),
-            make_unique<IdentifierExpr>("__next__")
+        make_unique<DotExpr>(
+            make_unique<IdentifierExpr>("__it"), "__next__"
         ),
         ArgumentList()
     );
-    if (id != nullptr)
+    if (!varname.empty())
     {
         *block->statements.begin() = make_unique<VariableDeclarationStmt>(
-            move(id), move(next), true
+            varname, move(next), true
         );
     }
     else
