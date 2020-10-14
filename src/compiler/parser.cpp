@@ -144,24 +144,6 @@ String Parser::get_err_info(const String &message)
     return tokenizer_.get_err_info(message);
 }
 
-IdentList Parser::gen_idents()
-{
-    IdentList idents;
-    while (current_token_.type != TokenType::RParen)
-    {
-        idents.push_back(gen_ident_expr());
-        if (current_token_.type == TokenType::Comma)
-        {
-            get_next_token();
-        }
-        else
-        {
-            check<TokenType::RParen>("expected ')' here");
-        }
-    }
-    return idents;
-}
-
 ArgumentList Parser::gen_arguments()
 {
     ArgumentList args;
@@ -210,7 +192,7 @@ ParameterList Parser::gen_parameters()
             }
 
             auto decl = make_unique<VariableDeclarationStmt>(
-                gen_ident_expr(), nullptr, is_ref
+                gen_ident_rawstr(), nullptr, is_ref
             );
             parameters.push_back(make_pair(move(decl), true));
         }
@@ -223,7 +205,7 @@ ParameterList Parser::gen_parameters()
                 get_next_token();
             }
 
-            auto ident = gen_ident_expr();
+            auto ident = gen_ident_rawstr();
             Ptr<VariableDeclarationStmt> decl = nullptr;
             if (current_token_.type == TokenType::Colon)
             {
@@ -429,13 +411,13 @@ Ptr<Stmt> Parser::gen_declaration()
         get_next_token();
     }
 
-    auto id = gen_ident_expr();
+    auto name = gen_ident_rawstr();
     switch (current_token_.type)
     {
     case TokenType::Comma:
     {
         list<VariableDeclarationStmt> decls;
-        decls.emplace_back(move(id), nullptr, is_ref);
+        decls.emplace_back(move(name), nullptr, is_ref);
 
         while (current_token_.type == TokenType::Comma)
         {
@@ -446,7 +428,7 @@ Ptr<Stmt> Parser::gen_declaration()
                 is_ref = true;
                 get_next_token();
             }
-            decls.emplace_back(gen_ident_expr(), nullptr, is_ref);
+            decls.emplace_back(gen_ident_rawstr(), nullptr, is_ref);
         }
 
         // @var1, ..., varn
@@ -470,7 +452,7 @@ Ptr<Stmt> Parser::gen_declaration()
     case TokenType::Colon:
         get_next_token();
         return make_unique<VariableDeclarationStmt>(
-            move(id), gen_delay_expr(), is_ref
+            move(name), gen_delay_expr(), is_ref
         );
 
     case TokenType::LParen:
@@ -505,8 +487,8 @@ Ptr<Stmt> Parser::gen_declaration()
         {
             block = gen_block();
         }
-        return make_unique<FunctionDeclarationStmt>(move(id),
-            make_unique<LambdaExpr>(move(parameters), move(block))
+        return make_unique<VariableDeclarationStmt>(move(name),
+            make_unique<LambdaExpr>(move(parameters), move(block)), true
         );
     }
 
@@ -517,14 +499,14 @@ Ptr<Stmt> Parser::gen_declaration()
         }
         break;
     }
-    return make_unique<VariableDeclarationStmt>(move(id), make_unique<NoneExpr>());
+    return make_unique<VariableDeclarationStmt>(move(name), make_unique<NoneExpr>());
 }
 
 Ptr<Stmt> Parser::gen_prefixop_decl()
 {
     get_next_token();
     check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<PrefixopDeclarationStmt>(gen_ident_expr());
+    return make_unique<PrefixopDeclarationStmt>(gen_ident_rawstr());
 }
 
 Ptr<Stmt> Parser::gen_infixop_decl()
@@ -537,7 +519,7 @@ Ptr<Stmt> Parser::gen_infixop_decl()
         get_next_token();
     }
     check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<InfixopDeclarationStmt>(gen_ident_expr(), priority);
+    return make_unique<InfixopDeclarationStmt>(gen_ident_rawstr(), priority);
 }
 
 UseStmt::Module Parser::gen_module()
@@ -688,18 +670,19 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
     get_next_token();
 
     auto expression = gen_expr();
-    Ptr<IdentifierExpr> id = nullptr;
 
+    string varname;
     if (current_token_.type == TokenType::As)
     {
         get_next_token();
         check<TokenType::Identifier>("expected an identifier here");
-        id = gen_ident_expr();
+        varname = gen_ident_rawstr();
     }
 
     auto block = gen_block();
     return make_unique<ForeachStmt>(
-        move(expression), move(id), move(block));
+        move(expression), move(varname), move(block)
+    );
 }
 
 Ptr<Stmt> Parser::gen_return_stmt()
@@ -1013,7 +996,7 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
     auto pos = tokenizer_.last_pos();
     get_next_token();
-    auto dot_expr = make_unique<DotExpr>(move(left), gen_ident_expr());
+    auto dot_expr = make_unique<DotExpr>(move(left), gen_ident_rawstr());
     dot_expr->pos = pos;
     return dot_expr;
 }
@@ -1027,7 +1010,7 @@ Ptr<Expr> Parser::gen_enum_expr()
     int64_t base = 0;
     while (current_token_.type != TokenType::RBrace)
     {
-        auto ident = gen_ident_expr();
+        auto ident = gen_ident_rawstr();
         if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
@@ -1035,10 +1018,8 @@ Ptr<Expr> Parser::gen_enum_expr()
             base = stoll(current_token_.value);
             get_next_token();
         }
-        enum_expr->decls.push_back(
-            make_unique<VariableDeclarationStmt>(move(ident),
-                make_unique<IntegerExpr>(base++), true
-            )
+        enum_expr->decls.emplace_back(move(ident),
+            make_unique<IntegerExpr>(base++), true
         );
 
         if (current_token_.type == TokenType::Comma)
@@ -1090,13 +1071,13 @@ Ptr<Expr> Parser::gen_class_expr()
         bases = gen_arguments();
     }
 
-    Ptr<IdentifierExpr> name = nullptr;
+    string name;
     if (current_token_.type == TokenType::Identifier)
     {
-        name = gen_ident_expr();
+        name = gen_ident_rawstr();
     }
 
-    ClassExpr::Members members;
+    DeclList members;
     eat<TokenType::LBrace>("expected '{'");
     while (current_token_.type != TokenType::RBrace)
     {

@@ -57,7 +57,6 @@ class Parser
     void try_continue();
     String get_err_info(const String &message);
 
-    IdentList gen_idents();
     ArgumentList gen_arguments();
     ParameterList gen_parameters();
 
