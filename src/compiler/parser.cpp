@@ -251,10 +251,15 @@ Ptr<BlockExpr> Parser::gen_stmts()
     auto stmts = make_unique<BlockExpr>();
     while (current_token_.type != TokenType::End)
     {
-        stmts->statements.push_back(gen_stmt());
         while (current_token_.type == TokenType::Semicolon)
         {
             get_next_token();
+        }
+
+        auto stmt = gen_stmt();
+        if (stmt)
+        {
+            stmts->statements.emplace_back(move(stmt));
         }
     }
     return stmts;
@@ -1081,9 +1086,17 @@ Ptr<Expr> Parser::gen_class_expr()
     eat<TokenType::LBrace>("expected '{'");
     while (current_token_.type != TokenType::RBrace)
     {
-        /**
-         * TODO: parse members
-        */
+        while (current_token_.type == TokenType::Semicolon)
+        {
+            get_next_token();
+        }
+
+        if (current_token_.type == TokenType::RBrace)
+        {
+            break;
+        }
+
+        members.emplace_back(gen_declaration());
     }
     get_next_token();
 
