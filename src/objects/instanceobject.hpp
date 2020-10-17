@@ -9,6 +9,8 @@ class InstanceObject : public Object
   public:
     InstanceObject();
 
+    Address load_member(const String &name) override;
+
     SPtr<Scope> &scope() { return scope_; }
 
   private:

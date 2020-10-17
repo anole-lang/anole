@@ -35,7 +35,9 @@ enum ObjectType : int
     Cont,
     AnoleModule,
     CppModule,
-    Class
+    Class,
+    Method,
+    Instance,
 };
 }
 using object_type::ObjectType;
@@ -85,6 +87,7 @@ class Object
     virtual Address load_member(const String &name);
 
     virtual void call(Size num);
+    virtual bool is_callable();
 
     virtual void collect(std::function<void(Scope *)>);
     virtual void collect(std::function<void(Object *)>);

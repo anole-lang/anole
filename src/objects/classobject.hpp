@@ -13,6 +13,7 @@ class ClassObject : public Object
         SPtr<Scope> pre_scope
     );
 
+    Address load_member(const String &name) override;
     void call(Size num) override;
 
     // collect

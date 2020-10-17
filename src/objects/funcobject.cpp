@@ -135,6 +135,11 @@ void FunctionObject::call(Size num)
     }
 }
 
+bool FunctionObject::is_callable()
+{
+    return true;
+}
+
 void FunctionObject::collect(function<void(Scope *)> func)
 {
     func(scope_.get());

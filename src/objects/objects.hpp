@@ -12,6 +12,7 @@
 #include "thunkobject.hpp"
 #include "floatobject.hpp"
 #include "moduleobject.hpp"
+#include "methodobject.hpp"
 #include "stringobject.hpp"
 #include "integerobject.hpp"
 #include "instanceobject.hpp"
