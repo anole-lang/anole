@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+
+- Instruction `EndScope`
+- Insturction `BuildClass`
+
 ### Updated
 
 - Improve AST and parser by modifying a few redundant structures
