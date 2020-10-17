@@ -364,11 +364,11 @@ struct DeclarationStmt : Stmt
 
 struct VariableDeclarationStmt : DeclarationStmt
 {
-    std::string name;
+    String name;
     Ptr<Expr> expr;
     bool is_ref;
 
-    VariableDeclarationStmt(std::string name,
+    VariableDeclarationStmt(String name,
         Ptr<Expr> &&expr, bool is_ref = false)
       : name(std::move(name))
       , expr(std::move(expr))

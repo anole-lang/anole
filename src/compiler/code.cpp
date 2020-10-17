@@ -322,6 +322,9 @@ void Code::print(ostream &out)
             printer.add_line(i, "StoreLocal", OPRAND(String));
             break;
 
+        case Opcode::NewScope:
+            printer.add_line(i, "NewScope");
+            break;
         case Opcode::EndScope:
             printer.add_line(i, "EndScope");
             break;

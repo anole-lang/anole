@@ -452,6 +452,36 @@ void ClassExpr::codegen(Code &code)
     for (auto &member : members)
     {
         member->codegen(code);
+
+        if (dynamic_cast<VariableDeclarationStmt *>(member.get()))
+        {
+            auto decl = dynamic_cast<VariableDeclarationStmt *>(member.get());
+            if (decl->name == "__init__")
+            {
+                if (!dynamic_cast<LambdaExpr *>(decl->expr.get()))
+                {
+                    throw CompileError("__init__ must be with function body");
+                }
+                else
+                {
+
+                }
+            }
+        }
+        else
+        {
+            auto decls = dynamic_cast<MultiVarsDeclarationStmt *>(member.get());
+            for (auto &decl : decls->decls)
+            {
+                if (decl.name == "__init__")
+                {
+                    if (!dynamic_cast<LambdaExpr *>(decl.expr.get()))
+                    {
+                        throw CompileError("__init__ must be with function body");
+                    }
+                }
+            }
+        }
     }
 
     code.add_ins<Opcode::EndScope>();

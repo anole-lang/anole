@@ -693,6 +693,13 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
 Ptr<Stmt> Parser::gen_return_stmt()
 {
     get_next_token();
+    try_continue();
+
+    if (current_token_.type == TokenType::Semicolon)
+    {
+        get_next_token();
+        return make_unique<ReturnStmt>(ExprList());
+    }
 
     ExprList exprs;
     exprs.push_back(gen_delay_expr());
@@ -1091,12 +1098,57 @@ Ptr<Expr> Parser::gen_class_expr()
             get_next_token();
         }
 
+        try_continue();
         if (current_token_.type == TokenType::RBrace)
         {
             break;
         }
 
-        members.emplace_back(gen_declaration());
+        auto decl = gen_declaration();
+
+        /**
+         * that the member's name is __init__
+         *  means it is the special constructor without return-values
+         *
+         * this will be promised by allowing only definition with function body
+        */
+        if (dynamic_cast<VariableDeclarationStmt *>(decl.get()))
+        {
+            auto vardecl = reinterpret_cast<VariableDeclarationStmt *>(decl.get());
+            if (vardecl->name == "__init__")
+            {
+                if (!dynamic_cast<LambdaExpr *>(vardecl->expr.get()))
+                {
+                    throw CompileError("__init__ must be with function body");
+                }
+                else
+                {
+                    auto block = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->block.get();
+                    block->statements.push_back(make_unique<ReturnStmt>(ExprList()));
+                }
+            }
+        }
+        else
+        {
+            auto muldecl = reinterpret_cast<MultiVarsDeclarationStmt *>(decl.get());
+            for (auto &vardecl : muldecl->decls)
+            {
+                if (vardecl.name == "__init__")
+                {
+                    if (!dynamic_cast<LambdaExpr *>(vardecl.expr.get()))
+                    {
+                        throw CompileError("__init__ must be with function body");
+                    }
+                    else
+                    {
+                        auto block = reinterpret_cast<LambdaExpr *>(vardecl.expr.get())->block.get();
+                        block->statements.push_back(make_unique<ReturnStmt>(ExprList()));
+                    }
+                }
+            }
+        }
+
+        members.emplace_back(move(decl));
     }
     get_next_token();
 

@@ -42,7 +42,7 @@ class Parser
         try_continue();
         if (current_token_.type != type)
         {
-            parse_error(err_info);
+            throw parse_error(err_info);
         }
     }
 
