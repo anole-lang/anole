@@ -378,3 +378,33 @@ R"(start
 running
 )");
 }
+
+TEST(Sample, SimpleClass)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
+@Student: class {
+    age: 10;
+    __init__(self) {
+        self.name: "unknown";
+    };
+};
+
+stu: Student();
+println(Student.age);
+println(stu.age);
+println(stu.name);
+stu.age: 20;
+println(Student.age);
+println(stu.age);
+)"),
+
+// output
+R"(10
+10
+unknown
+10
+20
+)");
+}
