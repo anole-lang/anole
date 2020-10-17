@@ -456,7 +456,8 @@ void return_handle()
 {
     auto n = Context::current()->get_return_vals_num();
     auto pre_context = Context::current()->pre_context();
-    if (Context::current()->get_stack() != pre_context->get_stack())
+
+    if (n != 0 && Context::current()->get_stack() != pre_context->get_stack())
     {
         auto pre_stack = pre_context->get_stack();
         auto cur_stack = Context::current()->get_stack();
@@ -810,6 +811,7 @@ void buildclass_handle()
     }
 
     Context::current()->push(cls);
+    // declare members in the new scope of the class
     Context::current()->scope() = cls->scope();
     ++Context::current()->pc();
 }
@@ -837,6 +839,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::storelocal_handle,
 
     &op_handles::newscope_handle,
+    &op_handles::endscope_handle,
 
     &op_handles::callac_handle,
     &op_handles::call_handle,
@@ -884,6 +887,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::buildenum_handle,
     &op_handles::buildlist_handle,
     &op_handles::builddict_handle,
+    &op_handles::buildclass_handle,
 };
 
 void Context::execute()
