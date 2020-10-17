@@ -430,11 +430,31 @@ void DictExpr::codegen(Code &code)
     code.add_ins<Opcode::BuildDict, Size>(keys.size());
 }
 
+/**
+ * loaded bases...
+ * BuildClass
+ * load and store members...
+ * EndScope
+*/
 void ClassExpr::codegen(Code &code)
 {
-    /**
-     * TODO:
-    */
+    code.add_ins<Opcode::CallAc>();
+    for (auto it = bases.rbegin(); it != bases.rend(); ++it)
+    {
+        (*it).first->codegen(code);
+        if ((*it).second)
+        {
+            code.add_ins<Opcode::Unpack>();
+        }
+    }
+    code.add_ins<Opcode::BuildClass>(name);
+
+    for (auto &member : members)
+    {
+        member->codegen(code);
+    }
+
+    code.add_ins<Opcode::EndScope>();
 }
 
 void DelayExpr::codegen(Code &code)

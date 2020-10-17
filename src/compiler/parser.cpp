@@ -407,7 +407,7 @@ Ptr<Stmt> Parser::gen_stmt()
 }
 
 // generate declaration or assignment (@var:)
-Ptr<Stmt> Parser::gen_declaration()
+Ptr<DeclarationStmt> Parser::gen_declaration()
 {
     bool is_ref = false;
     if (current_token_.type == TokenType::BAnd)
@@ -946,7 +946,7 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
     return expr;
 }
 
-string Parser::gen_ident_rawstr()
+String Parser::gen_ident_rawstr()
 {
     check<TokenType::Identifier>("expect an identifier here");
     auto result = current_token_.value;

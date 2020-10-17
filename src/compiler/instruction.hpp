@@ -4,7 +4,9 @@
 
 namespace anole
 {
-enum Opcode
+namespace opcode
+{
+enum Opcode : uint8_t
 {
     PlaceHolder,
 
@@ -24,6 +26,7 @@ enum Opcode
     StoreLocal,   // StoreLocal name
 
     NewScope,     // NewScope
+    EndScope,     // EndScope
 
     CallAc,       // CallAc
     Call,         // Call
@@ -71,7 +74,10 @@ enum Opcode
     BuildEnum,    // BuildEnum
     BuildList,    // BuildList num
     BuildDict,    // BuildDict num
+    BuildClass,   // BuildClass name
 };
+}
+using opcode::Opcode;
 
 struct Instruction
 {

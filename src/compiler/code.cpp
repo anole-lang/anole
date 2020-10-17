@@ -322,8 +322,8 @@ void Code::print(ostream &out)
             printer.add_line(i, "StoreLocal", OPRAND(String));
             break;
 
-        case Opcode::NewScope:
-            printer.add_line(i, "NewScope");
+        case Opcode::EndScope:
+            printer.add_line(i, "EndScope");
             break;
 
         case Opcode::CallAc:
@@ -455,6 +455,9 @@ void Code::print(ostream &out)
         case Opcode::BuildDict:
             printer.add_line(i, "BuildDict", OPRAND(Size));
             break;
+        case Opcode::BuildClass:
+            printer.add_line(i, "BuildClass", OPRAND(String));
+            break;
         }
     }
     printer.print();
@@ -524,6 +527,7 @@ void Code::serialize(ostream &out)
         case Opcode::StoreRef:
         case Opcode::StoreLocal:
         case Opcode::AddPrefixOp:
+        case Opcode::BuildClass:
             typeout(out, OPRAND(String));
             break;
 
@@ -643,6 +647,7 @@ bool Code::unserialize(ifstream &in)
         case Opcode::StoreRef:
         case Opcode::StoreLocal:
         case Opcode::AddPrefixOp:
+        case Opcode::BuildClass:
         {
             String val;
             typein(in, val);

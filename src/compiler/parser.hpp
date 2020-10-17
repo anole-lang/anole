@@ -64,7 +64,7 @@ class Parser
     Ptr<BlockExpr> gen_block();
 
     Ptr<Stmt> gen_stmt();
-    Ptr<Stmt> gen_declaration();
+    Ptr<DeclarationStmt> gen_declaration();
     Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();
     UseStmt::Module gen_module();
@@ -81,7 +81,7 @@ class Parser
     Ptr<Expr> gen_expr(int layer = -1);
     Ptr<Expr> gen_term();
     Ptr<Expr> gen_term_tail(Ptr<Expr> expr);
-    std::string gen_ident_rawstr();
+    String gen_ident_rawstr();
     Ptr<IdentifierExpr> gen_ident_expr();
     Ptr<Expr> gen_numeric_expr();
     Ptr<Expr> gen_none_expr();

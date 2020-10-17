@@ -262,11 +262,11 @@ struct DictExpr : Expr
 
 struct ClassExpr : Expr
 {
-    std::string name;
+    String name;
     ArgumentList bases;
     DeclList members;
 
-    ClassExpr(std::string name,
+    ClassExpr(String name,
         ArgumentList &&bases,
         DeclList &&members)
       : name(std::move(name))
