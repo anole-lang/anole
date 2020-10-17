@@ -3,6 +3,8 @@
 #include "ast.hpp"
 #include "tokenizer.hpp"
 
+#include "../error.hpp"
+
 #include <functional>
 
 namespace anole
@@ -32,7 +34,7 @@ class Parser
     Tokenizer tokenizer_;
     std::function<void()> continue_action_;
 
-    void throw_err(const String &err_info);
+    CompileError parse_error(const String &err_info);
 
     template<TokenType type>
     void check(const String &err_info)
@@ -40,7 +42,7 @@ class Parser
         try_continue();
         if (current_token_.type != type)
         {
-            throw_err(err_info);
+            throw parse_error(err_info);
         }
     }
 
@@ -55,7 +57,6 @@ class Parser
     void try_continue();
     String get_err_info(const String &message);
 
-    IdentList gen_idents();
     ArgumentList gen_arguments();
     ParameterList gen_parameters();
 
@@ -63,7 +64,7 @@ class Parser
     Ptr<BlockExpr> gen_block();
 
     Ptr<Stmt> gen_stmt();
-    Ptr<Stmt> gen_declaration();
+    Ptr<DeclarationStmt> gen_declaration();
     Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();
     UseStmt::Module gen_module();
@@ -80,17 +81,18 @@ class Parser
     Ptr<Expr> gen_expr(int layer = -1);
     Ptr<Expr> gen_term();
     Ptr<Expr> gen_term_tail(Ptr<Expr> expr);
-    Ptr<IdentifierExpr> gen_ident();
-    Ptr<Expr> gen_numeric();
-    Ptr<Expr> gen_none();
-    Ptr<Expr> gen_boolean();
-    Ptr<Expr> gen_string();
+    String gen_ident_rawstr();
+    Ptr<IdentifierExpr> gen_ident_expr();
+    Ptr<Expr> gen_numeric_expr();
+    Ptr<Expr> gen_none_expr();
+    Ptr<Expr> gen_boolean_expr();
+    Ptr<Expr> gen_string_expr();
     Ptr<Expr> gen_dot_expr(Ptr<Expr> left);
     Ptr<Expr> gen_index_expr(Ptr<Expr> expr);
     Ptr<Expr> gen_enum_expr();
     Ptr<Expr> gen_dict_expr();
+    Ptr<Expr> gen_class_expr();
     Ptr<Expr> gen_lambda_expr();
-    Ptr<Expr> gen_new_expr();
     Ptr<Expr> gen_match_expr();
     Ptr<Expr> gen_list_expr();
 };

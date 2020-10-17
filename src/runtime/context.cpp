@@ -405,6 +405,13 @@ void newscope_handle()
     ++Context::current()->pc();
 }
 
+void endscope_handle()
+{
+    auto &cur_scope = Context::current()->scope();
+    cur_scope = cur_scope->pre();
+    ++Context::current()->pc();
+}
+
 void callac_handle()
 {
     Context::current()->set_call_anchor();
@@ -449,7 +456,8 @@ void return_handle()
 {
     auto n = Context::current()->get_return_vals_num();
     auto pre_context = Context::current()->pre_context();
-    if (Context::current()->get_stack() != pre_context->get_stack())
+
+    if (n != 0 && Context::current()->get_stack() != pre_context->get_stack())
     {
         auto pre_stack = pre_context->get_stack();
         auto cur_stack = Context::current()->get_stack();
@@ -740,10 +748,14 @@ void index_handle()
 
 void buildenum_handle()
 {
-    Context::current()->push(Allocator<Object>::alloc<EnumObject>(
+    auto enm = Allocator<Object>::alloc<EnumObject>(
         Context::current()->scope()
-    ));
+    );
     Context::current()->scope() = Context::current()->scope()->pre();
+
+    enm->scope()->pre() = nullptr;;
+    Context::current()->push(enm);
+
     ++Context::current()->pc();
 }
 
@@ -771,6 +783,38 @@ void builddict_handle()
     Context::current()->push(dict);
     ++Context::current()->pc();
 }
+
+void buildclass_handle()
+{
+    auto name = OPRAND(String);
+    auto cls = Allocator<Object>::alloc<ClassObject>(
+        name, Context::current()->scope()
+    );
+
+    auto bases_num = Context::current()->get_call_args_num();
+    for (Size i = 0; i < bases_num; ++i)
+    {
+        auto base = Context::current()->pop_ptr();
+
+        if (auto base_cls = dynamic_cast<ClassObject *>(base))
+        {
+            auto &scope = base_cls->scope();
+            for (auto &sym_addr : scope->symbols())
+            {
+                cls->scope()->create_symbol(sym_addr.first, sym_addr.second->ptr());
+            }
+        }
+        else
+        {
+            throw RuntimeError("each base of one class must be one class");
+        }
+    }
+
+    Context::current()->push(cls);
+    // declare members in the new scope of the class
+    Context::current()->scope() = cls->scope();
+    ++Context::current()->pc();
+}
 }
 
 using OpHandle = void (*)();
@@ -795,6 +839,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::storelocal_handle,
 
     &op_handles::newscope_handle,
+    &op_handles::endscope_handle,
 
     &op_handles::callac_handle,
     &op_handles::call_handle,
@@ -842,6 +887,7 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::buildenum_handle,
     &op_handles::buildlist_handle,
     &op_handles::builddict_handle,
+    &op_handles::buildclass_handle,
 };
 
 void Context::execute()

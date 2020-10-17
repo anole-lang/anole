@@ -21,6 +21,7 @@ class FunctionObject : public Object
     String to_str() override;
     Address load_member(const String &name) override;
     void call(Size num) override;
+    bool is_callable() override;
 
     void collect(std::function<void(Scope *)>) override;
 

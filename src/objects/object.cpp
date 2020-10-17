@@ -182,6 +182,11 @@ void Object::call(Size arg_num)
     throw RuntimeError("failed call with the given non-function");
 }
 
+bool Object::is_callable()
+{
+    return false;
+}
+
 void Object::collect(function<void(Scope *)>)
 {
     // ...

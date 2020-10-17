@@ -65,6 +65,7 @@ map<String, TokenType> lc_mapping
 
     { "enum",       TokenType::Enum     },
     { "dict",       TokenType::Dict     },
+    { "class",      TokenType::Class    },
 
     { "none",       TokenType::None     },
     { "true",       TokenType::True     },

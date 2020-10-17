@@ -18,6 +18,7 @@ class Scope
     SPtr<Scope> &pre();
 
     Address create_symbol(const String &name);
+    void create_symbol(const String &name, Object *);
     void create_symbol(const String &name, Address value);
 
     Address load_symbol(const String &name);

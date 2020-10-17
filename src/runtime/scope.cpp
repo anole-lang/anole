@@ -32,6 +32,11 @@ Address Scope::create_symbol(const String &name)
     return symbols_[name];
 }
 
+void Scope::create_symbol(const String &name, Object *obj)
+{
+    symbols_[name] = make_shared<Variable>(obj);
+}
+
 void Scope::create_symbol(const String &name, Address value)
 {
     symbols_[name] = value;

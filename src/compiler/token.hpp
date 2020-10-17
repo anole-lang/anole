@@ -14,7 +14,7 @@ namespace anole
 */
 namespace token_type
 {
-enum TokenType : int
+enum TokenType : uint32_t
 {
     At,        // @
 
@@ -37,6 +37,7 @@ enum TokenType : int
 
     Enum,      // enum
     Dict,      // dict
+    Class,     // class
 
     None,      // none
     True,      // true
