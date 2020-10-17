@@ -4,12 +4,21 @@
 
 ### Added
 
-- Instruction `EndScope`
-- Insturction `BuildClass`
+- Instructions `EndScope/BuildClass` for creating class-objects
+- New builtin objects such as ClassObject, InstanceObject and MethodObject to support OOP
+- Support OOP mentioned in [PROPOSAL](https://github.com/anole-lang/anole/issues/20) now!!!
+
+### Changed
+
+- Return statement can return nothing now by `return ;`
 
 ### Updated
 
 - Improve AST and parser by modifying a few redundant structures
+
+### Fixed
+
+- Fix bug in checking type of token
 
 ### Removed
 
