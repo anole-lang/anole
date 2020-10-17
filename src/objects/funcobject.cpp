@@ -13,7 +13,7 @@ FunctionObject::FunctionObject(SPtr<Scope> pre_scope,
     SPtr<Code> code, Size base,
     Size parameter_num)
   : Object(ObjectType::Func)
-  , scope_(std::make_shared<Scope>(pre_scope))
+  , scope_(make_shared<Scope>(pre_scope))
   , code_(code), base_(base)
   , parameter_num_(parameter_num)
 {

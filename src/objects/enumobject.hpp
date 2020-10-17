@@ -20,6 +20,8 @@ class EnumObject : public Object
 
     void collect(std::function<void(Scope *)>) override;
 
+    SPtr<Scope> &scope() { return scope_; }
+
   private:
     SPtr<Scope> scope_;
 };

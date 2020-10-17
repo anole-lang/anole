@@ -34,7 +34,8 @@ enum ObjectType : int
     Thunk,
     Cont,
     AnoleModule,
-    CppModule
+    CppModule,
+    Class
 };
 }
 using object_type::ObjectType;
