@@ -1,3 +1,6 @@
+#ifndef __TEST_SAMPLETESTER_HPP__
+#define __TEST_SAMPLETESTER_HPP__
+
 #include "../src/anole.hpp"
 
 #include <gtest/gtest.h>
@@ -408,3 +411,5 @@ unknown
 20
 )");
 }
+
+#endif

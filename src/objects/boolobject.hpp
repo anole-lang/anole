@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_BOOL_HPP__
+#define __ANOLE_OBJECTS_BOOL_HPP__
 
 #include "object.hpp"
 
@@ -28,3 +29,5 @@ class BoolObject : public Object
     bool value_;
 };
 }
+
+#endif

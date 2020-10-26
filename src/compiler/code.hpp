@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_COMPILER_CODE_HPP__
+#define __ANOLE_COMPILER_CODE_HPP__
 
 #include "ast.hpp"
 #include "instruction.hpp"
@@ -137,3 +138,5 @@ class Code
     std::vector<Object *> constants_;
 };
 }
+
+#endif

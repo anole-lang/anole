@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_COMPILER_PARSER_HPP__
+#define __ANOLE_COMPILER_PARSER_HPP__
 
 #include "ast.hpp"
 #include "tokenizer.hpp"
@@ -97,3 +98,5 @@ class Parser
     Ptr<Expr> gen_list_expr();
 };
 }
+
+#endif

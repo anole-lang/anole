@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_ENUM_HPP__
+#define __ANOLE_OBJECTS_ENUM_HPP__
 
 #include "object.hpp"
 
@@ -26,3 +27,5 @@ class EnumObject : public Object
     SPtr<Scope> scope_;
 };
 }
+
+#endif

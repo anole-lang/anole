@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_ERROR_HPP__
+#define __ANOLE_ERROR_HPP__
 
 #include "base.hpp"
 
@@ -43,3 +44,5 @@ class RuntimeError : public std::exception
     String err_;
 };
 }
+
+#endif

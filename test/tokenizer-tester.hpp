@@ -1,3 +1,6 @@
+#ifndef __TEST_TOKENIZERTESTER_HPP__
+#define __TEST_TOKENIZERTESTER_HPP__
+
 #include "../src/compiler/compiler.hpp"
 
 #include <gtest/gtest.h>
@@ -35,3 +38,5 @@ and or not ! is = != < <= > >= => ?)");
         }
     }
 }
+
+#endif

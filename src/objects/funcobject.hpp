@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_FUNC_HPP__
+#define __ANOLE_OBJECTS_FUNC_HPP__
 
 #include "object.hpp"
 
@@ -32,3 +33,5 @@ class FunctionObject : public Object
     Size parameter_num_;
 };
 }
+
+#endif

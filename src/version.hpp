@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_VERSION_HPP__
+#define __ANOLE_VERSION_HPP__
 
 #include "base.hpp"
 
@@ -36,3 +37,5 @@ struct Version
 using Magic = Size;
 inline constexpr Magic theMagic = 2020'10'17;
 }
+
+#endif

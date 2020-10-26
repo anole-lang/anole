@@ -1,3 +1,6 @@
+#ifndef __LIB_FILE_FILEOBJECT_HPP__
+#define __LIB_FILE_FILEOBJECT_HPP__
+
 #include "../../src/anole.hpp"
 
 #include <fstream>
@@ -16,3 +19,5 @@ class FileObject : public Object, public std::enable_shared_from_this<FileObject
     std::fstream file_;
 };
 }
+
+#endif

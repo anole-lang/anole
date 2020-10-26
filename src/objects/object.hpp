@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_OBJECT_HPP__
+#define __ANOLE_OBJECTS_OBJECT_HPP__
 
 #include "../base.hpp"
 #include "../error.hpp"
@@ -97,3 +98,5 @@ class Object
     ObjectType type_;
 };
 }
+
+#endif

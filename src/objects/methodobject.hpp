@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_METHOD_HPP__
+#define __ANOLE_OBJECTS_METHOD_HPP__
 
 #include "object.hpp"
 
@@ -18,3 +19,5 @@ class MethodObject : public Object
     Object *binded_obj_;
 };
 } // namespace anole
+
+#endif

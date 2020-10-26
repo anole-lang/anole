@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_RUNTIME_SCOPE_HPP__
+#define __ANOLE_RUNTIME_SCOPE_HPP__
 
 #include "variable.hpp"
 #include "allocator.hpp"
@@ -33,3 +34,5 @@ class Scope
     std::map<String, Address> symbols_;
 };
 }
+
+#endif

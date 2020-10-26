@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_BASE_HPP__
+#define __ANOLE_BASE_HPP__
 
 #include <memory>
 #include <string>
@@ -14,3 +15,5 @@ using SPtr = std::shared_ptr<T>;
 using String = std::string;
 using Size   = std::uint64_t;
 }
+
+#endif

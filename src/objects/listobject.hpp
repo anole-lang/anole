@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_LIST_HPP__
+#define __ANOLE_OBJECTS_LIST_HPP__
 
 #include "object.hpp"
 
@@ -50,3 +51,5 @@ class ListIteratorObject : public Object
     std::list<Address>::iterator current_;
 };
 }
+
+#endif

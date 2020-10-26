@@ -1,3 +1,6 @@
+#ifndef __LIB_OS_PATH_HPP__
+#define __LIB_OS_PATH_HPP__
+
 #include "../../../src/anole.hpp"
 
 #include <string>
@@ -20,3 +23,5 @@ class PathObject : public Object, public std::enable_shared_from_this<PathObject
     std::filesystem::path path_;
 };
 }
+
+#endif

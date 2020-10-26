@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_COMPILER_TOKENIZER_HPP__
+#define __ANOLE_COMPILER_TOKENIZER_HPP__
 
 #include "token.hpp"
 
@@ -41,3 +42,5 @@ class Tokenizer
     char last_input_;
 };
 }
+
+#endif

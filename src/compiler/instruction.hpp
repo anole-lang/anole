@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_INSTRUCTION_HPP__
+#define __ANOLE_INSTRUCTION_HPP__
 
 #include <any>
 
@@ -85,3 +86,5 @@ struct Instruction
     std::any oprand;
 };
 }
+
+#endif

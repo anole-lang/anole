@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_INTEGER_HPP__
+#define __ANOLE_OBJECTS_INTEGER_HPP__
 
 #include "object.hpp"
 
@@ -44,3 +45,5 @@ class IntegerObject : public Object
     int64_t value_;
 };
 }
+
+#endif
