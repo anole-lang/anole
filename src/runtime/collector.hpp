@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_RUNTIME_COLLECTOR_HPP__
+#define __ANOLE_RUNTIME_COLLECTOR_HPP__
 
 #include "../base.hpp"
 
@@ -98,3 +99,5 @@ class Collector
     std::set<Object *> collected_;
 };
 } // namespace anole
+
+#endif

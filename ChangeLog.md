@@ -14,7 +14,8 @@
 
 ### Updated
 
-- Improve AST and parser by modifying a few redundant structures
+- Improve parser by modifying a few redundant structures
+- Use include-guards instead of `#pragma once` which was mentioned in [ENHANCEMENT#22](https://github.com/anole-lang/anole/issues/22)
 
 ### Fixed
 

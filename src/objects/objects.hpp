@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_HPP__
+#define __ANOLE_OBJECTS_HPP__
 
 #include "object.hpp"
 #include "boolobject.hpp"
@@ -17,3 +18,5 @@
 #include "integerobject.hpp"
 #include "instanceobject.hpp"
 #include "builtinfuncobject.hpp"
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_CLASS_HPP__
+#define __ANOLE_OBJECTS_CLASS_HPP__
 
 #include "object.hpp"
 
@@ -25,3 +26,5 @@ class ClassObject : public Object
     SPtr<Scope> scope_;
 };
 } // namespace anole
+
+#endif

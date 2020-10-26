@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_STRING_HPP__
+#define __ANOLE_OBJECTS_STRING_HPP__
 
 #include "object.hpp"
 
@@ -37,3 +38,5 @@ class StringObject : public Object
     String value_;
 };
 }
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_NONE_HPP__
+#define __ANOLE_OBJECTS_NONE_HPP__
 
 #include "object.hpp"
 
@@ -17,3 +18,5 @@ class NoneObject : public Object
     }
 };
 }
+
+#endif

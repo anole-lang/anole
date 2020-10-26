@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_RUNTIME_ALLOCATOR_HPP__
+#define __ANOLE_RUNTIME_ALLOCATOR_HPP__
 
 #include "collector.hpp"
 
@@ -76,3 +77,5 @@ class Allocator
     }
 };
 } // namespace anole
+
+#endif

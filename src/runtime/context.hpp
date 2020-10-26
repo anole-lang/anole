@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_RUNTIME_CONTEXT_HPP__
+#define __ANOLE_RUNTIME_CONTEXT_HPP__
 
 #include "scope.hpp"
 #include "allocator.hpp"
@@ -149,3 +150,5 @@ class Context
     Size return_anchor_;
 };
 }
+
+#endif

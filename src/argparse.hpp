@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_ARGPARSE_HPP__
+#define __ANOLE_ARGPARSE_HPP__
 
 #include "base.hpp"
 
@@ -233,3 +234,5 @@ class ArgumentParser
     std::map<Size, Argument> arguments_;
 };
 }
+
+#endif

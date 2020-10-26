@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __LIGHT_UNIQUEPTR_HPP__
+#define __LIGHT_UNIQUEPTR_HPP__
 
 #include "type_traits.hpp"
 
@@ -28,3 +29,5 @@ class unique_ptr
     using element_type = T;
 };
 } // namespace light
+
+#endif

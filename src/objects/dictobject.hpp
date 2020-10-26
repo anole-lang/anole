@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_DICT_HPP__
+#define __ANOLE_OBJECTS_DICT_HPP__
 
 #include "object.hpp"
 
@@ -40,3 +41,5 @@ class DictObject : public Object
     DataType data_;
 };
 }
+
+#endif

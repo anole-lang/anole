@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __LIGHT_TYPETRAITS_HPP__
+#define __LIGHT_TYPETRAITS_HPP__
 
 namespace light
 {
@@ -93,3 +94,5 @@ struct enable_if<true, T>
 template<bool B, typename T>
 using enable_if_t = typename enable_if<B, T>::type;
 } // namespace light
+
+#endif

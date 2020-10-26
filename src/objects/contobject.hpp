@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_CONT_HPP__
+#define __ANOLE_OBJECTS_CONT_HPP__
 
 #include "object.hpp"
 
@@ -22,3 +23,5 @@ class ContObject : public Object
     SPtr<Context> resume_;
 };
 }
+
+#endif

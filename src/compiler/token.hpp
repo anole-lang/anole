@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_COMPILER_TOKEN_HPP__
+#define __ANOLE_COMPILER_TOKEN_HPP__
 
 #include "../base.hpp"
 
@@ -115,3 +116,5 @@ struct Token
     Token &operator=(const Token &other) noexcept;
 };
 }
+
+#endif

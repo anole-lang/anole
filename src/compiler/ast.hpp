@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_COMPILER_AST_HPP__
+#define __ANOLE_COMPILER_AST_HPP__
 
 #include "token.hpp"
 
@@ -518,3 +519,5 @@ struct ForeachStmt : Stmt
     void codegen(Code &) override;
 };
 }
+
+#endif

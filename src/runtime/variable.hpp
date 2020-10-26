@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_RUNTIME_VARIABLE_HPP__
+#define __ANOLE_RUNTIME_VARIABLE_HPP__
 
 #include "../objects/object.hpp"
 
@@ -33,3 +34,5 @@ class Variable
     Object *ptr_;
 };
 } // namespace anole
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_BUILTINFUNC_HPP__
+#define __ANOLE_OBJECTS_BUILTINFUNC_HPP__
 
 #include "object.hpp"
 
@@ -46,3 +47,5 @@ class BuiltInFunctionObject : public Object
     Object *bind_;
 };
 }
+
+#endif

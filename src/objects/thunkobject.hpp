@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_THUNK_HPP__
+#define __ANOLE_OBJECTS_THUNK_HPP__
 
 #include "object.hpp"
 
@@ -31,3 +32,5 @@ class ThunkObject : public Object
     Size base_;
 };
 }
+
+#endif

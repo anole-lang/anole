@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_MODULE_HPP__
+#define __ANOLE_OBJECTS_MODULE_HPP__
 
 #include "object.hpp"
 
@@ -70,3 +71,5 @@ class CppModuleObject : public ModuleObject
     std::vector<String> *names_;
 };
 }
+
+#endif

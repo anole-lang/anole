@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ANOLE_OBJECTS_FLOAT_HPP__
+#define __ANOLE_OBJECTS_FLOAT_HPP__
 
 #include "object.hpp"
 
@@ -36,3 +37,5 @@ class FloatObject : public Object
     double value_;
 };
 }
+
+#endif
