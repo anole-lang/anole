@@ -1,7 +1,7 @@
 #ifndef __LIB_OS_PATH_HPP__
 #define __LIB_OS_PATH_HPP__
 
-#include "../../../src/anole.hpp"
+#include "../../../anole/anole.hpp"
 
 #include <string>
 #include <vector>

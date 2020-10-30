@@ -12,16 +12,16 @@ FPOBJ = $(addprefix $(shell pwd)/, ${OBJ})
 test: tmp/test
 	tmp/test
 
-tmp/error.so: src/error.cpp | ${DIR_TMP}
+tmp/error.so: anole/error.cpp | ${DIR_TMP}
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/objects.so: src/objects/*.cpp
+tmp/objects.so: anole/objects/*.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/runtime.so: src/runtime/*.cpp
+tmp/runtime.so: anole/runtime/*.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
-tmp/compiler.so: src/compiler/*.cpp
+tmp/compiler.so: anole/compiler/*.cpp
 	${CC} ${FLAGS} $^ -shared -fPIC -o $@
 
 tmp/test: test/test.cpp ${OBJ}

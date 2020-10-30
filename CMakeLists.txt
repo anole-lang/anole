@@ -10,10 +10,10 @@ set (CMAKE_CXX_STANDARD_REQUIRED True)
 set (CMAKE_EXE_LINKER_FLAGS "-rdynamic")
 set (CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 
-file (GLOB SRC_MAIN "src/*.cpp")
-file (GLOB SRC_OBJECTS "src/objects/*.cpp")
-file (GLOB SRC_RUNTIME "src/runtime/*.cpp")
-file (GLOB SRC_COMPILER "src/compiler/*.cpp")
+file (GLOB SRC_MAIN "anole/*.cpp")
+file (GLOB SRC_OBJECTS "anole/objects/*.cpp")
+file (GLOB SRC_RUNTIME "anole/runtime/*.cpp")
+file (GLOB SRC_COMPILER "anole/compiler/*.cpp")
 
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)
     set (CMAKE_CXX_FLAGS "-g -Wall")
@@ -97,7 +97,7 @@ ENDIF ()
 # -- install lib ----------------
 
 # install header `anole.hpp`
-install (FILES "src/anole.hpp"
+install (FILES "anole/anole.hpp"
     DESTINATION "include/anole"
 )
 
