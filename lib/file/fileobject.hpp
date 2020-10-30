@@ -1,7 +1,7 @@
 #ifndef __LIB_FILE_FILEOBJECT_HPP__
 #define __LIB_FILE_FILEOBJECT_HPP__
 
-#include "../../src/anole.hpp"
+#include "../../anole/anole.hpp"
 
 #include <fstream>
 
