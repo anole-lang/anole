@@ -550,15 +550,24 @@ void UseStmt::codegen(Code &code)
                 code.add_ins<Opcode::ImportPart, String>(alias.first.mod);
                 code.add_ins<Opcode::StoreRef, String>(alias.second);
             }
-            code.add_ins<Opcode::Pop>();
+            code.add_ins<Opcode::FastPop>();
         }
     }
 }
 
 void ExprStmt::codegen(Code &code)
 {
-    expr->codegen(code);
-    code.add_ins<Opcode::Pop>();
+    if (dynamic_cast<ParenOperatorExpr *>(expr.get()))
+    {
+        code.add_ins<Opcode::CallAc>();
+        expr->codegen(code);
+        code.add_ins<Opcode::Pop>();
+    }
+    else
+    {
+        expr->codegen(code);
+        code.add_ins<Opcode::FastPop>();
+    }
 }
 
 void VariableDeclarationStmt::codegen(Code &code)

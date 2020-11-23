@@ -286,6 +286,9 @@ void Code::print(ostream &out)
         case Opcode::Pop:
             printer.add_line(i, "Pop");
             break;
+        case Opcode::FastPop:
+            printer.add_line(i, "FastPop");
+            break;
 
         case Opcode::Import:
             printer.add_line(i, "Import", OPRAND(String));

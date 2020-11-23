@@ -7,10 +7,12 @@
 - Instructions `EndScope/BuildClass` for creating class-objects
 - New builtin objects such as ClassObject, InstanceObject and MethodObject to support OOP
 - Support OOP mentioned in [PROPOSAL#20](https://github.com/anole-lang/anole/issues/20) now!!!
+- Instruction `FastPop` to replace old `Pop`
 
 ### Changed
 
 - Return statement can return nothing now by `return ;`
+- Instruction `Pop` will pop the number determined by CallAc
 
 ### Updated
 

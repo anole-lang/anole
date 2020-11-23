@@ -12,6 +12,7 @@ enum Opcode : uint8_t
     PlaceHolder,
 
     Pop,          // Pop
+    FastPop,      // FastPop
 
     Import,       // Import name
     ImportPath,   // ImportPath path

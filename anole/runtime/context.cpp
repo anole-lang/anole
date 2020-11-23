@@ -200,6 +200,13 @@ namespace op_handles
 {
 void pop_handle()
 {
+    auto num = Context::current()->get_call_args_num();
+    Context::current()->pop(num);
+    ++Context::current()->pc();
+}
+
+void fastpop_handle()
+{
     Context::current()->pop();
     ++Context::current()->pc();
 }
@@ -791,6 +798,7 @@ void buildclass_handle()
         name, Context::current()->scope()
     );
 
+    auto bctors = Allocator<Object>::alloc<ListObject>();
     auto bases_num = Context::current()->get_call_args_num();
     for (Size i = 0; i < bases_num; ++i)
     {
@@ -799,9 +807,22 @@ void buildclass_handle()
         if (auto base_cls = dynamic_cast<ClassObject *>(base))
         {
             auto &scope = base_cls->scope();
+            bool has_ctor = false;
             for (auto &sym_addr : scope->symbols())
             {
-                cls->scope()->create_symbol(sym_addr.first, sym_addr.second->ptr());
+                if (sym_addr.first == "__init__")
+                {
+                    bctors->append(sym_addr.second->ptr());
+                    has_ctor = true;
+                }
+                else
+                {
+                    cls->scope()->create_symbol(sym_addr.first, sym_addr.second->ptr());
+                }
+            }
+            if (!has_ctor)
+            {
+                bctors->append(nullptr);
             }
         }
         else
@@ -809,6 +830,7 @@ void buildclass_handle()
             throw RuntimeError("each base of one class must be one class");
         }
     }
+    cls->scope()->create_symbol("bctors", bctors);
 
     Context::current()->push(cls);
     // declare members in the new scope of the class
@@ -824,6 +846,7 @@ constexpr OpHandle theOpHandles[] =
     nullptr,
 
     &op_handles::pop_handle,
+    &op_handles::fastpop_handle,
 
     &op_handles::import_handle,
     &op_handles::importpath_handle,

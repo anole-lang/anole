@@ -17,7 +17,7 @@ class FunctionObject : public Object
 
     SPtr<Scope> scope() { return scope_; }
     SPtr<Code>  code()  { return code_; }
-    Size base()  { return base_; }
+    Size base() { return base_; }
 
     String to_str() override;
     Address load_member(const String &name) override;
