@@ -97,9 +97,12 @@ class Context
         stack_->back() = std::make_shared<Variable>(ptr);
     }
 
-    void pop()
+    void pop(Size num = 1)
     {
-        stack_->pop_back();
+        for (Size i = 0; i < num; ++i)
+        {
+            stack_->pop_back();
+        }
     }
 
     template<typename R = Object>

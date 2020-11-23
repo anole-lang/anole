@@ -346,6 +346,9 @@ Ptr<Stmt> Parser::gen_stmt()
         }
         break;
 
+    case TokenType::Class:
+        return gen_class_declaration();
+
     case TokenType::Use:
         return gen_use_stmt();
 
@@ -389,7 +392,6 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::LParen:
     case TokenType::Enum:
     case TokenType::Dict:
-    case TokenType::Class:
     case TokenType::Match:
     case TokenType::LBracket:
     case TokenType::LBrace:
@@ -505,6 +507,19 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         break;
     }
     return make_unique<VariableDeclarationStmt>(move(name), make_unique<NoneExpr>());
+}
+
+Ptr<DeclarationStmt> Parser::gen_class_declaration()
+{
+    auto class_expr = gen_class_expr();
+    if (class_expr->name.empty())
+    {
+        throw CompileError("expected class name");
+    }
+
+    return make_unique<VariableDeclarationStmt>(
+        class_expr->name, move(class_expr), true
+    );
 }
 
 Ptr<Stmt> Parser::gen_prefixop_decl()
@@ -1073,7 +1088,7 @@ Ptr<Expr> Parser::gen_dict_expr()
     return dict_expr;
 }
 
-Ptr<Expr> Parser::gen_class_expr()
+Ptr<ClassExpr> Parser::gen_class_expr()
 {
     get_next_token(); // eat 'class'
 
