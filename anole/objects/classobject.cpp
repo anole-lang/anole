@@ -54,7 +54,7 @@ void ClassObject::call(Size num)
          * __init__ is a special method to construct object
          *  and it doesn't have return value
          *
-         * this is be done in the codegen phase
+         * this is be done in the parse phase
         */
         Context::current()->push(instance);
         auto ctor = scope_->load_symbol("__init__");

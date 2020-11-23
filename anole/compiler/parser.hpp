@@ -66,11 +66,12 @@ class Parser
 
     Ptr<Stmt> gen_stmt();
     Ptr<DeclarationStmt> gen_declaration();
-    Ptr<Stmt> gen_prefixop_decl();
-    Ptr<Stmt> gen_infixop_decl();
+    Ptr<DeclarationStmt> gen_class_declaration();
     UseStmt::Module gen_module();
     UseStmt::Alias gen_alias();
     Ptr<Stmt> gen_use_stmt();
+    Ptr<Stmt> gen_prefixop_decl();
+    Ptr<Stmt> gen_infixop_decl();
     Ptr<Stmt> gen_if_else();
     Ptr<AST>  gen_if_else_tail();
     Ptr<Stmt> gen_while_stmt();
@@ -92,7 +93,7 @@ class Parser
     Ptr<Expr> gen_index_expr(Ptr<Expr> expr);
     Ptr<Expr> gen_enum_expr();
     Ptr<Expr> gen_dict_expr();
-    Ptr<Expr> gen_class_expr();
+    Ptr<ClassExpr> gen_class_expr();
     Ptr<Expr> gen_lambda_expr();
     Ptr<Expr> gen_match_expr();
     Ptr<Expr> gen_list_expr();

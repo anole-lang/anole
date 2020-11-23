@@ -462,10 +462,6 @@ void ClassExpr::codegen(Code &code)
                 {
                     throw CompileError("__init__ must be with function body");
                 }
-                else
-                {
-
-                }
             }
         }
         else
