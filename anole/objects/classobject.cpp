@@ -71,4 +71,9 @@ void ClassObject::call(Size num)
 
     Context::current()->push(instance);
 }
+
+void ClassObject::collect(std::function<void(Scope *)> func)
+{
+    func(scope_.get());
+}
 } // namespace anole

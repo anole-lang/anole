@@ -20,4 +20,10 @@ void MethodObject::call(Size num)
     Context::current()->push(binded_obj_);
     callee_->call(num + 1);
 }
+
+void MethodObject::collect(function<void(Object *)> func)
+{
+    func(callee_);
+    func(binded_obj_);
+}
 } // namespace anole
