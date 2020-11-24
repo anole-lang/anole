@@ -33,4 +33,9 @@ Address InstanceObject::load_member(const String &name)
         return scope_->create_symbol(name);
     }
 }
+
+void InstanceObject::collect(function<void(Scope *)> func)
+{
+    func(scope_.get());
+}
 } // namespace anole

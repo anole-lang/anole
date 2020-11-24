@@ -12,6 +12,8 @@ class InstanceObject : public Object
 
     Address load_member(const String &name) override;
 
+    void collect(std::function<void(Scope *)>) override;
+
     SPtr<Scope> &scope() { return scope_; }
 
   private:

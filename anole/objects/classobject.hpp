@@ -17,7 +17,7 @@ class ClassObject : public Object
     Address load_member(const String &name) override;
     void call(Size num) override;
 
-    // collect
+    void collect(std::function<void(Scope *)>) override;
 
     SPtr<Scope> &scope() { return scope_; }
 

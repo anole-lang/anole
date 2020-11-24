@@ -14,6 +14,8 @@ class MethodObject : public Object
 
     void call(Size num) override;
 
+    void collect(std::function<void(Object *)>) override;
+
   private:
     Object *callee_;
     Object *binded_obj_;
