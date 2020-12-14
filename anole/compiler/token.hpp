@@ -5,17 +5,7 @@
 
 namespace anole
 {
-/**
- * use enum (without class/struct) with namespace
- *  and using token_type::TokenType in order to
- *  make the enum must be accessed using scope
- *  resolution operator and then we can enable
- *  static cast from the enum to its underlying
- *  type
-*/
-namespace token_type
-{
-enum TokenType : uint32_t
+enum class TokenType : Size
 {
     At,        // @
 
@@ -94,8 +84,6 @@ enum TokenType : uint32_t
 
     End,
 };
-}
-using token_type::TokenType;
 
 struct Token
 {
@@ -106,7 +94,7 @@ struct Token
 
     Token() noexcept = default;
 
-    explicit Token(TokenType type, String value = "") noexcept;
+    Token(TokenType type, String value = "") noexcept;
     explicit Token(String value) noexcept;
 
     Token(Token &&other) noexcept;

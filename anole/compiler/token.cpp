@@ -43,7 +43,7 @@ Token &Token::operator=(const Token &other) noexcept
 
 namespace
 {
-int lc_end_of_token_type = TokenType::End;
+Size lc_end_of_token_type = static_cast<Size>(TokenType::End);
 map<String, TokenType> lc_mapping
 {
     { "use",        TokenType::Use      },
@@ -111,7 +111,7 @@ TokenType Token::add_token_type(const String &str)
 {
     if (!lc_mapping.count(str))
     {
-        lc_mapping[str] = TokenType(++lc_end_of_token_type);
+        lc_mapping[str] = static_cast<TokenType>(++lc_end_of_token_type);
     }
     return lc_mapping[str];
 }
