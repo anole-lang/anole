@@ -629,7 +629,7 @@ void PrefixopDeclarationStmt::codegen(Code &code)
 
 void InfixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(op, priority));
+    code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(op, precedence));
 }
 
 void BreakStmt::codegen(Code &code)

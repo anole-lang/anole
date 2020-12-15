@@ -42,7 +42,7 @@ enum Opcode : uint8_t
     Match,        // Match target
 
     AddPrefixOp,  // AddPrefixOp op
-    AddInfixOp,   // AddInfixOp (op, priority)
+    AddInfixOp,   // AddInfixOp (op, precedence)
 
     Pack,         // Pack
     Unpack,       // Unpack

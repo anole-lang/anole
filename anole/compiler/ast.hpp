@@ -42,13 +42,6 @@ struct AST
 
     virtual bool is_integer_expr();
     virtual bool is_expr_stmt();
-
-    // for codegen
-    static bool &interpretive()
-    {
-        static bool mode = false;
-        return mode;
-    }
 };
 
 struct Stmt : AST
@@ -414,11 +407,11 @@ struct PrefixopDeclarationStmt : Stmt
 
 struct InfixopDeclarationStmt : Stmt
 {
-    Size priority;
+    Size precedence;
     std::string op;
 
-    InfixopDeclarationStmt(std::string op, Size priority)
-      : priority(priority), op(std::move(op))
+    InfixopDeclarationStmt(std::string op, Size precedence)
+      : precedence(precedence), op(std::move(op))
     {
         // ...
     }

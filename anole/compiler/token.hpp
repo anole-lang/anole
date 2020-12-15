@@ -7,80 +7,80 @@ namespace anole
 {
 enum class TokenType : Size
 {
-    At,        // @
+    At,         // @
 
-    Use,       // use
-    From,      // from
-    Prefixop,  // prefixop
-    Infixop,   // infixop
-    If,        // if
-    Elif,      // elif
-    Else,      // else
-    While,     // while
-    Do,        // do
-    Foreach,   // foreach
-    As,        // as
-    Break,     // break
-    Continue,  // continue
-    Return,    // return
-    Match,     // match
-    Delay,     // delay
+    Use,        // use
+    From,       // from
+    Prefixop,   // prefixop
+    Infixop,    // infixop
+    If,         // if
+    Elif,       // elif
+    Else,       // else
+    While,      // while
+    Do,         // do
+    Foreach,    // foreach
+    As,         // as
+    Break,      // break
+    Continue,   // continue
+    Return,     // return
+    Match,      // match
+    Delay,      // delay
 
-    Enum,      // enum
-    Dict,      // dict
-    Class,     // class
+    Enum,       // enum
+    Dict,       // dict
+    Class,      // class
 
-    None,      // none
-    True,      // true
-    False,     // false
+    None,       // none
+    True,       // true
+    False,      // false
 
     Identifier, // [^ 0-9_#@.:;?\(\)\[\]\{\}"]+
     Integer,    // [0-9]+
     Double,     // [0-9]+\.[0-9]*
     String,     // "[^"\n]"
 
-    Comma,     // ,
-    Dot,       // .
-    Dooot,     // ...
+    Comma,      // ,
+    Dot,        // .
+    Dooot,      // ...
 
-    LParen,    // (
-    RParen,    // )
-    LBracket,  // [
-    RBracket,  // ]
-    LBrace,    // {
-    RBrace,    // }
+    LParen,     // (
+    RParen,     // )
+    LBracket,   // [
+    RBracket,   // ]
+    LBrace,     // {
+    RBrace,     // }
 
-    Colon,     // :
-    Semicolon, // ;
+    Colon,      // :
+    Semicolon,  // ;
 
-    Add,       // +
-    Sub,       // -
-    Mul,       // *
-    Div,       // /
-    Mod,       // %
+    Add,        // +
+    Sub,        // -
+    Mul,        // *
+    Div,        // /
+    Mod,        // %
 
-    BAnd,      // &
-    BOr,       // |
-    BXor,      // ^
-    BNeg,      // ~
-    BLS,       // <<
-    BRS,       // >>
+    BAnd,       // &
+    BOr,        // |
+    BXor,       // ^
+    BNeg,       // ~
+    BLS,        // <<
+    BRS,        // >>
 
-    And,       // and
-    Or,        // or
-    Not,       // not !
+    And,        // and
+    Or,         // or
+    Not,        // not !
 
-    Is,        // is
-    CEQ,       // =
-    CNE,       // !=
-    CLT,       // <
-    CLE,       // <=
-    CGT,       // >
-    CGE,       // >=
+    Is,         // is
+    CEQ,        // =
+    CNE,        // !=
+    CLT,        // <
+    CLE,        // <=
+    CGT,        // >
+    CGE,        // >=
 
-    Ret,       // =>
+    Ret,        // =>
 
-    Ques,      // ?
+    Ques,       // ?
 
     End,
 };
@@ -90,12 +90,15 @@ struct Token
     TokenType type;
     String value;
 
+  public:
     static TokenType add_token_type(const String &str);
 
+  public:
     Token() noexcept = default;
 
-    Token(TokenType type, String value = "") noexcept;
-    explicit Token(String value) noexcept;
+    Token(TokenType type) noexcept;
+    Token(TokenType type, String value) noexcept;
+    Token(String value) noexcept;
 
     Token(Token &&other) noexcept;
     Token(const Token &other) noexcept;

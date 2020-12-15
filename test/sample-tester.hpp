@@ -21,7 +21,7 @@ inline String execute(const String &input)
     istringstream ss{input};
     auto code = make_shared<Code>();
     Context::current() = std::make_shared<Context>(code);
-    Parser parser{ss};
+    Parser parser{ss, "<test>"};
     while (auto ast = parser.gen_statement())
     {
         ast->codegen(*code);

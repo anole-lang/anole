@@ -7,6 +7,12 @@ using namespace std;
 
 namespace anole
 {
+Token::Token(TokenType type) noexcept
+  : type(type)
+{
+    // ...
+}
+
 Token::Token(TokenType type, String value) noexcept
   : type(type), value(move(value))
 {
@@ -99,20 +105,19 @@ map<String, TokenType> lc_mapping
 }
 
 Token::Token(String value) noexcept
-  : type(lc_mapping.count(value)
-        ? lc_mapping.at(value)
-        : TokenType::Identifier)
-  , value(move(value))
+  : value(move(value))
 {
-    // ...
+    auto find = lc_mapping.find(this->value);
+    type = (find == lc_mapping.end() ? TokenType::Identifier : find->second);
 }
 
 TokenType Token::add_token_type(const String &str)
 {
-    if (!lc_mapping.count(str))
+    auto find = lc_mapping.find(str);
+    if (find == lc_mapping.end())
     {
-        lc_mapping[str] = static_cast<TokenType>(++lc_end_of_token_type);
+        return lc_mapping[str] = static_cast<TokenType>(++lc_end_of_token_type);
     }
-    return lc_mapping[str];
+    return find->second;
 }
 }

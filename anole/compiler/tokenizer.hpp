@@ -12,24 +12,19 @@ namespace anole
 class Tokenizer
 {
   public:
-    explicit Tokenizer(
-        std::istream & = std::cin,
-        String = "<stdint>"
-    );
+    Tokenizer(std::istream &input, String name_of_input) noexcept;
 
-    Token next();
-    void cont();
+    Token next_token();
+    void resume();
     void reset();
 
-    std::pair<Size, Size> last_pos()
-    {
-        return { last_line_num_, last_char_at_line_ };
-    }
+    std::pair<Size, Size> last_pos();
     String get_err_info(const String &message);
 
   private:
     void get_next_input();
 
+  private:
     Size cur_line_num_;
     Size last_line_num_;
     Size cur_char_at_line_;
@@ -37,8 +32,8 @@ class Tokenizer
     String cur_line_;
     String pre_line_;
 
-    std::istream &input_stream_;
-    String name_of_in_;
+    std::istream &input_;
+    String name_of_input_;
     char last_input_;
 };
 }

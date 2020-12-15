@@ -59,15 +59,13 @@ void replrun::run()
  / ___ \| | | | (_) | |  __/   %s
 /_/   \_\_| |_|\___/|_|\___|)""\n\n", Version::literal);
 
-    AST::interpretive() = true;
-
     String line;
     istringstream ss;
-    Parser parser{ss};
+    Parser parser(ss, "<stdin>");
     auto code = make_shared<Code>("<stdin>");
     Context::current() = make_shared<Context>(code);
 
-    parser.set_continue_action([&ss, &parser]
+    parser.set_resume_action([&ss, &parser]
     {
         auto line = read_line(".. ");
         if (!line.empty())
@@ -77,7 +75,7 @@ void replrun::run()
         }
         ss.clear();
         ss.str(line += '\n');
-        parser.cont();
+        parser.resume();
     });
 
     sigsetjmp(lc_env, 1);

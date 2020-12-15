@@ -9,54 +9,14 @@ using namespace std;
 
 namespace anole
 {
-Parser::Parser(istream &in, String name_of_in)
-  : tokenizer_(in, name_of_in)
-{
-    get_next_token();
-}
-
-void Parser::cont()
-{
-    tokenizer_.cont();
-    get_next_token();
-}
-
-void Parser::reset()
-{
-    tokenizer_.reset();
-    get_next_token();
-}
-
-void Parser::set_continue_action(
-    function<void()> action)
-{
-    continue_action_ = move(action);
-}
-
-// use when interacting & return stmt node
-Ptr<AST> Parser::gen_statement()
-{
-    auto stmt = gen_stmt();
-    if (current_token_.type == TokenType::Semicolon)
-    {
-        get_next_token();
-    }
-    return stmt;
-}
-
-Ptr<AST> Parser::gen_statements()
-{
-    return gen_stmts();
-}
-
 namespace operators
 {
-set<TokenType> unary_ops
+set<TokenType> uops
 {
     TokenType::Not, TokenType::Sub, TokenType::BNeg
 };
 
-vector<Size> bop_priorities
+vector<Size> bop_precedences
 {
     100, 110, 120, 130, 140, 150, 160, 170, 180, 190
 };
@@ -74,18 +34,14 @@ map<Size, set<TokenType>> bop_mapping
     { 190, { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod } }
 };
 
-set<TokenType> &bops_at_priority(Size priority)
+set<TokenType> &bops_at_precedence(Size precedence)
 {
-    if (!bop_mapping.count(priority))
-    {
-        bop_mapping[priority] = {};
-    }
-    return bop_mapping[priority];
+    return bop_mapping[precedence];
 }
 
 set<TokenType> &bops_at_layer(Size layer)
 {
-    return bop_mapping[bop_priorities[layer]];
+    return bop_mapping[bop_precedences[layer]];
 }
 }
 
@@ -97,10 +53,10 @@ void Parser::add_prefixop(const String &str)
         throw RuntimeError("can't define predefined keywords or operators");
     }
 
-    operators::unary_ops.insert(type);
+    operators::uops.insert(type);
 }
 
-void Parser::add_infixop(const String &str, Size priority)
+void Parser::add_infixop(const String &str, Size precedence)
 {
     auto type = Token::add_token_type(str);
     if (type <= TokenType::End)
@@ -108,40 +64,84 @@ void Parser::add_infixop(const String &str, Size priority)
         throw RuntimeError("can't define predefined keywords or operators");
     }
 
-    auto lower = lower_bound(operators::bop_priorities.begin(),
-        operators::bop_priorities.end(), priority
+    auto lower = lower_bound(operators::bop_precedences.begin(),
+        operators::bop_precedences.end(), precedence
     );
-    if (lower == operators::bop_priorities.end() || *lower != priority)
+    if (lower == operators::bop_precedences.end() || *lower != precedence)
     {
-        operators::bop_priorities.insert(lower, priority);
+        operators::bop_precedences.insert(lower, precedence);
     }
 
-    operators::bops_at_priority(priority).insert(type);
+    operators::bops_at_precedence(precedence).insert(type);
 }
 
-CompileError Parser::parse_error(const String &err_info)
+Parser::Parser() noexcept
+  : Parser(cin, "<stdin>")
 {
-    return CompileError(get_err_info(err_info));
+    // ...
+}
+
+Parser::Parser(istream &input, String name_of_input) noexcept
+  : tokenizer_(input, move(name_of_input))
+  , current_token_(tokenizer_.next_token())
+{
+    // ...
+}
+
+void Parser::resume()
+{
+    tokenizer_.resume();
+    get_next_token();
+}
+
+void Parser::reset()
+{
+    tokenizer_.reset();
+    get_next_token();
+}
+
+void Parser::set_resume_action(function<void()> action)
+{
+    resume_action_ = move(action);
+}
+
+Ptr<AST> Parser::gen_statement()
+{
+    auto stmt = gen_stmt();
+    if (current_token_.type == TokenType::Semicolon)
+    {
+        get_next_token();
+    }
+    return stmt;
+}
+
+Ptr<AST> Parser::gen_statements()
+{
+    return gen_stmts();
+}
+
+CompileError Parser::parse_error(const String &info)
+{
+    return CompileError(tokenizer_.get_err_info(info));
+}
+
+void Parser::get_next_token()
+{
+    current_token_ = tokenizer_.next_token();
 }
 
 // update current token when cannot find the next token
-Token &Parser::get_next_token()
+Token &Parser::next_token()
 {
-    return current_token_ = tokenizer_.next();
+    return current_token_ = tokenizer_.next_token();
 }
 
-void Parser::try_continue()
+void Parser::try_resume()
 {
-    if (current_token_.type == TokenType::End
-        && AST::interpretive())
+    if (current_token_.type == TokenType::End && resume_action_)
     {
-        continue_action_();
+        resume_action_();
     }
-}
-
-String Parser::get_err_info(const String &message)
-{
-    return tokenizer_.get_err_info(message);
 }
 
 ArgumentList Parser::gen_arguments()
@@ -273,7 +273,7 @@ Ptr<BlockExpr> Parser::gen_block()
     if (current_token_.type == TokenType::LBrace)
     {
         get_next_token(); // eat '{'
-        try_continue();
+        try_resume();
         block = make_unique<BlockExpr>();
         // '}' means the end of a block
         while (current_token_.type != TokenType::RBrace)
@@ -288,14 +288,14 @@ Ptr<BlockExpr> Parser::gen_block()
             {
                 get_next_token();
             }
-            try_continue();
+            try_resume();
         }
         get_next_token(); // eat '}'
     }
     else if (current_token_.type == TokenType::Comma)
     {
         get_next_token();
-        try_continue();
+        try_resume();
         block = make_unique<BlockExpr>();
         block->statements.push_back(gen_stmt());
         if (current_token_.type == TokenType::Semicolon)
@@ -311,21 +311,6 @@ Ptr<BlockExpr> Parser::gen_block()
     return block;
 }
 
-Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
-{
-    auto pos = tokenizer_.last_pos();
-    get_next_token();
-
-    auto node = gen_expr();
-
-    check<TokenType::RBracket>("expected ']'");
-    get_next_token();
-
-    auto index = make_unique<IndexExpr>(move(expression), move(node));
-    index->pos = pos;
-    return index;
-}
-
 // generate normal statement
 Ptr<Stmt> Parser::gen_stmt()
 {
@@ -336,7 +321,7 @@ Ptr<Stmt> Parser::gen_stmt()
 
     // @ is special
     case TokenType::At:
-        if (get_next_token().type == TokenType::LParen)
+        if (next_token().type == TokenType::LParen)
         {
             return make_unique<ExprStmt>(gen_lambda_expr());
         }
@@ -399,11 +384,10 @@ Ptr<Stmt> Parser::gen_stmt()
         return make_unique<ExprStmt>(gen_expr());
 
     default:
-        if (operators::unary_ops.count(current_token_.type))
+        if (operators::uops.count(current_token_.type))
         {
             return make_unique<ExprStmt>(gen_expr());
         }
-        break;
     }
     throw parse_error("wrong token here");
 }
@@ -473,7 +457,7 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         auto parameters = gen_parameters();
         get_next_token();
 
-        try_continue();
+        try_resume();
         Ptr<BlockExpr> block = nullptr;
 
         if (current_token_.type == TokenType::Colon)
@@ -522,24 +506,46 @@ Ptr<DeclarationStmt> Parser::gen_class_declaration()
     );
 }
 
-Ptr<Stmt> Parser::gen_prefixop_decl()
+Ptr<Stmt> Parser::gen_use_stmt()
 {
-    get_next_token();
-    check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<PrefixopDeclarationStmt>(gen_ident_rawstr());
-}
+    UseStmt::Aliases aliases;
+    UseStmt::Module  from;
 
-Ptr<Stmt> Parser::gen_infixop_decl()
-{
+    // eat `use`
     get_next_token();
-    Size priority = 50;
-    if (current_token_.type == TokenType::Integer)
+
+    // use * from <module>
+    if (current_token_.type == TokenType::Mul)
     {
-        priority = stoull(current_token_.value);
         get_next_token();
+        eat<TokenType::From>("need from ident here");
+        return make_unique<UseStmt>(move(aliases), gen_module());
     }
-    check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<InfixopDeclarationStmt>(gen_ident_rawstr(), priority);
+
+    aliases.push_back(gen_alias());
+    bool use_direct = aliases.back().first.type == UseStmt::Module::Type::Path;
+    while (current_token_.type == TokenType::Comma)
+    {
+        get_next_token();
+        aliases.push_back(gen_alias());
+        use_direct |= aliases.back().first.type == UseStmt::Module::Type::Path;
+    }
+
+    if (current_token_.type == TokenType::From)
+    {
+        if (use_direct)
+        {
+            throw parse_error("path of module cannot appear before from");
+        }
+        get_next_token();
+        from = gen_module();
+    }
+    else
+    {
+        from.type = UseStmt::Module::Type::Null;
+    }
+
+    return make_unique<UseStmt>(move(aliases), move(from));
 }
 
 UseStmt::Module Parser::gen_module()
@@ -587,46 +593,24 @@ UseStmt::Alias Parser::gen_alias()
     return alias;
 }
 
-Ptr<Stmt> Parser::gen_use_stmt()
+Ptr<Stmt> Parser::gen_prefixop_decl()
 {
-    UseStmt::Aliases aliases;
-    UseStmt::Module  from;
-
-    // eat `use`
     get_next_token();
+    check<TokenType::Identifier>("expected an identifier here");
+    return make_unique<PrefixopDeclarationStmt>(gen_ident_rawstr());
+}
 
-    // use * from <module>
-    if (current_token_.type == TokenType::Mul)
+Ptr<Stmt> Parser::gen_infixop_decl()
+{
+    get_next_token();
+    Size precedence = 50;
+    if (current_token_.type == TokenType::Integer)
     {
+        precedence = stoull(current_token_.value);
         get_next_token();
-        eat<TokenType::From>("need from ident here");
-        return make_unique<UseStmt>(move(aliases), gen_module());
     }
-
-    aliases.push_back(gen_alias());
-    bool use_direct = aliases.back().first.type == UseStmt::Module::Type::Path;
-    while (current_token_.type == TokenType::Comma)
-    {
-        get_next_token();
-        aliases.push_back(gen_alias());
-        use_direct |= aliases.back().first.type == UseStmt::Module::Type::Path;
-    }
-
-    if (current_token_.type == TokenType::From)
-    {
-        if (use_direct)
-        {
-            throw parse_error("path of module cannot appear before from");
-        }
-        get_next_token();
-        from = gen_module();
-    }
-    else
-    {
-        from.type = UseStmt::Module::Type::Null;
-    }
-
-    return make_unique<UseStmt>(move(aliases), move(from));
+    check<TokenType::Identifier>("expected an identifier here");
+    return make_unique<InfixopDeclarationStmt>(gen_ident_rawstr(), precedence);
 }
 
 Ptr<Stmt> Parser::gen_if_else()
@@ -636,7 +620,7 @@ Ptr<Stmt> Parser::gen_if_else()
     auto cond = gen_expr();
     cond->pos = pos;
     auto true_block = gen_block();
-    try_continue();
+    try_resume();
     auto false_branch = gen_if_else_tail();
     return make_unique<IfElseStmt>(move(cond),
         move(true_block), move(false_branch)
@@ -708,7 +692,7 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
 Ptr<Stmt> Parser::gen_return_stmt()
 {
     get_next_token();
-    try_continue();
+    try_resume();
 
     if (current_token_.type == TokenType::Semicolon)
     {
@@ -729,7 +713,7 @@ Ptr<Stmt> Parser::gen_return_stmt()
 
 Ptr<Expr> Parser::gen_delay_expr()
 {
-    try_continue();
+    try_resume();
     if (current_token_.type == TokenType::Delay)
     {
         get_next_token();
@@ -762,14 +746,14 @@ Ptr<Expr> Parser::gen_expr(int layer)
     }
 
     // parse unary operation or term expression
-    if (Size(layer) == operators::bop_priorities.size())
+    if (Size(layer) == operators::bop_precedences.size())
     {
-        if (operators::unary_ops.count(current_token_.type))
+        if (operators::uops.count(current_token_.type))
         {
             auto pos = tokenizer_.last_pos();
             auto op = current_token_;
             get_next_token();
-            try_continue();
+            try_resume();
             auto expr = make_unique<UnaryOperatorExpr>(op, gen_expr(layer));
             expr->pos = pos;
             return expr;
@@ -870,7 +854,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
 
 Ptr<Expr> Parser::gen_term()
 {
-    try_continue();
+    try_resume();
     Ptr<Expr> node = nullptr;
     switch (current_token_.type)
     {
@@ -926,10 +910,10 @@ Ptr<Expr> Parser::gen_term()
 
 Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 {
-    try_continue();
+    try_resume();
     for (bool cond = true; cond;)
     {
-        try_continue();
+        try_resume();
         switch (current_token_.type)
         {
         case TokenType::Dot:
@@ -1028,6 +1012,21 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
     return dot_expr;
 }
 
+Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
+{
+    auto pos = tokenizer_.last_pos();
+    get_next_token();
+
+    auto node = gen_expr();
+
+    check<TokenType::RBracket>("expected ']'");
+    get_next_token();
+
+    auto index = make_unique<IndexExpr>(move(expression), move(node));
+    index->pos = pos;
+    return index;
+}
+
 Ptr<Expr> Parser::gen_enum_expr()
 {
     get_next_token();
@@ -1113,7 +1112,7 @@ Ptr<ClassExpr> Parser::gen_class_expr()
             get_next_token();
         }
 
-        try_continue();
+        try_resume();
         if (current_token_.type == TokenType::RBrace)
         {
             break;
@@ -1187,7 +1186,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
     // eat ')'
     get_next_token();
 
-    try_continue();
+    try_resume();
     Ptr<BlockExpr> block = nullptr;
 
     if (current_token_.type == TokenType::Colon)
@@ -1235,7 +1234,7 @@ Ptr<Expr> Parser::gen_match_expr()
         match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
         while (current_token_.type == TokenType::Comma)
         {
-            try_continue();
+            try_resume();
             get_next_token();
             match_expr->keylists.back().push_back(gen_expr());
             match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
@@ -1254,7 +1253,7 @@ Ptr<Expr> Parser::gen_match_expr()
             check<TokenType::RBrace>("expected '}'");
         }
 
-        try_continue();
+        try_resume();
     }
 
     get_next_token(); // eat '}'
