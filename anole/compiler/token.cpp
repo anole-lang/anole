@@ -7,14 +7,14 @@ using namespace std;
 
 namespace anole
 {
-Token::Token(TokenType type) noexcept
-  : type(type)
+Token::Token(TokenType type, Location location) noexcept
+  : type(type), location(location)
 {
     // ...
 }
 
-Token::Token(TokenType type, String value) noexcept
-  : type(type), value(move(value))
+Token::Token(TokenType type, String value, Location location) noexcept
+  : type(type), value(move(value)), location(location)
 {
     // ...
 }
@@ -22,6 +22,7 @@ Token::Token(TokenType type, String value) noexcept
 Token::Token(Token &&other) noexcept
   : type(other.type)
   , value(std::move(other.value))
+  , location(std::move(other.location))
 {
     // ...
 }
@@ -29,6 +30,8 @@ Token::Token(Token &&other) noexcept
 Token::Token(const Token &other) noexcept
   : type(other.type)
   , value(other.value)
+  , location(other.location)
+
 {
     // ...
 }
@@ -37,6 +40,7 @@ Token &Token::operator=(Token &&other) noexcept
 {
     type = other.type;
     value = move(other.value);
+    location = move(other.location);
     return *this;
 }
 
@@ -44,6 +48,7 @@ Token &Token::operator=(const Token &other) noexcept
 {
     type = other.type;
     value = other.value;
+    location = other.location;
     return *this;
 }
 
@@ -104,8 +109,8 @@ map<String, TokenType> lc_mapping
 };
 }
 
-Token::Token(String value) noexcept
-  : value(move(value))
+Token::Token(String value, Location location) noexcept
+  : value(move(value)), location(location)
 {
     auto find = lc_mapping.find(this->value);
     type = (find == lc_mapping.end() ? TokenType::Identifier : find->second);

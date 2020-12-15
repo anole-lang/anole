@@ -5,9 +5,7 @@
 
 namespace anole
 {
-namespace opcode
-{
-enum Opcode : uint8_t
+enum class Opcode : uint8_t
 {
     PlaceHolder,
 
@@ -78,8 +76,6 @@ enum Opcode : uint8_t
     BuildDict,    // BuildDict num
     BuildClass,   // BuildClass name
 };
-}
-using opcode::Opcode;
 
 struct Instruction
 {

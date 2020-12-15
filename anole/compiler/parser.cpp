@@ -615,16 +615,18 @@ Ptr<Stmt> Parser::gen_infixop_decl()
 
 Ptr<Stmt> Parser::gen_if_else()
 {
-    get_next_token();
-    auto pos = tokenizer_.last_pos();
+    auto location = next_token().location;
+
     auto cond = gen_expr();
-    cond->pos = pos;
     auto true_block = gen_block();
     try_resume();
     auto false_branch = gen_if_else_tail();
-    return make_unique<IfElseStmt>(move(cond),
+    auto stmt = make_unique<IfElseStmt>(move(cond),
         move(true_block), move(false_branch)
     );
+
+    stmt->location = location;
+    return stmt;
 }
 
 Ptr<AST> Parser::gen_if_else_tail()
@@ -646,12 +648,14 @@ Ptr<AST> Parser::gen_if_else_tail()
 
 Ptr<Stmt> Parser::gen_while_stmt()
 {
-    get_next_token();
-    auto pos = tokenizer_.last_pos();
+    auto location = next_token().location;
+
     auto cond = gen_expr();
-    cond->pos = pos;
     auto block = gen_block();
-    return make_unique<WhileStmt>(move(cond), move(block));
+    auto stmt = make_unique<WhileStmt>(move(cond), move(block));
+
+    stmt->location = location;
+    return stmt;
 }
 
 Ptr<Stmt> Parser::gen_do_while_stmt()
@@ -661,12 +665,13 @@ Ptr<Stmt> Parser::gen_do_while_stmt()
     auto block = gen_block();
 
     check<TokenType::While>("expected keyword 'while' after 'do'");
-    get_next_token();
+    auto location = next_token().location;
 
-    auto pos = tokenizer_.last_pos();
     auto cond = gen_expr();
-    cond->pos = pos;
-    return make_unique<DoWhileStmt>(move(cond), move(block));
+    auto stmt = make_unique<DoWhileStmt>(move(cond), move(block));
+
+    stmt->location = location;
+    return stmt;
 }
 
 Ptr<Stmt> Parser::gen_foreach_stmt()
@@ -732,15 +737,16 @@ Ptr<Expr> Parser::gen_expr(int layer)
         auto expr = gen_expr(0);
         if (current_token_.type == TokenType::Ques)
         {
-            auto pos = tokenizer_.last_pos();
+            auto location = current_token_.location;
             get_next_token();
             auto true_expr = gen_expr();
             eat<TokenType::Comma>("expected ',' here");
             auto false_expr = gen_expr();
-            expr = make_unique<QuesExpr>(
+            auto ques = make_unique<QuesExpr>(
                 move(expr), move(true_expr), move(false_expr)
             );
-            expr->pos = pos;
+            ques->location = location;
+            expr = std::move(ques);
         }
         return expr;
     }
@@ -750,12 +756,12 @@ Ptr<Expr> Parser::gen_expr(int layer)
     {
         if (operators::uops.count(current_token_.type))
         {
-            auto pos = tokenizer_.last_pos();
+            auto location = current_token_.location;
             auto op = current_token_;
             get_next_token();
             try_resume();
             auto expr = make_unique<UnaryOperatorExpr>(op, gen_expr(layer));
-            expr->pos = pos;
+            expr->location = location;
             return expr;
         }
         else
@@ -769,12 +775,11 @@ Ptr<Expr> Parser::gen_expr(int layer)
     // user `if` if right-associative
     while (operators::bops_at_layer(Size(layer)).count(op.type))
     {
-        auto pos = tokenizer_.last_pos();
+        auto location = current_token_.location;
         get_next_token();
         // gen_expr(layer) if right-associative
         auto rhs = gen_expr(layer + 1);
-        if (lhs->is_integer_expr()
-            && rhs->is_integer_expr())
+        if (lhs->is_integer_expr() && rhs->is_integer_expr())
         {
             auto alias = reinterpret_cast<IntegerExpr *>(lhs.get());
             auto rv = reinterpret_cast<IntegerExpr *>(rhs.get())->value;
@@ -843,8 +848,9 @@ Ptr<Expr> Parser::gen_expr(int layer)
         }
         else
         {
-            lhs = make_unique<BinaryOperatorExpr>(move(lhs), op, move(rhs));
-            lhs->pos = pos;
+            auto expr = make_unique<BinaryOperatorExpr>(move(lhs), op, move(rhs));
+            expr->location = location;
+            lhs = std::move(expr);
         }
         // delete if right-associative
         op = current_token_;
@@ -922,9 +928,10 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
 
         case TokenType::LParen:
         {
-            auto pos = tokenizer_.last_pos();
-            expr = make_unique<ParenOperatorExpr>(move(expr), gen_arguments());
-            expr->pos = pos;
+            auto location = current_token_.location;
+            auto paren_expr = make_unique<ParenOperatorExpr>(move(expr), gen_arguments());
+            paren_expr->location = location;
+            expr = move(paren_expr);
         }
             break;
 
@@ -962,7 +969,10 @@ String Parser::gen_ident_rawstr()
 
 Ptr<IdentifierExpr> Parser::gen_ident_expr()
 {
-    return make_unique<IdentifierExpr>(gen_ident_rawstr());
+    auto location = current_token_.location;
+    auto expr = make_unique<IdentifierExpr>(gen_ident_rawstr());
+    expr->location = location;
+    return expr;
 }
 
 Ptr<Expr> Parser::gen_numeric_expr()
@@ -1005,16 +1015,16 @@ Ptr<Expr> Parser::gen_string_expr()
 
 Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
-    auto pos = tokenizer_.last_pos();
+    auto location = current_token_.location;
     get_next_token();
-    auto dot_expr = make_unique<DotExpr>(move(left), gen_ident_rawstr());
-    dot_expr->pos = pos;
-    return dot_expr;
+    auto dor_expr = make_unique<DotExpr>(move(left), gen_ident_rawstr());
+    dor_expr->location = location;
+    return dor_expr;
 }
 
-Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
+Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expr)
 {
-    auto pos = tokenizer_.last_pos();
+    auto location = current_token_.location;
     get_next_token();
 
     auto node = gen_expr();
@@ -1022,9 +1032,9 @@ Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expression)
     check<TokenType::RBracket>("expected ']'");
     get_next_token();
 
-    auto index = make_unique<IndexExpr>(move(expression), move(node));
-    index->pos = pos;
-    return index;
+    auto index_expr = make_unique<IndexExpr>(move(expr), move(node));
+    index_expr->location = location;
+    return index_expr;
 }
 
 Ptr<Expr> Parser::gen_enum_expr()
@@ -1230,14 +1240,15 @@ Ptr<Expr> Parser::gen_match_expr()
     while (current_token_.type != TokenType::RBrace)
     {
         match_expr->keylists.push_back({});
+        auto location = current_token_.location;
         match_expr->keylists.back().push_back(gen_expr());
-        match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
+        match_expr->locations.push_back(location);
         while (current_token_.type == TokenType::Comma)
         {
             try_resume();
-            get_next_token();
+            auto location = next_token().location;
             match_expr->keylists.back().push_back(gen_expr());
-            match_expr->keylists.back().back()->pos = tokenizer_.last_pos();
+            match_expr->locations.push_back(location);
         }
 
         eat<TokenType::Ret>("expected symbol '=>'");

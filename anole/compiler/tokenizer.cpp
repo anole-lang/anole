@@ -11,8 +11,7 @@ using namespace std;
 namespace anole
 {
 Tokenizer::Tokenizer(istream &input, String name_of_input) noexcept
-  : cur_line_num_(1), last_line_num_(1)
-  , cur_char_at_line_(0), last_char_at_line_(0)
+  : cur_location_(1, 0), last_location_(1, 0)
   , input_(input), name_of_input_(move(name_of_input))
   , last_input_(' ')
 {
@@ -26,15 +25,10 @@ void Tokenizer::resume()
 
 void Tokenizer::reset()
 {
-    cur_line_num_ = last_line_num_ = 1;
-    cur_char_at_line_ = last_char_at_line_ = 0;
-    cur_line_.clear(), pre_line_.clear();
+    cur_location_.first = last_location_.first = 1;
+    cur_location_.second = last_location_.second = 0;
+    cur_line_.clear(), last_line_.clear();
     last_input_ = ' ';
-}
-
-pair<Size, Size> Tokenizer::last_pos()
-{
-    return { last_line_num_, last_char_at_line_ };
 }
 
 void Tokenizer::get_next_input()
@@ -47,14 +41,14 @@ void Tokenizer::get_next_input()
 
     if (last_input_ == '\n')
     {
-        ++cur_line_num_;
-        cur_char_at_line_ = 0;
-        pre_line_ = cur_line_;
+        ++cur_location_.first;
+        cur_location_.second = 0;
+        last_line_ = cur_line_;
         cur_line_.clear();
     }
     else
     {
-        ++cur_char_at_line_;
+        ++cur_location_.second;
         cur_line_ += last_input_;
     }
 }
@@ -102,8 +96,7 @@ Token Tokenizer::next_token()
         get_next_input();
     }
 
-    last_char_at_line_ = cur_char_at_line_;
-    last_line_num_ = cur_line_num_;
+    last_location_ = cur_location_;
 
     optional<Token> token;
     String value;
@@ -123,7 +116,7 @@ Token Tokenizer::next_token()
                 break;
 
             case '@':
-                token = TokenType::At;
+                token = Token(TokenType::At, last_location_);
                 break;
 
             case '"':
@@ -131,15 +124,15 @@ Token Tokenizer::next_token()
                 break;
 
             case ':':
-                token = TokenType::Colon;
+                token = Token(TokenType::Colon, last_location_);
                 break;
 
             case ';':
-                token = TokenType::Semicolon;
+                token = Token(TokenType::Semicolon, last_location_);
                 break;
 
             case ',':
-                token = TokenType::Comma;
+                token = Token(TokenType::Comma, last_location_);
                 break;
 
             case '.':
@@ -147,31 +140,31 @@ Token Tokenizer::next_token()
                 break;
 
             case '(':
-                token = TokenType::LParen;
+                token = Token(TokenType::LParen, last_location_);
                 break;
 
             case ')':
-                token = TokenType::RParen;
+                token = Token(TokenType::RParen, last_location_);
                 break;
 
             case '[':
-                token = TokenType::LBracket;
+                token = Token(TokenType::LBracket, last_location_);
                 break;
 
             case ']':
-                token = TokenType::RBracket;
+                token = Token(TokenType::RBracket, last_location_);
                 break;
 
             case '{':
-                token = TokenType::LBrace;
+                token = Token(TokenType::LBrace, last_location_);
                 break;
 
             case '}':
-                token = TokenType::RBrace;
+                token = Token(TokenType::RBrace, last_location_);
                 break;
 
             case '?':
-                token = TokenType::Ques;
+                token = Token(TokenType::Ques, last_location_);
                 break;
 
             default:
@@ -201,14 +194,14 @@ Token Tokenizer::next_token()
             }
             else
             {
-                return TokenType::Dot;
+                return Token(TokenType::Dot, last_location_);
             }
             break;
 
         case State::InDoot:
             if (last_input_ == '.')
             {
-                token = TokenType::Dooot;
+                token = Token(TokenType::Dooot, last_location_);
             }
             else
             {
@@ -246,7 +239,7 @@ Token Tokenizer::next_token()
                 }
                 else
                 {
-                    return Token(TokenType::Integer, value);
+                    return Token(TokenType::Integer, value, last_location_);
                 }
             }
             break;
@@ -258,7 +251,7 @@ Token Tokenizer::next_token()
             }
             else
             {
-                return Token(TokenType::Double, value);
+                return Token(TokenType::Double, value, last_location_);
             }
             break;
 
@@ -271,7 +264,7 @@ Token Tokenizer::next_token()
             }
             else
             {
-                return value;
+                return Token(value, last_location_);
             }
             break;
 
@@ -282,7 +275,7 @@ Token Tokenizer::next_token()
             }
             else
             {
-                return value;
+                return Token(value, last_location_);
             }
             break;
 
@@ -297,7 +290,7 @@ Token Tokenizer::next_token()
                 break;
 
             case '"':
-                token = Token(TokenType::String, value);
+                token = Token(TokenType::String, value, last_location_);
                 break;
 
             default:
@@ -365,24 +358,28 @@ Token Tokenizer::next_token()
     }
     if (!token)
     {
-        return TokenType::End;
+        return Token(TokenType::End, last_location_);
     }
     return *token;
 }
 
 String Tokenizer::get_err_info(const String &message)
 {
-    auto line = (cur_line_num_ != last_line_num_)
-        ? pre_line_ : cur_line_
+    auto line = (cur_location_.first != last_location_.first)
+        ? last_line_ : cur_line_
+    ;
+
+    auto line_num = last_location_.first,
+         char_at_line = last_location_.second
     ;
 
     return
         info::strong(name_of_input_ + ":"
-            + to_string(last_line_num_) + ":"
-            + to_string(last_char_at_line_) + ": ") +
+            + to_string(line_num) + ":"
+            + to_string(char_at_line) + ": ") +
         info::warning("error: ") + message + "\n" +
         line + "\n" +
-        String(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ')
+        String(char_at_line == 0 ? 0 : char_at_line - 1, ' ')
             + info::warning("^")
     ;
 }

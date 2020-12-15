@@ -85,20 +85,24 @@ enum class TokenType : Size
     End,
 };
 
+/**
+ * fst for line_num, snd for char_at_line
+*/
+using Location = std::pair<Size, Size>;
+
 struct Token
 {
     TokenType type;
-    String value;
+    String    value;
+    Location  location;
 
   public:
     static TokenType add_token_type(const String &str);
 
   public:
-    Token() noexcept = default;
-
-    Token(TokenType type) noexcept;
-    Token(TokenType type, String value) noexcept;
-    Token(String value) noexcept;
+    Token(TokenType type, Location location) noexcept;
+    Token(TokenType type, String value, Location location) noexcept;
+    Token(String value, Location location) noexcept;
 
     Token(Token &&other) noexcept;
     Token(const Token &other) noexcept;

@@ -18,19 +18,16 @@ class Tokenizer
     void resume();
     void reset();
 
-    std::pair<Size, Size> last_pos();
     String get_err_info(const String &message);
 
   private:
     void get_next_input();
 
   private:
-    Size cur_line_num_;
-    Size last_line_num_;
-    Size cur_char_at_line_;
-    Size last_char_at_line_;
+    Location cur_location_;
+    Location last_location_;
     String cur_line_;
-    String pre_line_;
+    String last_line_;
 
     std::istream &input_;
     String name_of_input_;

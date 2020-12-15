@@ -8,8 +8,6 @@ namespace light
 template<typename T>
 struct default_delete
 {
-    constexpr default_delete() noexcept = default;
-
     void operator()(T *ptr) const
     {
         static_assert(!is_void_v<T>,

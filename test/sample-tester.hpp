@@ -19,7 +19,7 @@ inline String execute(const String &input)
     cout.rdbuf(out.rdbuf());
 
     istringstream ss{input};
-    auto code = make_shared<Code>();
+    auto code = make_shared<Code>("<test>");
     Context::current() = std::make_shared<Context>(code);
     Parser parser{ss, "<test>"};
     while (auto ast = parser.gen_statement())

@@ -27,7 +27,7 @@ const char *CompileError::what() const noexcept
 
 RuntimeError::RuntimeError(const String &err)
 {
-    auto &mapping = Context::current()->code()->mapping();
+    auto &mapping = Context::current()->code()->source_mapping();
     if (mapping.count(Context::current()->pc()))
     {
         auto pos = mapping[Context::current()->pc()];
@@ -48,7 +48,7 @@ RuntimeError::RuntimeError(const String &err)
         {
             ++trace_count;
 
-            auto &mapping = Context::current()->code()->mapping();
+            auto &mapping = Context::current()->code()->source_mapping();
             if (mapping.count(Context::current()->pc()))
             {
                 auto pos = mapping[Context::current()->pc()];

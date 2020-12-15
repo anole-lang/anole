@@ -29,14 +29,21 @@ using ParameterList
     = std::list<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>
 ; // boolean stands for whether it is packed
 
+/**
+ * as an attribute
+ *  because not every node needs locations
+*/
+struct with_location
+{
+    Location location;
+};
+struct with_locations
+{
+    std::vector<Location> locations;
+};
+
 struct AST
 {
-    using Position = std::pair<Size, Size>;
-    // pos not be uesd in each node
-    Position pos = {0, 0};
-
-    constexpr AST() noexcept = default;
-
     virtual ~AST() = 0;
     virtual void codegen(Code &) = 0;
 
@@ -74,8 +81,8 @@ struct IntegerExpr : Expr
 
     IntegerExpr(int64_t value) : value(value) {}
 
-    bool is_integer_expr() override;
     void codegen(Code &) override;
+    bool is_integer_expr() override;
 };
 
 struct FloatExpr : Expr
@@ -109,7 +116,7 @@ struct StringExpr : Expr
     void codegen(Code &) override;
 };
 
-struct IdentifierExpr : Expr
+struct IdentifierExpr : Expr, with_location
 {
     String name;
 
@@ -122,7 +129,7 @@ struct IdentifierExpr : Expr
     void codegen(Code &) override;
 };
 
-struct ParenOperatorExpr : Expr
+struct ParenOperatorExpr : Expr, with_location
 {
     Ptr<Expr> expr;
     ArgumentList args;
@@ -138,7 +145,7 @@ struct ParenOperatorExpr : Expr
     void codegen(Code &) override;
 };
 
-struct UnaryOperatorExpr : Expr
+struct UnaryOperatorExpr : Expr, with_location
 {
     Token op;
     Ptr<Expr> expr;
@@ -153,7 +160,7 @@ struct UnaryOperatorExpr : Expr
     void codegen(Code &) override;
 };
 
-struct BinaryOperatorExpr : Expr
+struct BinaryOperatorExpr : Expr, with_location
 {
     Token op;
     Ptr<Expr> lhs, rhs;
@@ -185,7 +192,7 @@ struct LambdaExpr : Expr
     void codegen(Code &) override;
 };
 
-struct DotExpr : Expr
+struct DotExpr : Expr, with_location
 {
     Ptr<Expr> left;
     std::string name;
@@ -204,12 +211,12 @@ struct EnumExpr : Expr
 {
     std::list<struct VariableDeclarationStmt> decls;
 
-    EnumExpr() noexcept = default;
+    EnumExpr() = default;
 
     void codegen(Code &) override;
 };
 
-struct MatchExpr : Expr
+struct MatchExpr : Expr, with_locations
 {
     Ptr<Expr> expr;
     std::vector<ExprList> keylists;
@@ -221,7 +228,7 @@ struct MatchExpr : Expr
     void codegen(Code &) override;
 };
 
-struct ListExpr : Expr
+struct ListExpr : Expr, with_location
 {
     ExprList exprs;
 
@@ -230,7 +237,7 @@ struct ListExpr : Expr
     void codegen(Code &) override;
 };
 
-struct IndexExpr : Expr
+struct IndexExpr : Expr, with_location
 {
     Ptr<Expr> expr, index;
 
@@ -286,7 +293,7 @@ struct DelayExpr : Expr
     void codegen(Code &) override;
 };
 
-struct QuesExpr : Expr
+struct QuesExpr : Expr, with_location
 {
     Ptr<Expr> cond, true_expr, false_expr;
 
@@ -346,8 +353,8 @@ struct ExprStmt : Stmt
         // ...
     }
 
-    bool is_expr_stmt() override;
     void codegen(Code &) override;
+    bool is_expr_stmt() override;
 };
 
 struct DeclarationStmt : Stmt
@@ -442,7 +449,7 @@ struct ReturnStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct IfElseStmt : Stmt
+struct IfElseStmt : Stmt, with_location
 {
     Ptr<Expr> cond;
     Ptr<BlockExpr> true_block;
@@ -461,7 +468,7 @@ struct IfElseStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct WhileStmt : Stmt
+struct WhileStmt : Stmt, with_location
 {
     Ptr<Expr> cond;
     Ptr<BlockExpr> block;
@@ -477,7 +484,7 @@ struct WhileStmt : Stmt
     void codegen(Code &) override;
 };
 
-struct DoWhileStmt : Stmt
+struct DoWhileStmt : Stmt, with_location
 {
     Ptr<Expr> cond;
     Ptr<BlockExpr> block;

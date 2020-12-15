@@ -921,7 +921,7 @@ void Context::execute()
         cerr << "run at: " << Context::current()->code()->from() << ":" << Context::current()->pc() << endl;
         #endif
 
-        theOpHandles[Context::current()->opcode()]();
+        theOpHandles[static_cast<uint8_t>(Context::current()->opcode())]();
     }
 }
 }

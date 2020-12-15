@@ -179,11 +179,41 @@ void typein(istream &in, pair<T1, T2> &pir)
 
 namespace anole
 {
-Code::Code(String from)
+Code::Code(String from) noexcept
   : from_(move(from))
   , constants_{ NoneObject::one(), BoolObject::the_true(), BoolObject::the_false() }
 {
     // ...
+}
+
+const String &Code::from()
+{
+    return from_;
+}
+
+map<Size, Location> &Code::source_mapping()
+{
+    return source_mapping_;
+}
+
+void Code::locate(const Location &location)
+{
+    source_mapping_[instructions_.size()] = location;
+}
+
+Instruction &Code::ins_at(Size i)
+{
+    return instructions_[i];
+}
+
+Opcode &Code::opcode_at(Size i)
+{
+    return instructions_[i].opcode;
+}
+
+any &Code::oprand_at(Size i)
+{
+    return instructions_[i].oprand;
 }
 
 Size Code::size()
@@ -481,7 +511,7 @@ void Code::serialize(ostream &out)
 
     typeouts(out, constants_literals_.size(),
                   instructions_.size(),
-                  mapping_.size()
+                  source_mapping_.size()
     );
 
     for (Size i = 0; i < constants_literals_.size(); ++i)
@@ -509,7 +539,7 @@ void Code::serialize(ostream &out)
 
     for (auto &ins : instructions_)
     {
-        out.put(ins.opcode);
+        out.put(static_cast<uint8_t>(ins.opcode));
         switch (ins.opcode)
         {
         case Opcode::LoadConst:
@@ -556,7 +586,7 @@ void Code::serialize(ostream &out)
         }
     }
 
-    for (auto &line_pos : mapping_)
+    for (auto &line_pos : source_mapping_)
     {
         typeouts(out, line_pos.first,
             line_pos.second.first,
@@ -687,7 +717,7 @@ bool Code::unserialize(ifstream &in)
     {
         Size line, pf, ps;
         typeins(in, line, pf, ps);
-        mapping_[line] = { pf, ps };
+        source_mapping_[line] = { pf, ps };
     }
 
     return true;
