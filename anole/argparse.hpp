@@ -19,8 +19,7 @@ class Argument
         = std::function<std::any(const String &)>
     ;
 
-    Argument()
-      : action_([](const String &value) { return value; })
+    Argument() : action_([](const String &value) { return value; })
     {
         // ...
     }

@@ -9,15 +9,8 @@ namespace anole
 {
 namespace info
 {
-inline String strong(const String &str)
-{
-    return "\033[1m" + str + "\033[0m";
-}
-
-inline String warning(const String &str)
-{
-    return "\033[31m" + str + "\033[0m";
-}
+String strong(const String &str);
+String warning(const String &str);
 }
 
 class CompileError : public std::exception

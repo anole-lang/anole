@@ -1,9 +1,20 @@
 #include "anole.hpp"
 
-using namespace std;
-
 namespace anole
 {
+namespace info
+{
+String strong(const String &str)
+{
+    return "\033[1m" + str + "\033[0m";
+}
+
+String warning(const String &str)
+{
+    return "\033[31m" + str + "\033[0m";
+}
+} // namespace info
+
 CompileError::CompileError(String err)
   : err_(err)
 {
@@ -33,8 +44,8 @@ RuntimeError::RuntimeError(const String &err)
         auto pos = mapping[Context::current()->pc()];
         err_ = info::strong("  running at "
             + Context::current()->code()->from()
-            + ":" + to_string(pos.first)
-            + ":" + to_string(pos.second) + ": "
+            + ":" + std::to_string(pos.first)
+            + ":" + std::to_string(pos.second) + ": "
         );
     }
     err_ += info::warning("error: ") + err;
@@ -54,8 +65,8 @@ RuntimeError::RuntimeError(const String &err)
                 auto pos = mapping[Context::current()->pc()];
                 err_ = "  running at "
                     + Context::current()->code()->from()
-                    + ":" + to_string(pos.first)
-                    + ":" + to_string(pos.second) + "\n"
+                    + ":" + std::to_string(pos.first)
+                    + ":" + std::to_string(pos.second) + "\n"
                     + err_
                 ;
             }

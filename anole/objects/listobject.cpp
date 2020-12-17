@@ -216,9 +216,9 @@ Address ListIteratorObject::load_member(const String &name)
     if (method != lc_builtin_methods_for_listiterator.end())
     {
         return std::make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([
-                    this,
-                    &func = method->second](Size) mutable
+            Allocator<Object>::alloc<BuiltInFunctionObject>(
+                [this, &func = method->second]
+                (Size) mutable
                 {
                     func(this);
                 },

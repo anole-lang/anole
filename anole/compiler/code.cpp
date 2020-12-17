@@ -9,10 +9,10 @@
 
 #define OPRAND(TYPE) (std::any_cast<const TYPE &>(ins.oprand))
 
+namespace anole
+{
 namespace
 {
-using namespace anole;
-
 class Printer
 {
   public:
@@ -176,8 +176,6 @@ void typein(std::istream &in, std::pair<T1, T2> &pir)
 }
 }
 
-namespace anole
-{
 Code::Code(String from) noexcept
   : from_(std::move(from))
   , constants_{ NoneObject::one(), BoolObject::the_true(), BoolObject::the_false() }
