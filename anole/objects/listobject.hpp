@@ -32,20 +32,15 @@ class ListObject : public Object
 class ListIteratorObject : public Object
 {
   public:
-    ListIteratorObject(ListObject *bind)
-      : Object(ObjectType::ListIterator)
-      , bind_(bind)
-      , current_(bind->objects().begin())
-    {
-        // ...
-    }
+    ListIteratorObject(ListObject *bind);
 
+    bool has_next();
+    Address next();
+
+  public:
     Address load_member(const String &name) override;
 
     void collect(std::function<void(Object *)>) override;
-
-    bool has_next() { return current_ != bind_->objects().end(); }
-    Address next() { return *current_++; }
 
   private:
     ListObject *bind_;

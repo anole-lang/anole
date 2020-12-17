@@ -176,9 +176,7 @@ Address ListObject::load_member(const String &name)
     if (method != lc_builtin_methods_for_list.end())
     {
         return make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([
-                    this,
-                    &func = method->second](Size) mutable
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this, &func = method->second](Size) mutable
                 {
                     func(this);
                 },
@@ -195,6 +193,23 @@ void ListObject::collect(function<void(Object *)> func)
     {
         func(addr->ptr());
     }
+}
+
+ListIteratorObject::ListIteratorObject(ListObject *bind)
+  : Object(ObjectType::ListIterator)
+  , bind_(bind), current_(bind->objects().begin())
+{
+    // ...
+}
+
+bool ListIteratorObject::has_next()
+{
+    return current_ != bind_->objects().end();
+}
+
+Address ListIteratorObject::next()
+{
+    return *current_++;
 }
 
 Address ListIteratorObject::load_member(const String &name)
