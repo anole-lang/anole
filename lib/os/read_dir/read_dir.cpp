@@ -4,25 +4,23 @@
 #include <vector>
 #include <filesystem>
 
-using namespace std;
-namespace fs = filesystem;
-using namespace anole;
+namespace fs = std::filesystem;
 
 extern "C"
 {
-vector<String> _FUNCTIONS
+std::vector<anole::String> _FUNCTIONS
 {
-    "__read_dir"s
+    "__read_dir"
 };
 
-void __read_dir(Size n)
+void __read_dir(anole::Size n)
 {
     if (n != 1)
     {
-        throw RuntimeError("function read_dir need only one argument");
+        throw anole::RuntimeError("function read_dir need only one argument");
     }
 
-    auto path_obj = Context::current()->pop_ptr();
+    auto path_obj = anole::Context::current()->pop_ptr();
     fs::path path;
     if (auto ptr = dynamic_cast<PathObject *>(path_obj))
     {
@@ -35,15 +33,19 @@ void __read_dir(Size n)
 
     if (path.is_relative())
     {
-        path = Context::current()->current_path() / path;
+        path = anole::Context::current()->current_path() / path;
     }
 
-    auto paths = Allocator<Object>::alloc<ListObject>();
+    auto paths = anole::Allocator<anole::Object>::alloc<anole::ListObject>();
     for (auto &p : fs::directory_iterator(path))
     {
-        paths->append(Allocator<Object>::alloc<PathObject>(p.path().lexically_normal()));
+        paths->append(anole::Allocator<anole::Object>::
+            alloc<PathObject>(
+                p.path().lexically_normal()
+            )
+        );
     }
 
-    Context::current()->push(paths);
+    anole::Context::current()->push(paths);
 }
 }

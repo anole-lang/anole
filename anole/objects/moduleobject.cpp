@@ -11,13 +11,10 @@
 
 #include <fstream>
 
-using namespace std;
-namespace fs = filesystem;
+namespace fs = std::filesystem;
 
 namespace anole
 {
-ModuleObject::~ModuleObject() = default;
-
 ModuleObject *ModuleObject::generate(const String &name)
 {
     ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
@@ -40,6 +37,19 @@ ModuleObject *ModuleObject::generate(const fs::path &path)
         mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
     }
     return mod;
+}
+
+ModuleObject::ModuleObject(ObjectType type) noexcept
+  : Object(type), good_(false)
+{
+    // ...
+}
+
+ModuleObject::~ModuleObject() = default;
+
+bool ModuleObject::good()
+{
+    return good_;
 }
 
 AnoleModuleObject::AnoleModuleObject(const String &name)
@@ -98,6 +108,16 @@ AnoleModuleObject::AnoleModuleObject(const fs::path &path)
     }
 }
 
+const SPtr<Scope> &AnoleModuleObject::scope() const
+{
+    return scope_;
+}
+
+const SPtr<Code> &AnoleModuleObject::code() const
+{
+    return code_;
+}
+
 Address AnoleModuleObject::load_member(const String &name)
 {
     if (scope_->symbols().count(name))
@@ -107,19 +127,19 @@ Address AnoleModuleObject::load_member(const String &name)
     return Object::load_member(name);
 }
 
-void AnoleModuleObject::collect(function<void(Scope *)> func)
+void AnoleModuleObject::collect(std::function<void(Scope *)> func)
 {
     func(scope_.get());
 }
 
-void AnoleModuleObject::init(const filesystem::path &path)
+void AnoleModuleObject::init(const fs::path &path)
 {
     auto dir = path.parent_path();
     auto ir_path = path.string() + ".ir";
 
-    code_ = make_shared<Code>(path.filename().string());
+    code_ = std::make_shared<Code>(path.filename().string());
     auto origin = Context::current();
-    Context::current() = make_shared<Context>(code_, dir);
+    Context::current() = std::make_shared<Context>(code_, dir);
     Context::current()->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
@@ -130,7 +150,7 @@ void AnoleModuleObject::init(const filesystem::path &path)
     }
     else
     {
-        ifstream fin{path};
+        std::ifstream fin{path};
         if (!fin.good())
         {
             throw RuntimeError("cannot open file " + path.string());
@@ -193,6 +213,11 @@ CppModuleObject::~CppModuleObject()
     }
 }
 
+const std::vector<String> *CppModuleObject::names() const
+{
+    return names_;
+}
+
 Address CppModuleObject::load_member(const String &name)
 {
     using FuncType = void (*)(Size);
@@ -207,6 +232,6 @@ Address CppModuleObject::load_member(const String &name)
         [func](Size n) { func(n); }, this
     );
 
-    return make_shared<Variable>(result);
+    return std::make_shared<Variable>(result);
 }
 }

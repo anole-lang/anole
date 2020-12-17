@@ -6,13 +6,11 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
 namespace anole
 {
 namespace
 {
-vector<String> lc_mapping_t_s
+std::vector<String> lc_mapping_type_str
 {
     "none",
     "boolean",
@@ -30,7 +28,7 @@ vector<String> lc_mapping_t_s
     "anolemodule",
     "cppmodule"
 };
-map<String, ObjectType> lc_mapping_s_t
+std::map<String, ObjectType> lc_mapping_str_type
 {
     { "none",           ObjectType::None            },
     { "boolean",        ObjectType::Boolean         },
@@ -44,7 +42,7 @@ map<String, ObjectType> lc_mapping_s_t
     { "builtinfunc",    ObjectType::BuiltinFunc     },
     { "func",           ObjectType::Func            },
     { "thunk",          ObjectType::Thunk           },
-    { "cont",           ObjectType::Cont            },
+    { "continuation",   ObjectType::Continuation    },
     { "anolemodule",    ObjectType::AnoleModule     },
     { "cppmodule",      ObjectType::CppModule       }
 };
@@ -52,12 +50,13 @@ map<String, ObjectType> lc_mapping_s_t
 
 ObjectType Object::add_object_type(const String &literal)
 {
-    if (!lc_mapping_s_t.count(literal))
+    auto find = lc_mapping_str_type.find(literal);
+    if (find == lc_mapping_str_type.end())
     {
-        lc_mapping_s_t[literal] = ObjectType(lc_mapping_t_s.size());
-        lc_mapping_t_s.push_back(literal);
+        lc_mapping_type_str.push_back(literal);
+        return lc_mapping_str_type[literal] = static_cast<ObjectType>(lc_mapping_type_str.size());
     }
-    return lc_mapping_s_t[literal];
+    return find->second;
 }
 
 Object::~Object() = default;
@@ -65,7 +64,7 @@ Object::~Object() = default;
 Object *Object::type()
 {
     return Allocator<Object>::alloc<StringObject>(
-        lc_mapping_t_s[type_]
+        lc_mapping_type_str[static_cast<Size>(type_)]
     );
 }
 
@@ -81,7 +80,7 @@ String Object::to_str()
 
 String Object::to_key()
 {
-    return 'p' + to_string(reinterpret_cast<uintptr_t>(this));
+    return 'p' + std::to_string(reinterpret_cast<uintptr_t>(this));
 }
 
 Object *Object::neg()
@@ -187,17 +186,17 @@ bool Object::is_callable()
     return false;
 }
 
-void Object::collect(function<void(Scope *)>)
+void Object::collect(std::function<void(Scope *)>)
 {
     // ...
 }
 
-void Object::collect(function<void(Object *)>)
+void Object::collect(std::function<void(Object *)>)
 {
     // ...
 }
 
-void Object::collect(function<void(Context *)>)
+void Object::collect(std::function<void(Context *)>)
 {
     // ...
 }

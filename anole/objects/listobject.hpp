@@ -10,8 +10,12 @@ namespace anole
 class ListObject : public Object
 {
   public:
-    ListObject() : Object(ObjectType::List) {}
+    ListObject() noexcept;
 
+    std::list<Address> &objects();
+    void append(Object *ptr);
+
+  public:
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
@@ -21,9 +25,6 @@ class ListObject : public Object
 
     void collect(std::function<void(Object *)>) override;
 
-    std::list<Address> &objects();
-    void append(Object *ptr);
-
   private:
     std::list<Address> objects_;
 };
@@ -31,20 +32,15 @@ class ListObject : public Object
 class ListIteratorObject : public Object
 {
   public:
-    ListIteratorObject(ListObject *bind)
-      : Object(ObjectType::ListIterator)
-      , bind_(bind)
-      , current_(bind->objects().begin())
-    {
-        // ...
-    }
+    ListIteratorObject(ListObject *bind);
 
+    bool has_next();
+    Address next();
+
+  public:
     Address load_member(const String &name) override;
 
     void collect(std::function<void(Object *)>) override;
-
-    bool has_next() { return current_ != bind_->objects().end(); }
-    Address next() { return *current_++; }
 
   private:
     ListObject *bind_;

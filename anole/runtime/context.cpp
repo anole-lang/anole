@@ -13,16 +13,14 @@
 #include <iostream>
 #endif
 
-#define OPRAND(T) any_cast<const T &>(Context::current()->oprand())
-
-using namespace std;
+#define OPRAND(T) std::any_cast<const T &>(Context::current()->oprand())
 
 namespace anole
 {
 namespace
 {
-vector<char *> lc_args;
-map<const Variable *, String> lc_not_defineds;
+std::vector<char *> lc_args;
+std::map<const Variable *, String> lc_not_defineds;
 }
 
 SPtr<Context> &Context::current()
@@ -31,8 +29,7 @@ SPtr<Context> &Context::current()
     return the_current;
 }
 
-void
-Context::set_args(int argc, char *argv[], int start)
+void Context::set_args(int argc, char *argv[], int start)
 {
     for (; start < argc; ++start)
     {
@@ -40,22 +37,17 @@ Context::set_args(int argc, char *argv[], int start)
     }
 }
 
-const vector<char *>
-&Context::get_args()
+const std::vector<char *> &Context::get_args()
 {
     return lc_args;
 }
 
-void
-Context::add_not_defined_symbol(
-    const String &name, const Variable *addr)
+void Context::add_not_defined_symbol(const String &name, const Variable *addr)
 {
     lc_not_defineds[addr] = name;
 }
 
-void
-Context::rm_not_defined_symbol(
-    const Variable *addr)
+void Context::rm_not_defined_symbol(const Variable *addr)
 {
     if (lc_not_defineds.count(addr))
     {
@@ -63,9 +55,7 @@ Context::rm_not_defined_symbol(
     }
 }
 
-const String
-&Context::get_not_defined_symbol(
-    const Variable *addr)
+const String &Context::get_not_defined_symbol(const Variable *addr)
 {
     return lc_not_defineds[addr];
 }
@@ -139,39 +129,69 @@ SPtr<Code> &Context::code()
     return code_;
 }
 
-Size &Context::pc()
+Size &Context::pc() noexcept
 {
     return pc_;
 }
 
-const Instruction &Context::ins()
-{
-    return code_->ins_at(pc_);
-}
-
-const Instruction &Context::ins_at(Size index)
-{
-    return code_->ins_at(index);
-}
-
-const Opcode Context::opcode()
+const Opcode &Context::opcode() const
 {
     return code_->opcode_at(pc_);
 }
 
-const std::any &Context::oprand()
+const std::any &Context::oprand() const
 {
     return code_->oprand_at(pc_);
 }
 
 void Context::push(Object *ptr)
 {
-    stack_->push_back(make_shared<Variable>(ptr));
+    stack_->push_back(std::make_shared<Variable>(ptr));
 }
 
 void Context::push(Address addr)
 {
     stack_->push_back(addr);
+}
+
+void Context::set_top(Address addr)
+{
+    stack_->back() = addr;
+}
+
+void Context::set_top(Object *ptr)
+{
+    stack_->back() = std::make_shared<Variable>(ptr);
+}
+
+void Context::pop(Size num)
+{
+    for (Size i = 0; i < num; ++i)
+    {
+        stack_->pop_back();
+    }
+}
+
+Address Context::pop_address()
+{
+    auto res = stack_->back();
+    stack_->pop_back();
+    return res;
+}
+
+Size Context::size() const
+{
+    return stack_->size();
+}
+
+Context::Stack *Context::get_stack()
+{
+    return stack_.get();
+}
+
+std::filesystem::path &Context::current_path()
+{
+    return current_path_;
 }
 
 void Context::set_call_anchor()
@@ -220,13 +240,13 @@ void import_handle()
         throw RuntimeError("no module named " + name);
     }
 
-    Context::current()->push(move(mod));
+    Context::current()->push(std::move(mod));
     ++Context::current()->pc();
 }
 
 void importpath_handle()
 {
-    auto path = filesystem::path(OPRAND(String));
+    auto path = std::filesystem::path(OPRAND(String));
     if (path.is_relative())
     {
         path = Context::current()->current_path() / path;
@@ -237,7 +257,7 @@ void importpath_handle()
         throw RuntimeError("no such module: " + path.string());
     }
 
-    Context::current()->push(move(mod));
+    Context::current()->push(std::move(mod));
     ++Context::current()->pc();
 }
 
@@ -279,7 +299,7 @@ void importall_handle()
 
 void importallpath_handle()
 {
-    auto path = filesystem::path(OPRAND(String));
+    auto path = std::filesystem::path(OPRAND(String));
     if (path.is_relative())
     {
         path = Context::current()->current_path() / path;
@@ -353,7 +373,7 @@ void load_handle()
         else
         {
             Context::current()->push(addr);
-            Context::current() = make_shared<Context>(
+            Context::current() = std::make_shared<Context>(
                 Context::current(), thunk->scope(), thunk->code(), thunk->base()
             );
         }
@@ -406,7 +426,7 @@ void storelocal_handle()
 
 void newscope_handle()
 {
-    Context::current()->scope() = make_shared<Scope>(
+    Context::current()->scope() = std::make_shared<Scope>(
         Context::current()->scope()
     );
     ++Context::current()->pc();
@@ -548,7 +568,7 @@ void addprefixop_handle()
 
 void addinfixop_handle()
 {
-    using type = pair<String, Size>;
+    using type = std::pair<String, Size>;
     const auto &op_p = OPRAND(type);
     Parser::add_infixop(op_p.first, op_p.second);
     ++Context::current()->pc();
@@ -583,7 +603,7 @@ void unpack_handle()
 
 void lambdadecl_handle()
 {
-    using type = pair<Size, Size>;
+    using type = std::pair<Size, Size>;
     const auto &num_target = OPRAND(type);
     Context::current()->push(Allocator<Object>::alloc<FunctionObject>(
         Context::current()->scope(), Context::current()->code(),
@@ -921,7 +941,7 @@ void Context::execute()
         cerr << "run at: " << Context::current()->code()->from() << ":" << Context::current()->pc() << endl;
         #endif
 
-        theOpHandles[Context::current()->opcode()]();
+        theOpHandles[static_cast<uint8_t>(Context::current()->opcode())]();
     }
 }
 }

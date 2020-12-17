@@ -3,26 +3,38 @@
 #include "../runtime/runtime.hpp"
 #include "../compiler/compiler.hpp"
 
-#define OPRAND(T) any_cast<const T &>(Context::current()->oprand())
-
-using namespace std;
+#define OPRAND(T) std::any_cast<const T &>(Context::current()->oprand())
 
 namespace anole
 {
 FunctionObject::FunctionObject(SPtr<Scope> pre_scope,
-    SPtr<Code> code, Size base,
-    Size parameter_num)
+    SPtr<Code> code, Size base, Size parameter_num)
   : Object(ObjectType::Func)
-  , scope_(make_shared<Scope>(pre_scope))
+  , scope_(std::make_shared<Scope>(pre_scope))
   , code_(code), base_(base)
   , parameter_num_(parameter_num)
 {
     // ...
 }
 
+SPtr<Scope> FunctionObject::scope()
+{
+    return scope_;
+}
+
+SPtr<Code> FunctionObject::code()
+{
+    return code_;
+}
+
+Size FunctionObject::base()
+{
+    return base_;
+}
+
 String FunctionObject::to_str()
 {
-    return "<function>"s;
+    return "<function>";
 }
 
 Address FunctionObject::load_member(const String &name)
@@ -32,7 +44,7 @@ Address FunctionObject::load_member(const String &name)
 
 void FunctionObject::call(Size num)
 {
-    Context::current() = make_shared<Context>(
+    Context::current() = std::make_shared<Context>(
         Context::current(), scope_, code_, base_
     );
 
@@ -94,7 +106,7 @@ void FunctionObject::call(Size num)
 
         case Opcode::LambdaDecl:
         {
-            using type = pair<Size, Size>;
+            using type = std::pair<Size, Size>;
             pc = (OPRAND(type)).second;
         }
             break;
@@ -114,7 +126,7 @@ void FunctionObject::call(Size num)
     */
     if (arg_num)
     {
-        throw RuntimeError("function takes " + to_string(parameter_num_) + " arguments but " + to_string(num) + " were given");
+        throw RuntimeError("function takes " + std::to_string(parameter_num_) + " arguments but " + std::to_string(num) + " were given");
     }
     /**
      * if there were some parameters not meeting arguments
@@ -140,7 +152,7 @@ bool FunctionObject::is_callable()
     return true;
 }
 
-void FunctionObject::collect(function<void(Scope *)> func)
+void FunctionObject::collect(std::function<void(Scope *)> func)
 {
     func(scope_.get());
 }

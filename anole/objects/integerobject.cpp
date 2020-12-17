@@ -2,10 +2,6 @@
 
 #include "../runtime/runtime.hpp"
 
-#include <map>
-
-using namespace std;
-
 namespace anole
 {
 bool IntegerObject::to_bool()
@@ -15,7 +11,7 @@ bool IntegerObject::to_bool()
 
 String IntegerObject::to_str()
 {
-    return to_string(value_);
+    return std::to_string(value_);
 }
 
 String IntegerObject::to_key()
@@ -219,12 +215,11 @@ Address IntegerObject::load_member(const String &name)
 {
     if (name == "to_str")
     {
-        return make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>(
-                    [val = value_](Size)
+        return std::make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([val = value_](Size)
                 {
                     Context::current()
-                        ->push(Allocator<Object>::alloc<StringObject>(to_string(val)))
+                        ->push(Allocator<Object>::alloc<StringObject>(std::to_string(val)))
                     ;
                 }
             )

@@ -2,17 +2,15 @@
 
 #include "../objects/objects.hpp"
 
-using namespace std;
-
 namespace anole
 {
-Scope::Scope()
+Scope::Scope() noexcept
   : pre_scope_(nullptr)
 {
     // ...
 }
 
-Scope::Scope(SPtr<Scope> pre_scope)
+Scope::Scope(SPtr<Scope> pre_scope) noexcept
   : pre_scope_(std::move(pre_scope))
 {
     // ...
@@ -27,14 +25,14 @@ Address Scope::create_symbol(const String &name)
 {
     if (!symbols_.count(name))
     {
-        symbols_[name] = make_shared<Variable>();
+        symbols_[name] = std::make_shared<Variable>();
     }
     return symbols_[name];
 }
 
 void Scope::create_symbol(const String &name, Object *obj)
 {
-    symbols_[name] = make_shared<Variable>(obj);
+    symbols_[name] = std::make_shared<Variable>(obj);
 }
 
 void Scope::create_symbol(const String &name, Address value)
@@ -53,7 +51,7 @@ Address Scope::load_builtin(const String &name)
 {
     if (auto func = BuiltInFunctionObject::load_built_in_function(name))
     {
-        return make_shared<Variable>(func);
+        return std::make_shared<Variable>(func);
     }
     return nullptr;
 }

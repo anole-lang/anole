@@ -5,13 +5,11 @@
 #include <map>
 #include <utility>
 
-using namespace std;
-
 namespace anole
 {
 namespace
 {
-map<String, function<void(ListObject *)>>
+std::map<String, std::function<void(ListObject *)>>
 lc_builtin_methods_for_list
 {
     {"empty", [](ListObject *obj)
@@ -71,7 +69,7 @@ lc_builtin_methods_for_list
     }
 };
 
-map<String, function<void(ListIteratorObject *)>>
+std::map<String, std::function<void(ListIteratorObject *)>>
 lc_builtin_methods_for_listiterator
 {
     // used by foreach
@@ -88,6 +86,22 @@ lc_builtin_methods_for_listiterator
         }
     }
 };
+}
+
+ListObject::ListObject() noexcept
+  : Object(ObjectType::List)
+{
+    // ...
+}
+
+std::list<Address> &ListObject::objects()
+{
+    return objects_;
+}
+
+void ListObject::append(Object *obj)
+{
+    objects_.push_back(std::make_shared<Variable>(obj));
 }
 
 bool ListObject::to_bool()
@@ -159,10 +173,8 @@ Address ListObject::load_member(const String &name)
     auto method = lc_builtin_methods_for_list.find(name);
     if (method != lc_builtin_methods_for_list.end())
     {
-        return make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([
-                    this,
-                    &func = method->second](Size) mutable
+        return std::make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>([this, &func = method->second](Size) mutable
                 {
                     func(this);
                 },
@@ -173,7 +185,7 @@ Address ListObject::load_member(const String &name)
     return Object::load_member(name);
 }
 
-void ListObject::collect(function<void(Object *)> func)
+void ListObject::collect(std::function<void(Object *)> func)
 {
     for (auto &addr : objects_)
     {
@@ -181,14 +193,21 @@ void ListObject::collect(function<void(Object *)> func)
     }
 }
 
-list<Address> &ListObject::objects()
+ListIteratorObject::ListIteratorObject(ListObject *bind)
+  : Object(ObjectType::ListIterator)
+  , bind_(bind), current_(bind->objects().begin())
 {
-    return objects_;
+    // ...
 }
 
-void ListObject::append(Object *obj)
+bool ListIteratorObject::has_next()
 {
-    objects_.push_back(make_shared<Variable>(obj));
+    return current_ != bind_->objects().end();
+}
+
+Address ListIteratorObject::next()
+{
+    return *current_++;
 }
 
 Address ListIteratorObject::load_member(const String &name)
@@ -196,10 +215,10 @@ Address ListIteratorObject::load_member(const String &name)
     auto method = lc_builtin_methods_for_listiterator.find(name);
     if (method != lc_builtin_methods_for_listiterator.end())
     {
-        return make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([
-                    this,
-                    &func = method->second](Size) mutable
+        return std::make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>(
+                [this, &func = method->second]
+                (Size) mutable
                 {
                     func(this);
                 },
@@ -210,7 +229,7 @@ Address ListIteratorObject::load_member(const String &name)
     return Object::load_member(name);
 }
 
-void ListIteratorObject::collect(function<void(Object *)> func)
+void ListIteratorObject::collect(std::function<void(Object *)> func)
 {
     func(bind_);
 }

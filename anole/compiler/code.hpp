@@ -20,42 +20,18 @@ class Code
     friend class Collector;
 
   public:
-    Code(String from = "<stdin>");
+    Code(String from) noexcept;
 
-    const String &from()
-    {
-        return from_;
-    }
+    const String &from();
 
-    std::map<Size, AST::Position>
-    &mapping()
-    {
-        return mapping_;
-    }
+    std::map<Size, Location> &source_mapping();
+    void locate(const Location &location);
 
-    void mapping(const AST::Position &pos)
-    {
-        if (pos.first != 0)
-        {
-            mapping_[instructions_.size()] = pos;
-        }
-    }
+    const Instruction &ins_at(Size i) const;
+    const Opcode &opcode_at(Size i) const;
+    const std::any &oprand_at(Size i) const;
 
-    Instruction &ins_at(Size i)
-    {
-        return instructions_[i];
-    }
-
-    Opcode &opcode_at(Size i)
-    {
-        return instructions_[i].opcode;
-    }
-
-    std::any &oprand_at(Size i)
-    {
-        return instructions_[i].oprand;
-    }
-
+    Size add_ins(Instruction ins);
     template<Opcode op = Opcode::PlaceHolder>
     Size add_ins()
     {
@@ -82,12 +58,13 @@ class Code
         instructions_[ind] = { op, value };
     }
 
-    Size size();
+    Size size() const noexcept;
     void push_break(Size ind);
     void set_break_to(Size ind, Size base);
     void push_continue(Size ind);
     void set_continue_to(Size ind, Size base);
     bool check();
+
     Object *load_const(Size ind);
 
     template<typename O, typename T>
@@ -95,13 +72,13 @@ class Code
     {
         static_assert(std::is_base_of_v<Object, O>);
 
-        if (constants_map_.count(key))
+        if (constants_mapping_.count(key))
         {
-            return constants_map_[key];
+            return constants_mapping_[key];
         }
         else
         {
-            constants_map_[key] = constants_.size();
+            constants_mapping_[key] = constants_.size();
             constants_literals_.push_back(key);
             /**
              * TODO:
@@ -127,14 +104,14 @@ class Code
 
   private:
     String from_;
-    std::map<Size, AST::Position> mapping_;
+    std::map<Size, Location> source_mapping_;
 
     std::vector<Instruction> instructions_;
     // these two should be checked is empty or not
     std::vector<Size> breaks_, continues_;
     std::vector<String> constants_literals_;
 
-    std::map<String, Size> constants_map_;
+    std::map<String, Size> constants_mapping_;
     std::vector<Object *> constants_;
 };
 }

@@ -10,14 +10,12 @@ class ContObject : public Object
   public:
     ContObject(SPtr<Context> resume);
 
+    SPtr<Context> resume();
+
+  public:
     void call(Size num) override;
 
     void collect(std::function<void(Context *)>) override;
-
-    SPtr<Context> resume()
-    {
-        return resume_;
-    }
 
   private:
     SPtr<Context> resume_;

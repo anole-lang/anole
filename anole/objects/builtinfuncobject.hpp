@@ -21,22 +21,12 @@ class BuiltInFunctionObject : public Object
 {
   public:
     static Object *load_built_in_function(const String &);
-
-    static void register_built_in_function(
-        const String &,
-        std::function<void(Size)>
-    );
+    static void register_built_in_function(const String &, std::function<void(Size)>);
 
   public:
-    BuiltInFunctionObject(std::function<void(Size)> func,
-        Object *bind = nullptr)
-      : Object(ObjectType::BuiltinFunc)
-      , func_(std::move(func))
-      , bind_(bind)
-    {
-        // ...
-    }
+    BuiltInFunctionObject(std::function<void(Size)> func, Object *bind = nullptr) noexcept;
 
+  public:
     String to_str() override;
     void call(Size num) override;
 

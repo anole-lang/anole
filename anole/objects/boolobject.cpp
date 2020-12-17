@@ -2,8 +2,6 @@
 
 #include "../runtime/allocator.hpp"
 
-using namespace std;
-
 namespace anole
 {
 Object *BoolObject::the_true()

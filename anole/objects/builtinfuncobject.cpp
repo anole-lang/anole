@@ -4,33 +4,20 @@
 
 #include <map>
 
-using namespace std;
-
 namespace anole
 {
-String BuiltInFunctionObject::to_str()
-{
-    return "<builtin-function>"s;
-}
-
-void BuiltInFunctionObject::call(Size n)
-{
-    func_(n);
-    ++Context::current()->pc();
-}
-
 namespace
 {
-map<String, BuiltInFunctionObject *>
+std::map<String, BuiltInFunctionObject *>
 &get_built_in_functions()
 {
-    static map<String, BuiltInFunctionObject *> built_in_functions;
+    static std::map<String, BuiltInFunctionObject *> built_in_functions;
     return built_in_functions;
 }
 }
 
-Object *
-BuiltInFunctionObject::load_built_in_function(const String &name)
+Object
+*BuiltInFunctionObject::load_built_in_function(const String &name)
 {
     if (get_built_in_functions().count(name))
     {
@@ -40,7 +27,7 @@ BuiltInFunctionObject::load_built_in_function(const String &name)
 }
 
 void BuiltInFunctionObject::register_built_in_function(
-    const String &name, function<void(Size)> func)
+    const String &name, std::function<void(Size)> func)
 {
     /**
      * builtin functions won't be marked
@@ -49,7 +36,24 @@ void BuiltInFunctionObject::register_built_in_function(
     get_built_in_functions()[name] = new BuiltInFunctionObject(func);
 }
 
-void BuiltInFunctionObject::collect(function<void(Object *)> func)
+BuiltInFunctionObject::BuiltInFunctionObject(std::function<void(Size)> func, Object *bind) noexcept
+  : Object(ObjectType::BuiltinFunc), func_(std::move(func)), bind_(bind)
+{
+    // ...
+}
+
+String BuiltInFunctionObject::to_str()
+{
+    return "<builtin-function>";
+}
+
+void BuiltInFunctionObject::call(Size n)
+{
+    func_(n);
+    ++Context::current()->pc();
+}
+
+void BuiltInFunctionObject::collect(std::function<void(Object *)> func)
 {
     func(bind_);
 }

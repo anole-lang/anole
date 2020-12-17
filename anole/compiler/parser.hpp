@@ -13,50 +13,43 @@ namespace anole
 class Parser
 {
   public:
-    Parser(std::istream & = std::cin,
-        String = "<stdin>"
-    );
-    void cont();
+    // add new prefix operator
+    static void add_prefixop(const String &str);
+    // add new infix operator with precedence
+    static void add_infixop(const String &str, Size precedence);
+
+  public:
+    Parser() noexcept;
+    Parser(std::istream &input, String name_of_input) noexcept;
+
+    void resume();
     void reset();
-    void set_continue_action(std::function<void()>);
+    void set_resume_action(std::function<void()>);
+
     Ptr<AST> gen_statement();
     Ptr<AST> gen_statements();
 
-    // add new prefix operator
-    static void add_prefixop(const String &str);
-    // add new infix operator with priority
-    static void add_infixop(
-        const String &str,
-        Size priority
-    );
-
   private:
-    Token current_token_;
-    Tokenizer tokenizer_;
-    std::function<void()> continue_action_;
-
     CompileError parse_error(const String &err_info);
-
     template<TokenType type>
     void check(const String &err_info)
     {
-        try_continue();
+        try_resume();
         if (current_token_.type != type)
         {
             throw parse_error(err_info);
         }
     }
-
     template<TokenType type>
     void eat(const String &err_info = "")
     {
         check<type>(err_info);
-        get_next_token();
+        next_token();
     }
 
-    Token &get_next_token();
-    void try_continue();
-    String get_err_info(const String &message);
+    void get_next_token();
+    Token &next_token();
+    void try_resume();
 
     ArgumentList gen_arguments();
     ParameterList gen_parameters();
@@ -67,9 +60,9 @@ class Parser
     Ptr<Stmt> gen_stmt();
     Ptr<DeclarationStmt> gen_declaration();
     Ptr<DeclarationStmt> gen_class_declaration();
-    UseStmt::Module gen_module();
-    UseStmt::Alias gen_alias();
     Ptr<Stmt> gen_use_stmt();
+        UseStmt::Module gen_module();
+        UseStmt::Alias gen_alias();
     Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();
     Ptr<Stmt> gen_if_else();
@@ -97,6 +90,11 @@ class Parser
     Ptr<Expr> gen_lambda_expr();
     Ptr<Expr> gen_match_expr();
     Ptr<Expr> gen_list_expr();
+
+  private:
+    Tokenizer tokenizer_;
+    Token current_token_;
+    std::function<void()> resume_action_;
 };
 }
 

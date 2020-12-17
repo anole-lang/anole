@@ -15,6 +15,12 @@ class IntegerObject : public Object
         // ...
     }
 
+    constexpr int64_t value() const noexcept
+    {
+        return value_;
+    }
+
+  public:
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
@@ -35,11 +41,6 @@ class IntegerObject : public Object
     Object *bls(Object *) override;
     Object *brs(Object *) override;
     Address load_member(const String &name) override;
-
-    constexpr int64_t value() const noexcept
-    {
-        return value_;
-    }
 
   private:
     int64_t value_;

@@ -5,35 +5,8 @@
 #include <set>
 #include <tuple>
 
-using namespace std;
-
 namespace anole
 {
-AST::~AST() = default;
-Stmt::~Stmt() = default;
-Expr::~Expr() = default;
-DeclarationStmt::~DeclarationStmt() = default;
-
-bool AST::is_integer_expr()
-{
-    return false;
-}
-
-bool AST::is_expr_stmt()
-{
-    return false;
-}
-
-bool IntegerExpr::is_integer_expr()
-{
-    return true;
-}
-
-bool ExprStmt::is_expr_stmt()
-{
-    return true;
-}
-
 void BlockExpr::codegen(Code &code)
 {
     for (auto &statement : statements)
@@ -51,7 +24,7 @@ void IntegerExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<IntegerObject>(
-            'i' + to_string(value), value
+            'i' + std::to_string(value), value
         )
     );
 }
@@ -60,7 +33,7 @@ void FloatExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<FloatObject>(
-            'f' + to_string(value), value
+            'f' + std::to_string(value), value
         )
     );
 }
@@ -81,7 +54,7 @@ void StringExpr::codegen(Code &code)
 
 void IdentifierExpr::codegen(Code &code)
 {
-    code.mapping(pos);
+    code.locate(location);
     code.add_ins<Opcode::Load, String>(name);
 }
 
@@ -90,7 +63,7 @@ void ParenOperatorExpr::codegen(Code &code)
     if (args.empty())
     {
         expr->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::FastCall>();
         return;
     }
@@ -105,7 +78,7 @@ void ParenOperatorExpr::codegen(Code &code)
         }
     }
     expr->codegen(code);
-    code.mapping(pos);
+    code.locate(location);
     code.add_ins<Opcode::Call>();
 }
 
@@ -115,14 +88,14 @@ void UnaryOperatorExpr::codegen(Code &code)
     {
     case TokenType::Sub:
         expr->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Neg>();
         break;
 
     case TokenType::Not:
     {
         expr->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         auto o1 = code.add_ins();
         code.add_ins<Opcode::LoadConst, Size>(1); // BoolObject::the_true()
         auto o2 = code.add_ins();
@@ -134,7 +107,7 @@ void UnaryOperatorExpr::codegen(Code &code)
 
     case TokenType::BNeg:
         expr->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::BNeg>();
         break;
 
@@ -162,80 +135,80 @@ void BinaryOperatorExpr::codegen(Code &code)
     case TokenType::Add:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Add>();
         break;
 
     case TokenType::Sub:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Sub>();
         break;
 
     case TokenType::Mul:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Mul>();
         break;
 
     case TokenType::Div:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Div>();
         break;
 
     case TokenType::Mod:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Mod>();
         break;
 
     case TokenType::BAnd:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::BAnd>();
         break;
 
     case TokenType::BOr:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::BOr>();
         break;
 
     case TokenType::BXor:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::BXor>();
         break;
 
     case TokenType::BLS:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::BLS>();
         break;
 
     case TokenType::BRS:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::BRS>();
         break;
 
     case TokenType::And:
     {
         lhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         auto o1 = code.add_ins();
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         auto o2 = code.add_ins();
         code.add_ins<Opcode::LoadConst, Size>(1);
         auto o3 = code.add_ins();
@@ -249,10 +222,10 @@ void BinaryOperatorExpr::codegen(Code &code)
     case TokenType::Or:
     {
         lhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         auto o1 = code.add_ins();
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         auto o2 = code.add_ins();
         code.add_ins<Opcode::LoadConst, Size>(2);
         auto o3 = code.add_ins();
@@ -266,49 +239,49 @@ void BinaryOperatorExpr::codegen(Code &code)
     case TokenType::Is:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Is>();
         break;
 
     case TokenType::CEQ:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::CEQ>();
         break;
 
     case TokenType::CNE:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::CNE>();
         break;
 
     case TokenType::CLT:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::CLT>();
         break;
 
     case TokenType::CLE:
         lhs->codegen(code);
         rhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::CLE>();
         break;
 
     case TokenType::CGT:
         rhs->codegen(code);
         lhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::CLE>();
         break;
 
     case TokenType::CGE:
         rhs->codegen(code);
         lhs->codegen(code);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::CLT>();
         break;
 
@@ -317,7 +290,7 @@ void BinaryOperatorExpr::codegen(Code &code)
         rhs->codegen(code);
         lhs->codegen(code);
         code.add_ins<Opcode::Load, String>(op.value);
-        code.mapping(pos);
+        code.locate(location);
         code.add_ins<Opcode::Call>();
         break;
     }
@@ -332,22 +305,21 @@ void LambdaExpr::codegen(Code &code)
         parameter.first->codegen(code);
         if (parameter.second)
         {
-            auto store_ins = code.ins_at(code.size() - 1);
-            code.set_ins<Opcode::Pack>(code.size() - 1);
-            code.add_ins();
-            code.ins_at(code.size() - 1) = store_ins;
+            // copy the last instruction and then reset it to Pack
+            code.add_ins(code.ins_at(code.size() - 1));
+            code.set_ins<Opcode::Pack>(code.size() - 2);
         }
     }
     block->codegen(code);
 
     code.add_ins<Opcode::ReturnNone>();
-    code.set_ins<Opcode::LambdaDecl, pair<Size, Size>>(o1, make_pair<Size, Size>(parameters.size(), code.size()));
+    code.set_ins<Opcode::LambdaDecl, std::pair<Size, Size>>(o1, std::make_pair<Size, Size>(parameters.size(), code.size()));
 }
 
 void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
-    code.mapping(pos);
+        code.locate(location);
     code.add_ins<Opcode::LoadMember, String>(name);
 }
 
@@ -366,15 +338,15 @@ void MatchExpr::codegen(Code &code)
 {
     expr->codegen(code);
 
-    map<Size, vector<Size>> matchfroms;
-    vector<Size> jumpfroms;
+    std::map<Size, std::vector<Size>> matchfroms;
+    std::vector<Size> jumpfroms;
 
     for (Size i = 0; i < keylists.size(); ++i)
     {
         for (auto &key : keylists[i])
         {
             key->codegen(code);
-            code.mapping()[code.size()] = key->pos;
+            code.locate(locations[i]);
             matchfroms[i].push_back(code.add_ins());
         }
     }
@@ -413,7 +385,7 @@ void IndexExpr::codegen(Code &code)
     index->codegen(code);
     expr->codegen(code);
 
-    code.mapping(pos);
+    code.locate(location);
     code.add_ins<Opcode::Index>();
 }
 
@@ -494,7 +466,7 @@ void DelayExpr::codegen(Code &code)
 void QuesExpr::codegen(Code &code)
 {
     cond->codegen(code);
-    code.mapping()[code.size()] = cond->pos;
+    code.locate(location);
     auto o1 = code.add_ins();
     true_expr->codegen(code);
     auto o2 = code.add_ins();
@@ -605,7 +577,7 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
     {
         for (Size i = 0; i < decls.size(); ++i)
         {
-            make_unique<NoneExpr>()->codegen(code);
+            std::make_unique<NoneExpr>()->codegen(code);
         }
     }
 
@@ -629,7 +601,7 @@ void PrefixopDeclarationStmt::codegen(Code &code)
 
 void InfixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(op, priority));
+    code.add_ins<Opcode::AddInfixOp, std::pair<String, Size>>(make_pair(op, precedence));
 }
 
 void BreakStmt::codegen(Code &code)
@@ -655,7 +627,7 @@ void ReturnStmt::codegen(Code &code)
 void IfElseStmt::codegen(Code &code)
 {
     cond->codegen(code);
-    code.mapping()[code.size()] = cond->pos;
+    code.locate(location);
     auto o1 = code.add_ins();
     true_block->codegen(code);
     if (false_branch)
@@ -675,7 +647,7 @@ void WhileStmt::codegen(Code &code)
 {
     auto o1 = code.size();
     cond->codegen(code);
-    code.mapping()[code.size()] = cond->pos;
+    code.locate(location);
     auto o2 = code.add_ins();
     block->codegen(code);
     code.add_ins<Opcode::Jump>(o1);
@@ -690,7 +662,7 @@ void DoWhileStmt::codegen(Code &code)
     block->codegen(code);
     auto o2 = code.size();
     cond->codegen(code);
-    code.mapping()[code.size()] = cond->pos;
+    code.locate(location);
     code.add_ins<Opcode::JumpIf, Size>(o1);
     code.set_break_to(code.size(), o1);
     code.set_continue_to(o2, o1);
@@ -719,31 +691,31 @@ void ForeachStmt::codegen(Code &code)
     /**
      * generate ast for cond: __it.__has_next__()
     */
-    auto cond = make_unique<ParenOperatorExpr>(
-        make_unique<DotExpr>(
-            make_unique<IdentifierExpr>("__it"), "__has_next__"
+    auto cond = std::make_unique<ParenOperatorExpr>(
+        std::make_unique<DotExpr>(
+            std::make_unique<IdentifierExpr>("__it"), "__has_next__"
         ),
         ArgumentList()
     );
 
     block->statements.push_front(nullptr);
-    auto next = make_unique<ParenOperatorExpr>(
-        make_unique<DotExpr>(
-            make_unique<IdentifierExpr>("__it"), "__next__"
+    auto next = std::make_unique<ParenOperatorExpr>(
+        std::make_unique<DotExpr>(
+            std::make_unique<IdentifierExpr>("__it"), "__next__"
         ),
         ArgumentList()
     );
     if (!varname.empty())
     {
-        *block->statements.begin() = make_unique<VariableDeclarationStmt>(
+        *block->statements.begin() = std::make_unique<VariableDeclarationStmt>(
             varname, move(next), true
         );
     }
     else
     {
-        *block->statements.begin() = make_unique<ExprStmt>(move(next));
+        *block->statements.begin() = std::make_unique<ExprStmt>(std::move(next));
     }
 
-    WhileStmt(move(cond), move(block)).codegen(code);
+    WhileStmt(std::move(cond), std::move(block)).codegen(code);
 }
 }

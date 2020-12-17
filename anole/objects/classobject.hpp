@@ -10,16 +10,15 @@ class Scope;
 class ClassObject : public Object
 {
   public:
-    ClassObject(String name,
-        SPtr<Scope> pre_scope
-    );
+    ClassObject(String name, SPtr<Scope> pre_scope);
 
+    SPtr<Scope> &scope();
+
+  public:
     Address load_member(const String &name) override;
     void call(Size num) override;
 
     void collect(std::function<void(Scope *)>) override;
-
-    SPtr<Scope> &scope() { return scope_; }
 
   private:
     String name_;

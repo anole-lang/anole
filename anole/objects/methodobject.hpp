@@ -8,10 +8,9 @@ namespace anole
 class MethodObject : public Object
 {
   public:
-    MethodObject(Object *callee,
-        Object *binded_obj
-    );
+    MethodObject(Object *callee, Object *binded_obj);
 
+  public:
     void call(Size num) override;
 
     void collect(std::function<void(Object *)>) override;

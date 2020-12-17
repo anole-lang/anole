@@ -4,36 +4,34 @@
 
 #include <set>
 #include <cctype>
-
-using namespace std;
+#include <optional>
 
 namespace anole
 {
-Tokenizer::Tokenizer(istream &in, String name_of_in)
-  : cur_line_num_(1), last_line_num_(1)
-  , cur_char_at_line_(0), last_char_at_line_(0)
-  , input_stream_(in), name_of_in_(move(name_of_in))
+Tokenizer::Tokenizer(std::istream &input, String name_of_input) noexcept
+  : cur_location_(1, 0), last_location_(1, 0)
+  , input_(input), name_of_input_(move(name_of_input))
   , last_input_(' ')
 {
     // ...
 }
 
-void Tokenizer::cont()
+void Tokenizer::resume()
 {
     last_input_ = ' ';
 }
 
 void Tokenizer::reset()
 {
-    cur_line_num_ = last_line_num_ = 1;
-    cur_char_at_line_ = last_char_at_line_ = 0;
-    cur_line_.clear(), pre_line_.clear();
+    cur_location_.first = last_location_.first = 1;
+    cur_location_.second = last_location_.second = 0;
+    cur_line_.clear(), last_line_.clear();
     last_input_ = ' ';
 }
 
 void Tokenizer::get_next_input()
 {
-    last_input_ = input_stream_.get();
+    last_input_ = input_.get();
     if (last_input_ == EOF)
     {
         return;
@@ -41,37 +39,36 @@ void Tokenizer::get_next_input()
 
     if (last_input_ == '\n')
     {
-        ++cur_line_num_;
-        cur_char_at_line_ = 0;
-        pre_line_ = cur_line_;
+        ++cur_location_.first;
+        cur_location_.second = 0;
+        last_line_ = cur_line_;
         cur_line_.clear();
     }
     else
     {
-        ++cur_char_at_line_;
+        ++cur_location_.second;
         cur_line_ += last_input_;
     }
 }
 
 namespace
 {
-const set<char> illegal_idchrs
+const std::set<char> illegal_idchrs
 {
     '_', '@', '#', '$', '.', ',', ':', ';',
     '?', '(', ')', '[', ']', '{', '}', '"'
 };
 bool is_legal_idchr(char chr)
 {
-    if (isspace(chr) || isdigit(chr) || isalpha(chr)
-        || illegal_idchrs.count(chr))
-    {
-        return false;
-    }
-    return true;
+    return !(std::isspace(chr)
+        || std::isdigit(chr)
+        || std::isalpha(chr)
+        || illegal_idchrs.count(chr)
+    );
 }
 }
 
-Token Tokenizer::next()
+Token Tokenizer::next_token()
 {
     enum class State
     {
@@ -90,16 +87,16 @@ Token Tokenizer::next()
         InString,
         InStringEscaping
     };
+
     auto state = State::Begin;
-    while (isspace(last_input_))
+    while (std::isspace(last_input_))
     {
         get_next_input();
     }
 
-    last_char_at_line_ = cur_char_at_line_;
-    last_line_num_ = cur_line_num_;
+    last_location_ = cur_location_;
 
-    Ptr<Token> token = nullptr;
+    std::optional<Token> token;
     String value;
     while (!token)
     {
@@ -117,7 +114,7 @@ Token Tokenizer::next()
                 break;
 
             case '@':
-                token = make_unique<Token>(TokenType::At);
+                token = Token(TokenType::At, last_location_);
                 break;
 
             case '"':
@@ -125,15 +122,15 @@ Token Tokenizer::next()
                 break;
 
             case ':':
-                token = make_unique<Token>(TokenType::Colon);
+                token = Token(TokenType::Colon, last_location_);
                 break;
 
             case ';':
-                token = make_unique<Token>(TokenType::Semicolon);
+                token = Token(TokenType::Semicolon, last_location_);
                 break;
 
             case ',':
-                token = make_unique<Token>(TokenType::Comma);
+                token = Token(TokenType::Comma, last_location_);
                 break;
 
             case '.':
@@ -141,31 +138,31 @@ Token Tokenizer::next()
                 break;
 
             case '(':
-                token = make_unique<Token>(TokenType::LParen);
+                token = Token(TokenType::LParen, last_location_);
                 break;
 
             case ')':
-                token = make_unique<Token>(TokenType::RParen);
+                token = Token(TokenType::RParen, last_location_);
                 break;
 
             case '[':
-                token = make_unique<Token>(TokenType::LBracket);
+                token = Token(TokenType::LBracket, last_location_);
                 break;
 
             case ']':
-                token = make_unique<Token>(TokenType::RBracket);
+                token = Token(TokenType::RBracket, last_location_);
                 break;
 
             case '{':
-                token = make_unique<Token>(TokenType::LBrace);
+                token = Token(TokenType::LBrace, last_location_);
                 break;
 
             case '}':
-                token = make_unique<Token>(TokenType::RBrace);
+                token = Token(TokenType::RBrace, last_location_);
                 break;
 
             case '?':
-                token = make_unique<Token>(TokenType::Ques);
+                token = Token(TokenType::Ques, last_location_);
                 break;
 
             default:
@@ -195,20 +192,36 @@ Token Tokenizer::next()
             }
             else
             {
-                return Token(TokenType::Dot);
+                return Token(TokenType::Dot, last_location_);
             }
             break;
 
         case State::InDoot:
             if (last_input_ == '.')
             {
-                token = make_unique<Token>(TokenType::Dooot);
+                token = Token(TokenType::Dooot, last_location_);
             }
             else
             {
                 throw CompileError("unexpected \"..\"");
             }
             break;
+
+        case State::InLineComment:
+            while (last_input_ != '\n')
+            {
+                get_next_input();
+            }
+            get_next_input();
+            return next_token();
+
+        case State::InBlockComment:
+            while (last_input_ != '$')
+            {
+                get_next_input();
+            }
+            get_next_input();
+            return next_token();
 
         case State::InInteger:
             if (last_input_ == '.')
@@ -224,7 +237,7 @@ Token Tokenizer::next()
                 }
                 else
                 {
-                    return Token(TokenType::Integer, value);
+                    return Token(TokenType::Integer, value, last_location_);
                 }
             }
             break;
@@ -236,7 +249,7 @@ Token Tokenizer::next()
             }
             else
             {
-                return Token(TokenType::Double, value);
+                return Token(TokenType::Double, value, last_location_);
             }
             break;
 
@@ -249,7 +262,7 @@ Token Tokenizer::next()
             }
             else
             {
-                return Token(value);
+                return Token(value, last_location_);
             }
             break;
 
@@ -260,7 +273,7 @@ Token Tokenizer::next()
             }
             else
             {
-                return Token(value);
+                return Token(value, last_location_);
             }
             break;
 
@@ -275,7 +288,7 @@ Token Tokenizer::next()
                 break;
 
             case '"':
-                token = make_unique<Token>(TokenType::String, value);
+                token = Token(TokenType::String, value, last_location_);
                 break;
 
             default:
@@ -333,26 +346,8 @@ Token Tokenizer::next()
             }
             state = State::InString;
             break;
-
-        case State::InLineComment:
-            while (last_input_ != '\n')
-            {
-                get_next_input();
-            }
-            get_next_input();
-            return next();
-
-        case State::InBlockComment:
-            while (last_input_ != '$')
-            {
-                get_next_input();
-            }
-            get_next_input();
-            return next();
-
-        default:
-            break;
         }
+
         if (last_input_ == EOF)
         {
             break;
@@ -361,24 +356,28 @@ Token Tokenizer::next()
     }
     if (!token)
     {
-        token = make_unique<Token>(TokenType::End);
+        return Token(TokenType::End, last_location_);
     }
-    return move(*token);
+    return *token;
 }
 
 String Tokenizer::get_err_info(const String &message)
 {
-    auto line = (cur_line_num_ != last_line_num_)
-        ? pre_line_ : cur_line_
+    auto line = (cur_location_.first != last_location_.first)
+        ? last_line_ : cur_line_
+    ;
+
+    auto line_num = last_location_.first,
+         char_at_line = last_location_.second
     ;
 
     return
-        info::strong(name_of_in_ + ":"
-            + to_string(last_line_num_) + ":"
-            + to_string(last_char_at_line_) + ": ") +
+        info::strong(name_of_input_ + ":"
+            + std::to_string(line_num) + ":"
+            + std::to_string(char_at_line) + ": ") +
         info::warning("error: ") + message + "\n" +
         line + "\n" +
-        String(last_char_at_line_ == 0 ? 0 : last_char_at_line_ - 1, ' ')
+        String(char_at_line == 0 ? 0 : char_at_line - 1, ' ')
             + info::warning("^")
     ;
 }

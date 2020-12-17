@@ -16,9 +16,8 @@
 #include <sstream>
 #include <iostream>
 
-using namespace std;
-using namespace anole;
-
+namespace anole
+{
 namespace
 {
 sigjmp_buf lc_env;
@@ -37,15 +36,13 @@ String read_line(const char * str)
 
 void handle_sigint(int)
 {
-    cout << "\b \b\b \b\nKeyboard Interrupt\n";
+    std::cout << "\b \b\b \b\nKeyboard Interrupt\n";
     rl_on_new_line();
     rl_replace_line("", 0);
     siglongjmp(lc_env, 1);
 }
 }
 
-namespace anole
-{
 void replrun::run()
 {
     signal(SIGINT, handle_sigint);
@@ -59,15 +56,13 @@ void replrun::run()
  / ___ \| | | | (_) | |  __/   %s
 /_/   \_\_| |_|\___/|_|\___|)""\n\n", Version::literal);
 
-    AST::interpretive() = true;
-
     String line;
-    istringstream ss;
-    Parser parser{ss};
-    auto code = make_shared<Code>("<stdin>");
-    Context::current() = make_shared<Context>(code);
+    std::istringstream ss;
+    Parser parser(ss, "<stdin>");
+    auto code = std::make_shared<Code>("<stdin>");
+    Context::current() = std::make_shared<Context>(code);
 
-    parser.set_continue_action([&ss, &parser]
+    parser.set_resume_action([&ss, &parser]
     {
         auto line = read_line(".. ");
         if (!line.empty())
@@ -77,7 +72,7 @@ void replrun::run()
         }
         ss.clear();
         ss.str(line += '\n');
-        parser.cont();
+        parser.resume();
     });
 
     sigsetjmp(lc_env, 1);
@@ -100,17 +95,17 @@ void replrun::run()
         {
             ArgumentList args;
             args.emplace_back(move(reinterpret_cast<ExprStmt *>(stmt.get())->expr), false);
-            stmt = make_unique<ParenOperatorExpr>(
-                make_unique<IdentifierExpr>("println"),
-                move(args)
+            stmt = std::make_unique<ParenOperatorExpr>(
+                std::make_unique<IdentifierExpr>("println"),
+                std::move(args)
             );
         }
         stmt->codegen(*code);
         Context::execute();
     }
-    catch (const exception &e)
+    catch (const std::exception &e)
     {
-        cerr << e.what() << endl;
+        std::cerr << e.what() << std::endl;
     }
 }
 }

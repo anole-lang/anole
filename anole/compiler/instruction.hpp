@@ -5,9 +5,7 @@
 
 namespace anole
 {
-namespace opcode
-{
-enum Opcode : uint8_t
+enum class Opcode : uint8_t
 {
     PlaceHolder,
 
@@ -42,7 +40,7 @@ enum Opcode : uint8_t
     Match,        // Match target
 
     AddPrefixOp,  // AddPrefixOp op
-    AddInfixOp,   // AddInfixOp (op, priority)
+    AddInfixOp,   // AddInfixOp (op, precedence)
 
     Pack,         // Pack
     Unpack,       // Unpack
@@ -78,8 +76,6 @@ enum Opcode : uint8_t
     BuildDict,    // BuildDict num
     BuildClass,   // BuildClass name
 };
-}
-using opcode::Opcode;
 
 struct Instruction
 {

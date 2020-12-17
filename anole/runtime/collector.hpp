@@ -38,22 +38,10 @@ class Collector
         ref.collect_impl(p);
     }
 
-    static void try_gc()
-    {
-        auto &ref = collector();
-        if (ref.count_ > 10000)
-        {
-            ref.count_ = 0;
-            ref.gc();
-        }
-    }
+    static void try_gc();
 
   private:
-    static Collector &collector()
-    {
-        static Collector clctor;
-        return clctor;
-    }
+    static Collector &collector();
 
     template<typename T>
     static std::set<T *> &marked()
@@ -66,7 +54,7 @@ class Collector
      * default ctor is private
      *  in order that we can only use the static collector
     */
-    Collector() : count_(0) {}
+    Collector() noexcept;
 
     /**
      * gc can only be called by the collector self
@@ -86,17 +74,16 @@ class Collector
         marked<T>().insert(ptr);
     }
 
-    Size count_;
-
-  private:
     /**
      * collect variables
     */
     void collect_impl(Scope *);
     void collect_impl(Object *);
     void collect_impl(Context *);
+
     std::set<void *> visited_;
     std::set<Object *> collected_;
+    Size count_;
 };
 } // namespace anole
 

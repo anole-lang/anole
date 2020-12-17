@@ -9,17 +9,13 @@
 
 namespace anole
 {
-/**
- * use enum (without class/struct) with namespace
- *  and using object_type::ObjectType in order to
- *  make the enum must be accessed using scope
- *  resolution operator and then we can enable
- *  static cast from the enum to its underlying
- *  type
-*/
-namespace object_type
-{
-enum ObjectType : int
+class Code;
+class Scope;
+class Context;
+class Variable;
+using Address = SPtr<Variable>;
+
+enum class ObjectType : Size
 {
     None,
     Boolean,
@@ -33,36 +29,29 @@ enum ObjectType : int
     BuiltinFunc,
     Func,
     Thunk,
-    Cont,
+    Continuation,
     AnoleModule,
     CppModule,
     Class,
     Method,
     Instance,
 };
-}
-using object_type::ObjectType;
-class Object;
-
-class Code;
-class Scope;
-class Context;
-class Variable;
-using Address = SPtr<Variable>;
 
 class Object
 {
   public:
+    static ObjectType add_object_type(const String &literal);
+
+  public:
     constexpr Object(ObjectType type) noexcept : type_(type) {}
     virtual ~Object() = 0;
 
-    static ObjectType add_object_type(const String &literal);
-
     template<ObjectType type>
-    constexpr bool is() { return type_ == type; }
-    bool is(ObjectType type) { return type_ == type; }
+    constexpr bool is() noexcept { return type_ == type; }
+    constexpr bool is(ObjectType type) noexcept { return type_ == type; }
     Object *type();
 
+  public:
     virtual bool to_bool();
     virtual String to_str();
     virtual String to_key();

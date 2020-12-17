@@ -2,13 +2,11 @@
 
 #include "../runtime/runtime.hpp"
 
-using namespace std;
-
 namespace anole
 {
 namespace
 {
-map<String, function<void(DictObject *)>>
+std::map<String, std::function<void(DictObject *)>>
 lc_builtin_methods
 {
     {"empty", [](DictObject *obj)
@@ -49,6 +47,27 @@ lc_builtin_methods
 };
 }
 
+bool DictObject::ObjectCmp::operator()(Object *lhs, Object *rhs) const
+{
+    return lhs->to_key() < rhs->to_key();
+}
+
+DictObject::DictObject() noexcept
+  : Object(ObjectType::Dict)
+{
+    // ...
+}
+
+DictObject::DataType &DictObject::data()
+{
+    return data_;
+}
+
+void DictObject::insert(Object *key, Object *value)
+{
+    data_[key] = std::make_shared<Variable>(value);
+}
+
 bool DictObject::to_bool()
 {
     return !data_.empty();
@@ -84,7 +103,7 @@ Address DictObject::index(Object *index)
     /**
      * dict will create an empty target if the key is not recorded
     */
-    return data_[index] = make_shared<Variable>();
+    return data_[index] = std::make_shared<Variable>();
 }
 
 Address DictObject::load_member(const String &name)
@@ -92,10 +111,10 @@ Address DictObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([
-                    this,
-                    &func = method->second](Size) mutable
+        return std::make_shared<Variable>(
+            Allocator<Object>::alloc<BuiltInFunctionObject>(
+                [this, &func = method->second]
+                (Size) mutable
                 {
                     func(this);
                 },
@@ -106,22 +125,12 @@ Address DictObject::load_member(const String &name)
     return index(Allocator<Object>::alloc<StringObject>(name));
 }
 
-void DictObject::collect(function<void(Object *)> func)
+void DictObject::collect(std::function<void(Object *)> func)
 {
     for (auto &key_addr : data_)
     {
         func(key_addr.first);
         func(key_addr.second->ptr());
     }
-}
-
-DictObject::DataType &DictObject::data()
-{
-    return data_;
-}
-
-void DictObject::insert(Object *key, Object *value)
-{
-    data_[key] = make_shared<Variable>(value);
 }
 }

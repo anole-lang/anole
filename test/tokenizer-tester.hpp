@@ -5,13 +5,12 @@
 
 #include <gtest/gtest.h>
 
-using namespace std;
 using namespace anole;
 
 struct TokenizerTester : testing::Test
 {
-    stringstream ss;
-    Tokenizer tokenizer{ss};
+    std::stringstream ss;
+    Tokenizer tokenizer{ss, "<test>"};
 
     virtual void SetUp()
     {
@@ -29,12 +28,12 @@ match delay enum dict class none true false
 identifier 0123456789 0123456789.0123456789 "String"
 , . ... () [] {} : ; + - * / % & | ^ ~ << >>
 and or not ! is = != < <= > >= => ?)");
-    for (int type = 0; type < TokenType::End; ++type)
+    for (Size type = 0; type < Size(TokenType::End); ++type)
     {
-        ASSERT_EQ(tokenizer.next().type, TokenType(type));
-        if (type == TokenType::Not)
+        ASSERT_EQ(tokenizer.next_token().type, TokenType(type));
+        if (type == Size(TokenType::Not))
         {
-            ASSERT_EQ(tokenizer.next().type, TokenType::Not);
+            ASSERT_EQ(tokenizer.next_token().type, TokenType::Not);
         }
     }
 }

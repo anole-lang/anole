@@ -2,8 +2,6 @@
 
 #include "../runtime/allocator.hpp"
 
-using namespace std;
-
 namespace anole
 {
 bool FloatObject::to_bool()
@@ -13,7 +11,7 @@ bool FloatObject::to_bool()
 
 String FloatObject::to_str()
 {
-    return to_string(value_);
+    return std::to_string(value_);
 }
 
 String FloatObject::to_key()

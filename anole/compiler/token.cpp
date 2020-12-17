@@ -3,12 +3,16 @@
 #include <map>
 #include <utility>
 
-using namespace std;
-
 namespace anole
 {
-Token::Token(TokenType type, String value) noexcept
-  : type(type), value(move(value))
+Token::Token(TokenType type, Location location) noexcept
+  : type(type), location(location)
+{
+    // ...
+}
+
+Token::Token(TokenType type, String value, Location location) noexcept
+  : type(type), value(std::move(value)), location(location)
 {
     // ...
 }
@@ -16,6 +20,7 @@ Token::Token(TokenType type, String value) noexcept
 Token::Token(Token &&other) noexcept
   : type(other.type)
   , value(std::move(other.value))
+  , location(std::move(other.location))
 {
     // ...
 }
@@ -23,6 +28,8 @@ Token::Token(Token &&other) noexcept
 Token::Token(const Token &other) noexcept
   : type(other.type)
   , value(other.value)
+  , location(other.location)
+
 {
     // ...
 }
@@ -30,7 +37,8 @@ Token::Token(const Token &other) noexcept
 Token &Token::operator=(Token &&other) noexcept
 {
     type = other.type;
-    value = move(other.value);
+    value = std::move(other.value);
+    location = std::move(other.location);
     return *this;
 }
 
@@ -38,13 +46,14 @@ Token &Token::operator=(const Token &other) noexcept
 {
     type = other.type;
     value = other.value;
+    location = other.location;
     return *this;
 }
 
 namespace
 {
-int lc_end_of_token_type = TokenType::End;
-map<String, TokenType> lc_mapping
+Size lc_end_of_token_type = static_cast<Size>(TokenType::End);
+std::map<String, TokenType> lc_mapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
@@ -98,21 +107,20 @@ map<String, TokenType> lc_mapping
 };
 }
 
-Token::Token(String value) noexcept
-  : type(lc_mapping.count(value)
-        ? lc_mapping.at(value)
-        : TokenType::Identifier)
-  , value(move(value))
+Token::Token(String value, Location location) noexcept
+  : value(std::move(value)), location(location)
 {
-    // ...
+    auto find = lc_mapping.find(this->value);
+    type = (find == lc_mapping.end() ? TokenType::Identifier : find->second);
 }
 
 TokenType Token::add_token_type(const String &str)
 {
-    if (!lc_mapping.count(str))
+    auto find = lc_mapping.find(str);
+    if (find == lc_mapping.end())
     {
-        lc_mapping[str] = TokenType(++lc_end_of_token_type);
+        return lc_mapping[str] = static_cast<TokenType>(++lc_end_of_token_type);
     }
-    return lc_mapping[str];
+    return find->second;
 }
 }
