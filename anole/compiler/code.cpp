@@ -200,22 +200,28 @@ void Code::locate(const Location &location)
     source_mapping_[instructions_.size()] = location;
 }
 
-Instruction &Code::ins_at(Size i)
+const Instruction &Code::ins_at(Size i) const
 {
     return instructions_[i];
 }
 
-Opcode &Code::opcode_at(Size i)
+const Opcode &Code::opcode_at(Size i) const
 {
     return instructions_[i].opcode;
 }
 
-std::any &Code::oprand_at(Size i)
+const std::any &Code::oprand_at(Size i) const
 {
     return instructions_[i].oprand;
 }
 
-Size Code::size()
+Size Code::add_ins(Instruction ins)
+{
+    instructions_.push_back(std::move(ins));
+    return instructions_.size() - 1;
+}
+
+Size Code::size() const noexcept
 {
     return instructions_.size();
 }

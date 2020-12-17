@@ -305,10 +305,9 @@ void LambdaExpr::codegen(Code &code)
         parameter.first->codegen(code);
         if (parameter.second)
         {
-            auto store_ins = code.ins_at(code.size() - 1);
-            code.set_ins<Opcode::Pack>(code.size() - 1);
-            code.add_ins();
-            code.ins_at(code.size() - 1) = store_ins;
+            // copy the last instruction and then reset it to Pack
+            code.add_ins(code.ins_at(code.size() - 1));
+            code.set_ins<Opcode::Pack>(code.size() - 2);
         }
     }
     block->codegen(code);

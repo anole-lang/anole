@@ -2,10 +2,30 @@
 
 #include "../objects/objects.hpp"
 
-using namespace std;
-
 namespace anole
 {
+void Collector::try_gc()
+{
+    auto &ref = collector();
+    if (ref.count_ > 10000)
+    {
+        ref.count_ = 0;
+        ref.gc();
+    }
+}
+
+Collector &Collector::collector()
+{
+    static Collector clctor;
+    return clctor;
+}
+
+Collector::Collector() noexcept
+  : count_(0)
+{
+    // ...
+}
+
 void Collector::gc()
 {
     /**

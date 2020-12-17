@@ -13,8 +13,8 @@ class Scope
     friend class Collector;
 
   public:
-    Scope();
-    Scope(SPtr<Scope> pre_scope);
+    Scope() noexcept;
+    Scope(SPtr<Scope> pre_scope) noexcept;
 
     SPtr<Scope> &pre();
 
@@ -30,6 +30,7 @@ class Scope
   private:
     Address find_symbol(const String &name);
 
+  private:
     SPtr<Scope> pre_scope_;
     std::map<String, Address> symbols_;
 };

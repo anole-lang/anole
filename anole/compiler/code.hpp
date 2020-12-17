@@ -27,10 +27,11 @@ class Code
     std::map<Size, Location> &source_mapping();
     void locate(const Location &location);
 
-    Instruction &ins_at(Size i);
-    Opcode &opcode_at(Size i);
-    std::any &oprand_at(Size i);
+    const Instruction &ins_at(Size i) const;
+    const Opcode &opcode_at(Size i) const;
+    const std::any &oprand_at(Size i) const;
 
+    Size add_ins(Instruction ins);
     template<Opcode op = Opcode::PlaceHolder>
     Size add_ins()
     {
@@ -57,7 +58,7 @@ class Code
         instructions_[ind] = { op, value };
     }
 
-    Size size();
+    Size size() const noexcept;
     void push_break(Size ind);
     void set_break_to(Size ind, Size base);
     void push_continue(Size ind);

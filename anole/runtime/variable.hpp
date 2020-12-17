@@ -10,22 +10,22 @@ namespace anole
 class Variable
 {
   public:
-    Variable() : ptr_(nullptr) {}
-    Variable(Object *ptr) : ptr_(ptr) {}
+    constexpr Variable() noexcept : ptr_(nullptr) {}
+    constexpr Variable(Object *ptr) noexcept : ptr_(ptr) {}
 
     Variable &operator=(Object *) = delete;
 
-    void bind(Object *ptr)
+    void bind(Object *ptr) noexcept
     {
         ptr_ = ptr;
     }
 
-    Object *ptr()
+    constexpr Object *ptr() const noexcept
     {
         return ptr_;
     }
 
-    operator bool()
+    constexpr operator bool() const noexcept
     {
         return ptr_ != nullptr;
     }
