@@ -10,10 +10,11 @@
 #define OPRAND(TYPE) (any_cast<const TYPE &>(ins.oprand))
 
 using namespace std;
-using namespace anole;
 
 namespace
 {
+using namespace anole;
+
 class Printer
 {
   public:

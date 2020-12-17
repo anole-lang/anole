@@ -44,7 +44,7 @@ map<String, ObjectType> lc_mapping_str_type
     { "builtinfunc",    ObjectType::BuiltinFunc     },
     { "func",           ObjectType::Func            },
     { "thunk",          ObjectType::Thunk           },
-    { "cont",           ObjectType::Cont            },
+    { "continuation",   ObjectType::Continuation    },
     { "anolemodule",    ObjectType::AnoleModule     },
     { "cppmodule",      ObjectType::CppModule       }
 };
@@ -52,12 +52,13 @@ map<String, ObjectType> lc_mapping_str_type
 
 ObjectType Object::add_object_type(const String &literal)
 {
-    if (!lc_mapping_str_type.count(literal))
+    auto find = lc_mapping_str_type.find(literal);
+    if (find == lc_mapping_str_type.end())
     {
-        lc_mapping_str_type[literal] = static_cast<ObjectType>(lc_mapping_type_str.size());
         lc_mapping_type_str.push_back(literal);
+        return lc_mapping_str_type[literal] = static_cast<ObjectType>(lc_mapping_type_str.size());
     }
-    return lc_mapping_str_type[literal];
+    return find->second;
 }
 
 Object::~Object() = default;

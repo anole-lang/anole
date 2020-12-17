@@ -45,10 +45,9 @@ struct with_locations
 struct AST
 {
     virtual ~AST() = 0;
+    virtual bool is_integer_expr() noexcept;
+    virtual bool is_expr_stmt() noexcept;
     virtual void codegen(Code &) = 0;
-
-    virtual bool is_integer_expr();
-    virtual bool is_expr_stmt();
 };
 
 struct Stmt : AST
@@ -79,17 +78,25 @@ struct IntegerExpr : Expr
 {
     int64_t value;
 
-    IntegerExpr(int64_t value) : value(value) {}
+    constexpr IntegerExpr(int64_t value) noexcept
+      : value(value)
+    {
+        // ...
+    }
 
+    bool is_integer_expr() noexcept override;
     void codegen(Code &) override;
-    bool is_integer_expr() override;
 };
 
 struct FloatExpr : Expr
 {
     double value;
 
-    FloatExpr(double value) : value(value) {}
+    constexpr FloatExpr(double value) noexcept
+      : value(value)
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -98,7 +105,11 @@ struct BoolExpr : Expr
 {
     bool value;
 
-    BoolExpr(bool value) : value(value) {}
+    constexpr BoolExpr(bool value) noexcept
+      : value(value)
+    {
+        // ...
+    }
 
     void codegen(Code &) override;
 };
@@ -107,12 +118,7 @@ struct StringExpr : Expr
 {
     String value;
 
-    StringExpr(String value)
-      : value(std::move(value))
-    {
-        // ...
-    }
-
+    StringExpr(String) noexcept;
     void codegen(Code &) override;
 };
 
@@ -120,12 +126,7 @@ struct IdentifierExpr : Expr, with_location
 {
     String name;
 
-    IdentifierExpr(String name)
-      : name(std::move(name))
-    {
-        // ...
-    }
-
+    IdentifierExpr(String) noexcept;
     void codegen(Code &) override;
 };
 
@@ -134,14 +135,7 @@ struct ParenOperatorExpr : Expr, with_location
     Ptr<Expr> expr;
     ArgumentList args;
 
-    ParenOperatorExpr(Ptr<Expr> &&expr,
-        ArgumentList &&args)
-      : expr(std::move(expr))
-      , args(std::move(args))
-    {
-        // ...
-    }
-
+    ParenOperatorExpr(Ptr<Expr> &&, ArgumentList &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -150,13 +144,7 @@ struct UnaryOperatorExpr : Expr, with_location
     Token op;
     Ptr<Expr> expr;
 
-    UnaryOperatorExpr(Token op,
-        Ptr<Expr> &&expr)
-      : op(op), expr(std::move(expr))
-    {
-        // ...
-    }
-
+    UnaryOperatorExpr(Token, Ptr<Expr> &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -165,14 +153,7 @@ struct BinaryOperatorExpr : Expr, with_location
     Token op;
     Ptr<Expr> lhs, rhs;
 
-    BinaryOperatorExpr(Ptr<Expr> &&lhs,
-        Token op, Ptr<Expr> &&rhs)
-      : op(op), lhs(std::move(lhs))
-      , rhs(std::move(rhs))
-    {
-        // ...
-    }
-
+    BinaryOperatorExpr(Ptr<Expr> &&, Token, Ptr<Expr> &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -181,37 +162,22 @@ struct LambdaExpr : Expr
     ParameterList parameters;
     Ptr<BlockExpr> block;
 
-    LambdaExpr(ParameterList &&parameters,
-        Ptr<BlockExpr> &&block)
-      : parameters(std::move(parameters))
-      , block(std::move(block))
-    {
-        // ...
-    }
-
+    LambdaExpr(ParameterList &&, Ptr<BlockExpr> &&) noexcept;
     void codegen(Code &) override;
 };
 
 struct DotExpr : Expr, with_location
 {
     Ptr<Expr> left;
-    std::string name;
+    String name;
 
-    DotExpr(Ptr<Expr> &&left, std::string name)
-      : left(std::move(left))
-      , name(std::move(name))
-    {
-        // ...
-    }
-
+    DotExpr(Ptr<Expr> &&, String) noexcept;
     void codegen(Code &) override;
 };
 
 struct EnumExpr : Expr
 {
     std::list<struct VariableDeclarationStmt> decls;
-
-    EnumExpr() = default;
 
     void codegen(Code &) override;
 };
@@ -223,16 +189,12 @@ struct MatchExpr : Expr, with_locations
     std::vector<Ptr<Expr>> values;
     Ptr<Expr> else_expr;
 
-    MatchExpr() noexcept = default;
-
     void codegen(Code &) override;
 };
 
 struct ListExpr : Expr, with_location
 {
     ExprList exprs;
-
-    ListExpr() noexcept = default;
 
     void codegen(Code &) override;
 };
@@ -241,22 +203,13 @@ struct IndexExpr : Expr, with_location
 {
     Ptr<Expr> expr, index;
 
-    IndexExpr(Ptr<Expr> &&expr,
-        Ptr<Expr> &&index)
-      : expr(std::move(expr))
-      , index(std::move(index))
-    {
-        // ...
-    }
-
+    IndexExpr(Ptr<Expr> &&, Ptr<Expr> &&) noexcept;
     void codegen(Code &) override;
 };
 
 struct DictExpr : Expr
 {
     ExprList keys, values;
-
-    DictExpr() noexcept = default;
 
     void codegen(Code &) override;
 };
@@ -267,16 +220,7 @@ struct ClassExpr : Expr
     ArgumentList bases;
     DeclList members;
 
-    ClassExpr(String name,
-        ArgumentList &&bases,
-        DeclList &&members)
-      : name(std::move(name))
-      , bases(std::move(bases))
-      , members(std::move(members))
-    {
-        // ...
-    }
-
+    ClassExpr(String, ArgumentList &&, DeclList &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -284,12 +228,7 @@ struct DelayExpr : Expr
 {
     Ptr<Expr> expr;
 
-    DelayExpr(Ptr<Expr> &&expr)
-      : expr(std::move(expr))
-    {
-        // ...
-    }
-
+    DelayExpr(Ptr<Expr> &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -297,17 +236,8 @@ struct QuesExpr : Expr, with_location
 {
     Ptr<Expr> cond, true_expr, false_expr;
 
-    QuesExpr(Ptr<Expr> &&cond,
-        Ptr<Expr> &&true_expr,
-        Ptr<Expr> &&false_expr)
-      : cond(std::move(cond))
-      , true_expr(std::move(true_expr))
-      , false_expr(std::move(false_expr))
-    {
-        // ...
-    }
-
-    void codegen(Code &code) override;
+    QuesExpr(Ptr<Expr> &&, Ptr<Expr> &&, Ptr<Expr> &&) noexcept;
+    void codegen(Code &) override;
 };
 
 struct UseStmt : Stmt
@@ -333,13 +263,7 @@ struct UseStmt : Stmt
     // from may be a name or a path
     Module from;
 
-    UseStmt(Aliases &&aliases, Module from)
-      : aliases(std::move(aliases))
-      , from(std::move(from))
-    {
-        // ...
-    }
-
+    UseStmt(Aliases &&, Module) noexcept;
     void codegen(Code &) override;
 };
 
@@ -347,14 +271,9 @@ struct ExprStmt : Stmt
 {
     Ptr<Expr> expr;
 
-    ExprStmt(Ptr<Expr> &&expr)
-      : expr(std::move(expr))
-    {
-        // ...
-    }
-
+    ExprStmt(Ptr<Expr> &&) noexcept;
+    bool is_expr_stmt() noexcept override;
     void codegen(Code &) override;
-    bool is_expr_stmt() override;
 };
 
 struct DeclarationStmt : Stmt
@@ -369,15 +288,7 @@ struct VariableDeclarationStmt : DeclarationStmt
     Ptr<Expr> expr;
     bool is_ref;
 
-    VariableDeclarationStmt(String name,
-        Ptr<Expr> &&expr, bool is_ref = false)
-      : name(std::move(name))
-      , expr(std::move(expr))
-      , is_ref(is_ref)
-    {
-        // ...
-    }
-
+    VariableDeclarationStmt(String, Ptr<Expr> &&, bool = false) noexcept;
     void codegen(Code &) override;
 };
 
@@ -387,42 +298,24 @@ struct MultiVarsDeclarationStmt : DeclarationStmt
     std::list<VariableDeclarationStmt> decls;
     ExprList exprs;
 
-    MultiVarsDeclarationStmt(
-        std::list<VariableDeclarationStmt> &&decls,
-        ExprList &&exprs)
-      : decls(std::move(decls))
-      , exprs(std::move(exprs))
-    {
-        // ...
-    }
-
+    MultiVarsDeclarationStmt(std::list<VariableDeclarationStmt> &&, ExprList &&) noexcept;
     void codegen(Code &) override;
 };
 
 struct PrefixopDeclarationStmt : Stmt
 {
-    std::string op;
+    String op;
 
-    PrefixopDeclarationStmt(std::string op)
-      : op(std::move(op))
-    {
-        // ...
-    }
-
+    PrefixopDeclarationStmt(String) noexcept;
     void codegen(Code &) override;
 };
 
 struct InfixopDeclarationStmt : Stmt
 {
     Size precedence;
-    std::string op;
+    String op;
 
-    InfixopDeclarationStmt(std::string op, Size precedence)
-      : precedence(precedence), op(std::move(op))
-    {
-        // ...
-    }
-
+    InfixopDeclarationStmt(String, Size) noexcept;
     void codegen(Code &) override;
 };
 
@@ -440,12 +333,7 @@ struct ReturnStmt : Stmt
 {
     ExprList exprs;
 
-    ReturnStmt(ExprList &&exprs)
-      : exprs(std::move(exprs))
-    {
-        // ...
-    }
-
+    ReturnStmt(ExprList &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -455,16 +343,7 @@ struct IfElseStmt : Stmt, with_location
     Ptr<BlockExpr> true_block;
     Ptr<AST> false_branch;
 
-    IfElseStmt(Ptr<Expr> &&cond,
-        Ptr<BlockExpr> &&true_block,
-        Ptr<AST> &&false_branch)
-      : cond(std::move(cond))
-      , true_block(std::move(true_block))
-      , false_branch(std::move(false_branch))
-    {
-        // ...
-    }
-
+    IfElseStmt(Ptr<Expr> &&, Ptr<BlockExpr> &&, Ptr<AST> &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -473,14 +352,7 @@ struct WhileStmt : Stmt, with_location
     Ptr<Expr> cond;
     Ptr<BlockExpr> block;
 
-    WhileStmt(Ptr<Expr> &&cond,
-        Ptr<BlockExpr> &&block)
-      : cond(std::move(cond))
-      , block(std::move(block))
-    {
-        // ...
-    }
-
+    WhileStmt(Ptr<Expr> &&, Ptr<BlockExpr> &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -489,33 +361,17 @@ struct DoWhileStmt : Stmt, with_location
     Ptr<Expr> cond;
     Ptr<BlockExpr> block;
 
-    DoWhileStmt(Ptr<Expr> &&cond,
-        Ptr<BlockExpr> &&block)
-      : cond(std::move(cond))
-      , block(std::move(block))
-    {
-        // ...
-    }
-
+    DoWhileStmt(Ptr<Expr> &&, Ptr<BlockExpr> &&) noexcept;
     void codegen(Code &) override;
 };
 
 struct ForeachStmt : Stmt
 {
     Ptr<Expr> expr;
-    std::string varname;
+    String varname;
     Ptr<BlockExpr> block;
 
-    ForeachStmt(Ptr<Expr> &&expr,
-        std::string varname,
-        Ptr<BlockExpr> &&block)
-      : expr(std::move(expr))
-      , varname(std::move(varname))
-      , block(std::move(block))
-    {
-        // ...
-    }
-
+    ForeachStmt(Ptr<Expr> &&, String, Ptr<BlockExpr> &&) noexcept;
     void codegen(Code &) override;
 };
 }

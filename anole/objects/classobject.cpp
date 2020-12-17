@@ -6,13 +6,15 @@ using namespace std;
 
 namespace anole
 {
-ClassObject::ClassObject(String name,
-    SPtr<Scope> pre_scope)
-  : Object(ObjectType::Class)
-  , name_(move(name))
-  , scope_(make_shared<Scope>(pre_scope))
+ClassObject::ClassObject(String name, SPtr<Scope> pre_scope)
+  : Object(ObjectType::Class), name_(move(name)), scope_(make_shared<Scope>(pre_scope))
 {
     // ...
+}
+
+SPtr<Scope> &ClassObject::scope()
+{
+    return scope_;
 }
 
 Address ClassObject::load_member(const String &name)

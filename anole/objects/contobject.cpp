@@ -7,10 +7,15 @@ using namespace std;
 namespace anole
 {
 ContObject::ContObject(SPtr<Context> resume)
-  : Object(ObjectType::Cont)
+  : Object(ObjectType::Continuation)
   , resume_(std::make_shared<Context>(*resume))
 {
     // ...
+}
+
+SPtr<Context> ContObject::resume()
+{
+    return resume_;
 }
 
 void ContObject::call(Size n)

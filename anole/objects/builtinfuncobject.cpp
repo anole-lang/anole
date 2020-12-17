@@ -8,17 +8,6 @@ using namespace std;
 
 namespace anole
 {
-String BuiltInFunctionObject::to_str()
-{
-    return "<builtin-function>"s;
-}
-
-void BuiltInFunctionObject::call(Size n)
-{
-    func_(n);
-    ++Context::current()->pc();
-}
-
 namespace
 {
 map<String, BuiltInFunctionObject *>
@@ -29,8 +18,8 @@ map<String, BuiltInFunctionObject *>
 }
 }
 
-Object *
-BuiltInFunctionObject::load_built_in_function(const String &name)
+Object
+*BuiltInFunctionObject::load_built_in_function(const String &name)
 {
     if (get_built_in_functions().count(name))
     {
@@ -47,6 +36,23 @@ void BuiltInFunctionObject::register_built_in_function(
      *  and always live until the program exits
     */
     get_built_in_functions()[name] = new BuiltInFunctionObject(func);
+}
+
+BuiltInFunctionObject::BuiltInFunctionObject(std::function<void(Size)> func, Object *bind) noexcept
+  : Object(ObjectType::BuiltinFunc), func_(std::move(func)), bind_(bind)
+{
+    // ...
+}
+
+String BuiltInFunctionObject::to_str()
+{
+    return "<builtin-function>"s;
+}
+
+void BuiltInFunctionObject::call(Size n)
+{
+    func_(n);
+    ++Context::current()->pc();
 }
 
 void BuiltInFunctionObject::collect(function<void(Object *)> func)

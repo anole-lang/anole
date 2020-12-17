@@ -9,12 +9,17 @@ class FloatObject : public Object
 {
   public:
     constexpr FloatObject(double value) noexcept
-      : Object(ObjectType::Float)
-      , value_(value)
+      : Object(ObjectType::Float), value_(value)
     {
         // ...
     }
 
+    constexpr double value() const noexcept
+    {
+        return value_;
+    }
+
+  public:
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
@@ -27,11 +32,6 @@ class FloatObject : public Object
     Object *cne(Object *) override;
     Object *clt(Object *) override;
     Object *cle(Object *) override;
-
-    constexpr double value() const noexcept
-    {
-        return value_;
-    }
 
   private:
     double value_;

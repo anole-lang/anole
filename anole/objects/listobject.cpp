@@ -90,6 +90,22 @@ lc_builtin_methods_for_listiterator
 };
 }
 
+ListObject::ListObject() noexcept
+  : Object(ObjectType::List)
+{
+    // ...
+}
+
+list<Address> &ListObject::objects()
+{
+    return objects_;
+}
+
+void ListObject::append(Object *obj)
+{
+    objects_.push_back(make_shared<Variable>(obj));
+}
+
 bool ListObject::to_bool()
 {
     return !objects_.empty();
@@ -179,16 +195,6 @@ void ListObject::collect(function<void(Object *)> func)
     {
         func(addr->ptr());
     }
-}
-
-list<Address> &ListObject::objects()
-{
-    return objects_;
-}
-
-void ListObject::append(Object *obj)
-{
-    objects_.push_back(make_shared<Variable>(obj));
 }
 
 Address ListIteratorObject::load_member(const String &name)

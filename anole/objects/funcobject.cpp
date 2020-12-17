@@ -20,6 +20,21 @@ FunctionObject::FunctionObject(SPtr<Scope> pre_scope,
     // ...
 }
 
+SPtr<Scope> FunctionObject::scope()
+{
+    return scope_;
+}
+
+SPtr<Code> FunctionObject::code()
+{
+    return code_;
+}
+
+Size FunctionObject::base()
+{
+    return base_;
+}
+
 String FunctionObject::to_str()
 {
     return "<function>"s;

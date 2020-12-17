@@ -9,31 +9,6 @@ using namespace std;
 
 namespace anole
 {
-AST::~AST() = default;
-Stmt::~Stmt() = default;
-Expr::~Expr() = default;
-DeclarationStmt::~DeclarationStmt() = default;
-
-bool AST::is_integer_expr()
-{
-    return false;
-}
-
-bool AST::is_expr_stmt()
-{
-    return false;
-}
-
-bool IntegerExpr::is_integer_expr()
-{
-    return true;
-}
-
-bool ExprStmt::is_expr_stmt()
-{
-    return true;
-}
-
 void BlockExpr::codegen(Code &code)
 {
     for (auto &statement : statements)

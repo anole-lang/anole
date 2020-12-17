@@ -49,6 +49,27 @@ lc_builtin_methods
 };
 }
 
+bool DictObject::ObjectCmp::operator()(Object *lhs, Object *rhs) const
+{
+    return lhs->to_key() < rhs->to_key();
+}
+
+DictObject::DictObject() noexcept
+  : Object(ObjectType::Dict)
+{
+    // ...
+}
+
+DictObject::DataType &DictObject::data()
+{
+    return data_;
+}
+
+void DictObject::insert(Object *key, Object *value)
+{
+    data_[key] = make_shared<Variable>(value);
+}
+
 bool DictObject::to_bool()
 {
     return !data_.empty();
@@ -113,15 +134,5 @@ void DictObject::collect(function<void(Object *)> func)
         func(key_addr.first);
         func(key_addr.second->ptr());
     }
-}
-
-DictObject::DataType &DictObject::data()
-{
-    return data_;
-}
-
-void DictObject::insert(Object *key, Object *value)
-{
-    data_[key] = make_shared<Variable>(value);
 }
 }

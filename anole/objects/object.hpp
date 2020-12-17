@@ -9,6 +9,12 @@
 
 namespace anole
 {
+class Code;
+class Scope;
+class Context;
+class Variable;
+using Address = SPtr<Variable>;
+
 enum class ObjectType : Size
 {
     None,
@@ -23,34 +29,29 @@ enum class ObjectType : Size
     BuiltinFunc,
     Func,
     Thunk,
-    Cont,
+    Continuation,
     AnoleModule,
     CppModule,
     Class,
     Method,
     Instance,
 };
-class Object;
-
-class Code;
-class Scope;
-class Context;
-class Variable;
-using Address = SPtr<Variable>;
 
 class Object
 {
   public:
+    static ObjectType add_object_type(const String &literal);
+
+  public:
     constexpr Object(ObjectType type) noexcept : type_(type) {}
     virtual ~Object() = 0;
 
-    static ObjectType add_object_type(const String &literal);
-
     template<ObjectType type>
-    constexpr bool is() { return type_ == type; }
-    bool is(ObjectType type) { return type_ == type; }
+    constexpr bool is() noexcept { return type_ == type; }
+    constexpr bool is(ObjectType type) noexcept { return type_ == type; }
     Object *type();
 
+  public:
     virtual bool to_bool();
     virtual String to_str();
     virtual String to_key();

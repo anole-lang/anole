@@ -16,8 +16,6 @@ namespace fs = filesystem;
 
 namespace anole
 {
-ModuleObject::~ModuleObject() = default;
-
 ModuleObject *ModuleObject::generate(const String &name)
 {
     ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
@@ -40,6 +38,19 @@ ModuleObject *ModuleObject::generate(const fs::path &path)
         mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
     }
     return mod;
+}
+
+ModuleObject::ModuleObject(ObjectType type) noexcept
+  : Object(type), good_(false)
+{
+    // ...
+}
+
+ModuleObject::~ModuleObject() = default;
+
+bool ModuleObject::good()
+{
+    return good_;
 }
 
 AnoleModuleObject::AnoleModuleObject(const String &name)
@@ -96,6 +107,16 @@ AnoleModuleObject::AnoleModuleObject(const fs::path &path)
     {
         good_ = false;
     }
+}
+
+const SPtr<Scope> &AnoleModuleObject::scope() const
+{
+    return scope_;
+}
+
+const SPtr<Code> &AnoleModuleObject::code() const
+{
+    return code_;
 }
 
 Address AnoleModuleObject::load_member(const String &name)
@@ -191,6 +212,11 @@ CppModuleObject::~CppModuleObject()
     {
         dlclose(handle_);
     }
+}
+
+const std::vector<String> *CppModuleObject::names() const
+{
+    return names_;
 }
 
 Address CppModuleObject::load_member(const String &name)

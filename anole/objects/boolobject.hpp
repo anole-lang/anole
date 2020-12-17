@@ -19,8 +19,7 @@ class BoolObject : public Object
 
   private:
     constexpr BoolObject(bool value) noexcept
-      : Object(ObjectType::Boolean)
-      , value_(value)
+      : Object(ObjectType::Boolean), value_(value)
     {
         // ...
     }

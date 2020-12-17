@@ -10,21 +10,19 @@ class Code;
 class FunctionObject : public Object
 {
   public:
-    FunctionObject(SPtr<Scope> pre_scope,
-        SPtr<Code> code, Size base,
-        Size parameter_num
-    );
+    FunctionObject(SPtr<Scope> pre_scope, SPtr<Code> code, Size base, Size parameter_num);
 
+    SPtr<Scope> scope();
+    SPtr<Code>  code();
+    Size        base();
+
+  public:
     String to_str() override;
     Address load_member(const String &name) override;
     void call(Size num) override;
     bool is_callable() override;
 
     void collect(std::function<void(Scope *)>) override;
-
-    SPtr<Scope> scope() { return scope_; }
-    SPtr<Code>  code()  { return code_; }
-    Size base() { return base_; }
 
   private:
     SPtr<Scope> scope_;

@@ -10,13 +10,11 @@ namespace anole
 class StringObject : public Object
 {
   public:
-    StringObject(String value)
-      : Object(ObjectType::String)
-      , value_(std::move(value))
-    {
-        // ...
-    }
+    StringObject(String value) noexcept;
 
+    const String &value() const;
+
+  public:
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
@@ -28,11 +26,6 @@ class StringObject : public Object
     Object *cle(Object *) override;
     Address index(Object *) override;
     Address load_member(const String &name) override;
-
-    const String &value() const
-    {
-        return value_;
-    }
 
   private:
     String value_;

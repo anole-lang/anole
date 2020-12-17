@@ -10,19 +10,18 @@ class Code;
 class ThunkObject : public Object
 {
   public:
-    ThunkObject(SPtr<Scope> pre_scope,
-        SPtr<Code> code, Size base
-    );
-
-    void collect(std::function<void(Scope *)> func) override;
-    void collect(std::function<void(Object *)> func) override;
+    ThunkObject(SPtr<Scope> pre_scope, SPtr<Code> code, Size base);
 
     void set_result(Address res);
-    bool computed() { return computed_; }
-    Address result() { return result_; }
-    SPtr<Scope> scope() { return scope_; }
-    SPtr<Code> code() { return code_; }
-    Size base() { return base_; }
+    bool computed() const;
+    Address result();
+    SPtr<Scope> scope();
+    SPtr<Code> code();
+    Size base() const;
+
+  public:
+    void collect(std::function<void(Scope *)> func) override;
+    void collect(std::function<void(Object *)> func) override;
 
   private:
     bool computed_;

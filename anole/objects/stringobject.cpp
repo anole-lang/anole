@@ -32,6 +32,18 @@ lc_builtin_methods
 };
 }
 
+StringObject::StringObject(String value) noexcept
+  : Object(ObjectType::String)
+  , value_(std::move(value))
+{
+    // ...
+}
+
+const String &StringObject::value() const
+{
+    return value_;
+}
+
 bool StringObject::to_bool()
 {
     return !value_.empty();

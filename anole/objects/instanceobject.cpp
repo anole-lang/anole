@@ -13,6 +13,11 @@ InstanceObject::InstanceObject()
     // ...
 }
 
+SPtr<Scope> &InstanceObject::scope()
+{
+    return scope_;
+}
+
 Address InstanceObject::load_member(const String &name)
 {
     if (scope_->symbols().count(name))

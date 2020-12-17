@@ -10,8 +10,12 @@ namespace anole
 class ListObject : public Object
 {
   public:
-    ListObject() : Object(ObjectType::List) {}
+    ListObject() noexcept;
 
+    std::list<Address> &objects();
+    void append(Object *ptr);
+
+  public:
     bool to_bool() override;
     String to_str() override;
     String to_key() override;
@@ -20,9 +24,6 @@ class ListObject : public Object
     Address load_member(const String &name) override;
 
     void collect(std::function<void(Object *)>) override;
-
-    std::list<Address> &objects();
-    void append(Object *ptr);
 
   private:
     std::list<Address> objects_;

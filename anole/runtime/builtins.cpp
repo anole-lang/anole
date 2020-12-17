@@ -49,7 +49,7 @@ REGISTER_BUILTIN(call_with_current_continuation,
             )->bind(cont_obj)
         ;
     }
-    else if (Context::current()->top_ptr()->is<ObjectType::Cont>())
+    else if (Context::current()->top_ptr()->is<ObjectType::Continuation>())
     {
         auto resume = Context::current()->pop_ptr<ContObject>()->resume();
         auto cont_obj = Allocator<Object>::alloc<ContObject>(Context::current());
