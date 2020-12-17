@@ -2,31 +2,32 @@
 
 #include <vector>
 
-using namespace std;
-using namespace anole;
-
 extern "C"
 {
-vector<String> _FUNCTIONS
+std::vector<anole::String> _FUNCTIONS
 {
-    "__args"s
+    "__args"
 };
 
-void __args(Size n)
+void __args(anole::Size n)
 {
     if (n != 0)
     {
-        throw RuntimeError("args need no arguments");
+        throw anole::RuntimeError("args need no arguments");
     }
 
-    auto raw_args = Context::get_args();
+    auto raw_args = anole::Context::get_args();
 
-    auto args = Allocator<Object>::alloc<ListObject>();
+    auto args = anole::Allocator<anole::Object>::alloc<anole::ListObject>();
     for (auto arg : raw_args)
     {
-        args->append(Allocator<Object>::alloc<StringObject>(String(arg)));
+        args->append(anole::Allocator<anole::Object>::
+            alloc<anole::StringObject>(
+                anole::String(arg)
+            )
+        );
     }
 
-    Context::current()->push(args);
+    anole::Context::current()->push(args);
 }
 }

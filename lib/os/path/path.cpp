@@ -1,41 +1,39 @@
 #include "path.hpp"
 
-using namespace std;
-namespace fs = filesystem;
-using namespace anole;
+namespace fs = std::filesystem;
 
 extern "C"
 {
-vector<String> _FUNCTIONS
+std::vector<anole::String> _FUNCTIONS
 {
-    "__current_path"s,
-    "__is_directory"s
+    "__current_path",
+    "__is_directory"
 };
 
-void __current_path(Size n)
+void __current_path(anole::Size n)
 {
     if (n != 0)
     {
-        throw RuntimeError("function current_path need no arguments");
+        throw anole::RuntimeError("function current_path need no arguments");
     }
 
-    Context::current()->push(
-        Allocator<Object>::alloc<PathObject>(
+    anole::Context::current()->push(
+        anole::Allocator<anole::Object>::alloc<PathObject>(
             fs::current_path()
         )
     );
 }
 
-void __is_directory(Size n)
+void __is_directory(anole::Size n)
 {
     if (n != 1)
     {
-        throw RuntimeError("function current_path need 1 argument");
+        throw anole::RuntimeError("function current_path need 1 argument");
     }
 
-    auto path_obj = Context::current()->pop_ptr();
+    auto path_obj = anole::Context::current()->pop_ptr();
     fs::path path;
-    if (path_obj->is(Object::add_object_type("path")))
+    if (path_obj->is(anole::Object::add_object_type("path")))
     {
         path = static_cast<PathObject *>(path_obj)->path();
     }
@@ -46,39 +44,50 @@ void __is_directory(Size n)
 
     if (path.is_relative())
     {
-        path = Context::current()->current_path() / path;
+        path = anole::Context::current()->current_path() / path;
     }
 
-    Context::current()->push(fs::is_directory(path) ? BoolObject::the_true() : BoolObject::the_false());
+    anole::Context::current()->push(
+        fs::is_directory(path)
+        ? anole::BoolObject::the_true()
+        : anole::BoolObject::the_false()
+    );
 }
 }
 
 namespace
 {
-map<String, function<void(PathObject *)>>
+std::map<anole::String, std::function<void(PathObject *)>>
 lc_builtin_methods
 {
     {"is_directory", [](PathObject *obj)
         {
-            Context::current()->push(fs::is_directory(obj->path()) ? BoolObject::the_true() : BoolObject::the_false());
+            anole::Context::current()->push(
+                fs::is_directory(obj->path())
+                ? anole::BoolObject::the_true()
+                : anole::BoolObject::the_false()
+            );
         }
     }
 };
 }
 
 PathObject::PathObject(fs::path path)
-  : Object(Object::add_object_type("path"))
-  , path_(move(path)) {}
+  : anole::Object(anole::Object::add_object_type("path"))
+  , path_(std::move(path))
+{
+    // ...
+}
 
-Address PathObject::load_member(const String &name)
+anole::Address PathObject::load_member(const anole::String &name)
 {
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([
-                    this,
-                    &func = method->second](Size) mutable
+        return std::make_shared<anole::Variable>(
+            anole::Allocator<anole::Object>::alloc<anole::BuiltInFunctionObject>(
+                [this, &func = method->second]
+                (anole::Size) mutable
                 {
                     func(this);
                 },
@@ -86,10 +95,10 @@ Address PathObject::load_member(const String &name)
             )
         );
     }
-    return Object::load_member(name);
+    return anole::Object::load_member(name);
 }
 
-String PathObject::to_str()
+anole::String PathObject::to_str()
 {
     return path_.string();
 }

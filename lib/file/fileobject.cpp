@@ -2,26 +2,23 @@
 
 #include <fstream>
 
-using namespace std;
-using namespace anole;
-
 extern "C"
 {
-void __open(Size n)
+void __open(anole::Size n)
 {
     if (n != 2)
     {
-        throw RuntimeError("function open need 2 arguments");
+        throw anole::RuntimeError("function open need 2 arguments");
     }
 
-    auto path = Context::current()->pop_ptr();
-    auto mode = Context::current()->pop_ptr();
+    auto path = anole::Context::current()->pop_ptr();
+    auto mode = anole::Context::current()->pop_ptr();
 
-    Context::current()
+    anole::Context::current()
         ->push(
-            Allocator<Object>::alloc<FileObject>(
+            anole::Allocator<anole::Object>::alloc<FileObject>(
                 path->to_str(),
-                dynamic_cast<IntegerObject *>(mode)->value()
+                dynamic_cast<anole::IntegerObject *>(mode)->value()
             )
         )
     ;
@@ -30,17 +27,17 @@ void __open(Size n)
 
 namespace
 {
-map<String, function<void(FileObject *)>>
+std::map<anole::String, std::function<void(FileObject *)>>
 lc_builtin_methods
 {
     {"good", [](FileObject *obj)
         {
-            Context::current()->push(obj->file().good() ? BoolObject::the_true() : BoolObject::the_false());
+            anole::Context::current()->push(obj->file().good() ? anole::BoolObject::the_true() : anole::BoolObject::the_false());
         }
     },
     {"eof", [](FileObject *obj)
         {
-            Context::current()->push(obj->file().eof() ? BoolObject::the_true() : BoolObject::the_false());
+            anole::Context::current()->push(obj->file().eof() ? anole::BoolObject::the_true() : anole::BoolObject::the_false());
         }
     },
     {"close", [](FileObject *obj)
@@ -55,67 +52,75 @@ lc_builtin_methods
     },
     {"read", [](FileObject *obj)
         {
-            Context::current()->push(
-                Allocator<Object>::alloc<StringObject>(
-                    String(1, obj->file().get())
+            anole::Context::current()->push(
+                anole::Allocator<anole::Object>::alloc<anole::StringObject>(
+                    anole::String(1, obj->file().get())
                 )
             );
         }
     },
     {"readline", [](FileObject *obj)
         {
-            String line;
+            anole::String line;
             std::getline(obj->file(), line);
-            Context::current()->push(
-                Allocator<Object>::alloc<StringObject>(line)
+            anole::Context::current()->push(anole::Allocator<anole::Object>::
+                alloc<anole::StringObject>(line)
             );
         }
     },
     {"write", [](FileObject *obj)
         {
             const auto &str
-                = dynamic_cast<StringObject *>(Context::current()->pop_ptr())->to_str()
+                = dynamic_cast<anole::StringObject *>(anole::Context::current()->pop_ptr())->to_str()
             ;
             obj->file().write(str.c_str(), str.size());
         }
     },
     {"tellg", [](FileObject *obj)
         {
-            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellg()));
+            anole::Context::current()->push(anole::Allocator<anole::Object>::
+                alloc<anole::IntegerObject>(
+                    obj->file().tellg()
+                )
+            );
         }
     },
     {"tellp", [](FileObject *obj)
         {
-            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(obj->file().tellp()));
+            anole::Context::current()->push(anole::Allocator<anole::Object>::
+                alloc<anole::IntegerObject>(
+                    obj->file().tellp()
+                )
+            );
         }
     },
     {"seekg", [](FileObject *obj)
         {
-            obj->file().seekg(dynamic_cast<IntegerObject *>(Context::current()->pop_ptr())->value());
+            obj->file().seekg(dynamic_cast<anole::IntegerObject *>(anole::Context::current()->pop_ptr())->value());
         }
     },
     {"seekp", [](FileObject *obj)
         {
-            obj->file().seekp(dynamic_cast<IntegerObject *>(Context::current()->pop_ptr())->value());
+            obj->file().seekp(dynamic_cast<anole::IntegerObject *>(anole::Context::current()->pop_ptr())->value());
         }
     }
 };
 }
 
-FileObject::FileObject(const String &path, int64_t mode)
-  : Object(Object::add_object_type("file"))
+FileObject::FileObject(const anole::String &path, int64_t mode)
+  : anole::Object(anole::Object::add_object_type("file"))
 {
-    static const ios_base::openmode mapping[6]
+    static constexpr std::ios_base::openmode mapping[6]
     {
-        ios_base::app,
-        ios_base::binary,
-        ios_base::in,
-        ios_base::out,
-        ios_base::trunc,
-        ios_base::ate
+        std::ios_base::app,
+        std::ios_base::binary,
+        std::ios_base::in,
+        std::ios_base::out,
+        std::ios_base::trunc,
+        std::ios_base::ate
     };
 
-    ios_base::openmode mod;
+    std::ios_base::openmode mod;
     bool assigned = false;
     for (int i = 0; i < 6; ++i)
     {
@@ -136,15 +141,15 @@ FileObject::FileObject(const String &path, int64_t mode)
     file_.open(path, mod);
 }
 
-Address FileObject::load_member(const String &name)
+anole::Address FileObject::load_member(const anole::String &name)
 {
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<Variable>(
-            Allocator<Object>::alloc<BuiltInFunctionObject>([
-                    this,
-                    &func = method->second](Size) mutable
+        return std::make_shared<anole::Variable>(
+            anole::Allocator<anole::Object>::alloc<anole::BuiltInFunctionObject>(
+                [this, &func = method->second]
+                (anole::Size) mutable
                 {
                     func(this);
                 },
@@ -155,7 +160,7 @@ Address FileObject::load_member(const String &name)
     return Object::load_member(name);
 }
 
-fstream &FileObject::file()
+std::fstream &FileObject::file()
 {
     return file_;
 }
