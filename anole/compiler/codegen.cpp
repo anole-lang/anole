@@ -5,8 +5,6 @@
 #include <set>
 #include <tuple>
 
-using namespace std;
-
 namespace anole
 {
 void BlockExpr::codegen(Code &code)
@@ -26,7 +24,7 @@ void IntegerExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<IntegerObject>(
-            'i' + to_string(value), value
+            'i' + std::to_string(value), value
         )
     );
 }
@@ -35,7 +33,7 @@ void FloatExpr::codegen(Code &code)
 {
     code.add_ins<Opcode::LoadConst, Size>(
         code.create_const<FloatObject>(
-            'f' + to_string(value), value
+            'f' + std::to_string(value), value
         )
     );
 }
@@ -316,7 +314,7 @@ void LambdaExpr::codegen(Code &code)
     block->codegen(code);
 
     code.add_ins<Opcode::ReturnNone>();
-    code.set_ins<Opcode::LambdaDecl, pair<Size, Size>>(o1, make_pair<Size, Size>(parameters.size(), code.size()));
+    code.set_ins<Opcode::LambdaDecl, std::pair<Size, Size>>(o1, std::make_pair<Size, Size>(parameters.size(), code.size()));
 }
 
 void DotExpr::codegen(Code &code)
@@ -341,8 +339,8 @@ void MatchExpr::codegen(Code &code)
 {
     expr->codegen(code);
 
-    map<Size, vector<Size>> matchfroms;
-    vector<Size> jumpfroms;
+    std::map<Size, std::vector<Size>> matchfroms;
+    std::vector<Size> jumpfroms;
 
     for (Size i = 0; i < keylists.size(); ++i)
     {
@@ -580,7 +578,7 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
     {
         for (Size i = 0; i < decls.size(); ++i)
         {
-            make_unique<NoneExpr>()->codegen(code);
+            std::make_unique<NoneExpr>()->codegen(code);
         }
     }
 
@@ -604,7 +602,7 @@ void PrefixopDeclarationStmt::codegen(Code &code)
 
 void InfixopDeclarationStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::AddInfixOp, pair<String, Size>>(make_pair(op, precedence));
+    code.add_ins<Opcode::AddInfixOp, std::pair<String, Size>>(make_pair(op, precedence));
 }
 
 void BreakStmt::codegen(Code &code)
@@ -694,31 +692,31 @@ void ForeachStmt::codegen(Code &code)
     /**
      * generate ast for cond: __it.__has_next__()
     */
-    auto cond = make_unique<ParenOperatorExpr>(
-        make_unique<DotExpr>(
-            make_unique<IdentifierExpr>("__it"), "__has_next__"
+    auto cond = std::make_unique<ParenOperatorExpr>(
+        std::make_unique<DotExpr>(
+            std::make_unique<IdentifierExpr>("__it"), "__has_next__"
         ),
         ArgumentList()
     );
 
     block->statements.push_front(nullptr);
-    auto next = make_unique<ParenOperatorExpr>(
-        make_unique<DotExpr>(
-            make_unique<IdentifierExpr>("__it"), "__next__"
+    auto next = std::make_unique<ParenOperatorExpr>(
+        std::make_unique<DotExpr>(
+            std::make_unique<IdentifierExpr>("__it"), "__next__"
         ),
         ArgumentList()
     );
     if (!varname.empty())
     {
-        *block->statements.begin() = make_unique<VariableDeclarationStmt>(
+        *block->statements.begin() = std::make_unique<VariableDeclarationStmt>(
             varname, move(next), true
         );
     }
     else
     {
-        *block->statements.begin() = make_unique<ExprStmt>(move(next));
+        *block->statements.begin() = std::make_unique<ExprStmt>(std::move(next));
     }
 
-    WhileStmt(move(cond), move(block)).codegen(code);
+    WhileStmt(std::move(cond), std::move(block)).codegen(code);
 }
 }

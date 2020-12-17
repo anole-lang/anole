@@ -11,8 +11,7 @@
 
 #include <fstream>
 
-using namespace std;
-namespace fs = filesystem;
+namespace fs = std::filesystem;
 
 namespace anole
 {
@@ -128,19 +127,19 @@ Address AnoleModuleObject::load_member(const String &name)
     return Object::load_member(name);
 }
 
-void AnoleModuleObject::collect(function<void(Scope *)> func)
+void AnoleModuleObject::collect(std::function<void(Scope *)> func)
 {
     func(scope_.get());
 }
 
-void AnoleModuleObject::init(const filesystem::path &path)
+void AnoleModuleObject::init(const fs::path &path)
 {
     auto dir = path.parent_path();
     auto ir_path = path.string() + ".ir";
 
-    code_ = make_shared<Code>(path.filename().string());
+    code_ = std::make_shared<Code>(path.filename().string());
     auto origin = Context::current();
-    Context::current() = make_shared<Context>(code_, dir);
+    Context::current() = std::make_shared<Context>(code_, dir);
     Context::current()->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
@@ -151,7 +150,7 @@ void AnoleModuleObject::init(const filesystem::path &path)
     }
     else
     {
-        ifstream fin{path};
+        std::ifstream fin{path};
         if (!fin.good())
         {
             throw RuntimeError("cannot open file " + path.string());
@@ -233,6 +232,6 @@ Address CppModuleObject::load_member(const String &name)
         [func](Size n) { func(n); }, this
     );
 
-    return make_shared<Variable>(result);
+    return std::make_shared<Variable>(result);
 }
 }

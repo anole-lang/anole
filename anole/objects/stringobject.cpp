@@ -2,13 +2,11 @@
 
 #include "../runtime/runtime.hpp"
 
-using namespace std;
-
 namespace anole
 {
 namespace
 {
-map<String, function<void(StringObject *)>>
+std::map<String, std::function<void(StringObject *)>>
 lc_builtin_methods
 {
     {"size", [](StringObject *obj)
@@ -129,7 +127,7 @@ Address StringObject::index(Object *index)
     if (index->is<ObjectType::Integer>())
     {
         auto p = reinterpret_cast<IntegerObject *>(index);
-        return make_shared<Variable>(
+        return std::make_shared<Variable>(
             Allocator<Object>::alloc<StringObject>(
                 String(1, value_[p->value()])
             )
@@ -146,7 +144,7 @@ Address StringObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<Variable>(
+        return std::make_shared<Variable>(
             Allocator<Object>::alloc<BuiltInFunctionObject>([
                     this,
                     &func = method->second](Size) mutable

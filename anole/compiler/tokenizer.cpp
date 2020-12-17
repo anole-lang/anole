@@ -6,11 +6,9 @@
 #include <cctype>
 #include <optional>
 
-using namespace std;
-
 namespace anole
 {
-Tokenizer::Tokenizer(istream &input, String name_of_input) noexcept
+Tokenizer::Tokenizer(std::istream &input, String name_of_input) noexcept
   : cur_location_(1, 0), last_location_(1, 0)
   , input_(input), name_of_input_(move(name_of_input))
   , last_input_(' ')
@@ -55,16 +53,16 @@ void Tokenizer::get_next_input()
 
 namespace
 {
-const set<char> illegal_idchrs
+const std::set<char> illegal_idchrs
 {
     '_', '@', '#', '$', '.', ',', ':', ';',
     '?', '(', ')', '[', ']', '{', '}', '"'
 };
 bool is_legal_idchr(char chr)
 {
-    return !(isspace(chr)
-        || isdigit(chr)
-        || isalpha(chr)
+    return !(std::isspace(chr)
+        || std::isdigit(chr)
+        || std::isalpha(chr)
         || illegal_idchrs.count(chr)
     );
 }
@@ -91,14 +89,14 @@ Token Tokenizer::next_token()
     };
 
     auto state = State::Begin;
-    while (isspace(last_input_))
+    while (std::isspace(last_input_))
     {
         get_next_input();
     }
 
     last_location_ = cur_location_;
 
-    optional<Token> token;
+    std::optional<Token> token;
     String value;
     while (!token)
     {
@@ -375,8 +373,8 @@ String Tokenizer::get_err_info(const String &message)
 
     return
         info::strong(name_of_input_ + ":"
-            + to_string(line_num) + ":"
-            + to_string(char_at_line) + ": ") +
+            + std::to_string(line_num) + ":"
+            + std::to_string(char_at_line) + ": ") +
         info::warning("error: ") + message + "\n" +
         line + "\n" +
         String(char_at_line == 0 ? 0 : char_at_line - 1, ' ')

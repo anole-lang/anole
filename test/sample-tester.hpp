@@ -9,17 +9,16 @@
 #include <sstream>
 #include <iostream>
 
-using namespace std;
 using namespace anole;
 
 inline String execute(const String &input)
 {
-    ostringstream out;
-    auto backup = cout.rdbuf();
-    cout.rdbuf(out.rdbuf());
+    std::ostringstream out;
+    auto backup = std::cout.rdbuf();
+    std::cout.rdbuf(out.rdbuf());
 
-    istringstream ss{input};
-    auto code = make_shared<Code>("<test>");
+    std::istringstream ss{input};
+    auto code = std::make_shared<Code>("<test>");
     Context::current() = std::make_shared<Context>(code);
     Parser parser{ss, "<test>"};
     while (auto ast = parser.gen_statement())
@@ -30,7 +29,7 @@ inline String execute(const String &input)
     #ifdef _DEBUG
     code->print();
     #endif
-    cout.rdbuf(backup);
+    std::cout.rdbuf(backup);
     return out.str();
 }
 

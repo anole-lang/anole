@@ -2,12 +2,10 @@
 
 #include "../runtime/runtime.hpp"
 
-using namespace std;
-
 namespace anole
 {
 ClassObject::ClassObject(String name, SPtr<Scope> pre_scope)
-  : Object(ObjectType::Class), name_(move(name)), scope_(make_shared<Scope>(pre_scope))
+  : Object(ObjectType::Class), name_(std::move(name)), scope_(std::make_shared<Scope>(pre_scope))
 {
     // ...
 }
@@ -25,7 +23,7 @@ Address ClassObject::load_member(const String &name)
 
         if (member->ptr()->is_callable())
         {
-            return make_shared<Variable>(
+            return std::make_shared<Variable>(
                 Allocator<Object>::alloc<MethodObject>(member->ptr(), this)
             );
         }

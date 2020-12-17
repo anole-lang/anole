@@ -2,8 +2,6 @@
 
 #include "../runtime/runtime.hpp"
 
-using namespace std;
-
 namespace anole
 {
 ContObject::ContObject(SPtr<Context> resume)
@@ -25,12 +23,12 @@ void ContObject::call(Size n)
         throw RuntimeError("continuation need a argument");
     }
     auto retval = Context::current()->pop_ptr();
-    Context::current() = make_shared<Context>(resume_);
+    Context::current() = std::make_shared<Context>(resume_);
     Context::current()->push(retval);
     ++Context::current()->pc();
 }
 
-void ContObject::collect(function<void(Context *)> func)
+void ContObject::collect(std::function<void(Context *)> func)
 {
     func(resume_.get());
 }

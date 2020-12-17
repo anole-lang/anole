@@ -6,13 +6,11 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
 namespace anole
 {
 namespace
 {
-vector<String> lc_mapping_type_str
+std::vector<String> lc_mapping_type_str
 {
     "none",
     "boolean",
@@ -30,7 +28,7 @@ vector<String> lc_mapping_type_str
     "anolemodule",
     "cppmodule"
 };
-map<String, ObjectType> lc_mapping_str_type
+std::map<String, ObjectType> lc_mapping_str_type
 {
     { "none",           ObjectType::None            },
     { "boolean",        ObjectType::Boolean         },
@@ -82,7 +80,7 @@ String Object::to_str()
 
 String Object::to_key()
 {
-    return 'p' + to_string(reinterpret_cast<uintptr_t>(this));
+    return 'p' + std::to_string(reinterpret_cast<uintptr_t>(this));
 }
 
 Object *Object::neg()
@@ -188,17 +186,17 @@ bool Object::is_callable()
     return false;
 }
 
-void Object::collect(function<void(Scope *)>)
+void Object::collect(std::function<void(Scope *)>)
 {
     // ...
 }
 
-void Object::collect(function<void(Object *)>)
+void Object::collect(std::function<void(Object *)>)
 {
     // ...
 }
 
-void Object::collect(function<void(Context *)>)
+void Object::collect(std::function<void(Context *)>)
 {
     // ...
 }

@@ -3,8 +3,6 @@
 #include <map>
 #include <utility>
 
-using namespace std;
-
 namespace anole
 {
 Token::Token(TokenType type, Location location) noexcept
@@ -14,7 +12,7 @@ Token::Token(TokenType type, Location location) noexcept
 }
 
 Token::Token(TokenType type, String value, Location location) noexcept
-  : type(type), value(move(value)), location(location)
+  : type(type), value(std::move(value)), location(location)
 {
     // ...
 }
@@ -39,8 +37,8 @@ Token::Token(const Token &other) noexcept
 Token &Token::operator=(Token &&other) noexcept
 {
     type = other.type;
-    value = move(other.value);
-    location = move(other.location);
+    value = std::move(other.value);
+    location = std::move(other.location);
     return *this;
 }
 
@@ -55,7 +53,7 @@ Token &Token::operator=(const Token &other) noexcept
 namespace
 {
 Size lc_end_of_token_type = static_cast<Size>(TokenType::End);
-map<String, TokenType> lc_mapping
+std::map<String, TokenType> lc_mapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
@@ -110,7 +108,7 @@ map<String, TokenType> lc_mapping
 }
 
 Token::Token(String value, Location location) noexcept
-  : value(move(value)), location(location)
+  : value(std::move(value)), location(location)
 {
     auto find = lc_mapping.find(this->value);
     type = (find == lc_mapping.end() ? TokenType::Identifier : find->second);

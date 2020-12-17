@@ -1,7 +1,5 @@
 #include "ast.hpp"
 
-using namespace std;
-
 namespace anole
 {
 AST::~AST() = default;

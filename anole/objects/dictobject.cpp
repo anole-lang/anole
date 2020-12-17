@@ -2,13 +2,11 @@
 
 #include "../runtime/runtime.hpp"
 
-using namespace std;
-
 namespace anole
 {
 namespace
 {
-map<String, function<void(DictObject *)>>
+std::map<String, std::function<void(DictObject *)>>
 lc_builtin_methods
 {
     {"empty", [](DictObject *obj)
@@ -67,7 +65,7 @@ DictObject::DataType &DictObject::data()
 
 void DictObject::insert(Object *key, Object *value)
 {
-    data_[key] = make_shared<Variable>(value);
+    data_[key] = std::make_shared<Variable>(value);
 }
 
 bool DictObject::to_bool()
@@ -105,7 +103,7 @@ Address DictObject::index(Object *index)
     /**
      * dict will create an empty target if the key is not recorded
     */
-    return data_[index] = make_shared<Variable>();
+    return data_[index] = std::make_shared<Variable>();
 }
 
 Address DictObject::load_member(const String &name)
@@ -113,7 +111,7 @@ Address DictObject::load_member(const String &name)
     auto method = lc_builtin_methods.find(name);
     if (method != lc_builtin_methods.end())
     {
-        return make_shared<Variable>(
+        return std::make_shared<Variable>(
             Allocator<Object>::alloc<BuiltInFunctionObject>([
                     this,
                     &func = method->second](Size) mutable
@@ -127,7 +125,7 @@ Address DictObject::load_member(const String &name)
     return index(Allocator<Object>::alloc<StringObject>(name));
 }
 
-void DictObject::collect(function<void(Object *)> func)
+void DictObject::collect(std::function<void(Object *)> func)
 {
     for (auto &key_addr : data_)
     {

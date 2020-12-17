@@ -5,22 +5,20 @@
 #include <set>
 #include <algorithm>
 
-using namespace std;
-
 namespace anole
 {
 namespace operators
 {
-set<TokenType> uops
+std::set<TokenType> uops
 {
     TokenType::Not, TokenType::Sub, TokenType::BNeg
 };
 
-vector<Size> bop_precedences
+std::vector<Size> bop_precedences
 {
     100, 110, 120, 130, 140, 150, 160, 170, 180, 190
 };
-map<Size, set<TokenType>> bop_mapping
+std::map<Size, std::set<TokenType>> bop_mapping
 {
     { 100, { TokenType::Or } },
     { 110, { TokenType::And } },
@@ -34,12 +32,12 @@ map<Size, set<TokenType>> bop_mapping
     { 190, { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod } }
 };
 
-set<TokenType> &bops_at_precedence(Size precedence)
+std::set<TokenType> &bops_at_precedence(Size precedence)
 {
     return bop_mapping[precedence];
 }
 
-set<TokenType> &bops_at_layer(Size layer)
+std::set<TokenType> &bops_at_layer(Size layer)
 {
     return bop_mapping[bop_precedences[layer]];
 }
@@ -76,13 +74,13 @@ void Parser::add_infixop(const String &str, Size precedence)
 }
 
 Parser::Parser() noexcept
-  : Parser(cin, "<stdin>")
+  : Parser(std::cin, "<stdin>")
 {
     // ...
 }
 
-Parser::Parser(istream &input, String name_of_input) noexcept
-  : tokenizer_(input, move(name_of_input))
+Parser::Parser(std::istream &input, String name_of_input) noexcept
+  : tokenizer_(input, std::move(name_of_input))
   , current_token_(tokenizer_.next_token())
 {
     // ...
@@ -100,9 +98,9 @@ void Parser::reset()
     get_next_token();
 }
 
-void Parser::set_resume_action(function<void()> action)
+void Parser::set_resume_action(std::function<void()> action)
 {
-    resume_action_ = move(action);
+    resume_action_ = std::move(action);
 }
 
 Ptr<AST> Parser::gen_statement()
@@ -157,7 +155,7 @@ ArgumentList Parser::gen_arguments()
             unpack = true;
             get_next_token();
         }
-        args.push_back(make_pair(move(expr), unpack));
+        args.push_back(std::make_pair(std::move(expr), unpack));
         if (current_token_.type == TokenType::Comma)
         {
             get_next_token(); // eat ','
@@ -191,10 +189,10 @@ ParameterList Parser::gen_parameters()
                 get_next_token();
             }
 
-            auto decl = make_unique<VariableDeclarationStmt>(
+            auto decl = std::make_unique<VariableDeclarationStmt>(
                 gen_ident_rawstr(), nullptr, is_ref
             );
-            parameters.push_back(make_pair(move(decl), true));
+            parameters.push_back(std::make_pair(std::move(decl), true));
         }
         else
         {
@@ -211,8 +209,8 @@ ParameterList Parser::gen_parameters()
             {
                 need_default = true;
                 get_next_token();
-                decl = make_unique<VariableDeclarationStmt>(
-                    move(ident), gen_expr(), is_ref
+                decl = std::make_unique<VariableDeclarationStmt>(
+                    std::move(ident), gen_expr(), is_ref
                 );
             }
             else if (need_default)
@@ -221,12 +219,12 @@ ParameterList Parser::gen_parameters()
             }
             else
             {
-                decl = make_unique<VariableDeclarationStmt>(
-                    move(ident), nullptr, is_ref
+                decl = std::make_unique<VariableDeclarationStmt>(
+                    std::move(ident), nullptr, is_ref
                 );
             }
 
-            parameters.push_back(make_pair(move(decl), false));
+            parameters.push_back(std::make_pair(std::move(decl), false));
         }
 
         if (current_token_.type == TokenType::Comma)
@@ -248,7 +246,7 @@ ParameterList Parser::gen_parameters()
 // usually use when interacting
 Ptr<BlockExpr> Parser::gen_stmts()
 {
-    auto stmts = make_unique<BlockExpr>();
+    auto stmts = std::make_unique<BlockExpr>();
     while (current_token_.type != TokenType::End)
     {
         while (current_token_.type == TokenType::Semicolon)
@@ -259,7 +257,7 @@ Ptr<BlockExpr> Parser::gen_stmts()
         auto stmt = gen_stmt();
         if (stmt)
         {
-            stmts->statements.emplace_back(move(stmt));
+            stmts->statements.emplace_back(std::move(stmt));
         }
     }
     return stmts;
@@ -274,14 +272,14 @@ Ptr<BlockExpr> Parser::gen_block()
     {
         get_next_token(); // eat '{'
         try_resume();
-        block = make_unique<BlockExpr>();
+        block = std::make_unique<BlockExpr>();
         // '}' means the end of a block
         while (current_token_.type != TokenType::RBrace)
         {
             auto stmt = gen_stmt();
             if (stmt)
             {
-                block->statements.push_back(move(stmt));
+                block->statements.push_back(std::move(stmt));
             }
 
             if (current_token_.type == TokenType::Semicolon)
@@ -296,7 +294,7 @@ Ptr<BlockExpr> Parser::gen_block()
     {
         get_next_token();
         try_resume();
-        block = make_unique<BlockExpr>();
+        block = std::make_unique<BlockExpr>();
         block->statements.push_back(gen_stmt());
         if (current_token_.type == TokenType::Semicolon)
         {
@@ -323,7 +321,7 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::At:
         if (next_token().type == TokenType::LParen)
         {
-            return make_unique<ExprStmt>(gen_lambda_expr());
+            return std::make_unique<ExprStmt>(gen_lambda_expr());
         }
         else if (current_token_.type != TokenType::End)
         {
@@ -357,11 +355,11 @@ Ptr<Stmt> Parser::gen_stmt()
 
     case TokenType::Break:
         get_next_token();
-        return make_unique<BreakStmt>();
+        return std::make_unique<BreakStmt>();
 
     case TokenType::Continue:
         get_next_token();
-        return make_unique<ContinueStmt>();
+        return std::make_unique<ContinueStmt>();
 
     case TokenType::Return:
         return gen_return_stmt();
@@ -381,12 +379,12 @@ Ptr<Stmt> Parser::gen_stmt()
     case TokenType::LBracket:
     case TokenType::LBrace:
     case TokenType::Not:
-        return make_unique<ExprStmt>(gen_expr());
+        return std::make_unique<ExprStmt>(gen_expr());
 
     default:
         if (operators::uops.count(current_token_.type))
         {
-            return make_unique<ExprStmt>(gen_expr());
+            return std::make_unique<ExprStmt>(gen_expr());
         }
     }
     throw parse_error("wrong token here");
@@ -407,8 +405,8 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
     {
     case TokenType::Comma:
     {
-        list<VariableDeclarationStmt> decls;
-        decls.emplace_back(move(name), nullptr, is_ref);
+        std::list<VariableDeclarationStmt> decls;
+        decls.emplace_back(std::move(name), nullptr, is_ref);
 
         while (current_token_.type == TokenType::Comma)
         {
@@ -425,7 +423,7 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         // @var1, ..., varn
         if (current_token_.type != TokenType::Colon)
         {
-            return make_unique<MultiVarsDeclarationStmt>(move(decls), ExprList{});
+            return std::make_unique<MultiVarsDeclarationStmt>(std::move(decls), ExprList{});
         }
 
         // @var1, ..., varn: expr
@@ -437,13 +435,13 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
             get_next_token();
             exprs.push_back(gen_delay_expr());
         }
-        return make_unique<MultiVarsDeclarationStmt>(move(decls), move(exprs));
+        return std::make_unique<MultiVarsDeclarationStmt>(std::move(decls), std::move(exprs));
     }
 
     case TokenType::Colon:
         get_next_token();
-        return make_unique<VariableDeclarationStmt>(
-            move(name), gen_delay_expr(), is_ref
+        return std::make_unique<VariableDeclarationStmt>(
+            std::move(name), gen_delay_expr(), is_ref
         );
 
     case TokenType::LParen:
@@ -463,7 +461,7 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
-            block = make_unique<BlockExpr>();
+            block = std::make_unique<BlockExpr>();
             ExprList exprs;
             exprs.push_back(gen_delay_expr());
             while (current_token_.type == TokenType::Comma)
@@ -472,14 +470,14 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
                 exprs.push_back(gen_delay_expr());
             }
 
-            block->statements.push_back(make_unique<ReturnStmt>(move(exprs)));
+            block->statements.push_back(std::make_unique<ReturnStmt>(std::move(exprs)));
         }
         else
         {
             block = gen_block();
         }
-        return make_unique<VariableDeclarationStmt>(move(name),
-            make_unique<LambdaExpr>(move(parameters), move(block)), true
+        return std::make_unique<VariableDeclarationStmt>(std::move(name),
+            std::make_unique<LambdaExpr>(std::move(parameters), std::move(block)), true
         );
     }
 
@@ -490,7 +488,7 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         }
         break;
     }
-    return make_unique<VariableDeclarationStmt>(move(name), make_unique<NoneExpr>());
+    return std::make_unique<VariableDeclarationStmt>(std::move(name), std::make_unique<NoneExpr>());
 }
 
 Ptr<DeclarationStmt> Parser::gen_class_declaration()
@@ -501,8 +499,8 @@ Ptr<DeclarationStmt> Parser::gen_class_declaration()
         throw CompileError("expected class name");
     }
 
-    return make_unique<VariableDeclarationStmt>(
-        class_expr->name, move(class_expr), true
+    return std::make_unique<VariableDeclarationStmt>(
+        class_expr->name, std::move(class_expr), true
     );
 }
 
@@ -519,7 +517,7 @@ Ptr<Stmt> Parser::gen_use_stmt()
     {
         get_next_token();
         eat<TokenType::From>("need from ident here");
-        return make_unique<UseStmt>(move(aliases), gen_module());
+        return std::make_unique<UseStmt>(std::move(aliases), gen_module());
     }
 
     aliases.push_back(gen_alias());
@@ -545,7 +543,7 @@ Ptr<Stmt> Parser::gen_use_stmt()
         from.type = UseStmt::Module::Type::Null;
     }
 
-    return make_unique<UseStmt>(move(aliases), move(from));
+    return std::make_unique<UseStmt>(std::move(aliases), std::move(from));
 }
 
 UseStmt::Module Parser::gen_module()
@@ -597,7 +595,7 @@ Ptr<Stmt> Parser::gen_prefixop_decl()
 {
     get_next_token();
     check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<PrefixopDeclarationStmt>(gen_ident_rawstr());
+    return std::make_unique<PrefixopDeclarationStmt>(gen_ident_rawstr());
 }
 
 Ptr<Stmt> Parser::gen_infixop_decl()
@@ -610,7 +608,7 @@ Ptr<Stmt> Parser::gen_infixop_decl()
         get_next_token();
     }
     check<TokenType::Identifier>("expected an identifier here");
-    return make_unique<InfixopDeclarationStmt>(gen_ident_rawstr(), precedence);
+    return std::make_unique<InfixopDeclarationStmt>(gen_ident_rawstr(), precedence);
 }
 
 Ptr<Stmt> Parser::gen_if_else()
@@ -621,8 +619,8 @@ Ptr<Stmt> Parser::gen_if_else()
     auto true_block = gen_block();
     try_resume();
     auto false_branch = gen_if_else_tail();
-    auto stmt = make_unique<IfElseStmt>(move(cond),
-        move(true_block), move(false_branch)
+    auto stmt = std::make_unique<IfElseStmt>(std::move(cond),
+        std::move(true_block), std::move(false_branch)
     );
 
     stmt->location = location;
@@ -652,7 +650,7 @@ Ptr<Stmt> Parser::gen_while_stmt()
 
     auto cond = gen_expr();
     auto block = gen_block();
-    auto stmt = make_unique<WhileStmt>(move(cond), move(block));
+    auto stmt = std::make_unique<WhileStmt>(std::move(cond), std::move(block));
 
     stmt->location = location;
     return stmt;
@@ -668,7 +666,7 @@ Ptr<Stmt> Parser::gen_do_while_stmt()
     auto location = next_token().location;
 
     auto cond = gen_expr();
-    auto stmt = make_unique<DoWhileStmt>(move(cond), move(block));
+    auto stmt = std::make_unique<DoWhileStmt>(std::move(cond), std::move(block));
 
     stmt->location = location;
     return stmt;
@@ -680,7 +678,7 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
 
     auto expression = gen_expr();
 
-    string varname;
+    String varname;
     if (current_token_.type == TokenType::As)
     {
         get_next_token();
@@ -689,8 +687,8 @@ Ptr<Stmt> Parser::gen_foreach_stmt()
     }
 
     auto block = gen_block();
-    return make_unique<ForeachStmt>(
-        move(expression), move(varname), move(block)
+    return std::make_unique<ForeachStmt>(
+        std::move(expression), std::move(varname), std::move(block)
     );
 }
 
@@ -702,7 +700,7 @@ Ptr<Stmt> Parser::gen_return_stmt()
     if (current_token_.type == TokenType::Semicolon)
     {
         get_next_token();
-        return make_unique<ReturnStmt>(ExprList());
+        return std::make_unique<ReturnStmt>(ExprList());
     }
 
     ExprList exprs;
@@ -713,7 +711,7 @@ Ptr<Stmt> Parser::gen_return_stmt()
         exprs.push_back(gen_delay_expr());
     }
 
-    return make_unique<ReturnStmt>(move(exprs));
+    return std::make_unique<ReturnStmt>(std::move(exprs));
 }
 
 Ptr<Expr> Parser::gen_delay_expr()
@@ -722,7 +720,7 @@ Ptr<Expr> Parser::gen_delay_expr()
     if (current_token_.type == TokenType::Delay)
     {
         get_next_token();
-        return make_unique<DelayExpr>(gen_expr());
+        return std::make_unique<DelayExpr>(gen_expr());
     }
     else
     {
@@ -742,8 +740,8 @@ Ptr<Expr> Parser::gen_expr(int layer)
             auto true_expr = gen_expr();
             eat<TokenType::Comma>("expected ',' here");
             auto false_expr = gen_expr();
-            auto ques = make_unique<QuesExpr>(
-                move(expr), move(true_expr), move(false_expr)
+            auto ques = std::make_unique<QuesExpr>(
+                std::move(expr), std::move(true_expr), std::move(false_expr)
             );
             ques->location = location;
             expr = std::move(ques);
@@ -760,7 +758,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
             auto op = current_token_;
             get_next_token();
             try_resume();
-            auto expr = make_unique<UnaryOperatorExpr>(op, gen_expr(layer));
+            auto expr = std::make_unique<UnaryOperatorExpr>(op, gen_expr(layer));
             expr->location = location;
             return expr;
         }
@@ -806,49 +804,49 @@ Ptr<Expr> Parser::gen_expr(int layer)
                 break;
 
             case TokenType::And:
-                lhs = make_unique<BoolExpr>(alias->value && rv);
+                lhs = std::make_unique<BoolExpr>(alias->value && rv);
                 break;
 
             case TokenType::Or:
-                lhs = make_unique<BoolExpr>(alias->value || rv);
+                lhs = std::make_unique<BoolExpr>(alias->value || rv);
                 break;
 
             case TokenType::Is:
-                lhs = make_unique<BoolExpr>(alias->value == rv);
+                lhs = std::make_unique<BoolExpr>(alias->value == rv);
                 break;
 
             case TokenType::CEQ:
-                lhs = make_unique<BoolExpr>(alias->value == rv);
+                lhs = std::make_unique<BoolExpr>(alias->value == rv);
                 break;
 
             case TokenType::CNE:
-                lhs = make_unique<BoolExpr>(alias->value != rv);
+                lhs = std::make_unique<BoolExpr>(alias->value != rv);
                 break;
 
             case TokenType::CLT:
-                lhs = make_unique<BoolExpr>(alias->value < rv);
+                lhs = std::make_unique<BoolExpr>(alias->value < rv);
                 break;
 
             case TokenType::CLE:
-                lhs = make_unique<BoolExpr>(alias->value <= rv);
+                lhs = std::make_unique<BoolExpr>(alias->value <= rv);
                 break;
 
             case TokenType::CGT:
-                lhs = make_unique<BoolExpr>(alias->value > rv);
+                lhs = std::make_unique<BoolExpr>(alias->value > rv);
                 break;
 
             case TokenType::CGE:
-                lhs = make_unique<BoolExpr>(alias->value >= rv);
+                lhs = std::make_unique<BoolExpr>(alias->value >= rv);
                 break;
 
             default:
-                lhs = make_unique<BinaryOperatorExpr>(move(lhs), op, move(rhs));
+                lhs = std::make_unique<BinaryOperatorExpr>(std::move(lhs), op, std::move(rhs));
                 break;
             }
         }
         else
         {
-            auto expr = make_unique<BinaryOperatorExpr>(move(lhs), op, move(rhs));
+            auto expr = std::make_unique<BinaryOperatorExpr>(std::move(lhs), op, std::move(rhs));
             expr->location = location;
             lhs = std::move(expr);
         }
@@ -907,7 +905,7 @@ Ptr<Expr> Parser::gen_term()
         return gen_class_expr();
 
     case TokenType::LBrace:
-        return make_unique<LambdaExpr>(ParameterList{}, gen_block());
+        return std::make_unique<LambdaExpr>(ParameterList{}, gen_block());
 
     default:
         throw parse_error("expected an expr here");
@@ -923,21 +921,21 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
         switch (current_token_.type)
         {
         case TokenType::Dot:
-            expr = gen_dot_expr(move(expr));
+            expr = gen_dot_expr(std::move(expr));
             break;
 
         case TokenType::LParen:
         {
             auto location = current_token_.location;
-            auto paren_expr = make_unique<ParenOperatorExpr>(move(expr), gen_arguments());
+            auto paren_expr = std::make_unique<ParenOperatorExpr>(std::move(expr), gen_arguments());
             paren_expr->location = location;
-            expr = move(paren_expr);
+            expr = std::move(paren_expr);
         }
             break;
 
         case TokenType::LBracket:
         {
-            expr = gen_index_expr(move(expr));
+            expr = gen_index_expr(std::move(expr));
         }
             break;
 
@@ -951,8 +949,8 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
     {
         auto op = current_token_;
         get_next_token();
-        return make_unique<BinaryOperatorExpr>(
-            move(expr), op, gen_delay_expr()
+        return std::make_unique<BinaryOperatorExpr>(
+            std::move(expr), op, gen_delay_expr()
         );
     }
 
@@ -970,7 +968,7 @@ String Parser::gen_ident_rawstr()
 Ptr<IdentifierExpr> Parser::gen_ident_expr()
 {
     auto location = current_token_.location;
-    auto expr = make_unique<IdentifierExpr>(gen_ident_rawstr());
+    auto expr = std::make_unique<IdentifierExpr>(gen_ident_rawstr());
     expr->location = location;
     return expr;
 }
@@ -980,11 +978,11 @@ Ptr<Expr> Parser::gen_numeric_expr()
     Ptr<Expr> numeric_expr = nullptr;
     if (current_token_.type == TokenType::Integer)
     {
-        numeric_expr = make_unique<IntegerExpr>(stoll(current_token_.value));
+        numeric_expr = std::make_unique<IntegerExpr>(stoll(current_token_.value));
     }
     else
     {
-        numeric_expr = make_unique<FloatExpr>(stod(current_token_.value));
+        numeric_expr = std::make_unique<FloatExpr>(stod(current_token_.value));
     }
     get_next_token();
     return numeric_expr;
@@ -993,12 +991,12 @@ Ptr<Expr> Parser::gen_numeric_expr()
 Ptr<Expr> Parser::gen_none_expr()
 {
     get_next_token();
-    return make_unique<NoneExpr>();
+    return std::make_unique<NoneExpr>();
 }
 
 Ptr<Expr> Parser::gen_boolean_expr()
 {
-    auto bool_expr = make_unique<BoolExpr>(
+    auto bool_expr = std::make_unique<BoolExpr>(
         current_token_.type == TokenType::True
         ? true : false
     );
@@ -1008,7 +1006,7 @@ Ptr<Expr> Parser::gen_boolean_expr()
 
 Ptr<Expr> Parser::gen_string_expr()
 {
-    auto string_expr = make_unique<StringExpr>(current_token_.value);
+    auto string_expr = std::make_unique<StringExpr>(current_token_.value);
     get_next_token();
     return string_expr;
 }
@@ -1017,7 +1015,7 @@ Ptr<Expr> Parser::gen_dot_expr(Ptr<Expr> left)
 {
     auto location = current_token_.location;
     get_next_token();
-    auto dor_expr = make_unique<DotExpr>(move(left), gen_ident_rawstr());
+    auto dor_expr = std::make_unique<DotExpr>(std::move(left), gen_ident_rawstr());
     dor_expr->location = location;
     return dor_expr;
 }
@@ -1032,7 +1030,7 @@ Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expr)
     check<TokenType::RBracket>("expected ']'");
     get_next_token();
 
-    auto index_expr = make_unique<IndexExpr>(move(expr), move(node));
+    auto index_expr = std::make_unique<IndexExpr>(std::move(expr), std::move(node));
     index_expr->location = location;
     return index_expr;
 }
@@ -1040,7 +1038,7 @@ Ptr<Expr> Parser::gen_index_expr(Ptr<Expr> expr)
 Ptr<Expr> Parser::gen_enum_expr()
 {
     get_next_token();
-    auto enum_expr = make_unique<EnumExpr>();
+    auto enum_expr = std::make_unique<EnumExpr>();
     eat<TokenType::LBrace>("expected '{' here");
 
     int64_t base = 0;
@@ -1054,8 +1052,8 @@ Ptr<Expr> Parser::gen_enum_expr()
             base = stoll(current_token_.value);
             get_next_token();
         }
-        enum_expr->decls.emplace_back(move(ident),
-            make_unique<IntegerExpr>(base++), true
+        enum_expr->decls.emplace_back(std::move(ident),
+            std::make_unique<IntegerExpr>(base++), true
         );
 
         if (current_token_.type == TokenType::Comma)
@@ -1076,7 +1074,7 @@ Ptr<Expr> Parser::gen_dict_expr()
 {
     get_next_token(); // eat `dict`
     eat<TokenType::LBrace>("expected '{'");
-    auto dict_expr = make_unique<DictExpr>();
+    auto dict_expr = std::make_unique<DictExpr>();
 
     while (current_token_.type != TokenType::RBrace)
     {
@@ -1107,7 +1105,7 @@ Ptr<ClassExpr> Parser::gen_class_expr()
         bases = gen_arguments();
     }
 
-    string name;
+    String name;
     if (current_token_.type == TokenType::Identifier)
     {
         name = gen_ident_rawstr();
@@ -1148,7 +1146,7 @@ Ptr<ClassExpr> Parser::gen_class_expr()
                 else
                 {
                     auto block = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->block.get();
-                    block->statements.push_back(make_unique<ReturnStmt>(ExprList()));
+                    block->statements.push_back(std::make_unique<ReturnStmt>(ExprList()));
                 }
             }
         }
@@ -1166,17 +1164,17 @@ Ptr<ClassExpr> Parser::gen_class_expr()
                     else
                     {
                         auto block = reinterpret_cast<LambdaExpr *>(vardecl.expr.get())->block.get();
-                        block->statements.push_back(make_unique<ReturnStmt>(ExprList()));
+                        block->statements.push_back(std::make_unique<ReturnStmt>(ExprList()));
                     }
                 }
             }
         }
 
-        members.emplace_back(move(decl));
+        members.emplace_back(std::move(decl));
     }
     get_next_token();
 
-    return make_unique<ClassExpr>(move(name), move(bases), move(members));
+    return std::make_unique<ClassExpr>(std::move(name), std::move(bases), std::move(members));
 }
 
 /**
@@ -1202,7 +1200,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
     if (current_token_.type == TokenType::Colon)
     {
         get_next_token();
-        block = make_unique<BlockExpr>();
+        block = std::make_unique<BlockExpr>();
         ExprList exprs;
         exprs.push_back(gen_delay_expr());
         while (current_token_.type == TokenType::Comma)
@@ -1211,14 +1209,14 @@ Ptr<Expr> Parser::gen_lambda_expr()
             exprs.push_back(gen_delay_expr());
         }
 
-        block->statements.push_back(make_unique<ReturnStmt>(move(exprs)));
+        block->statements.push_back(std::make_unique<ReturnStmt>(std::move(exprs)));
     }
     else
     {
         block = gen_block();
     }
 
-    return gen_term_tail(make_unique<LambdaExpr>(move(parameters), move(block)));
+    return gen_term_tail(std::make_unique<LambdaExpr>(std::move(parameters), std::move(block)));
 }
 
 /**
@@ -1230,7 +1228,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
 */
 Ptr<Expr> Parser::gen_match_expr()
 {
-    auto match_expr = make_unique<MatchExpr>();
+    auto match_expr = std::make_unique<MatchExpr>();
 
     get_next_token(); // eat 'match'
     match_expr->expr = gen_expr();
@@ -1283,11 +1281,11 @@ Ptr<Expr> Parser::gen_match_expr()
     return match_expr;
 }
 
-// generate list as [expr1, expr2, ..., exprN]
+// generate std::list as [expr1, expr2, ..., exprN]
 Ptr<Expr> Parser::gen_list_expr()
 {
     eat<TokenType::LBracket>(); // eat '['
-    auto list_expr = make_unique<ListExpr>();
+    auto list_expr = std::make_unique<ListExpr>();
     while (current_token_.type != TokenType::RBracket)
     {
         list_expr->exprs.push_back(gen_expr());

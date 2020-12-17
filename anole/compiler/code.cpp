@@ -7,9 +7,7 @@
 #include <set>
 #include <fstream>
 
-#define OPRAND(TYPE) (any_cast<const TYPE &>(ins.oprand))
-
-using namespace std;
+#define OPRAND(TYPE) (std::any_cast<const TYPE &>(ins.oprand))
 
 namespace
 {
@@ -18,7 +16,7 @@ using namespace anole;
 class Printer
 {
   public:
-    Printer(ostream &out) : out_(out) {}
+    Printer(std::ostream &out) : out_(out) {}
 
     template<typename ...Ts>
     void add_line(Ts ...args)
@@ -47,7 +45,7 @@ class Printer
                     out_ << String(lens_[i] - line[i].size(), ' ');
                 }
             }
-            out_ << endl;
+            out_ << std::endl;
         }
     }
 
@@ -60,7 +58,7 @@ class Printer
   private:
     String gen_each(Size value)
     {
-        return to_string(value);
+        return std::to_string(value);
     }
 
     String gen_each(const char *value)
@@ -74,13 +72,13 @@ class Printer
     }
 
     template<typename T1, typename T2>
-    String gen_each(pair<T1, T2> value)
+    String gen_each(std::pair<T1, T2> value)
     {
         return "(" + gen_each(value.first) + ", " + gen_each(value.second) + ")";
     }
 
     template<typename T, typename ...Ts>
-    void gen_line(vector<String> &line, T arg, Ts ...args)
+    void gen_line(std::vector<String> &line, T arg, Ts ...args)
     {
         auto str = gen_each(arg);
         if (lens_.size() <= line.size())
@@ -98,13 +96,13 @@ class Printer
         }
     }
 
-    ostream &out_;
-    vector<vector<String>> lines_;
-    vector<Size> lens_;
+    std::ostream &out_;
+    std::vector<std::vector<String>> lines_;
+    std::vector<Size> lens_;
 };
 
 template<typename T>
-void typeout(ostream &out, const T &value)
+void typeout(std::ostream &out, const T &value)
 {
     const char *chrs = reinterpret_cast<const char *>(&value);
     for (Size i = 0; i < sizeof(T); ++i)
@@ -113,7 +111,7 @@ void typeout(ostream &out, const T &value)
     }
 }
 
-void typeout(ostream &out, const String &value)
+void typeout(std::ostream &out, const String &value)
 {
     typeout(out, value.size());
     for (const auto c : value)
@@ -123,7 +121,7 @@ void typeout(ostream &out, const String &value)
 }
 
 template<typename T, typename ...Args>
-void typeouts(ostream &out, const T &arg, const Args &...args)
+void typeouts(std::ostream &out, const T &arg, const Args &...args)
 {
     typeout(out, arg);
     if constexpr (sizeof...(Args) > 0)
@@ -134,13 +132,13 @@ void typeouts(ostream &out, const T &arg, const Args &...args)
 
 // not partial specialization
 template<typename T1, typename T2>
-void typeout(ostream &out, const pair<T1, T2> &pir)
+void typeout(std::ostream &out, const std::pair<T1, T2> &pir)
 {
     typeouts(out, pir.first, pir.second);
 }
 
 template<typename T>
-void typein(istream &in, T &target)
+void typein(std::istream &in, T &target)
 {
     char temp[sizeof(T)];
     char *p = temp;
@@ -151,7 +149,7 @@ void typein(istream &in, T &target)
     target = *(reinterpret_cast<T*>(temp));
 }
 
-void typein(istream &in, String &value)
+void typein(std::istream &in, String &value)
 {
     Size len;
     typein(in, len);
@@ -162,7 +160,7 @@ void typein(istream &in, String &value)
 }
 
 template<typename T, typename ...Args>
-void typeins(istream &in, T &arg, Args &...args)
+void typeins(std::istream &in, T &arg, Args &...args)
 {
     typein(in, arg);
     if constexpr (sizeof...(Args) > 0)
@@ -172,7 +170,7 @@ void typeins(istream &in, T &arg, Args &...args)
 }
 
 template<typename T1, typename T2>
-void typein(istream &in, pair<T1, T2> &pir)
+void typein(std::istream &in, std::pair<T1, T2> &pir)
 {
     typeins(in, pir.first, pir.second);
 }
@@ -181,7 +179,7 @@ void typein(istream &in, pair<T1, T2> &pir)
 namespace anole
 {
 Code::Code(String from) noexcept
-  : from_(move(from))
+  : from_(std::move(from))
   , constants_{ NoneObject::one(), BoolObject::the_true(), BoolObject::the_false() }
 {
     // ...
@@ -192,7 +190,7 @@ const String &Code::from()
     return from_;
 }
 
-map<Size, Location> &Code::source_mapping()
+std::map<Size, Location> &Code::source_mapping()
 {
     return source_mapping_;
 }
@@ -212,7 +210,7 @@ Opcode &Code::opcode_at(Size i)
     return instructions_[i].opcode;
 }
 
-any &Code::oprand_at(Size i)
+std::any &Code::oprand_at(Size i)
 {
     return instructions_[i].oprand;
 }
@@ -281,13 +279,13 @@ Object *Code::load_const(Size ind)
     return constants_[ind];
 }
 
-void Code::print(const filesystem::path &path)
+void Code::print(const std::filesystem::path &path)
 {
-    ofstream fout{path};
+    std::ofstream fout{path};
     print(fout);
 }
 
-void Code::print(ostream &out)
+void Code::print(std::ostream &out)
 {
     Printer printer{out};
 
@@ -400,7 +398,7 @@ void Code::print(ostream &out)
 
         case Opcode::AddInfixOp:
         {
-            using type = pair<String, Size>;
+            using type = std::pair<String, Size>;
             printer.add_line(i, "AddInfixOp", OPRAND(type));
         }
             break;
@@ -414,7 +412,7 @@ void Code::print(ostream &out)
 
         case Opcode::LambdaDecl:
         {
-            using type = pair<Size, Size>;
+            using type = std::pair<Size, Size>;
             printer.add_line(i, "LambdaDecl", OPRAND(type));
         }
             break;
@@ -500,13 +498,13 @@ void Code::print(ostream &out)
     printer.print();
 }
 
-void Code::serialize(const filesystem::path &path)
+void Code::serialize(const std::filesystem::path &path)
 {
-    ofstream fout{path};
+    std::ofstream fout{path};
     serialize(fout);
 }
 
-void Code::serialize(ostream &out)
+void Code::serialize(std::ostream &out)
 {
     typeout(out, theMagic);
 
@@ -534,7 +532,7 @@ void Code::serialize(ostream &out)
             break;
 
         default:
-            throw runtime_error("WTF, here is a bug!");
+            throw std::runtime_error("WTF, here is a bug!");
         }
     }
 
@@ -570,14 +568,14 @@ void Code::serialize(ostream &out)
 
         case Opcode::AddInfixOp:
         {
-            using type = pair<String, Size>;
+            using type = std::pair<String, Size>;
             typeout(out, OPRAND(type));
         }
             break;
 
         case Opcode::LambdaDecl:
         {
-            using type = pair<Size, Size>;
+            using type = std::pair<Size, Size>;
             typeout(out, OPRAND(type));
         }
             break;
@@ -596,13 +594,13 @@ void Code::serialize(ostream &out)
     }
 }
 
-bool Code::unserialize(const filesystem::path &path)
+bool Code::unserialize(const std::filesystem::path &path)
 {
-    ifstream fin{path};
+    std::ifstream fin{path};
     return unserialize(fin);
 }
 
-bool Code::unserialize(ifstream &in)
+bool Code::unserialize(std::ifstream &in)
 {
     Magic magic; typein(in, magic);
     if (magic != theMagic)
@@ -625,7 +623,7 @@ bool Code::unserialize(ifstream &in)
         {
             int64_t val;
             typein(in, val);
-            constants_literals_.push_back(type + to_string(val));
+            constants_literals_.push_back(type + std::to_string(val));
             constants_.push_back(new IntegerObject(val));
         }
             break;
@@ -634,7 +632,7 @@ bool Code::unserialize(ifstream &in)
         {
             double val;
             typein(in, val);
-            constants_literals_.push_back(type + to_string(val));
+            constants_literals_.push_back(type + std::to_string(val));
             constants_.push_back(new FloatObject(val));
         }
             break;
@@ -649,7 +647,7 @@ bool Code::unserialize(ifstream &in)
             break;
 
         default:
-            throw runtime_error("WTF, you want me to eat shit?!");
+            throw std::runtime_error("WTF, you want me to eat shit?!");
         }
     }
 
@@ -694,7 +692,7 @@ bool Code::unserialize(ifstream &in)
 
         case Opcode::AddInfixOp:
         {
-            pair<String, Size> val;
+            std::pair<String, Size> val;
             typein(in, val);
             oprand = val;
         }
@@ -702,7 +700,7 @@ bool Code::unserialize(ifstream &in)
 
         case Opcode::LambdaDecl:
         {
-            pair<Size, Size> val;
+            std::pair<Size, Size> val;
             typein(in, val);
             oprand = val;
         }

@@ -2,13 +2,11 @@
 
 #include "../runtime/runtime.hpp"
 
-using namespace std;
-
 namespace anole
 {
 InstanceObject::InstanceObject()
   : Object(ObjectType::Instance)
-  , scope_(make_shared<Scope>(nullptr))
+  , scope_(std::make_shared<Scope>(nullptr))
 {
     // ...
 }
@@ -26,7 +24,7 @@ Address InstanceObject::load_member(const String &name)
 
         if (member->ptr()->is_callable())
         {
-            return make_shared<Variable>(
+            return std::make_shared<Variable>(
                 Allocator<Object>::alloc<MethodObject>(member->ptr(), this)
             );
         }
@@ -39,7 +37,7 @@ Address InstanceObject::load_member(const String &name)
     }
 }
 
-void InstanceObject::collect(function<void(Scope *)> func)
+void InstanceObject::collect(std::function<void(Scope *)> func)
 {
     func(scope_.get());
 }

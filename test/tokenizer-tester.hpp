@@ -5,12 +5,11 @@
 
 #include <gtest/gtest.h>
 
-using namespace std;
 using namespace anole;
 
 struct TokenizerTester : testing::Test
 {
-    stringstream ss;
+    std::stringstream ss;
     Tokenizer tokenizer{ss, "<test>"};
 
     virtual void SetUp()
