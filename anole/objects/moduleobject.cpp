@@ -4,9 +4,9 @@
 #include "../compiler/compiler.hpp"
 
 #ifdef __linux__
-#include <dlfcn.h>
+    #include <dlfcn.h>
 #else
-#error "only support linux"
+    #error only support linux
 #endif
 
 #include <fstream>
@@ -167,11 +167,11 @@ void AnoleModuleObject::init(const fs::path &path)
         code_->serialize(ir_path);
     }
 
-    #ifdef _DEBUG
+  #ifdef _DEBUG
     auto rd_path = path;
     rd_path += ".rd";
     code_->print(rd_path);
-    #endif
+  #endif
 
     scope_ = Context::current()->scope();
     Context::current() = origin;
