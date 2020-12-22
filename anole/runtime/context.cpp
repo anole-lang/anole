@@ -10,7 +10,7 @@
 #include <filesystem>
 
 #ifdef _DEBUG
-#include <iostream>
+    #include <iostream>
 #endif
 
 #define OPRAND(T) std::any_cast<const T &>(Context::current()->oprand())
@@ -937,9 +937,9 @@ void Context::execute()
 {
     while (Context::current()->pc() < Context::current()->code()->size())
     {
-        #ifdef _DEBUG
+      #ifdef _DEBUG
         cerr << "run at: " << Context::current()->code()->from() << ":" << Context::current()->pc() << endl;
-        #endif
+      #endif
 
         theOpHandles[static_cast<uint8_t>(Context::current()->opcode())]();
     }

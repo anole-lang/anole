@@ -26,9 +26,9 @@ inline String execute(const String &input)
         ast->codegen(*code);
         Context::execute();
     }
-    #ifdef _DEBUG
+  #ifdef _DEBUG
     code->print();
-    #endif
+  #endif
     std::cout.rdbuf(backup);
     return out.str();
 }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Updated
+
+- Improve the performance of REPL
+
 ## 0.0.21 - 2020/11/24
 
 ### Added

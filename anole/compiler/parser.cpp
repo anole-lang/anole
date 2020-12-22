@@ -134,11 +134,26 @@ Token &Parser::next_token()
     return current_token_ = tokenizer_.next_token();
 }
 
-void Parser::try_resume()
+void Parser::try_resume(Size times)
 {
-    if (current_token_.type == TokenType::End && resume_action_)
+    if (!resume_action_)
     {
-        resume_action_();
+        return;
+    }
+
+    if (times == 0)
+    {
+        while (current_token_.type == TokenType::End)
+        {
+            resume_action_();
+        }
+    }
+    else
+    {
+        while (current_token_.type == TokenType::End && times--)
+        {
+            resume_action_();
+        }
     }
 }
 
@@ -617,7 +632,7 @@ Ptr<Stmt> Parser::gen_if_else()
 
     auto cond = gen_expr();
     auto true_block = gen_block();
-    try_resume();
+    try_resume(1);
     auto false_branch = gen_if_else_tail();
     auto stmt = std::make_unique<IfElseStmt>(std::move(cond),
         std::move(true_block), std::move(false_branch)
