@@ -49,7 +49,7 @@ class Parser
 
     void get_next_token();
     Token &next_token();
-    void try_resume();
+    void try_resume(Size times = 0);
 
     ArgumentList gen_arguments();
     ParameterList gen_parameters();
