@@ -643,6 +643,9 @@ void IfElseStmt::codegen(Code &code)
     }
 }
 
+/**
+ * no block-scope
+*/
 void WhileStmt::codegen(Code &code)
 {
     auto o1 = code.size();
@@ -671,29 +674,35 @@ void DoWhileStmt::codegen(Code &code)
 /** foreach expr as ident { stmts }
  *   is equivalent to:
  *
- *  @&__it: expr.__iterator__();
- *  while __it.__has_next__() {
- *    @&ident: __it.__next__();
- *    ... stmts ...
+ *  {
+ *    @& #__it_<line>: expr.__iterator__();
+ *    while #__it_<line>.__has_next__() {
+ *      @& ident: #__it_<line>.__next__();
+ *      ... stmts ...
+ *    }
  *  }
+ *
+ *  use # and <line> to represent the inner name and prevent duplication of names
 */
 void ForeachStmt::codegen(Code &code)
 {
     expr->codegen(code);
 
     /**
-     * generate code for: @&__it: expr.__iterator__();
+     * generate code for: @& $__it: expr.__iterator__();
     */
     code.add_ins<Opcode::LoadMember, String>("__iterator__");
     code.add_ins<Opcode::FastCall>();
-    code.add_ins<Opcode::StoreRef, String>("__it");
+
+    auto it_name = "#__it_" + std::to_string(code.size());
+    code.add_ins<Opcode::StoreRef>(it_name);
 
     /**
      * generate ast for cond: __it.__has_next__()
     */
     auto cond = std::make_unique<ParenOperatorExpr>(
         std::make_unique<DotExpr>(
-            std::make_unique<IdentifierExpr>("__it"), "__has_next__"
+            std::make_unique<IdentifierExpr>(it_name), "__has_next__"
         ),
         ArgumentList()
     );
@@ -701,7 +710,7 @@ void ForeachStmt::codegen(Code &code)
     block->statements.push_front(nullptr);
     auto next = std::make_unique<ParenOperatorExpr>(
         std::make_unique<DotExpr>(
-            std::make_unique<IdentifierExpr>("__it"), "__next__"
+            std::make_unique<IdentifierExpr>(it_name), "__next__"
         ),
         ArgumentList()
     );
