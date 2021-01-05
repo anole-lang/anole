@@ -6,6 +6,10 @@
 
 - Improve the performance of REPL
 
+### Fixed
+
+- Fix the bug caused by no-block-scope when using nested foreach-stmt, see more in [BUG#40](https://github.com/anole-lang/anole/issues/40)
+
 ## 0.0.21 - 2020/11/24
 
 ### Added

@@ -411,4 +411,16 @@ unknown
 )");
 }
 
+TEST(Sample, NestedForeach)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
+foreach [1, 2] as i, foreach [2, 3] as j, { print(i); print(j); }();
+)"),
+
+// output
+R"(12132223)");
+}
+
 #endif
