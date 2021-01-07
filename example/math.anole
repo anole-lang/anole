@@ -1,6 +1,6 @@
 println("Let's start!");
 
-# define
+// define
 
 @fib1(n): (n < 3) ? 1, fib1(n - 1) + fib1(n - 2);
 
@@ -11,7 +11,7 @@ println("Let's start!");
 @fib2(f):
   @(n): (n < 3) ? 1, f(n - 1) + f(n - 2);
 
-# test time
+// test time
 
 print("fib 30: ");
 start: time();

@@ -1,12 +1,12 @@
 @refof(&var): delay var;
 prefixop refof;
 
-$
-` b: refof use delay expression and not need to decalre reference
-` c: declare reference to the given expression
-` d: declare reference to the given expression
-      and call expression will return the reference to the result expression
-$
+//
+// b: refof use delay expression and not need to decalre reference
+// c: declare reference to the given expression
+// d: declare reference to the given expression
+//     and call expression will return the reference to the result expression
+
 @a: 1;
 @b, &c, &d: refof a, a, { return a; }();
 
