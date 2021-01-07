@@ -34,7 +34,7 @@ enum class TokenType : Size
     True,       // true
     False,      // false
 
-    Identifier, // [^ 0-9_#@.:;?\(\)\[\]\{\}"]+
+    Identifier, // ([a-zA-Z_][0-9a-zA-Z_]+) | ([^0-9a-zA-Z_@#.,:;"&\(\)\[\]\{\}]+)
     Integer,    // [0-9]+
     Double,     // [0-9]+\.[0-9]*
     String,     // "[^"\n]"
