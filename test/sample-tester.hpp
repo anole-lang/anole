@@ -206,7 +206,7 @@ Lyx: @(cont) {
 }
 
 Xb();
-        )code"),
+)code"),
 
 // output
 R"(Hi! My name is Xu Bo.

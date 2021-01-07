@@ -90,7 +90,6 @@ std::map<String, TokenType> lc_mapping
     { "*",          TokenType::Mul      },
     { "/",          TokenType::Div      },
     { "%",          TokenType::Mod      },
-    { "&",          TokenType::BAnd     },
     { "|",          TokenType::BOr      },
     { "^",          TokenType::BXor     },
     { "~",          TokenType::BNeg     },

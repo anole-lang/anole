@@ -53,17 +53,22 @@ void Tokenizer::get_next_input()
 
 namespace
 {
-const std::set<char> illegal_idchrs
+bool is_normal_idchr(char chr)
 {
-    '_', '@', '#', '$', '.', ',', ':', ';',
-    '?', '(', ')', '[', ']', '{', '}', '"'
+    return std::isdigit(chr) || std::isalpha(chr) || (chr == '_');
+}
+
+const std::set<char> reserved_chrs
+{
+    '@', '.', ',', ':', ';', '"', '?',
+    '&', '(', ')', '[', ']', '{', '}',
 };
-bool is_legal_idchr(char chr)
+
+bool is_abnormal_idchr(char chr)
 {
     return !(std::isspace(chr)
-        || std::isdigit(chr)
-        || std::isalpha(chr)
-        || illegal_idchrs.count(chr)
+        || is_normal_idchr(chr)
+        || reserved_chrs.count(chr)
     );
 }
 }
@@ -78,7 +83,6 @@ Token Tokenizer::next_token()
         InDoot,
 
         InLineComment,
-        InBlockComment,
 
         InInteger,
         InDouble,
@@ -105,16 +109,16 @@ Token Tokenizer::next_token()
         case State::Begin:
             switch (last_input_)
             {
-            case '#':
+            case '/':
                 state = State::InLineComment;
-                break;
-
-            case '$':
-                state = State::InBlockComment;
                 break;
 
             case '@':
                 token = Token(TokenType::At, last_location_);
+                break;
+
+            case '&':
+                token = Token(TokenType::BAnd, last_location_);
                 break;
 
             case '"':
@@ -176,7 +180,7 @@ Token Tokenizer::next_token()
                     state = State::InNormalIdentifier;
                     value += last_input_;
                 }
-                else if (is_legal_idchr(last_input_))
+                else if (is_abnormal_idchr(last_input_))
                 {
                     state = State::InAbnormalIdentifier;
                     value += last_input_;
@@ -208,20 +212,26 @@ Token Tokenizer::next_token()
             break;
 
         case State::InLineComment:
-            while (last_input_ != '\n')
+            if (last_input_ == '/')
             {
+                while (last_input_ != '\n' && last_input_ != EOF)
+                {
+                    get_next_input();
+                }
                 get_next_input();
+                return next_token();
             }
-            get_next_input();
-            return next_token();
-
-        case State::InBlockComment:
-            while (last_input_ != '$')
+            else if (is_abnormal_idchr(last_input_))
             {
-                get_next_input();
+                state = State::InAbnormalIdentifier;
+                value.push_back('/');
+                value.push_back(last_input_);
             }
-            get_next_input();
-            return next_token();
+            else
+            {
+                return Token(String(1, '/'), last_location_);
+            }
+            break;
 
         case State::InInteger:
             if (last_input_ == '.')
@@ -254,9 +264,7 @@ Token Tokenizer::next_token()
             break;
 
         case State::InNormalIdentifier:
-            if (isdigit(last_input_)
-                || isalpha(last_input_)
-                || last_input_ == '_')
+            if (is_normal_idchr(last_input_))
             {
                 value += last_input_;
             }
@@ -267,7 +275,7 @@ Token Tokenizer::next_token()
             break;
 
         case State::InAbnormalIdentifier:
-            if (is_legal_idchr(last_input_))
+            if (is_abnormal_idchr(last_input_))
             {
                 value += last_input_;
             }
