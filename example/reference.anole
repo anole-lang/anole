@@ -1,7 +1,6 @@
 @refof(&var): delay var;
 prefixop refof;
 
-//
 // b: refof use delay expression and not need to decalre reference
 // c: declare reference to the given expression
 // d: declare reference to the given expression

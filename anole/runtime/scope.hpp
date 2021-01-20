@@ -23,11 +23,11 @@ class Scope
     void create_symbol(const String &name, Address value);
 
     Address load_symbol(const String &name);
-    Address load_builtin(const String &name);
 
     const std::map<String, Address> &symbols() const;
 
   private:
+    Address load_builtin(const String &name);
     Address find_symbol(const String &name);
 
   private:
