@@ -32,10 +32,6 @@ class Context
     static void set_args(int argc, char *argv[], int start);
     static const std::vector<char *> &get_args();
 
-    static void add_not_defined_symbol(const String &name, const Variable *addr);
-    static void rm_not_defined_symbol(const Variable *addr);
-    static const String &get_not_defined_symbol(const Variable *addr);
-
     static void execute();
 
   public:
@@ -64,7 +60,7 @@ class Context
         {
             throw RuntimeError(
                 "var named " +
-                get_not_defined_symbol(stack_->back().get()) +
+                stack_->back()->called_name() +
                 " doesn't reference to any object"
             );
         }
@@ -77,7 +73,7 @@ class Context
     template<typename R = Object>
     R *pop_ptr()
     {
-        auto ptr = stack_->back()->ptr();
+        auto ptr = top_ptr<R>();
         stack_->pop_back();
         return reinterpret_cast<R *>(ptr);
     }

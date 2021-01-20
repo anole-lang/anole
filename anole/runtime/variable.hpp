@@ -10,8 +10,8 @@ namespace anole
 class Variable
 {
   public:
-    constexpr Variable() noexcept : ptr_(nullptr) {}
-    constexpr Variable(Object *ptr) noexcept : ptr_(ptr) {}
+    Variable() noexcept(noexcept(String())) : ptr_(nullptr) {}
+    Variable(Object *ptr) noexcept(noexcept(String())) : ptr_(ptr) {}
 
     Variable &operator=(Object *) = delete;
 
@@ -20,18 +20,24 @@ class Variable
         ptr_ = ptr;
     }
 
-    constexpr Object *ptr() const noexcept
+    Object *ptr() const noexcept
     {
         return ptr_;
     }
 
-    constexpr operator bool() const noexcept
+    void set_called_name(String called_name)
     {
-        return ptr_ != nullptr;
+        called_name_ = std::move(called_name);
+    }
+
+    const String &called_name() const noexcept
+    {
+      return called_name_;
     }
 
   private:
     Object *ptr_;
+    String called_name_;
 };
 } // namespace anole
 

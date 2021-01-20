@@ -78,7 +78,7 @@ struct IntegerExpr : Expr
 {
     int64_t value;
 
-    constexpr IntegerExpr(int64_t value) noexcept
+    IntegerExpr(int64_t value) noexcept
       : value(value)
     {
         // ...
@@ -92,7 +92,7 @@ struct FloatExpr : Expr
 {
     double value;
 
-    constexpr FloatExpr(double value) noexcept
+    FloatExpr(double value) noexcept
       : value(value)
     {
         // ...
@@ -105,7 +105,7 @@ struct BoolExpr : Expr
 {
     bool value;
 
-    constexpr BoolExpr(bool value) noexcept
+    BoolExpr(bool value) noexcept
       : value(value)
     {
         // ...

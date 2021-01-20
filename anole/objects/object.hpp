@@ -47,8 +47,8 @@ class Object
     virtual ~Object() = 0;
 
     template<ObjectType type>
-    constexpr bool is() noexcept { return type_ == type; }
-    constexpr bool is(ObjectType type) noexcept { return type_ == type; }
+    bool is() noexcept { return type_ == type; }
+    bool is(ObjectType type) noexcept { return type_ == type; }
     Object *type();
 
   public:

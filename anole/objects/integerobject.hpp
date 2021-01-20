@@ -8,14 +8,14 @@ namespace anole
 class IntegerObject : public Object
 {
   public:
-    constexpr IntegerObject(int64_t value) noexcept
+    IntegerObject(int64_t value) noexcept
       : Object(ObjectType::Integer)
       , value_(value)
     {
         // ...
     }
 
-    constexpr int64_t value() const noexcept
+    int64_t value() const noexcept
     {
         return value_;
     }

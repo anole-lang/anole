@@ -23,11 +23,21 @@ SPtr<Scope> &Scope::pre()
 
 Address Scope::create_symbol(const String &name)
 {
-    if (!symbols_.count(name))
+    Address addr;
+
+    auto find = symbols_.find(name);
+    if (find == symbols_.end())
     {
-        symbols_[name] = std::make_shared<Variable>();
+        addr = std::make_shared<Variable>();
+        symbols_[name] = addr;
     }
-    return symbols_[name];
+    else
+    {
+        addr = find->second;
+    }
+    addr->set_called_name(name);
+
+    return addr;
 }
 
 void Scope::create_symbol(const String &name, Object *obj)
@@ -44,7 +54,21 @@ Address Scope::load_symbol(const String &name)
 {
     auto ptr = find_symbol(name);
     auto res = ptr ? ptr : load_builtin(name);
-    return res ? res : create_symbol(name);
+
+    if (res)
+    {
+        res->set_called_name(name);
+        return res;
+    }
+    else
+    {
+        return create_symbol(name);
+    }
+}
+
+const std::map<String, Address> &Scope::symbols() const
+{
+    return symbols_;
 }
 
 Address Scope::load_builtin(const String &name)
@@ -54,11 +78,6 @@ Address Scope::load_builtin(const String &name)
         return std::make_shared<Variable>(func);
     }
     return nullptr;
-}
-
-const std::map<String, Address> &Scope::symbols() const
-{
-    return symbols_;
 }
 
 Address Scope::find_symbol(const String &name)

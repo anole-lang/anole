@@ -20,7 +20,6 @@ namespace anole
 namespace
 {
 std::vector<char *> lc_args;
-std::map<const Variable *, String> lc_not_defineds;
 }
 
 SPtr<Context> &Context::current()
@@ -40,24 +39,6 @@ void Context::set_args(int argc, char *argv[], int start)
 const std::vector<char *> &Context::get_args()
 {
     return lc_args;
-}
-
-void Context::add_not_defined_symbol(const String &name, const Variable *addr)
-{
-    lc_not_defineds[addr] = name;
-}
-
-void Context::rm_not_defined_symbol(const Variable *addr)
-{
-    if (lc_not_defineds.count(addr))
-    {
-        lc_not_defineds.erase(addr);
-    }
-}
-
-const String &Context::get_not_defined_symbol(const Variable *addr)
-{
-    return lc_not_defineds[addr];
 }
 
 /**
@@ -351,13 +332,7 @@ void load_handle()
     const auto &name = OPRAND(String);
     auto addr = Context::current()->scope()->load_symbol(name);
 
-    if (!*addr)
-    {
-        Context::add_not_defined_symbol(name, addr.get());
-        Context::current()->push(addr);
-        ++Context::current()->pc();
-    }
-    else if (!addr->ptr()->is<ObjectType::Thunk>())
+    if (addr->ptr() == nullptr || !addr->ptr()->is<ObjectType::Thunk>())
     {
         Context::current()->push(addr);
         ++Context::current()->pc();
@@ -390,10 +365,6 @@ void loadmember_handle()
 {
     const auto &name = OPRAND(String);
     auto address = Context::current()->pop_ptr()->load_member(name);
-    if (!*address)
-    {
-        Context::add_not_defined_symbol(name, address.get());
-    }
     Context::current()->push(address);
     ++Context::current()->pc();
 }
@@ -403,7 +374,6 @@ void store_handle()
     auto addr = Context::current()->pop_address();
     addr->bind(Context::current()->pop_ptr());
     Context::current()->push(addr);
-    Context::rm_not_defined_symbol(addr.get());
     ++Context::current()->pc();
 }
 
