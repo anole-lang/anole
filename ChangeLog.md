@@ -5,6 +5,7 @@
 ### Updated
 
 - Improve the performance of REPL
+- Improve the error information of non-defined variables which may cause segmentation fault
 
 ### Fixed
 
