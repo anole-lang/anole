@@ -17,11 +17,20 @@ namespace anole
 {
 namespace
 {
-
+/**
+ * TODO:
+ *  declare local loaded modules
+*/
 }
 
 ModuleObject *ModuleObject::generate(const String &name)
 {
+    /**
+     * TODO:
+     *  check and generate the path here instead of constructors of AnoleModule and CppModule
+     *  then we could check the module on this path is loaded or not
+    */
+
     ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
     if (!mod->good())
     {

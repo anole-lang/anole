@@ -19,10 +19,6 @@ namespace anole
 class Code;
 class Context;
 
-/**
- * TODO: support thread
- *  may use thread_local
-*/
 extern SPtr<Context> theCurrContext;
 
 // Context should be contructed by make_shared
