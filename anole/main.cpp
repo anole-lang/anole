@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) try
         {
             path /= "__init__.anole";
         }
-        Context::current() = make_shared<Context>(make_shared<Code>(path.string()),
+        theCurrContext = make_shared<Context>(make_shared<Code>(path.string()),
             path.parent_path().relative_path()
         );
 

@@ -17,6 +17,13 @@
 namespace anole
 {
 class Code;
+class Context;
+
+/**
+ * TODO: support thread
+ *  may use thread_local
+*/
+extern SPtr<Context> theCurrContext;
 
 // Context should be contructed by make_shared
 class Context
@@ -27,8 +34,6 @@ class Context
     using Stack = std::list<Address>;
 
   public:
-    static SPtr<Context> &current();
-
     static void set_args(int argc, char *argv[], int start);
     static const std::vector<char *> &get_args();
 

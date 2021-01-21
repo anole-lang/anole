@@ -52,8 +52,8 @@ Token &Token::operator=(const Token &other) noexcept
 
 namespace
 {
-Size lc_end_of_token_type = static_cast<Size>(TokenType::End);
-std::map<String, TokenType> lc_mapping
+Size localEndOfTokenType = static_cast<Size>(TokenType::End);
+std::map<String, TokenType> localMapping
 {
     { "use",        TokenType::Use      },
     { "from",       TokenType::From     },
@@ -109,16 +109,16 @@ std::map<String, TokenType> lc_mapping
 Token::Token(String value, Location location) noexcept
   : value(std::move(value)), location(location)
 {
-    auto find = lc_mapping.find(this->value);
-    type = (find == lc_mapping.end() ? TokenType::Identifier : find->second);
+    auto find = localMapping.find(this->value);
+    type = (find == localMapping.end() ? TokenType::Identifier : find->second);
 }
 
 TokenType Token::add_token_type(const String &str)
 {
-    auto find = lc_mapping.find(str);
-    if (find == lc_mapping.end())
+    auto find = localMapping.find(str);
+    if (find == localMapping.end())
     {
-        return lc_mapping[str] = static_cast<TokenType>(++lc_end_of_token_type);
+        return localMapping[str] = static_cast<TokenType>(++localEndOfTokenType);
     }
     return find->second;
 }

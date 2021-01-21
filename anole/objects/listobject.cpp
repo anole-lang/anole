@@ -10,59 +10,59 @@ namespace anole
 namespace
 {
 std::map<String, std::function<void(ListObject *)>>
-lc_builtin_methods_for_list
+localBuiltinMethodsForList
 {
     {"empty", [](ListObject *obj)
         {
-            Context::current()->push(obj->objects().empty() ? BoolObject::the_true() : BoolObject::the_false());
+            theCurrContext->push(obj->objects().empty() ? BoolObject::the_true() : BoolObject::the_false());
         }
     },
     {"size", [](ListObject *obj)
         {
-            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->objects().size())));
+            theCurrContext->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->objects().size())));
         }
     },
     {"push", [](ListObject *obj)
         {
-            obj->append(Context::current()->pop_ptr());
-            Context::current()->push(NoneObject::one());
+            obj->append(theCurrContext->pop_ptr());
+            theCurrContext->push(NoneObject::one());
         }
     },
     {"pop", [](ListObject *obj)
         {
             auto res = obj->objects().back();
             obj->objects().pop_back();
-            Context::current()->push(res);
+            theCurrContext->push(res);
         }
     },
     {"pop_front", [](ListObject *obj)
         {
             auto res = obj->objects().front();
             obj->objects().pop_front();
-            Context::current()->push(res);
+            theCurrContext->push(res);
         }
     },
     {"front", [](ListObject *obj)
         {
-            Context::current()->push(obj->objects().front());
+            theCurrContext->push(obj->objects().front());
         }
     },
     {"back", [](ListObject *obj)
         {
-            Context::current()->push(obj->objects().back());
+            theCurrContext->push(obj->objects().back());
         }
     },
     {"clear", [](ListObject *obj)
         {
             obj->objects().clear();
-            Context::current()->push(NoneObject::one());
+            theCurrContext->push(NoneObject::one());
         }
     },
 
     // used by foreach
     {"__iterator__", [](ListObject *obj)
         {
-            Context::current()
+            theCurrContext
                 ->push(Allocator<Object>::alloc<ListIteratorObject>(obj))
             ;
         }
@@ -70,19 +70,19 @@ lc_builtin_methods_for_list
 };
 
 std::map<String, std::function<void(ListIteratorObject *)>>
-lc_builtin_methods_for_listiterator
+localBuiltinMethodsForListIterator
 {
     // used by foreach
     {"__has_next__", [](ListIteratorObject *obj)
         {
-            Context::current()
+            theCurrContext
                 ->push(obj->has_next() ? BoolObject::the_true() : BoolObject::the_false())
             ;
         }
     },
     {"__next__", [](ListIteratorObject *obj)
         {
-            Context::current()->push(obj->next());
+            theCurrContext->push(obj->next());
         }
     }
 };
@@ -170,8 +170,8 @@ Address ListObject::index(Object *index)
 
 Address ListObject::load_member(const String &name)
 {
-    auto method = lc_builtin_methods_for_list.find(name);
-    if (method != lc_builtin_methods_for_list.end())
+    auto method = localBuiltinMethodsForList.find(name);
+    if (method != localBuiltinMethodsForList.end())
     {
         return std::make_shared<Variable>(
             Allocator<Object>::alloc<BuiltInFunctionObject>([this, &func = method->second](Size) mutable
@@ -212,8 +212,8 @@ Address ListIteratorObject::next()
 
 Address ListIteratorObject::load_member(const String &name)
 {
-    auto method = lc_builtin_methods_for_listiterator.find(name);
-    if (method != lc_builtin_methods_for_listiterator.end())
+    auto method = localBuiltinMethodsForListIterator.find(name);
+    if (method != localBuiltinMethodsForListIterator.end())
     {
         return std::make_shared<Variable>(
             Allocator<Object>::alloc<BuiltInFunctionObject>(

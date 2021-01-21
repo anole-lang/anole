@@ -15,6 +15,11 @@ namespace fs = std::filesystem;
 
 namespace anole
 {
+namespace
+{
+
+}
+
 ModuleObject *ModuleObject::generate(const String &name)
 {
     ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
@@ -62,7 +67,7 @@ AnoleModuleObject::AnoleModuleObject(const String &name)
      *  and then look up in "/usr/local/lib/anole/" if not find
     */
 
-    auto cpath = Context::current()->current_path();
+    auto cpath = theCurrContext->current_path();
     if (fs::is_regular_file(cpath / (name + ".anole")))
     {
         init(cpath / (name + ".anole"));
@@ -138,9 +143,9 @@ void AnoleModuleObject::init(const fs::path &path)
     auto ir_path = path.string() + ".ir";
 
     code_ = std::make_shared<Code>(path.filename().string());
-    auto origin = Context::current();
-    Context::current() = std::make_shared<Context>(code_, dir);
-    Context::current()->pre_context() = origin;
+    auto origin = theCurrContext;
+    theCurrContext = std::make_shared<Context>(code_, dir);
+    theCurrContext->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
         && fs::last_write_time(ir_path) >= fs::last_write_time(path)
@@ -173,14 +178,14 @@ void AnoleModuleObject::init(const fs::path &path)
     code_->print(rd_path);
   #endif
 
-    scope_ = Context::current()->scope();
-    Context::current() = origin;
+    scope_ = theCurrContext->scope();
+    theCurrContext = origin;
 }
 
 CppModuleObject::CppModuleObject(const String &name)
   : ModuleObject(ObjectType::CppModule)
 {
-    auto path = Context::current()->current_path() / (name + ".so");
+    auto path = theCurrContext->current_path() / (name + ".so");
     handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
     if (!handle_)
     {

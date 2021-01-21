@@ -22,10 +22,10 @@ void ContObject::call(Size n)
     {
         throw RuntimeError("continuation need a argument");
     }
-    auto retval = Context::current()->pop_ptr();
-    Context::current() = std::make_shared<Context>(resume_);
-    Context::current()->push(retval);
-    ++Context::current()->pc();
+    auto retval = theCurrContext->pop_ptr();
+    theCurrContext = std::make_shared<Context>(resume_);
+    theCurrContext->push(retval);
+    ++theCurrContext->pc();
 }
 
 void ContObject::collect(std::function<void(Context *)> func)

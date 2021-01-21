@@ -218,7 +218,7 @@ Address IntegerObject::load_member(const String &name)
         return std::make_shared<Variable>(
             Allocator<Object>::alloc<BuiltInFunctionObject>([val = value_](Size)
                 {
-                    Context::current()
+                    theCurrContext
                         ->push(Allocator<Object>::alloc<StringObject>(std::to_string(val)))
                     ;
                 }

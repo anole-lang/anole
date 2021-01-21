@@ -19,7 +19,7 @@ inline String execute(const String &input)
 
     std::istringstream ss{input};
     auto code = std::make_shared<Code>("<test>");
-    Context::current() = std::make_shared<Context>(code);
+    theCurrContext = std::make_shared<Context>(code);
     Parser parser{ss, "<test>"};
     while (auto ast = parser.gen_statement())
     {

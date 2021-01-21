@@ -18,9 +18,9 @@ String warning(const String &str)
 CompileError::CompileError(String err)
   : err_(err)
 {
-    while (Context::current() && Context::current()->pre_context())
+    while (theCurrContext && theCurrContext->pre_context())
     {
-        Context::current() = Context::current()->pre_context();
+        theCurrContext = theCurrContext->pre_context();
     }
 }
 
@@ -38,12 +38,12 @@ const char *CompileError::what() const noexcept
 
 RuntimeError::RuntimeError(const String &err)
 {
-    auto &mapping = Context::current()->code()->source_mapping();
-    if (mapping.count(Context::current()->pc()))
+    auto &mapping = theCurrContext->code()->source_mapping();
+    if (mapping.count(theCurrContext->pc()))
     {
-        auto pos = mapping[Context::current()->pc()];
+        auto pos = mapping[theCurrContext->pc()];
         err_ = info::strong("  running at "
-            + Context::current()->code()->from()
+            + theCurrContext->code()->from()
             + ":" + std::to_string(pos.first)
             + ":" + std::to_string(pos.second) + ": "
         );
@@ -51,20 +51,20 @@ RuntimeError::RuntimeError(const String &err)
     err_ += info::warning("error: ") + err;
 
     int trace_count = 0;
-    while (Context::current()->pre_context())
+    while (theCurrContext->pre_context())
     {
-        Context::current() = Context::current()->pre_context();
+        theCurrContext = theCurrContext->pre_context();
 
         if (trace_count < 66)
         {
             ++trace_count;
 
-            auto &mapping = Context::current()->code()->source_mapping();
-            if (mapping.count(Context::current()->pc()))
+            auto &mapping = theCurrContext->code()->source_mapping();
+            if (mapping.count(theCurrContext->pc()))
             {
-                auto pos = mapping[Context::current()->pc()];
+                auto pos = mapping[theCurrContext->pc()];
                 err_ = "  running at "
-                    + Context::current()->code()->from()
+                    + theCurrContext->code()->from()
                     + ":" + std::to_string(pos.first)
                     + ":" + std::to_string(pos.second) + "\n"
                     + err_

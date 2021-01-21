@@ -29,9 +29,9 @@ Collector::Collector() noexcept
 void Collector::gc()
 {
     /**
-     * collect variables from Context::current()
+     * collect variables from theCurrContext
     */
-    collect(Context::current().get());
+    collect(theCurrContext.get());
 
     auto temp_marked = marked<Object>();
     for (auto ptr : temp_marked)

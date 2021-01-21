@@ -11,10 +11,10 @@ void __open(anole::Size n)
         throw anole::RuntimeError("function open need 2 arguments");
     }
 
-    auto path = anole::Context::current()->pop_ptr();
-    auto mode = anole::Context::current()->pop_ptr();
+    auto path = anole::theCurrContext->pop_ptr();
+    auto mode = anole::theCurrContext->pop_ptr();
 
-    anole::Context::current()
+    anole::theCurrContext
         ->push(
             anole::Allocator<anole::Object>::alloc<FileObject>(
                 path->to_str(),
@@ -28,16 +28,16 @@ void __open(anole::Size n)
 namespace
 {
 std::map<anole::String, std::function<void(FileObject *)>>
-lc_builtin_methods
+localBuiltinMethods
 {
     {"good", [](FileObject *obj)
         {
-            anole::Context::current()->push(obj->file().good() ? anole::BoolObject::the_true() : anole::BoolObject::the_false());
+            anole::theCurrContext->push(obj->file().good() ? anole::BoolObject::the_true() : anole::BoolObject::the_false());
         }
     },
     {"eof", [](FileObject *obj)
         {
-            anole::Context::current()->push(obj->file().eof() ? anole::BoolObject::the_true() : anole::BoolObject::the_false());
+            anole::theCurrContext->push(obj->file().eof() ? anole::BoolObject::the_true() : anole::BoolObject::the_false());
         }
     },
     {"close", [](FileObject *obj)
@@ -52,7 +52,7 @@ lc_builtin_methods
     },
     {"read", [](FileObject *obj)
         {
-            anole::Context::current()->push(
+            anole::theCurrContext->push(
                 anole::Allocator<anole::Object>::alloc<anole::StringObject>(
                     anole::String(1, obj->file().get())
                 )
@@ -63,7 +63,7 @@ lc_builtin_methods
         {
             anole::String line;
             std::getline(obj->file(), line);
-            anole::Context::current()->push(anole::Allocator<anole::Object>::
+            anole::theCurrContext->push(anole::Allocator<anole::Object>::
                 alloc<anole::StringObject>(line)
             );
         }
@@ -71,14 +71,14 @@ lc_builtin_methods
     {"write", [](FileObject *obj)
         {
             const auto &str
-                = dynamic_cast<anole::StringObject *>(anole::Context::current()->pop_ptr())->to_str()
+                = dynamic_cast<anole::StringObject *>(anole::theCurrContext->pop_ptr())->to_str()
             ;
             obj->file().write(str.c_str(), str.size());
         }
     },
     {"tellg", [](FileObject *obj)
         {
-            anole::Context::current()->push(anole::Allocator<anole::Object>::
+            anole::theCurrContext->push(anole::Allocator<anole::Object>::
                 alloc<anole::IntegerObject>(
                     obj->file().tellg()
                 )
@@ -87,7 +87,7 @@ lc_builtin_methods
     },
     {"tellp", [](FileObject *obj)
         {
-            anole::Context::current()->push(anole::Allocator<anole::Object>::
+            anole::theCurrContext->push(anole::Allocator<anole::Object>::
                 alloc<anole::IntegerObject>(
                     obj->file().tellp()
                 )
@@ -96,12 +96,12 @@ lc_builtin_methods
     },
     {"seekg", [](FileObject *obj)
         {
-            obj->file().seekg(dynamic_cast<anole::IntegerObject *>(anole::Context::current()->pop_ptr())->value());
+            obj->file().seekg(dynamic_cast<anole::IntegerObject *>(anole::theCurrContext->pop_ptr())->value());
         }
     },
     {"seekp", [](FileObject *obj)
         {
-            obj->file().seekp(dynamic_cast<anole::IntegerObject *>(anole::Context::current()->pop_ptr())->value());
+            obj->file().seekp(dynamic_cast<anole::IntegerObject *>(anole::theCurrContext->pop_ptr())->value());
         }
     }
 };
@@ -143,8 +143,8 @@ FileObject::FileObject(const anole::String &path, int64_t mode)
 
 anole::Address FileObject::load_member(const anole::String &name)
 {
-    auto method = lc_builtin_methods.find(name);
-    if (method != lc_builtin_methods.end())
+    auto method = localBuiltinMethods.find(name);
+    if (method != localBuiltinMethods.end())
     {
         return std::make_shared<anole::Variable>(
             anole::Allocator<anole::Object>::alloc<anole::BuiltInFunctionObject>(

@@ -10,7 +10,7 @@ namespace anole
 {
 namespace
 {
-std::vector<String> lc_mapping_type_str
+std::vector<String> localMappingTypeStr
 {
     "none",
     "boolean",
@@ -28,7 +28,7 @@ std::vector<String> lc_mapping_type_str
     "anolemodule",
     "cppmodule"
 };
-std::map<String, ObjectType> lc_mapping_str_type
+std::map<String, ObjectType> localMappingStrType
 {
     { "none",           ObjectType::None            },
     { "boolean",        ObjectType::Boolean         },
@@ -50,11 +50,11 @@ std::map<String, ObjectType> lc_mapping_str_type
 
 ObjectType Object::add_object_type(const String &literal)
 {
-    auto find = lc_mapping_str_type.find(literal);
-    if (find == lc_mapping_str_type.end())
+    auto find = localMappingStrType.find(literal);
+    if (find == localMappingStrType.end())
     {
-        lc_mapping_type_str.push_back(literal);
-        return lc_mapping_str_type[literal] = static_cast<ObjectType>(lc_mapping_type_str.size());
+        localMappingTypeStr.push_back(literal);
+        return localMappingStrType[literal] = static_cast<ObjectType>(localMappingTypeStr.size());
     }
     return find->second;
 }
@@ -64,7 +64,7 @@ Object::~Object() = default;
 Object *Object::type()
 {
     return Allocator<Object>::alloc<StringObject>(
-        lc_mapping_type_str[static_cast<Size>(type_)]
+        localMappingTypeStr[static_cast<Size>(type_)]
     );
 }
 
