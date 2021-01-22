@@ -59,7 +59,10 @@ void replrun::run()
     String line;
     std::istringstream ss;
     Parser parser(ss, "<stdin>");
-    auto code = std::make_shared<Code>("<stdin>");
+    /**
+     * theWorkingPtah is specific for here
+    */
+    auto code = std::make_shared<Code>("<stdin>", theWorkingPath);
     theCurrContext = std::make_shared<Context>(code);
 
     parser.set_resume_action([&ss, &parser]
