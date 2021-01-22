@@ -12,7 +12,7 @@ MethodObject::MethodObject(Object *callee, Object *binded_obj)
 
 void MethodObject::call(Size num)
 {
-    Context::current()->push(binded_obj_);
+    theCurrContext->push(binded_obj_);
     callee_->call(num + 1);
 }
 

@@ -7,11 +7,11 @@ namespace anole
 namespace
 {
 std::map<String, std::function<void(StringObject *)>>
-lc_builtin_methods
+localBuiltinMethods
 {
     {"size", [](StringObject *obj)
         {
-            Context::current()
+            theCurrContext
                 ->push(Allocator<Object>::alloc<IntegerObject>(
                     int64_t(obj->value().size()))
                 )
@@ -20,7 +20,7 @@ lc_builtin_methods
     },
     {"to_int", [](StringObject *obj)
         {
-            Context::current()
+            theCurrContext
                 ->push(Allocator<Object>::alloc<IntegerObject>(
                     int64_t(stoll(obj->value())))
                 )
@@ -141,8 +141,8 @@ Address StringObject::index(Object *index)
 
 Address StringObject::load_member(const String &name)
 {
-    auto method = lc_builtin_methods.find(name);
-    if (method != lc_builtin_methods.end())
+    auto method = localBuiltinMethods.find(name);
+    if (method != localBuiltinMethods.end())
     {
         return std::make_shared<Variable>(
             Allocator<Object>::alloc<BuiltInFunctionObject>(

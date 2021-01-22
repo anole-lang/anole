@@ -1,4 +1,4 @@
-use * from libpath;
+use * from "./libpath.so";
 
 @current_path(): __current_path();
 @is_directory(path): __is_directory(path);

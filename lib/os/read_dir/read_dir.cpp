@@ -20,7 +20,7 @@ void __read_dir(anole::Size n)
         throw anole::RuntimeError("function read_dir need only one argument");
     }
 
-    auto path_obj = anole::Context::current()->pop_ptr();
+    auto path_obj = anole::theCurrContext->pop_ptr();
     fs::path path;
     if (auto ptr = dynamic_cast<PathObject *>(path_obj))
     {
@@ -33,7 +33,7 @@ void __read_dir(anole::Size n)
 
     if (path.is_relative())
     {
-        path = anole::Context::current()->current_path() / path;
+        path = *anole::theWorkingPath / path;
     }
 
     auto paths = anole::Allocator<anole::Object>::alloc<anole::ListObject>();
@@ -46,6 +46,6 @@ void __read_dir(anole::Size n)
         );
     }
 
-    anole::Context::current()->push(paths);
+    anole::theCurrContext->push(paths);
 }
 }

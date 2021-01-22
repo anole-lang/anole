@@ -17,6 +17,11 @@
 namespace anole
 {
 class Code;
+class Context;
+
+// special for code in REPL mode
+extern SPtr<std::filesystem::path> theWorkingPath;
+extern SPtr<Context> theCurrContext;
 
 // Context should be contructed by make_shared
 class Context
@@ -27,8 +32,6 @@ class Context
     using Stack = std::list<Address>;
 
   public:
-    static SPtr<Context> &current();
-
     static void set_args(int argc, char *argv[], int start);
     static const std::vector<char *> &get_args();
 
@@ -39,7 +42,9 @@ class Context
     Context(SPtr<Context> resume);
     // copy ctor
     Context(const Context &context);
-    Context(SPtr<Code> code, std::filesystem::path path = std::filesystem::current_path());
+    // generally the first ctor
+    Context(SPtr<Code> code);
+    // ctor for callable objects
     Context(SPtr<Context> pre, SPtr<Scope> scope, SPtr<Code> code, Size pc = 0);
 
     SPtr<Context> &pre_context();
@@ -81,7 +86,7 @@ class Context
 
     Size size() const;
     Stack *get_stack();
-    std::filesystem::path &current_path();
+    const std::filesystem::path &code_path() const;
 
     void set_call_anchor();
     Size get_call_args_num();
@@ -95,7 +100,6 @@ class Context
     SPtr<Code> code_;
     Size pc_;
     SPtr<Stack> stack_;
-    std::filesystem::path current_path_;
 
     std::stack<Size> call_anchors_;
     Size return_anchor_;

@@ -12,8 +12,16 @@ class Code;
 class ModuleObject : public Object
 {
   public:
+    /**
+     * generate(String) will only return AnoleModule
+    */
     static ModuleObject *generate(const String &name);
-    static ModuleObject *generate(const std::filesystem::path &path);
+    /**
+     * generate(path)
+     *  return CppModule if path endwith .so,
+     *  else return AnoleModule whose path should be not endwith .anole
+    */
+    static ModuleObject *generate(std::filesystem::path path);
 
   public:
     ModuleObject(ObjectType type) noexcept;
@@ -31,7 +39,6 @@ class ModuleObject : public Object
 class AnoleModuleObject : public ModuleObject
 {
   public:
-    AnoleModuleObject(const String &name);
     AnoleModuleObject(const std::filesystem::path &path);
 
     const SPtr<Scope> &scope() const;
@@ -39,8 +46,6 @@ class AnoleModuleObject : public ModuleObject
 
   public:
     Address load_member(const String &name) override;
-
-    void collect(std::function<void(Scope *)>) override;
 
   private:
     void init(const std::filesystem::path &path);
@@ -53,7 +58,6 @@ class AnoleModuleObject : public ModuleObject
 class CppModuleObject : public ModuleObject
 {
   public:
-    CppModuleObject(const String &name);
     CppModuleObject(const std::filesystem::path &path);
     ~CppModuleObject();
 

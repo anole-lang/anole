@@ -20,7 +20,7 @@ namespace anole
 {
 namespace
 {
-sigjmp_buf lc_env;
+sigjmp_buf localEnv;
 
 String read_line(const char * str)
 {
@@ -39,7 +39,7 @@ void handle_sigint(int)
     std::cout << "\b \b\b \b\nKeyboard Interrupt\n";
     rl_on_new_line();
     rl_replace_line("", 0);
-    siglongjmp(lc_env, 1);
+    siglongjmp(localEnv, 1);
 }
 }
 
@@ -59,8 +59,11 @@ void replrun::run()
     String line;
     std::istringstream ss;
     Parser parser(ss, "<stdin>");
-    auto code = std::make_shared<Code>("<stdin>");
-    Context::current() = std::make_shared<Context>(code);
+    /**
+     * theWorkingPtah is specific for here
+    */
+    auto code = std::make_shared<Code>("<stdin>", theWorkingPath);
+    theCurrContext = std::make_shared<Context>(code);
 
     parser.set_resume_action([&ss, &parser]
     {
@@ -75,7 +78,7 @@ void replrun::run()
         parser.resume();
     });
 
-    sigsetjmp(lc_env, 1);
+    sigsetjmp(localEnv, 1);
     for (;;) try
     {
         do
@@ -88,7 +91,7 @@ void replrun::run()
         ss.str(line + '\n');
         parser.reset();
 
-        Context::current()->pc() = code->size();
+        theCurrContext->pc() = code->size();
 
         auto stmt = parser.gen_statement();
         if (stmt->is_expr_stmt())

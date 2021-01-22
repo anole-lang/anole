@@ -28,6 +28,6 @@ void __args(anole::Size n)
         );
     }
 
-    anole::Context::current()->push(args);
+    anole::theCurrContext->push(args);
 }
 }

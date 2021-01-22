@@ -15,26 +15,83 @@ namespace fs = std::filesystem;
 
 namespace anole
 {
-ModuleObject *ModuleObject::generate(const String &name)
+namespace
 {
-    ModuleObject *mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
-    if (!mod->good())
-    {
-        mod = Allocator<Object>::alloc<CppModuleObject>(name);
-    }
-    return mod;
+/**
+ * TODO:
+ *  add more information about loaded modules
+ *   such as the create-time
+*/
+std::map<fs::path, ModuleObject *> localLoadedModules;
 }
 
-ModuleObject *ModuleObject::generate(const fs::path &path)
+ModuleObject *ModuleObject::generate(const String &name)
 {
-    ModuleObject *mod;
-    if (path.extension() == ".so")
+    fs::path path;
+
+    // assume absolute path
+    const auto &code_path = theCurrContext->code_path();
+    if (fs::is_regular_file(code_path / (name + ".anole")))
     {
-        mod = Allocator<Object>::alloc<CppModuleObject>(path);
+        path = code_path / (name + ".anole");
+    }
+    else if (fs::is_directory(code_path / name))
+    {
+        path = code_path / name / "__init__.anole";
+    }
+    else if (fs::is_regular_file(fs::path("/usr/local/lib/anole") / (name + ".anole")))
+    {
+        path = fs::path("/usr/local/lib/anole") / (name + ".anole");
+    }
+    else if (fs::is_directory(fs::path("/usr/local/lib/anole") / name))
+    {
+        path = fs::path("/usr/local/lib/anole") / name / "__init__.anole";
     }
     else
     {
-        mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
+        throw RuntimeError("no module named " + name);
+    }
+
+    return generate(path);
+}
+
+ModuleObject *ModuleObject::generate(fs::path path)
+{
+    if (path.is_relative())
+    {
+        path = theCurrContext->code_path() / path;
+    }
+
+    /**
+     * NOTE:
+     *  only standardize the path of code here
+    */
+    path = path.lexically_normal();
+
+    auto find = localLoadedModules.find(path);
+    if (find != localLoadedModules.end())
+    {
+        return find->second;
+    }
+
+    ModuleObject *mod;
+    if (path.extension() == ".so")
+    {
+        mod = new CppModuleObject(path);
+    }
+    else
+    {
+        mod = new AnoleModuleObject(path);
+    }
+
+    if (!mod->good())
+    {
+        delete mod;
+        mod = nullptr;
+    }
+    else
+    {
+        localLoadedModules[path] = mod;
     }
     return mod;
 }
@@ -52,95 +109,17 @@ bool ModuleObject::good()
     return good_;
 }
 
-AnoleModuleObject::AnoleModuleObject(const String &name)
-  : ModuleObject(ObjectType::AnoleModule)
-{
-    good_ = true;
-
-    /**
-     * use module-name will look up the module in current directory firstly
-     *  and then look up in "/usr/local/lib/anole/" if not find
-    */
-
-    auto cpath = Context::current()->current_path();
-    if (fs::is_regular_file(cpath / (name + ".anole")))
-    {
-        init(cpath / (name + ".anole"));
-    }
-    else if (fs::is_directory(cpath / name))
-    {
-        init(cpath / name / "__init__.anole");
-    }
-    else if (fs::is_regular_file(fs::path("/usr/local/lib/anole") / (name + ".anole")))
-    {
-        init(fs::path("/usr/local/lib/anole") / (name + ".anole"));
-    }
-    else if (fs::is_directory(fs::path("/usr/local/lib/anole") / name))
-    {
-        init(fs::path("/usr/local/lib/anole") / name / "__init__.anole");
-    }
-    else
-    {
-        good_ = false;
-    }
-}
-
+// assume absolute path
 AnoleModuleObject::AnoleModuleObject(const fs::path &path)
   : ModuleObject(ObjectType::AnoleModule)
-{
-    good_ = true;
-
-    /**
-     * support "/path/to/mod.anole"
-     *  and "/path/to/mod" with "/path/to/mod/__init__.anole"
-    */
-    if (path.extension() == ".anole")
-    {
-        init(path);
-    }
-    else if (fs::is_directory(path))
-    {
-        init(path / "__init__.anole");
-    }
-    else
-    {
-        good_ = false;
-    }
-}
-
-const SPtr<Scope> &AnoleModuleObject::scope() const
-{
-    return scope_;
-}
-
-const SPtr<Code> &AnoleModuleObject::code() const
-{
-    return code_;
-}
-
-Address AnoleModuleObject::load_member(const String &name)
-{
-    if (scope_->symbols().count(name))
-    {
-        return scope_->load_symbol(name);
-    }
-    return Object::load_member(name);
-}
-
-void AnoleModuleObject::collect(std::function<void(Scope *)> func)
-{
-    func(scope_.get());
-}
-
-void AnoleModuleObject::init(const fs::path &path)
 {
     auto dir = path.parent_path();
     auto ir_path = path.string() + ".ir";
 
-    code_ = std::make_shared<Code>(path.filename().string());
-    auto origin = Context::current();
-    Context::current() = std::make_shared<Context>(code_, dir);
-    Context::current()->pre_context() = origin;
+    code_ = std::make_shared<Code>(path.filename().string(), dir);
+    auto origin = theCurrContext;
+    theCurrContext = std::make_shared<Context>(code_);
+    theCurrContext->pre_context() = origin;
 
     if (fs::is_regular_file(ir_path)
         && fs::last_write_time(ir_path) >= fs::last_write_time(path)
@@ -173,27 +152,32 @@ void AnoleModuleObject::init(const fs::path &path)
     code_->print(rd_path);
   #endif
 
-    scope_ = Context::current()->scope();
-    Context::current() = origin;
+    scope_ = theCurrContext->scope();
+    theCurrContext = origin;
+
+    good_ = true;
 }
 
-CppModuleObject::CppModuleObject(const String &name)
-  : ModuleObject(ObjectType::CppModule)
+const SPtr<Scope> &AnoleModuleObject::scope() const
 {
-    auto path = Context::current()->current_path() / (name + ".so");
-    handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
-    if (!handle_)
-    {
-        auto path = "/usr/local/lib/anole/" + name + ".so";
-        handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
-    }
-    good_ = handle_;
-    names_ = good_
-        ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
-        : nullptr
-    ;
+    return scope_;
 }
 
+const SPtr<Code> &AnoleModuleObject::code() const
+{
+    return code_;
+}
+
+Address AnoleModuleObject::load_member(const String &name)
+{
+    if (scope_->symbols().count(name))
+    {
+        return scope_->load_symbol(name);
+    }
+    return Object::load_member(name);
+}
+
+// assume absolute path
 CppModuleObject::CppModuleObject(const fs::path &path)
   : ModuleObject(ObjectType::CppModule)
 {

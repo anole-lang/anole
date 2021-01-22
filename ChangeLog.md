@@ -2,10 +2,20 @@
 
 ## Unreleased
 
+### Added
+
+- Make sure that all files will be executed once if default
+
+### Changed
+
+- Only Anole modules can be imported by simple name now
+- Cpp modules must be imported by using their direct paths
+
 ### Updated
 
 - Improve the performance of REPL
 - Improve the error information of non-defined variables which may cause segmentation fault
+- Make sure all paths could be finded correctly
 
 ### Fixed
 

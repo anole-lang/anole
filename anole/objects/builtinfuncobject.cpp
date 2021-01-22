@@ -50,7 +50,7 @@ String BuiltInFunctionObject::to_str()
 void BuiltInFunctionObject::call(Size n)
 {
     func_(n);
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void BuiltInFunctionObject::collect(std::function<void(Object *)> func)

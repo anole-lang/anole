@@ -56,20 +56,20 @@ void ClassObject::call(Size num)
          *
          * this is be done in the parse phase
         */
-        Context::current()->push(instance);
+        theCurrContext->push(instance);
         auto ctor = scope_->load_symbol("__init__");
         ctor->ptr()->call(num + 1);
     }
     else if (num == 0)
     {
-        ++Context::current()->pc();
+        ++theCurrContext->pc();
     }
     else
     {
         throw RuntimeError("only default ctor but given non-zero arguments");
     }
 
-    Context::current()->push(instance);
+    theCurrContext->push(instance);
 }
 
 void ClassObject::collect(std::function<void(Scope *)> func)

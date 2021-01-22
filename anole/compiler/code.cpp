@@ -176,8 +176,15 @@ void typein(std::istream &in, std::pair<T1, T2> &pir)
 }
 }
 
-Code::Code(String from) noexcept
-  : from_(std::move(from))
+Code::Code(String from, const std::filesystem::path &path)
+  : from_(std::move(from)), path_(std::make_shared<std::filesystem::path>(path))
+  , constants_{ NoneObject::one(), BoolObject::the_true(), BoolObject::the_false() }
+{
+    // ...
+}
+
+Code::Code(String from, SPtr<std::filesystem::path> path) noexcept
+  : from_(std::move(from)), path_(std::move(path))
   , constants_{ NoneObject::one(), BoolObject::the_true(), BoolObject::the_false() }
 {
     // ...
@@ -186,6 +193,11 @@ Code::Code(String from) noexcept
 const String &Code::from()
 {
     return from_;
+}
+
+const std::filesystem::path &Code::path() const
+{
+    return *path_;
 }
 
 std::map<Size, Location> &Code::source_mapping()

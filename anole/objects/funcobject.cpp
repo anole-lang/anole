@@ -3,7 +3,7 @@
 #include "../runtime/runtime.hpp"
 #include "../compiler/compiler.hpp"
 
-#define OPRAND(T) std::any_cast<const T &>(Context::current()->oprand())
+#define OPRAND(T) std::any_cast<const T &>(theCurrContext->oprand())
 
 namespace anole
 {
@@ -44,26 +44,26 @@ Address FunctionObject::load_member(const String &name)
 
 void FunctionObject::call(Size num)
 {
-    Context::current() = std::make_shared<Context>(
-        Context::current(), scope_, code_, base_
+    theCurrContext = std::make_shared<Context>(
+        theCurrContext, scope_, code_, base_
     );
 
     auto parameter_num = parameter_num_;
     auto arg_num = num;
-    auto &pc = Context::current()->pc();
+    auto &pc = theCurrContext->pc();
     while (arg_num && parameter_num)
     {
-        switch (Context::current()->opcode())
+        switch (theCurrContext->opcode())
         {
         case Opcode::Pack:
         {
             ++pc;
             auto list = Allocator<Object>::alloc<ListObject>();
-            if (Context::current()->opcode() == Opcode::StoreRef)
+            if (theCurrContext->opcode() == Opcode::StoreRef)
             {
                 while (arg_num)
                 {
-                    list->objects().push_back(Context::current()->pop_address());
+                    list->objects().push_back(theCurrContext->pop_address());
                     --arg_num;
                 }
             }
@@ -72,11 +72,11 @@ void FunctionObject::call(Size num)
             {
                 while (arg_num)
                 {
-                    list->append(Context::current()->pop_ptr());
+                    list->append(theCurrContext->pop_ptr());
                     --arg_num;
                 }
             }
-            Context::current()->scope()
+            theCurrContext->scope()
                 ->create_symbol(OPRAND(String))
                     ->bind(list)
             ;
@@ -86,8 +86,8 @@ void FunctionObject::call(Size num)
             break;
 
         case Opcode::StoreRef:
-            Context::current()->scope()->create_symbol(OPRAND(String),
-                Context::current()->pop_address()
+            theCurrContext->scope()->create_symbol(OPRAND(String),
+                theCurrContext->pop_address()
             );
             ++pc;
             --arg_num;
@@ -95,9 +95,9 @@ void FunctionObject::call(Size num)
             break;
 
         case Opcode::StoreLocal:
-            Context::current()->scope()
+            theCurrContext->scope()
                 ->create_symbol(OPRAND(String))
-                    ->bind(Context::current()->pop_ptr())
+                    ->bind(theCurrContext->pop_ptr())
             ;
             ++pc;
             --arg_num;
@@ -139,8 +139,8 @@ void FunctionObject::call(Size num)
     */
     else if (parameter_num)
     {
-        if (Context::current()->opcode() == Opcode::StoreRef
-            || Context::current()->opcode() == Opcode::StoreLocal)
+        if (theCurrContext->opcode() == Opcode::StoreRef
+            || theCurrContext->opcode() == Opcode::StoreLocal)
         {
             throw RuntimeError("missing the parameter named '" + OPRAND(String) + '\'');
         }

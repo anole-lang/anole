@@ -13,32 +13,31 @@
     #include <iostream>
 #endif
 
-#define OPRAND(T) std::any_cast<const T &>(Context::current()->oprand())
+#define OPRAND(T) std::any_cast<const T &>(theCurrContext->oprand())
+
+namespace fs = std::filesystem;
 
 namespace anole
 {
+SPtr<fs::path> theWorkingPath = std::make_shared<fs::path>(fs::current_path());
+SPtr<Context> theCurrContext = nullptr;
+
 namespace
 {
-std::vector<char *> lc_args;
-}
-
-SPtr<Context> &Context::current()
-{
-    static SPtr<Context> the_current = nullptr;
-    return the_current;
+std::vector<char *> localArgs;
 }
 
 void Context::set_args(int argc, char *argv[], int start)
 {
     for (; start < argc; ++start)
     {
-        lc_args.push_back(argv[start]);
+        localArgs.push_back(argv[start]);
     }
 }
 
 const std::vector<char *> &Context::get_args()
 {
-    return lc_args;
+    return localArgs;
 }
 
 /**
@@ -52,7 +51,6 @@ Context::Context(SPtr<Context> resume)
   , scope_(std::make_shared<Scope>(resume->scope_))
   , code_(resume->code_), pc_(resume->pc_)
   , stack_(std::make_shared<Stack>(*resume->stack_))
-  , current_path_(resume->current_path_)
   , call_anchors_(resume->call_anchors_)
   , return_anchor_(resume->return_anchor_)
 {
@@ -64,20 +62,17 @@ Context::Context(const Context &context)
   , scope_(context.scope_)
   , code_(context.code_), pc_(context.pc_)
   , stack_(std::make_shared<Stack>(*context.stack_))
-  , current_path_(context.current_path_)
   , call_anchors_(context.call_anchors_)
   , return_anchor_(context.return_anchor_)
 {
     // ...
 }
 
-Context::Context(SPtr<Code> code,
-    std::filesystem::path path)
+Context::Context(SPtr<Code> code)
   : pre_context_(nullptr)
   , scope_(std::make_shared<Scope>(nullptr))
   , code_(code), pc_(0)
   , stack_(std::make_shared<Stack>())
-  , current_path_(std::move(path))
   , return_anchor_(0)
 {
     // ...
@@ -89,7 +84,6 @@ Context::Context(SPtr<Context> pre, SPtr<Scope> scope,
   , scope_(std::make_shared<Scope>(scope))
   , code_(std::move(code)), pc_(pc)
   , stack_(pre->stack_)
-  , current_path_(pre->current_path_)
   , return_anchor_(0)
 {
     // ...
@@ -170,9 +164,9 @@ Context::Stack *Context::get_stack()
     return stack_.get();
 }
 
-std::filesystem::path &Context::current_path()
+const fs::path &Context::code_path() const
 {
-    return current_path_;
+    return code_->path();
 }
 
 void Context::set_call_anchor()
@@ -201,155 +195,131 @@ namespace op_handles
 {
 void pop_handle()
 {
-    auto num = Context::current()->get_call_args_num();
-    Context::current()->pop(num);
-    ++Context::current()->pc();
+    auto num = theCurrContext->get_call_args_num();
+    theCurrContext->pop(num);
+    ++theCurrContext->pc();
 }
 
 void fastpop_handle()
 {
-    Context::current()->pop();
-    ++Context::current()->pc();
+    theCurrContext->pop();
+    ++theCurrContext->pc();
 }
 
 void import_handle()
 {
     const auto &name = OPRAND(String);
-    auto mod = ModuleObject::generate(name);
-    if (!mod->good())
+    auto anole_mod = ModuleObject::generate(name);
+    if (anole_mod == nullptr)
     {
         throw RuntimeError("no module named " + name);
     }
 
-    Context::current()->push(std::move(mod));
-    ++Context::current()->pc();
+    theCurrContext->push(std::move(anole_mod));
+    ++theCurrContext->pc();
 }
 
 void importpath_handle()
 {
-    auto path = std::filesystem::path(OPRAND(String));
-    if (path.is_relative())
-    {
-        path = Context::current()->current_path() / path;
-    }
+    auto path = fs::path(OPRAND(String));
     auto mod = ModuleObject::generate(path);
-    if (!mod->good())
+    if (mod == nullptr)
     {
         throw RuntimeError("no such module: " + path.string());
     }
 
-    Context::current()->push(std::move(mod));
-    ++Context::current()->pc();
+    theCurrContext->push(std::move(mod));
+    ++theCurrContext->pc();
 }
 
 void importall_handle()
 {
     const auto &name = OPRAND(String);
-
-    auto anole_mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
-    if (anole_mod->good())
-    {
-        for (const auto &name_ptr : anole_mod->scope()->symbols())
-        {
-            Context::current()->scope()->create_symbol(
-                name_ptr.first, name_ptr.second
-            );
-        }
-        ++Context::current()->pc();
-        return;
-    }
-
-    auto cpp_mod = Allocator<Object>::alloc<CppModuleObject>(name);
-    if (!cpp_mod->good())
+    auto anole_mod = reinterpret_cast<AnoleModuleObject *>(ModuleObject::generate(name));
+    if (anole_mod == nullptr)
     {
         throw RuntimeError("no module named " + name);
     }
-    auto names = cpp_mod->names();
-    if (!names)
+
+    for (const auto &name_ptr : anole_mod->scope()->symbols())
     {
-        throw RuntimeError("no defined _FUNCTIONS in C++ source");
-    }
-    for (const auto &name : *names)
-    {
-        Context::current()->scope()->create_symbol(
-            name, cpp_mod->load_member(name)
+        theCurrContext->scope()->create_symbol(
+            name_ptr.first, name_ptr.second
         );
     }
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void importallpath_handle()
 {
-    auto path = std::filesystem::path(OPRAND(String));
-    if (path.is_relative())
-    {
-        path = Context::current()->current_path() / path;
-    }
-
-    auto anole_mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
-    if (anole_mod->good())
-    {
-        for (const auto &name_ptr : anole_mod->scope()->symbols())
-        {
-            Context::current()->scope()->create_symbol(
-                name_ptr.first, name_ptr.second
-            );
-        }
-        ++Context::current()->pc();
-        return;
-    }
-
-    auto cpp_mod = Allocator<Object>::alloc<CppModuleObject>(path);
-    if (!cpp_mod->good())
+    auto path = fs::path(OPRAND(String));
+    auto mod = ModuleObject::generate(path);
+    if (mod == nullptr)
     {
         throw RuntimeError("no such module: " + path.string());
     }
-    auto names = cpp_mod->names();
-    if (!names)
+
+    if (mod->is<ObjectType::AnoleModule>())
     {
-        throw RuntimeError("no defined _FUNCTIONS in C++ source");
+        auto anole_mod = reinterpret_cast<AnoleModuleObject *>(mod);
+        for (const auto &name_ptr : anole_mod->scope()->symbols())
+        {
+            theCurrContext->scope()->create_symbol(
+                name_ptr.first, name_ptr.second
+            );
+        }
     }
-    for (const auto &name : *names)
+    else
     {
-        Context::current()->scope()->create_symbol(
-            name, cpp_mod->load_member(name)
-        );
+        auto cpp_mod = reinterpret_cast<CppModuleObject *>(mod);
+        auto names = cpp_mod->names();
+        if (!names)
+        {
+            throw RuntimeError("no defined _FUNCTIONS in C++ source");
+        }
+        for (const auto &name : *names)
+        {
+            theCurrContext->scope()->create_symbol(
+                name, cpp_mod->load_member(name)
+            );
+        }
     }
-    ++Context::current()->pc();
+
+    ++theCurrContext->pc();
 }
 
 void importpart_handle()
 {
     const auto &name = OPRAND(String);
-    Context::current()->push(
-        Context::current()->top_ptr<ModuleObject>()->load_member(name)
+    theCurrContext->push(
+        theCurrContext->top_ptr<ModuleObject>()->load_member(name)
     );
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void load_handle()
 {
     const auto &name = OPRAND(String);
-    auto addr = Context::current()->scope()->load_symbol(name);
+    auto addr = theCurrContext->scope()->load_symbol(name);
 
     if (addr->ptr() == nullptr || !addr->ptr()->is<ObjectType::Thunk>())
     {
-        Context::current()->push(addr);
-        ++Context::current()->pc();
+        theCurrContext->push(addr);
+        ++theCurrContext->pc();
     }
     else
     {
         auto thunk = reinterpret_cast<ThunkObject *>(addr->ptr());
         if (thunk->computed())
         {
-            Context::current()->push(thunk->result());
-            ++Context::current()->pc();
+            theCurrContext->push(thunk->result());
+            ++theCurrContext->pc();
         }
         else
         {
-            Context::current()->push(addr);
-            Context::current() = std::make_shared<Context>(
-                Context::current(), thunk->scope(), thunk->code(), thunk->base()
+            theCurrContext->push(addr);
+            theCurrContext = std::make_shared<Context>(
+                theCurrContext, thunk->scope(), thunk->code(), thunk->base()
             );
         }
     }
@@ -357,62 +327,62 @@ void load_handle()
 
 void loadconst_handle()
 {
-    Context::current()->push(Context::current()->code()->load_const(OPRAND(Size)));
-    ++Context::current()->pc();
+    theCurrContext->push(theCurrContext->code()->load_const(OPRAND(Size)));
+    ++theCurrContext->pc();
 }
 
 void loadmember_handle()
 {
     const auto &name = OPRAND(String);
-    auto address = Context::current()->pop_ptr()->load_member(name);
-    Context::current()->push(address);
-    ++Context::current()->pc();
+    auto address = theCurrContext->pop_ptr()->load_member(name);
+    theCurrContext->push(address);
+    ++theCurrContext->pc();
 }
 
 void store_handle()
 {
-    auto addr = Context::current()->pop_address();
-    addr->bind(Context::current()->pop_ptr());
-    Context::current()->push(addr);
-    ++Context::current()->pc();
+    auto addr = theCurrContext->pop_address();
+    addr->bind(theCurrContext->pop_ptr());
+    theCurrContext->push(addr);
+    ++theCurrContext->pc();
 }
 
 void storeref_handle()
 {
-    Context::current()->scope()->create_symbol(
-        OPRAND(String), Context::current()->pop_address()
+    theCurrContext->scope()->create_symbol(
+        OPRAND(String), theCurrContext->pop_address()
     );
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void storelocal_handle()
 {
-    Context::current()->scope()
+    theCurrContext->scope()
         ->create_symbol(OPRAND(String))
-            ->bind(Context::current()->pop_ptr())
+            ->bind(theCurrContext->pop_ptr())
     ;
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void newscope_handle()
 {
-    Context::current()->scope() = std::make_shared<Scope>(
-        Context::current()->scope()
+    theCurrContext->scope() = std::make_shared<Scope>(
+        theCurrContext->scope()
     );
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void endscope_handle()
 {
-    auto &cur_scope = Context::current()->scope();
+    auto &cur_scope = theCurrContext->scope();
     cur_scope = cur_scope->pre();
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void callac_handle()
 {
-    Context::current()->set_call_anchor();
-    ++Context::current()->pc();
+    theCurrContext->set_call_anchor();
+    ++theCurrContext->pc();
 }
 
 void call_handle()
@@ -427,8 +397,8 @@ void call_handle()
      *  variables linked to the resume context
      *  may be ignored
     */
-    auto callee = Context::current()->pop_ptr();
-    callee->call(Context::current()->get_call_args_num());
+    auto callee = theCurrContext->pop_ptr();
+    callee->call(theCurrContext->get_call_args_num());
 }
 
 void fastcall_handle()
@@ -439,25 +409,25 @@ void fastcall_handle()
      *  linked to callee and the callee self
      *  may not be collected
     */
-    auto callee = Context::current()->pop_ptr();
+    auto callee = theCurrContext->pop_ptr();
     callee->call(0);
 }
 
 void returnac_handle()
 {
-    Context::current()->set_return_anchor();
-    ++Context::current()->pc();
+    theCurrContext->set_return_anchor();
+    ++theCurrContext->pc();
 }
 
 void return_handle()
 {
-    auto n = Context::current()->get_return_vals_num();
-    auto pre_context = Context::current()->pre_context();
+    auto n = theCurrContext->get_return_vals_num();
+    auto pre_context = theCurrContext->pre_context();
 
-    if (n != 0 && Context::current()->get_stack() != pre_context->get_stack())
+    if (n != 0 && theCurrContext->get_stack() != pre_context->get_stack())
     {
         auto pre_stack = pre_context->get_stack();
-        auto cur_stack = Context::current()->get_stack();
+        auto cur_stack = theCurrContext->get_stack();
 
         auto begin = cur_stack->begin();
         n = cur_stack->size() - n;
@@ -472,68 +442,68 @@ void return_handle()
 
         cur_stack->erase(begin, cur_stack->end());
     }
-    Context::current() = pre_context;
-    ++Context::current()->pc();
+    theCurrContext = pre_context;
+    ++theCurrContext->pc();
 
     Collector::try_gc();
 }
 
 void returnnone_handle()
 {
-    Context::current() = Context::current()->pre_context();
-    Context::current()->push(NoneObject::one());
-    ++Context::current()->pc();
+    theCurrContext = theCurrContext->pre_context();
+    theCurrContext->push(NoneObject::one());
+    ++theCurrContext->pc();
 
     Collector::try_gc();
 }
 
 void jump_handle()
 {
-    Context::current()->pc() = OPRAND(Size);
+    theCurrContext->pc() = OPRAND(Size);
 }
 
 void jumpif_handle()
 {
-    if (Context::current()->pop_ptr()->to_bool())
+    if (theCurrContext->pop_ptr()->to_bool())
     {
-        Context::current()->pc() = OPRAND(Size);
+        theCurrContext->pc() = OPRAND(Size);
     }
     else
     {
-        ++Context::current()->pc();
+        ++theCurrContext->pc();
     }
 }
 
 void jumpifnot_handle()
 {
-    if (!Context::current()->pop_ptr()->to_bool())
+    if (!theCurrContext->pop_ptr()->to_bool())
     {
-        Context::current()->pc() = OPRAND(Size);
+        theCurrContext->pc() = OPRAND(Size);
     }
     else
     {
-        ++Context::current()->pc();
+        ++theCurrContext->pc();
     }
 }
 
 void match_handle()
 {
-    auto key = Context::current()->pop_ptr();
-    if (Context::current()->top_ptr()->ceq(key)->to_bool())
+    auto key = theCurrContext->pop_ptr();
+    if (theCurrContext->top_ptr()->ceq(key)->to_bool())
     {
-        Context::current()->pop();
-        Context::current()->pc() = OPRAND(Size);
+        theCurrContext->pop();
+        theCurrContext->pc() = OPRAND(Size);
     }
     else
     {
-        ++Context::current()->pc();
+        ++theCurrContext->pc();
     }
 }
 
 void addprefixop_handle()
 {
     Parser::add_prefixop(OPRAND(String));
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void addinfixop_handle()
@@ -541,7 +511,7 @@ void addinfixop_handle()
     using type = std::pair<String, Size>;
     const auto &op_p = OPRAND(type);
     Parser::add_infixop(op_p.first, op_p.second);
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void pack_handle()
@@ -552,208 +522,208 @@ void pack_handle()
      *
      * a empty list will be the packed result
     */
-   Context::current()->push(Allocator<Object>::alloc<ListObject>());
-    ++Context::current()->pc();
+   theCurrContext->push(Allocator<Object>::alloc<ListObject>());
+    ++theCurrContext->pc();
 }
 
 void unpack_handle()
 {
-    if (Context::current()->top_ptr()->is<ObjectType::List>())
+    if (theCurrContext->top_ptr()->is<ObjectType::List>())
     {
-        auto l = Context::current()->top_ptr<ListObject>();
-        Context::current()->pop();
+        auto l = theCurrContext->top_ptr<ListObject>();
+        theCurrContext->pop();
         for (auto it = l->objects().rbegin();
             it != l->objects().rend(); ++it)
         {
-            Context::current()->push(*it);
+            theCurrContext->push(*it);
         }
     }
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void lambdadecl_handle()
 {
     using type = std::pair<Size, Size>;
     const auto &num_target = OPRAND(type);
-    Context::current()->push(Allocator<Object>::alloc<FunctionObject>(
-        Context::current()->scope(), Context::current()->code(),
-        Context::current()->pc() + 1, num_target.first
+    theCurrContext->push(Allocator<Object>::alloc<FunctionObject>(
+        theCurrContext->scope(), theCurrContext->code(),
+        theCurrContext->pc() + 1, num_target.first
     ));
-    Context::current()->pc() = num_target.second;
+    theCurrContext->pc() = num_target.second;
 }
 
 void thunkdecl_handle()
 {
-    Context::current()->push(Allocator<Object>::alloc<ThunkObject>(
-        Context::current()->scope(), Context::current()->code(),
-        Context::current()->pc() + 1
+    theCurrContext->push(Allocator<Object>::alloc<ThunkObject>(
+        theCurrContext->scope(), theCurrContext->code(),
+        theCurrContext->pc() + 1
     ));
-    Context::current()->pc() = OPRAND(Size);
+    theCurrContext->pc() = OPRAND(Size);
 }
 
 void thunkover_handle()
 {
-    auto result = Context::current()->pop_address();
-    Context::current()->top_ptr<ThunkObject>()->set_result(result);
-    Context::current()->set_top(result);
-    Context::current() = Context::current()->pre_context();
-    ++Context::current()->pc();
+    auto result = theCurrContext->pop_address();
+    theCurrContext->top_ptr<ThunkObject>()->set_result(result);
+    theCurrContext->set_top(result);
+    theCurrContext = theCurrContext->pre_context();
+    ++theCurrContext->pc();
 }
 
 void neg_handle()
 {
-    Context::current()->push(Context::current()->pop_ptr()->neg());
-    ++Context::current()->pc();
+    theCurrContext->push(theCurrContext->pop_ptr()->neg());
+    ++theCurrContext->pc();
 }
 
 void add_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->add(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->add(rhs));
+    ++theCurrContext->pc();
 }
 
 void sub_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->sub(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->sub(rhs));
+    ++theCurrContext->pc();
 }
 
 void mul_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->mul(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->mul(rhs));
+    ++theCurrContext->pc();
 }
 
 void div_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->div(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->div(rhs));
+    ++theCurrContext->pc();
 }
 
 void mod_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->mod(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->mod(rhs));
+    ++theCurrContext->pc();
 }
 
 void is_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    Context::current()->set_top(
-        Context::current()->top_ptr() == rhs
+    auto rhs = theCurrContext->pop_ptr();
+    theCurrContext->set_top(
+        theCurrContext->top_ptr() == rhs
         ? BoolObject::the_true()
         : BoolObject::the_false()
     );
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void ceq_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->ceq(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->ceq(rhs));
+    ++theCurrContext->pc();
 }
 
 void cne_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->cne(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->cne(rhs));
+    ++theCurrContext->pc();
 }
 
 void clt_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->clt(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->clt(rhs));
+    ++theCurrContext->pc();
 }
 
 void cle_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->cle(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->cle(rhs));
+    ++theCurrContext->pc();
 }
 
 void bneg_handle()
 {
-    Context::current()->push(Context::current()->pop_ptr()->bneg());
-    ++Context::current()->pc();
+    theCurrContext->push(theCurrContext->pop_ptr()->bneg());
+    ++theCurrContext->pc();
 }
 
 void bor_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->bor(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->bor(rhs));
+    ++theCurrContext->pc();
 }
 
 void bxor_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->bxor(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->bxor(rhs));
+    ++theCurrContext->pc();
 }
 
 void band_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->band(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->band(rhs));
+    ++theCurrContext->pc();
 }
 
 void bls_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->bls(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->bls(rhs));
+    ++theCurrContext->pc();
 }
 
 void brs_handle()
 {
-    auto rhs = Context::current()->pop_ptr();
-    auto lhs = Context::current()->top_ptr();
-    Context::current()->set_top(lhs->brs(rhs));
-    ++Context::current()->pc();
+    auto rhs = theCurrContext->pop_ptr();
+    auto lhs = theCurrContext->top_ptr();
+    theCurrContext->set_top(lhs->brs(rhs));
+    ++theCurrContext->pc();
 }
 
 void index_handle()
 {
-    auto obj = Context::current()->pop_ptr();
-    auto index = Context::current()->pop_ptr();
-    Context::current()->push(obj->index(index));
-    ++Context::current()->pc();
+    auto obj = theCurrContext->pop_ptr();
+    auto index = theCurrContext->pop_ptr();
+    theCurrContext->push(obj->index(index));
+    ++theCurrContext->pc();
 }
 
 void buildenum_handle()
 {
     auto enm = Allocator<Object>::alloc<EnumObject>(
-        Context::current()->scope()
+        theCurrContext->scope()
     );
-    Context::current()->scope() = Context::current()->scope()->pre();
+    theCurrContext->scope() = theCurrContext->scope()->pre();
 
     enm->scope()->pre() = nullptr;;
-    Context::current()->push(enm);
+    theCurrContext->push(enm);
 
-    ++Context::current()->pc();
+    ++theCurrContext->pc();
 }
 
 void buildlist_handle()
@@ -762,10 +732,10 @@ void buildlist_handle()
     auto size = OPRAND(Size);
     while (size--)
     {
-        list->append(Context::current()->pop_ptr());
+        list->append(theCurrContext->pop_ptr());
     }
-    Context::current()->push(list);
-    ++Context::current()->pc();
+    theCurrContext->push(list);
+    ++theCurrContext->pc();
 }
 
 void builddict_handle()
@@ -774,25 +744,25 @@ void builddict_handle()
     auto size = OPRAND(Size);
     while (size--)
     {
-        auto key = Context::current()->pop_ptr();
-        dict->insert(key, Context::current()->pop_ptr());
+        auto key = theCurrContext->pop_ptr();
+        dict->insert(key, theCurrContext->pop_ptr());
     }
-    Context::current()->push(dict);
-    ++Context::current()->pc();
+    theCurrContext->push(dict);
+    ++theCurrContext->pc();
 }
 
 void buildclass_handle()
 {
     auto name = OPRAND(String);
     auto cls = Allocator<Object>::alloc<ClassObject>(
-        name, Context::current()->scope()
+        name, theCurrContext->scope()
     );
 
     auto bctors = Allocator<Object>::alloc<ListObject>();
-    auto bases_num = Context::current()->get_call_args_num();
+    auto bases_num = theCurrContext->get_call_args_num();
     for (Size i = 0; i < bases_num; ++i)
     {
-        auto base = Context::current()->pop_ptr();
+        auto base = theCurrContext->pop_ptr();
 
         if (auto base_cls = dynamic_cast<ClassObject *>(base))
         {
@@ -822,10 +792,10 @@ void buildclass_handle()
     }
     cls->scope()->create_symbol("bctors", bctors);
 
-    Context::current()->push(cls);
+    theCurrContext->push(cls);
     // declare members in the new scope of the class
-    Context::current()->scope() = cls->scope();
-    ++Context::current()->pc();
+    theCurrContext->scope() = cls->scope();
+    ++theCurrContext->pc();
 }
 }
 
@@ -905,13 +875,13 @@ constexpr OpHandle theOpHandles[] =
 
 void Context::execute()
 {
-    while (Context::current()->pc() < Context::current()->code()->size())
+    while (theCurrContext->pc() < theCurrContext->code()->size())
     {
       #ifdef _DEBUG
-        cerr << "run at: " << Context::current()->code()->from() << ":" << Context::current()->pc() << endl;
+        cerr << "run at: " << theCurrContext->code()->from() << ":" << theCurrContext->pc() << endl;
       #endif
 
-        theOpHandles[static_cast<uint8_t>(Context::current()->opcode())]();
+        theOpHandles[static_cast<uint8_t>(theCurrContext->opcode())]();
     }
 }
 }

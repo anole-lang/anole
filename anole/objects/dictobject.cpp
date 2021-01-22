@@ -7,41 +7,41 @@ namespace anole
 namespace
 {
 std::map<String, std::function<void(DictObject *)>>
-lc_builtin_methods
+localBuiltinMethods
 {
     {"empty", [](DictObject *obj)
         {
-            Context::current()->push(obj->data().empty() ? BoolObject::the_true() : BoolObject::the_false());
+            theCurrContext->push(obj->data().empty() ? BoolObject::the_true() : BoolObject::the_false());
         }
     },
     {"size", [](DictObject *obj)
         {
-            Context::current()->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->data().size())));
+            theCurrContext->push(Allocator<Object>::alloc<IntegerObject>(int64_t(obj->data().size())));
         }
     },
     {"at", [](DictObject *obj)
         {
-            Context::current()->push(obj->index(Context::current()->pop_ptr())->ptr());
+            theCurrContext->push(obj->index(theCurrContext->pop_ptr())->ptr());
         }
     },
     {"insert", [](DictObject *obj)
         {
-            auto p1 = Context::current()->pop_ptr();
-            auto p2 = Context::current()->pop_ptr();
+            auto p1 = theCurrContext->pop_ptr();
+            auto p2 = theCurrContext->pop_ptr();
             obj->insert(p1, p2);
-            Context::current()->push(NoneObject::one());
+            theCurrContext->push(NoneObject::one());
         }
     },
     {"erase", [](DictObject *obj)
         {
-            obj->data().erase(Context::current()->pop_ptr());
-            Context::current()->push(NoneObject::one());
+            obj->data().erase(theCurrContext->pop_ptr());
+            theCurrContext->push(NoneObject::one());
         }
     },
     {"clear", [](DictObject *obj)
         {
             obj->data().clear();
-            Context::current()->push(NoneObject::one());
+            theCurrContext->push(NoneObject::one());
         }
     }
 };
@@ -108,8 +108,8 @@ Address DictObject::index(Object *index)
 
 Address DictObject::load_member(const String &name)
 {
-    auto method = lc_builtin_methods.find(name);
-    if (method != lc_builtin_methods.end())
+    auto method = localBuiltinMethods.find(name);
+    if (method != localBuiltinMethods.end())
     {
         return std::make_shared<Variable>(
             Allocator<Object>::alloc<BuiltInFunctionObject>(

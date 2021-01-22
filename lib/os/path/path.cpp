@@ -17,7 +17,7 @@ void __current_path(anole::Size n)
         throw anole::RuntimeError("function current_path need no arguments");
     }
 
-    anole::Context::current()->push(
+    anole::theCurrContext->push(
         anole::Allocator<anole::Object>::alloc<PathObject>(
             fs::current_path()
         )
@@ -31,7 +31,7 @@ void __is_directory(anole::Size n)
         throw anole::RuntimeError("function current_path need 1 argument");
     }
 
-    auto path_obj = anole::Context::current()->pop_ptr();
+    auto path_obj = anole::theCurrContext->pop_ptr();
     fs::path path;
     if (path_obj->is(anole::Object::add_object_type("path")))
     {
@@ -44,10 +44,10 @@ void __is_directory(anole::Size n)
 
     if (path.is_relative())
     {
-        path = anole::Context::current()->current_path() / path;
+        path = *anole::theWorkingPath / path;
     }
 
-    anole::Context::current()->push(
+    anole::theCurrContext->push(
         fs::is_directory(path)
         ? anole::BoolObject::the_true()
         : anole::BoolObject::the_false()
@@ -58,11 +58,11 @@ void __is_directory(anole::Size n)
 namespace
 {
 std::map<anole::String, std::function<void(PathObject *)>>
-lc_builtin_methods
+localBuiltinMethods
 {
     {"is_directory", [](PathObject *obj)
         {
-            anole::Context::current()->push(
+            anole::theCurrContext->push(
                 fs::is_directory(obj->path())
                 ? anole::BoolObject::the_true()
                 : anole::BoolObject::the_false()
@@ -81,8 +81,8 @@ PathObject::PathObject(fs::path path)
 
 anole::Address PathObject::load_member(const anole::String &name)
 {
-    auto method = lc_builtin_methods.find(name);
-    if (method != lc_builtin_methods.end())
+    auto method = localBuiltinMethods.find(name);
+    if (method != localBuiltinMethods.end())
     {
         return std::make_shared<anole::Variable>(
             anole::Allocator<anole::Object>::alloc<anole::BuiltInFunctionObject>(

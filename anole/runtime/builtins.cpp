@@ -15,44 +15,48 @@ REGISTER_BUILTIN(eval,
     std::istringstream ss
     {
       "return " +
-        dynamic_cast<StringObject *>(Context::current()->pop_ptr())->value() +
+        dynamic_cast<StringObject *>(theCurrContext->pop_ptr())->value() +
       ";"
     };
 
-    auto code = std::make_shared<Code>("<eval>");
+    /**
+     * regard code from eval-expr as an extra area from the origin code
+     *  so use the same path
+    */
+    auto code = std::make_shared<Code>("<eval>", theCurrContext->code_path());
     Parser(ss, "<eval>").gen_statement()->codegen(*code);
-    Context::current() = std::make_shared<Context>(
-        Context::current(), Context::current()->scope(), code, -1
+    theCurrContext = std::make_shared<Context>(
+        theCurrContext, theCurrContext->scope(), code, -1
     );
-    Context::current()->scope() = Context::current()->scope()->pre();
+    theCurrContext->scope() = theCurrContext->scope()->pre();
 });
 
 REGISTER_BUILTIN(call_with_current_continuation,
 {
-    if (Context::current()->top_ptr()->is<ObjectType::Func>())
+    if (theCurrContext->top_ptr()->is<ObjectType::Func>())
     {
         /**
          * TODO: check the collectable
         */
-        auto func = reinterpret_cast<FunctionObject *>(Context::current()->pop_ptr());
+        auto func = reinterpret_cast<FunctionObject *>(theCurrContext->pop_ptr());
         // copy current context
-        auto cont_obj = Allocator<Object>::alloc<ContObject>(Context::current());
-        Context::current() = std::make_shared<Context>(
-            Context::current(), func->scope(), func->code(), func->base()
+        auto cont_obj = Allocator<Object>::alloc<ContObject>(theCurrContext);
+        theCurrContext = std::make_shared<Context>(
+            theCurrContext, func->scope(), func->code(), func->base()
         );
         // the base => StoreRef/StoreLocal
-        Context::current()->scope()
+        theCurrContext->scope()
             ->create_symbol(std::any_cast<String>(
-                Context::current()->oprand())
+                theCurrContext->oprand())
             )->bind(cont_obj)
         ;
     }
-    else if (Context::current()->top_ptr()->is<ObjectType::Continuation>())
+    else if (theCurrContext->top_ptr()->is<ObjectType::Continuation>())
     {
-        auto resume = Context::current()->pop_ptr<ContObject>()->resume();
-        auto cont_obj = Allocator<Object>::alloc<ContObject>(Context::current());
-        Context::current() = std::make_shared<Context>(resume);
-        Context::current()->push(cont_obj);
+        auto resume = theCurrContext->pop_ptr<ContObject>()->resume();
+        auto cont_obj = Allocator<Object>::alloc<ContObject>(theCurrContext);
+        theCurrContext = std::make_shared<Context>(resume);
+        theCurrContext->push(cont_obj);
     }
     else
     {
@@ -62,10 +66,10 @@ REGISTER_BUILTIN(call_with_current_continuation,
 
 REGISTER_BUILTIN(id,
 {
-    Context::current()->push(
+    theCurrContext->push(
         Allocator<Object>::alloc<IntegerObject>(
             reinterpret_cast<int64_t>(
-                Context::current()->pop_ptr()
+                theCurrContext->pop_ptr()
             )
         )
     );
@@ -73,48 +77,48 @@ REGISTER_BUILTIN(id,
 
 REGISTER_BUILTIN(print,
 {
-    if (Context::current()->top_ptr() != NoneObject::one())
+    if (theCurrContext->top_ptr() != NoneObject::one())
     {
-        std::cout << Context::current()->pop_ptr()->to_str();
+        std::cout << theCurrContext->pop_ptr()->to_str();
     }
-    Context::current()->push(NoneObject::one());
+    theCurrContext->push(NoneObject::one());
 });
 
 REGISTER_BUILTIN(println,
 {
-    if (Context::current()->top_ptr() != NoneObject::one())
+    if (theCurrContext->top_ptr() != NoneObject::one())
     {
-        std::cout << Context::current()->pop_ptr()->to_str() << std::endl;
+        std::cout << theCurrContext->pop_ptr()->to_str() << std::endl;
     }
-    Context::current()->push(NoneObject::one());
+    theCurrContext->push(NoneObject::one());
 });
 
 REGISTER_BUILTIN(input,
 {
     String line;
     std::getline(std::cin, line);
-    Context::current()->push(Allocator<Object>::alloc<StringObject>(line));
+    theCurrContext->push(Allocator<Object>::alloc<StringObject>(line));
 });
 
 REGISTER_BUILTIN(exit,
 {
     exit(0);
-    Context::current()->push(NoneObject::one());
+    theCurrContext->push(NoneObject::one());
 });
 
 REGISTER_BUILTIN(time,
 {
     time_t result = std::time(nullptr);
-    Context::current()->push(Allocator<Object>::alloc<IntegerObject>(result));
+    theCurrContext->push(Allocator<Object>::alloc<IntegerObject>(result));
 });
 
 REGISTER_BUILTIN(str,
 {
-    Context::current()->push(Allocator<Object>::alloc<StringObject>(Context::current()->pop_ptr()->to_str()));
+    theCurrContext->push(Allocator<Object>::alloc<StringObject>(theCurrContext->pop_ptr()->to_str()));
 });
 
 REGISTER_BUILTIN(type,
 {
-    Context::current()->push(Context::current()->pop_ptr()->type());
+    theCurrContext->push(theCurrContext->pop_ptr()->type());
 });
 }

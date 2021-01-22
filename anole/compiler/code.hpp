@@ -20,9 +20,11 @@ class Code
     friend class Collector;
 
   public:
-    Code(String from) noexcept;
+    Code(String from, const std::filesystem::path &path);
+    Code(String from, SPtr<std::filesystem::path> path) noexcept;
 
     const String &from();
+    const std::filesystem::path &path() const;
 
     std::map<Size, Location> &source_mapping();
     void locate(const Location &location);
@@ -104,6 +106,11 @@ class Code
 
   private:
     String from_;
+    /**
+     * SPtr for REPL
+     *  because the main code from <stdin> should be with the working path
+    */
+    SPtr<std::filesystem::path> path_;
     std::map<Size, Location> source_mapping_;
 
     std::vector<Instruction> instructions_;

@@ -81,22 +81,34 @@ int main(int argc, char *argv[]) try
         {
             path /= "__init__.anole";
         }
-        Context::current() = make_shared<Context>(make_shared<Code>(path.string()),
-            path.parent_path().relative_path()
+
+        if (path.is_relative())
+        {
+            path = fs::current_path() / path;
+        }
+
+        theCurrContext = make_shared<Context>(
+            make_shared<Code>(path.string(), path.parent_path())
         );
 
         try
         {
-            AnoleModuleObject mod{path};
-            if (!mod.good())
+            auto mod = ModuleObject::generate(path);
+            if (mod == nullptr)
+            {
+                cout << "anole: cannot open file " << path << endl;
+            }
+            else if (mod->is<ObjectType::CppModule>())
             {
                 cout << "anole: cannot open file " << path << endl;
             }
             else if (parser.get<bool>("r"))
             {
+                auto anole_mod = reinterpret_cast<AnoleModuleObject *>(mod);
+
                 auto rd_path = path;
                 rd_path += ".rd";
-                mod.code()->print(rd_path);
+                anole_mod->code()->print(rd_path);
             }
         }
         catch (const exception& e)
