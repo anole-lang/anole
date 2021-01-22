@@ -104,6 +104,11 @@ class Code
 
   private:
     String from_;
+    /**
+     * TODO:
+     *  add member path
+     *  then we can find modules by the code's path
+    */
     std::map<Size, Location> source_mapping_;
 
     std::vector<Instruction> instructions_;

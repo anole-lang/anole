@@ -96,6 +96,10 @@ class Context
     SPtr<Code> code_;
     Size pc_;
     SPtr<Stack> stack_;
+    /**
+     * TODO:
+     *  use SPtr<path> to share the common working path
+    */
     std::filesystem::path current_path_;
 
     std::stack<Size> call_anchors_;

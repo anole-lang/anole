@@ -21,6 +21,7 @@ namespace
  * TODO:
  *  declare local loaded modules
 */
+
 }
 
 ModuleObject *ModuleObject::generate(const String &name)

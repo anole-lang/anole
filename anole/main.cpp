@@ -81,6 +81,13 @@ int main(int argc, char *argv[]) try
         {
             path /= "__init__.anole";
         }
+        /**
+         * TODO:
+         *  distinguish different paths:
+         *   current path for context to share,
+         *   the path of code binds to the source code,
+         *   use the latter only when using other modules
+        */
         theCurrContext = make_shared<Context>(make_shared<Code>(path.string()),
             path.parent_path().relative_path()
         );
