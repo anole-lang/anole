@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 
 using namespace anole;
 
@@ -18,7 +19,7 @@ inline String execute(const String &input)
     std::cout.rdbuf(out.rdbuf());
 
     std::istringstream ss{input};
-    auto code = std::make_shared<Code>("<test>");
+    auto code = std::make_shared<Code>("<test>", std::filesystem::current_path());
     theCurrContext = std::make_shared<Context>(code);
     Parser parser{ss, "<test>"};
     while (auto ast = parser.gen_statement())
