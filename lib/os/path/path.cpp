@@ -44,7 +44,7 @@ void __is_directory(anole::Size n)
 
     if (path.is_relative())
     {
-        path = anole::theCurrContext->current_path() / path;
+        path = *anole::theWorkingPath / path;
     }
 
     anole::theCurrContext->push(

@@ -33,7 +33,7 @@ void __read_dir(anole::Size n)
 
     if (path.is_relative())
     {
-        path = anole::theCurrContext->current_path() / path;
+        path = *anole::theWorkingPath / path;
     }
 
     auto paths = anole::Allocator<anole::Object>::alloc<anole::ListObject>();
