@@ -19,7 +19,11 @@ REGISTER_BUILTIN(eval,
       ";"
     };
 
-    auto code = std::make_shared<Code>("<eval>");
+    /**
+     * regard code from eval-expr as an extra area from the origin code
+     *  so use the same path
+    */
+    auto code = std::make_shared<Code>("<eval>", theCurrContext->code_path());
     Parser(ss, "<eval>").gen_statement()->codegen(*code);
     theCurrContext = std::make_shared<Context>(
         theCurrContext, theCurrContext->scope(), code, -1

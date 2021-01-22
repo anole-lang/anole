@@ -15,8 +15,11 @@
 
 #define OPRAND(T) std::any_cast<const T &>(theCurrContext->oprand())
 
+namespace fs = std::filesystem;
+
 namespace anole
 {
+SPtr<fs::path> theWorkingPath = std::make_shared<fs::path>(fs::current_path());
 SPtr<Context> theCurrContext = nullptr;
 
 namespace
@@ -48,7 +51,6 @@ Context::Context(SPtr<Context> resume)
   , scope_(std::make_shared<Scope>(resume->scope_))
   , code_(resume->code_), pc_(resume->pc_)
   , stack_(std::make_shared<Stack>(*resume->stack_))
-  , current_path_(resume->current_path_)
   , call_anchors_(resume->call_anchors_)
   , return_anchor_(resume->return_anchor_)
 {
@@ -60,20 +62,17 @@ Context::Context(const Context &context)
   , scope_(context.scope_)
   , code_(context.code_), pc_(context.pc_)
   , stack_(std::make_shared<Stack>(*context.stack_))
-  , current_path_(context.current_path_)
   , call_anchors_(context.call_anchors_)
   , return_anchor_(context.return_anchor_)
 {
     // ...
 }
 
-Context::Context(SPtr<Code> code,
-    std::filesystem::path path)
+Context::Context(SPtr<Code> code)
   : pre_context_(nullptr)
   , scope_(std::make_shared<Scope>(nullptr))
   , code_(code), pc_(0)
   , stack_(std::make_shared<Stack>())
-  , current_path_(std::move(path))
   , return_anchor_(0)
 {
     // ...
@@ -85,7 +84,6 @@ Context::Context(SPtr<Context> pre, SPtr<Scope> scope,
   , scope_(std::make_shared<Scope>(scope))
   , code_(std::move(code)), pc_(pc)
   , stack_(pre->stack_)
-  , current_path_(pre->current_path_)
   , return_anchor_(0)
 {
     // ...
@@ -166,9 +164,9 @@ Context::Stack *Context::get_stack()
     return stack_.get();
 }
 
-std::filesystem::path &Context::current_path()
+const fs::path &Context::code_path() const
 {
-    return current_path_;
+    return code_->path();
 }
 
 void Context::set_call_anchor()
@@ -211,25 +209,21 @@ void fastpop_handle()
 void import_handle()
 {
     const auto &name = OPRAND(String);
-    auto mod = ModuleObject::generate(name);
-    if (!mod->good())
+    auto anole_mod = ModuleObject::generate(name);
+    if (anole_mod == nullptr)
     {
         throw RuntimeError("no module named " + name);
     }
 
-    theCurrContext->push(std::move(mod));
+    theCurrContext->push(std::move(anole_mod));
     ++theCurrContext->pc();
 }
 
 void importpath_handle()
 {
-    auto path = std::filesystem::path(OPRAND(String));
-    if (path.is_relative())
-    {
-        path = theCurrContext->current_path() / path;
-    }
+    auto path = fs::path(OPRAND(String));
     auto mod = ModuleObject::generate(path);
-    if (!mod->good())
+    if (mod == nullptr)
     {
         throw RuntimeError("no such module: " + path.string());
     }
@@ -241,34 +235,16 @@ void importpath_handle()
 void importall_handle()
 {
     const auto &name = OPRAND(String);
-
-    auto anole_mod = Allocator<Object>::alloc<AnoleModuleObject>(name);
-    if (anole_mod->good())
-    {
-        for (const auto &name_ptr : anole_mod->scope()->symbols())
-        {
-            theCurrContext->scope()->create_symbol(
-                name_ptr.first, name_ptr.second
-            );
-        }
-        ++theCurrContext->pc();
-        return;
-    }
-
-    auto cpp_mod = Allocator<Object>::alloc<CppModuleObject>(name);
-    if (!cpp_mod->good())
+    auto anole_mod = reinterpret_cast<AnoleModuleObject *>(ModuleObject::generate(name));
+    if (anole_mod == nullptr)
     {
         throw RuntimeError("no module named " + name);
     }
-    auto names = cpp_mod->names();
-    if (!names)
-    {
-        throw RuntimeError("no defined _FUNCTIONS in C++ source");
-    }
-    for (const auto &name : *names)
+
+    for (const auto &name_ptr : anole_mod->scope()->symbols())
     {
         theCurrContext->scope()->create_symbol(
-            name, cpp_mod->load_member(name)
+            name_ptr.first, name_ptr.second
         );
     }
     ++theCurrContext->pc();
@@ -276,41 +252,39 @@ void importall_handle()
 
 void importallpath_handle()
 {
-    auto path = std::filesystem::path(OPRAND(String));
-    if (path.is_relative())
+    auto path = fs::path(OPRAND(String));
+    auto mod = ModuleObject::generate(path);
+    if (mod == nullptr)
     {
-        path = theCurrContext->current_path() / path;
+        throw RuntimeError("no such module: " + path.string());
     }
 
-    auto anole_mod = Allocator<Object>::alloc<AnoleModuleObject>(path);
-    if (anole_mod->good())
+    if (mod->is<ObjectType::AnoleModule>())
     {
+        auto anole_mod = reinterpret_cast<AnoleModuleObject *>(mod);
         for (const auto &name_ptr : anole_mod->scope()->symbols())
         {
             theCurrContext->scope()->create_symbol(
                 name_ptr.first, name_ptr.second
             );
         }
-        ++theCurrContext->pc();
-        return;
+    }
+    else
+    {
+        auto cpp_mod = reinterpret_cast<CppModuleObject *>(mod);
+        auto names = cpp_mod->names();
+        if (!names)
+        {
+            throw RuntimeError("no defined _FUNCTIONS in C++ source");
+        }
+        for (const auto &name : *names)
+        {
+            theCurrContext->scope()->create_symbol(
+                name, cpp_mod->load_member(name)
+            );
+        }
     }
 
-    auto cpp_mod = Allocator<Object>::alloc<CppModuleObject>(path);
-    if (!cpp_mod->good())
-    {
-        throw RuntimeError("no such module: " + path.string());
-    }
-    auto names = cpp_mod->names();
-    if (!names)
-    {
-        throw RuntimeError("no defined _FUNCTIONS in C++ source");
-    }
-    for (const auto &name : *names)
-    {
-        theCurrContext->scope()->create_symbol(
-            name, cpp_mod->load_member(name)
-        );
-    }
     ++theCurrContext->pc();
 }
 
