@@ -1,6 +1,6 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.22 - 2021/01/24
 
 ### Added
 
@@ -10,16 +10,22 @@
 
 - Only Anole modules can be imported by simple name now
 - Cpp modules must be imported by using their direct paths
+- Instruction `ImportAll` is unary operation now
 
 ### Updated
 
 - Improve the performance of REPL
 - Improve the error information of non-defined variables which may cause segmentation fault
 - Make sure all paths could be finded correctly
+- Support using sub-modules/components directly now, see [ENHANCEMENT#27](https://github.com/anole-lang/anole/issues/27)
 
 ### Fixed
 
 - Fix the bug caused by no-block-scope when using nested foreach-stmt, see more in [BUG#40](https://github.com/anole-lang/anole/issues/40)
+
+### Removed
+
+- Remove instruction `ImportAllPath`
 
 ## 0.0.21 - 2020/11/24
 

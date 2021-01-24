@@ -477,19 +477,39 @@ void QuesExpr::codegen(Code &code)
 
 void UseStmt::codegen(Code &code)
 {
-    if (from.type == Module::Type::Null)
+    auto part_import = [&code] (auto begin, auto end) mutable
+    {
+        for (auto it = begin; it != end; ++it)
+        {
+            // assume type is name
+            code.add_ins<Opcode::ImportPart, String>(it->mod);
+        }
+    };
+
+    auto module_import = [&code, &part_import] (auto begin, auto end) mutable
+    {
+        if (begin->type == Module::Type::Name)
+        {
+            code.add_ins<Opcode::Import, String>(begin->mod);
+        }
+        else
+        {
+            code.add_ins<Opcode::ImportPath, String>(begin->mod);
+        }
+        part_import(begin + 1, end);
+    };
+
+    if (from.empty())
     {
         for (auto &alias : aliases)
         {
-            if (alias.first.type == Module::Type::Name)
-            {
-                code.add_ins<Opcode::Import, String>(alias.first.mod);
-            }
-            else
-            {
-                code.add_ins<Opcode::ImportPath, String>(alias.first.mod);
-            }
+            module_import(alias.first.begin(), alias.first.end());
             code.add_ins<Opcode::StoreRef, String>(alias.second);
+
+            if (alias.first.size() > 1)
+            {
+                code.add_ins<Opcode::FastPop, Size>(alias.first.size() - 1);
+            }
         }
     }
     else
@@ -497,32 +517,30 @@ void UseStmt::codegen(Code &code)
         // means `use *`
         if (aliases.empty())
         {
-            if (from.type == Module::Type::Name)
+            module_import(from.begin(), from.end());
+            code.add_ins<Opcode::ImportAll>();
+
+            if (from.size() > 1)
             {
-                code.add_ins<Opcode::ImportAll, String>(from.mod);
-            }
-            else
-            {
-                code.add_ins<Opcode::ImportAllPath, String>(from.mod);
+                code.add_ins<Opcode::FastPop, Size>(from.size() - 1);
             }
         }
         else
         {
-            if (from.type == Module::Type::Name)
-            {
-                code.add_ins<Opcode::Import, String>(from.mod);
-            }
-            else
-            {
-                code.add_ins<Opcode::ImportPath, String>(from.mod);
-            }
+            module_import(from.begin(), from.end());
 
             for (auto &alias : aliases)
             {
-                code.add_ins<Opcode::ImportPart, String>(alias.first.mod);
+                part_import(alias.first.begin(), alias.first.end());
                 code.add_ins<Opcode::StoreRef, String>(alias.second);
+
+                if (alias.first.size() > 1)
+                {
+                    code.add_ins<Opcode::FastPop, Size>(alias.first.size() - 1);
+                }
             }
-            code.add_ins<Opcode::FastPop>();
+
+            code.add_ins<Opcode::FastPop, Size>(from.size());
         }
     }
 }
@@ -538,7 +556,7 @@ void ExprStmt::codegen(Code &code)
     else
     {
         expr->codegen(code);
-        code.add_ins<Opcode::FastPop>();
+        code.add_ins<Opcode::FastPop, Size>(1);
     }
 }
 

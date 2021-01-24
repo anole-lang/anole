@@ -93,7 +93,7 @@ QuesExpr::QuesExpr(Ptr<Expr> &&cond, Ptr<Expr> &&true_expr, Ptr<Expr> &&false_ex
     // ...
 }
 
-UseStmt::UseStmt(Aliases &&aliases, Module from) noexcept
+UseStmt::UseStmt(Aliases &&aliases, UseStmt::NestedModule &&from) noexcept
   : aliases(std::move(aliases)), from(std::move(from))
 {
     // ...

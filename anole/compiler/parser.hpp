@@ -30,14 +30,16 @@ class Parser
     Ptr<AST> gen_statements();
 
   private:
-    CompileError parse_error(const String &err_info);
+    // special name to be like CompileError
+    CompileError ParseError(const String &err_info);
+
     template<TokenType type>
     void check(const String &err_info)
     {
         try_resume();
         if (current_token_.type != type)
         {
-            throw parse_error(err_info);
+            throw ParseError(err_info);
         }
     }
     template<TokenType type>
@@ -62,6 +64,7 @@ class Parser
     Ptr<DeclarationStmt> gen_class_declaration();
     Ptr<Stmt> gen_use_stmt();
         UseStmt::Module gen_module();
+        UseStmt::NestedModule gen_nested_module();
         UseStmt::Alias gen_alias();
     Ptr<Stmt> gen_prefixop_decl();
     Ptr<Stmt> gen_infixop_decl();

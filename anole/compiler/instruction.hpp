@@ -10,12 +10,11 @@ enum class Opcode : uint8_t
     PlaceHolder,
 
     Pop,          // Pop
-    FastPop,      // FastPop
+    FastPop,      // FastPop num
 
     Import,       // Import name
     ImportPath,   // ImportPath path
-    ImportAll,    // ImportAll name
-    ImportAllPath,// ImportAllPath path
+    ImportAll,    // ImportAll
     ImportPart,   // ImportPart name
 
     Load,         // Load name

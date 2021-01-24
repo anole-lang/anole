@@ -129,6 +129,11 @@ void Context::push(Address addr)
     stack_->push_back(addr);
 }
 
+const Address &Context::top_address() const
+{
+    return stack_->back();
+}
+
 void Context::set_top(Address addr)
 {
     stack_->back() = addr;
@@ -202,7 +207,8 @@ void pop_handle()
 
 void fastpop_handle()
 {
-    theCurrContext->pop();
+    const auto &num = OPRAND(Size);
+    theCurrContext->pop(num);
     ++theCurrContext->pc();
 }
 
@@ -234,30 +240,12 @@ void importpath_handle()
 
 void importall_handle()
 {
-    const auto &name = OPRAND(String);
-    auto anole_mod = reinterpret_cast<AnoleModuleObject *>(ModuleObject::generate(name));
-    if (anole_mod == nullptr)
+    if (dynamic_cast<ModuleObject *>(theCurrContext->top_ptr()) == nullptr)
     {
-        throw RuntimeError("no module named " + name);
+        throw RuntimeError(theCurrContext->top_address()->called_name() + " is not a module");
     }
 
-    for (const auto &name_ptr : anole_mod->scope()->symbols())
-    {
-        theCurrContext->scope()->create_symbol(
-            name_ptr.first, name_ptr.second
-        );
-    }
-    ++theCurrContext->pc();
-}
-
-void importallpath_handle()
-{
-    auto path = fs::path(OPRAND(String));
-    auto mod = ModuleObject::generate(path);
-    if (mod == nullptr)
-    {
-        throw RuntimeError("no such module: " + path.string());
-    }
+    auto mod = theCurrContext->pop_ptr<ModuleObject>();
 
     if (mod->is<ObjectType::AnoleModule>())
     {
@@ -291,6 +279,12 @@ void importallpath_handle()
 void importpart_handle()
 {
     const auto &name = OPRAND(String);
+
+    if (dynamic_cast<ModuleObject *>(theCurrContext->top_ptr()) == nullptr)
+    {
+        throw RuntimeError(theCurrContext->top_address()->called_name() + " is not a module");
+    }
+
     theCurrContext->push(
         theCurrContext->top_ptr<ModuleObject>()->load_member(name)
     );
@@ -811,7 +805,6 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::import_handle,
     &op_handles::importpath_handle,
     &op_handles::importall_handle,
-    &op_handles::importallpath_handle,
     &op_handles::importpart_handle,
 
     &op_handles::load_handle,

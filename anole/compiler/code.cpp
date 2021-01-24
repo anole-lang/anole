@@ -342,10 +342,7 @@ void Code::print(std::ostream &out)
             printer.add_line(i, "ImportPath", OPRAND(String));
             break;
         case Opcode::ImportAll:
-            printer.add_line(i, "ImportAll", OPRAND(String));
-            break;
-        case Opcode::ImportAllPath:
-            printer.add_line(i, "ImportAllPath", OPRAND(String));
+            printer.add_line(i, "ImportAll");
             break;
         case Opcode::ImportPart:
             printer.add_line(i, "ImportPart", OPRAND(String));
@@ -570,8 +567,6 @@ void Code::serialize(std::ostream &out)
 
         case Opcode::Import:
         case Opcode::ImportPath:
-        case Opcode::ImportAll:
-        case Opcode::ImportAllPath:
         case Opcode::ImportPart:
         case Opcode::Load:
         case Opcode::LoadMember:
@@ -690,8 +685,6 @@ bool Code::unserialize(std::ifstream &in)
 
         case Opcode::Import:
         case Opcode::ImportPath:
-        case Opcode::ImportAll:
-        case Opcode::ImportAllPath:
         case Opcode::ImportPart:
         case Opcode::Load:
         case Opcode::LoadMember:
