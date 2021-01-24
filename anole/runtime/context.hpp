@@ -71,7 +71,7 @@ class Context
         }
         return reinterpret_cast<R *>(stack_->back()->ptr());
     }
-
+    const Address &top_address() const;
     void set_top(Address addr);
     void set_top(Object *ptr);
     void pop(Size num = 1);
