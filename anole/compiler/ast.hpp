@@ -247,23 +247,24 @@ struct UseStmt : Stmt
         enum class Type
         {
             Name,
-            Path,
-            Null
+            Path
         };
+
         String mod;
         Type type;
     };
+    using NestedModule = std::vector<Module>;
 
-    // second String is the alias
-    using Alias = std::pair<Module, String>;
+    // second String for the alias
+    using Alias = std::pair<NestedModule, String>;
     using Aliases = std::list<Alias>;
 
-    // aliases are empty means `use *`
+    // empty alias means `use *`
     Aliases aliases;
-    // from may be a name or a path
-    Module from;
+    // may be empty
+    NestedModule from;
 
-    UseStmt(Aliases &&, Module) noexcept;
+    UseStmt(Aliases &&, NestedModule &&) noexcept;
     void codegen(Code &) override;
 };
 

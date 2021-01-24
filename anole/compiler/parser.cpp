@@ -118,7 +118,7 @@ Ptr<AST> Parser::gen_statements()
     return gen_stmts();
 }
 
-CompileError Parser::parse_error(const String &info)
+CompileError Parser::ParseError(const String &info)
 {
     return CompileError(tokenizer_.get_err_info(info));
 }
@@ -230,7 +230,7 @@ ParameterList Parser::gen_parameters()
             }
             else if (need_default)
             {
-                throw parse_error("parameter without default argument cannot follow parameter with default argument");
+                throw ParseError("parameter without default argument cannot follow parameter with default argument");
             }
             else
             {
@@ -246,7 +246,7 @@ ParameterList Parser::gen_parameters()
         {
             if (packed)
             {
-                throw parse_error("packed parameter should be the last parameter");
+                throw ParseError("packed parameter should be the last parameter");
             }
             get_next_token();
         }
@@ -318,7 +318,7 @@ Ptr<BlockExpr> Parser::gen_block()
     }
     else
     {
-        throw parse_error("expected '{' or ',' here");
+        throw ParseError("expected '{' or ',' here");
     }
 
     return block;
@@ -402,7 +402,7 @@ Ptr<Stmt> Parser::gen_stmt()
             return std::make_unique<ExprStmt>(gen_expr());
         }
     }
-    throw parse_error("wrong token here");
+    throw ParseError("wrong token here");
 }
 
 // generate declaration or assignment (@var:)
@@ -463,7 +463,7 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
     {
         if (is_ref)
         {
-            throw parse_error("& cannot be here");
+            throw ParseError("& cannot be here");
         }
 
         get_next_token();
@@ -499,7 +499,7 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
     default:
         if (is_ref)
         {
-            throw parse_error("reference should be binded with other variable");
+            throw ParseError("reference should be binded with other variable");
         }
         break;
     }
@@ -511,7 +511,7 @@ Ptr<DeclarationStmt> Parser::gen_class_declaration()
     auto class_expr = gen_class_expr();
     if (class_expr->name.empty())
     {
-        throw CompileError("expected class name");
+        throw ParseError("expected class name");
     }
 
     return std::make_unique<VariableDeclarationStmt>(
@@ -522,7 +522,7 @@ Ptr<DeclarationStmt> Parser::gen_class_declaration()
 Ptr<Stmt> Parser::gen_use_stmt()
 {
     UseStmt::Aliases aliases;
-    UseStmt::Module  from;
+    UseStmt::NestedModule from;
 
     // eat `use`
     get_next_token();
@@ -531,36 +531,35 @@ Ptr<Stmt> Parser::gen_use_stmt()
     if (current_token_.type == TokenType::Mul)
     {
         get_next_token();
-        eat<TokenType::From>("need from ident here");
-        return std::make_unique<UseStmt>(std::move(aliases), gen_module());
+        eat<TokenType::From>("need a module here");
+        return std::make_unique<UseStmt>(std::move(aliases), gen_nested_module());
     }
 
     aliases.push_back(gen_alias());
-    bool use_direct = aliases.back().first.type == UseStmt::Module::Type::Path;
+    bool use_direct = aliases.back().first.back().type == UseStmt::Module::Type::Path;
     while (current_token_.type == TokenType::Comma)
     {
         get_next_token();
         aliases.push_back(gen_alias());
-        use_direct |= aliases.back().first.type == UseStmt::Module::Type::Path;
+        use_direct |= aliases.back().first.back().type == UseStmt::Module::Type::Path;
     }
 
     if (current_token_.type == TokenType::From)
     {
         if (use_direct)
         {
-            throw parse_error("path of module cannot appear before from");
+            throw ParseError("unexpected from because there is at least one module denoted by its path");
         }
         get_next_token();
-        from = gen_module();
-    }
-    else
-    {
-        from.type = UseStmt::Module::Type::Null;
+        from = gen_nested_module();
     }
 
     return std::make_unique<UseStmt>(std::move(aliases), std::move(from));
 }
 
+/**
+ * single module may be denoted by name of path
+*/
 UseStmt::Module Parser::gen_module()
 {
     UseStmt::Module mod;
@@ -574,17 +573,36 @@ UseStmt::Module Parser::gen_module()
     }
     else
     {
-        throw parse_error("need name or path of the source module after from");
+        throw ParseError("expect a module here");
     }
     // eat `<module>`
     get_next_token();
     return mod;
 }
 
+UseStmt::NestedModule Parser::gen_nested_module()
+{
+    UseStmt::NestedModule result;
+
+    result.push_back(gen_module());
+    while (current_token_.type == TokenType::Dot)
+    {
+        get_next_token();
+        result.push_back(gen_module());
+
+        if (result.back().type == UseStmt::Module::Type::Path)
+        {
+            throw ParseError("module denoted by path must be the top module");
+        }
+    }
+
+    return result;
+}
+
 UseStmt::Alias Parser::gen_alias()
 {
     UseStmt::Alias alias;
-    alias.first = gen_module();
+    alias.first = gen_nested_module();
     if (current_token_.type == TokenType::As)
     {
         get_next_token();
@@ -594,13 +612,13 @@ UseStmt::Alias Parser::gen_alias()
     }
     else
     {
-        if (alias.first.type == UseStmt::Module::Type::Path)
+        if (alias.first.back().type == UseStmt::Module::Type::Path)
         {
-            throw parse_error("use direct path of module need an alias");
+            throw ParseError("use direct path of module need an alias");
         }
         else
         {
-            alias.second = alias.first.mod;
+            alias.second = alias.first.back().mod;
         }
     }
     return alias;
@@ -923,7 +941,7 @@ Ptr<Expr> Parser::gen_term()
         return std::make_unique<LambdaExpr>(ParameterList{}, gen_block());
 
     default:
-        throw parse_error("expected an expr here");
+        throw ParseError("expected an expr here");
     }
 }
 
@@ -1156,7 +1174,7 @@ Ptr<ClassExpr> Parser::gen_class_expr()
             {
                 if (!dynamic_cast<LambdaExpr *>(vardecl->expr.get()))
                 {
-                    throw CompileError("__init__ must be with function body");
+                    throw ParseError("__init__ must be with function body");
                 }
                 else
                 {
@@ -1174,7 +1192,7 @@ Ptr<ClassExpr> Parser::gen_class_expr()
                 {
                     if (!dynamic_cast<LambdaExpr *>(vardecl.expr.get()))
                     {
-                        throw CompileError("__init__ must be with function body");
+                        throw ParseError("__init__ must be with function body");
                     }
                     else
                     {
