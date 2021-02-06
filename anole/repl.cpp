@@ -104,6 +104,11 @@ void replrun::run()
             );
         }
         stmt->codegen(*code);
+
+      #ifdef _DEBUG
+        code->print(std::cerr);
+      #endif
+
         Context::execute();
     }
     catch (const std::exception &e)
