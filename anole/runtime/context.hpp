@@ -91,9 +91,6 @@ class Context
     void set_call_anchor();
     Size get_call_args_num();
 
-    void set_return_anchor();
-    Size get_return_vals_num();
-
   private:
     SPtr<Context> pre_context_;
     SPtr<Scope> scope_;
@@ -102,7 +99,6 @@ class Context
     SPtr<Stack> stack_;
 
     std::stack<Size> call_anchors_;
-    Size return_anchor_;
 };
 }
 

@@ -52,7 +52,6 @@ Context::Context(SPtr<Context> resume)
   , code_(resume->code_), pc_(resume->pc_)
   , stack_(std::make_shared<Stack>(*resume->stack_))
   , call_anchors_(resume->call_anchors_)
-  , return_anchor_(resume->return_anchor_)
 {
     // ...
 }
@@ -63,7 +62,6 @@ Context::Context(const Context &context)
   , code_(context.code_), pc_(context.pc_)
   , stack_(std::make_shared<Stack>(*context.stack_))
   , call_anchors_(context.call_anchors_)
-  , return_anchor_(context.return_anchor_)
 {
     // ...
 }
@@ -73,7 +71,6 @@ Context::Context(SPtr<Code> code)
   , scope_(std::make_shared<Scope>(nullptr))
   , code_(code), pc_(0)
   , stack_(std::make_shared<Stack>())
-  , return_anchor_(0)
 {
     // ...
 }
@@ -84,7 +81,6 @@ Context::Context(SPtr<Context> pre, SPtr<Scope> scope,
   , scope_(std::make_shared<Scope>(scope))
   , code_(std::move(code)), pc_(pc)
   , stack_(pre->stack_)
-  , return_anchor_(0)
 {
     // ...
 }
@@ -186,26 +182,9 @@ Size Context::get_call_args_num()
     return n;
 }
 
-void Context::set_return_anchor()
-{
-    return_anchor_ = stack_->size();
-}
-
-Size Context::get_return_vals_num()
-{
-    return stack_->size() - return_anchor_;
-}
-
 namespace op_handles
 {
 void pop_handle()
-{
-    auto num = theCurrContext->get_call_args_num();
-    theCurrContext->pop(num);
-    ++theCurrContext->pc();
-}
-
-void fastpop_handle()
 {
     const auto &num = OPRAND(Size);
     theCurrContext->pop(num);
@@ -404,37 +383,15 @@ void fastcall_handle()
      *  may not be collected
     */
     auto callee = theCurrContext->pop_ptr();
-    callee->call(0);
-}
-
-void returnac_handle()
-{
-    theCurrContext->set_return_anchor();
-    ++theCurrContext->pc();
+    callee->call(OPRAND(Size));
 }
 
 void return_handle()
 {
-    auto n = theCurrContext->get_return_vals_num();
     auto pre_context = theCurrContext->pre_context();
-
-    if (n != 0 && theCurrContext->get_stack() != pre_context->get_stack())
+    if (theCurrContext->get_stack() != pre_context->get_stack())
     {
-        auto pre_stack = pre_context->get_stack();
-        auto cur_stack = theCurrContext->get_stack();
-
-        auto begin = cur_stack->begin();
-        n = cur_stack->size() - n;
-        while (n--)
-        {
-            ++begin;
-        }
-
-        pre_stack->insert(pre_stack->end(),
-            begin, cur_stack->end()
-        );
-
-        cur_stack->erase(begin, cur_stack->end());
+        pre_context->push(theCurrContext->pop_address());
     }
     theCurrContext = pre_context;
     ++theCurrContext->pc();
@@ -522,9 +479,20 @@ void pack_handle()
 
 void unpack_handle()
 {
+    const auto &n = OPRAND(Size);
+
     if (theCurrContext->top_ptr()->is<ObjectType::List>())
     {
         auto l = theCurrContext->top_ptr<ListObject>();
+
+        if (n && l->objects().size() != n)
+        {
+            throw RuntimeError(
+                "expect " + std::to_string(n) +
+                " but given " + std::to_string(l->objects().size())
+            );
+        }
+
         theCurrContext->pop();
         for (auto it = l->objects().rbegin();
             it != l->objects().rend(); ++it)
@@ -532,6 +500,11 @@ void unpack_handle()
             theCurrContext->push(*it);
         }
     }
+    else
+    {
+        throw RuntimeError("expect list expr");
+    }
+
     ++theCurrContext->pc();
 }
 
@@ -800,7 +773,6 @@ constexpr OpHandle theOpHandles[] =
     nullptr,
 
     &op_handles::pop_handle,
-    &op_handles::fastpop_handle,
 
     &op_handles::import_handle,
     &op_handles::importpath_handle,
@@ -820,7 +792,6 @@ constexpr OpHandle theOpHandles[] =
     &op_handles::callac_handle,
     &op_handles::call_handle,
     &op_handles::fastcall_handle,
-    &op_handles::returnac_handle,
     &op_handles::return_handle,
     &op_handles::returnnone_handle,
     &op_handles::jump_handle,
@@ -871,7 +842,7 @@ void Context::execute()
     while (theCurrContext->pc() < theCurrContext->code()->size())
     {
       #ifdef _DEBUG
-        cerr << "run at: " << theCurrContext->code()->from() << ":" << theCurrContext->pc() << endl;
+        std::cerr << "run at: " << theCurrContext->code()->from() << ":" << theCurrContext->pc() << std::endl;
       #endif
 
         theOpHandles[static_cast<uint8_t>(theCurrContext->opcode())]();
