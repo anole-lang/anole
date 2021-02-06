@@ -23,14 +23,5 @@ prints(a, b);
 let(a, b)(b, a);
 prints(a, b);
 
-let(a, b)(test());
+let(a, b)(test()...);
 prints(a, b);
-
-@nested(): test(), 3;
-@a, b, c, d: nested(), 4;
-prints(a, b, c, d);
-
-@rasl(...args): args.size() = 1 ? args[0], args;
-prefixop rasl;
-
-prints(rasl nested(), rasl (@(): 1)());
