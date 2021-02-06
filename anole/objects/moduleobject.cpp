@@ -11,6 +11,10 @@
 
 #include <fstream>
 
+#ifdef _DEBUG
+    #include <iostream>
+#endif
+
 namespace fs = std::filesystem;
 
 namespace anole
@@ -140,6 +144,11 @@ AnoleModuleObject::AnoleModuleObject(const fs::path &path)
         while (auto stmt = parser.gen_statement())
         {
             stmt->codegen(*code_);
+
+          #ifdef _DEBUG
+            code_->print(std::cerr);
+          #endif
+
             Context::execute();
         }
 

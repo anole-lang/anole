@@ -68,8 +68,6 @@ void ClassObject::call(Size num)
     {
         throw RuntimeError("only default ctor but given non-zero arguments");
     }
-
-    theCurrContext->push(instance);
 }
 
 void ClassObject::collect(std::function<void(Scope *)> func)
