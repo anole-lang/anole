@@ -9,8 +9,7 @@ enum class Opcode : uint8_t
 {
     PlaceHolder,
 
-    Pop,          // Pop
-    FastPop,      // FastPop num
+    Pop,          // Pop num
 
     Import,       // Import name
     ImportPath,   // ImportPath path
@@ -29,8 +28,7 @@ enum class Opcode : uint8_t
 
     CallAc,       // CallAc
     Call,         // Call
-    FastCall,     // FastCall
-    ReturnAc,     // ReturnAc
+    FastCall,     // FastCall num
     Return,       // Return
     ReturnNone,   // ReturnNone
     Jump,         // Jump target
@@ -42,7 +40,7 @@ enum class Opcode : uint8_t
     AddInfixOp,   // AddInfixOp (op, precedence)
 
     Pack,         // Pack
-    Unpack,       // Unpack
+    Unpack,       // Unpack num
 
     LambdaDecl,   // LambdaDecl (num, target)
     ThunkDecl,    // ThunkDecl target

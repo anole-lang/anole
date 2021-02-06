@@ -303,6 +303,11 @@ struct MultiVarsDeclarationStmt : DeclarationStmt
     void codegen(Code &) override;
 };
 
+/**
+ * TODO:
+ *  NestedMultiVarsDeclarationStmt
+*/
+
 struct PrefixopDeclarationStmt : Stmt
 {
     String op;

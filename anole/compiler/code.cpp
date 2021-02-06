@@ -329,10 +329,7 @@ void Code::print(std::ostream &out)
             break;
 
         case Opcode::Pop:
-            printer.add_line(i, "Pop");
-            break;
-        case Opcode::FastPop:
-            printer.add_line(i, "FastPop");
+            printer.add_line(i, "Pop", OPRAND(Size));
             break;
 
         case Opcode::Import:
@@ -381,10 +378,7 @@ void Code::print(std::ostream &out)
             printer.add_line(i, "Call");
             break;
         case Opcode::FastCall:
-            printer.add_line(i, "FastCall");
-            break;
-        case Opcode::ReturnAc:
-            printer.add_line(i, "ReturnAc");
+            printer.add_line(i, "FastCall", OPRAND(Size));
             break;
         case Opcode::Return:
             printer.add_line(i, "Return");
@@ -420,7 +414,7 @@ void Code::print(std::ostream &out)
             printer.add_line(i, "Pack");
             break;
         case Opcode::Unpack:
-            printer.add_line(i, "Unpack");
+            printer.add_line(i, "Unpack", OPRAND(Size));
             break;
 
         case Opcode::LambdaDecl:
@@ -554,11 +548,14 @@ void Code::serialize(std::ostream &out)
         out.put(static_cast<uint8_t>(ins.opcode));
         switch (ins.opcode)
         {
+        case Opcode::Pop:
         case Opcode::LoadConst:
+        case Opcode::FastCall:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
         case Opcode::Match:
+        case Opcode::Unpack:
         case Opcode::ThunkDecl:
         case Opcode::BuildList:
         case Opcode::BuildDict:
@@ -668,11 +665,14 @@ bool Code::unserialize(std::ifstream &in)
         std::any oprand = {};
         switch (opcode)
         {
+        case Opcode::Pop:
         case Opcode::LoadConst:
+        case Opcode::FastCall:
         case Opcode::Jump:
         case Opcode::JumpIf:
         case Opcode::JumpIfNot:
         case Opcode::Match:
+        case Opcode::Unpack:
         case Opcode::ThunkDecl:
         case Opcode::BuildList:
         case Opcode::BuildDict:

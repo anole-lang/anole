@@ -1,5 +1,15 @@
 # ChangeLog for Anole
 
+## Unreleased
+
+### Changed
+
+- `return val1, val2;` equals `return [val1, val2]` now
+
+### Removed
+
+- Discard feature direct-return-multi-value, see [DISCARD#49](https://github.com/anole-lang/anole/issues/49)
+
 ## 0.0.22 - 2021/01/24
 
 ### Added
