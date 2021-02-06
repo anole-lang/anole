@@ -64,22 +64,44 @@ void ParenOperatorExpr::codegen(Code &code)
     {
         expr->codegen(code);
         code.locate(location);
-        code.add_ins<Opcode::FastCall>();
+        code.add_ins<Opcode::FastCall, Size>(0);
         return;
     }
 
-    code.add_ins<Opcode::CallAc>();
+    bool need_callac = false;
     for (auto it = args.rbegin(); it != args.rend(); ++it)
     {
-        (*it).first->codegen(code);
         if ((*it).second)
         {
-            code.add_ins<Opcode::Unpack>();
+            need_callac = true;
         }
     }
-    expr->codegen(code);
-    code.locate(location);
-    code.add_ins<Opcode::Call>();
+
+    if (need_callac)
+    {
+        code.add_ins<Opcode::CallAc>();
+        for (auto it = args.rbegin(); it != args.rend(); ++it)
+        {
+            (*it).first->codegen(code);
+            if ((*it).second)
+            {
+                code.add_ins<Opcode::Unpack, Size>(0);
+            }
+        }
+        expr->codegen(code);
+        code.locate(location);
+        code.add_ins<Opcode::Call>();
+    }
+    else
+    {
+        for (auto it = args.rbegin(); it != args.rend(); ++it)
+        {
+            (*it).first->codegen(code);
+        }
+        expr->codegen(code);
+        code.locate(location);
+        code.add_ins<Opcode::FastCall>(args.size());
+    }
 }
 
 void UnaryOperatorExpr::codegen(Code &code)
@@ -113,10 +135,9 @@ void UnaryOperatorExpr::codegen(Code &code)
 
     default:
     {
-        code.add_ins<Opcode::CallAc>();
         expr->codegen(code);
         code.add_ins<Opcode::Load, String>(op.value);
-        code.add_ins<Opcode::Call>();
+        code.add_ins<Opcode::FastCall, Size>(1);
     }
         break;
     }
@@ -286,12 +307,11 @@ void BinaryOperatorExpr::codegen(Code &code)
         break;
 
     default:
-        code.add_ins<Opcode::CallAc>();
         rhs->codegen(code);
         lhs->codegen(code);
         code.add_ins<Opcode::Load, String>(op.value);
         code.locate(location);
-        code.add_ins<Opcode::Call>();
+        code.add_ins<Opcode::FastCall, Size>(2);
         break;
     }
 }
@@ -319,7 +339,7 @@ void LambdaExpr::codegen(Code &code)
 void DotExpr::codegen(Code &code)
 {
     left->codegen(code);
-        code.locate(location);
+    code.locate(location);
     code.add_ins<Opcode::LoadMember, String>(name);
 }
 
@@ -410,13 +430,17 @@ void DictExpr::codegen(Code &code)
 */
 void ClassExpr::codegen(Code &code)
 {
+    /**
+     * TODO:
+     *  remove CallAc
+    */
     code.add_ins<Opcode::CallAc>();
     for (auto it = bases.rbegin(); it != bases.rend(); ++it)
     {
         (*it).first->codegen(code);
         if ((*it).second)
         {
-            code.add_ins<Opcode::Unpack>();
+            code.add_ins<Opcode::Unpack, Size>(0);
         }
     }
     code.add_ins<Opcode::BuildClass>(name);
@@ -424,32 +448,6 @@ void ClassExpr::codegen(Code &code)
     for (auto &member : members)
     {
         member->codegen(code);
-
-        if (dynamic_cast<VariableDeclarationStmt *>(member.get()))
-        {
-            auto decl = dynamic_cast<VariableDeclarationStmt *>(member.get());
-            if (decl->name == "__init__")
-            {
-                if (!dynamic_cast<LambdaExpr *>(decl->expr.get()))
-                {
-                    throw CompileError("__init__ must be with function body");
-                }
-            }
-        }
-        else
-        {
-            auto decls = dynamic_cast<MultiVarsDeclarationStmt *>(member.get());
-            for (auto &decl : decls->decls)
-            {
-                if (decl.name == "__init__")
-                {
-                    if (!dynamic_cast<LambdaExpr *>(decl.expr.get()))
-                    {
-                        throw CompileError("__init__ must be with function body");
-                    }
-                }
-            }
-        }
     }
 
     code.add_ins<Opcode::EndScope>();
@@ -508,7 +506,7 @@ void UseStmt::codegen(Code &code)
 
             if (alias.first.size() > 1)
             {
-                code.add_ins<Opcode::FastPop, Size>(alias.first.size() - 1);
+                code.add_ins<Opcode::Pop, Size>(alias.first.size() - 1);
             }
         }
     }
@@ -522,7 +520,7 @@ void UseStmt::codegen(Code &code)
 
             if (from.size() > 1)
             {
-                code.add_ins<Opcode::FastPop, Size>(from.size() - 1);
+                code.add_ins<Opcode::Pop, Size>(from.size() - 1);
             }
         }
         else
@@ -536,28 +534,19 @@ void UseStmt::codegen(Code &code)
 
                 if (alias.first.size() > 1)
                 {
-                    code.add_ins<Opcode::FastPop, Size>(alias.first.size() - 1);
+                    code.add_ins<Opcode::Pop, Size>(alias.first.size() - 1);
                 }
             }
 
-            code.add_ins<Opcode::FastPop, Size>(from.size());
+            code.add_ins<Opcode::Pop, Size>(from.size());
         }
     }
 }
 
 void ExprStmt::codegen(Code &code)
 {
-    if (dynamic_cast<ParenOperatorExpr *>(expr.get()))
-    {
-        code.add_ins<Opcode::CallAc>();
-        expr->codegen(code);
-        code.add_ins<Opcode::Pop>();
-    }
-    else
-    {
-        expr->codegen(code);
-        code.add_ins<Opcode::FastPop, Size>(1);
-    }
+    expr->codegen(code);
+    code.add_ins<Opcode::Pop, Size>(1);
 }
 
 void VariableDeclarationStmt::codegen(Code &code)
@@ -584,18 +573,23 @@ void VariableDeclarationStmt::codegen(Code &code)
 
 void MultiVarsDeclarationStmt::codegen(Code &code)
 {
-    if (!exprs.empty())
+    if (exprs.empty())
+    {
+        for (Size i = 0; i < decls.size(); ++i)
+        {
+            std::make_unique<NoneExpr>()->codegen(code);
+        }
+    }
+    else
     {
         for (auto expr = exprs.rbegin(); expr != exprs.rend(); ++expr)
         {
             (*expr)->codegen(code);
         }
-    }
-    else
-    {
-        for (Size i = 0; i < decls.size(); ++i)
+
+        if (exprs.size() == 1)
         {
-            std::make_unique<NoneExpr>()->codegen(code);
+            code.add_ins<Opcode::Unpack>(decls.size());
         }
     }
 
@@ -634,12 +628,24 @@ void ContinueStmt::codegen(Code &code)
 
 void ReturnStmt::codegen(Code &code)
 {
-    code.add_ins<Opcode::ReturnAc>();
-    for (auto expr = exprs.rbegin(); expr != exprs.rend(); ++expr)
+    if (exprs.empty())
     {
-        (*expr)->codegen(code);
+        code.add_ins<Opcode::ReturnNone>();
     }
-    code.add_ins<Opcode::Return>();
+    else
+    {
+        for (auto expr = exprs.rbegin(); expr != exprs.rend(); ++expr)
+        {
+            (*expr)->codegen(code);
+        }
+
+        if (exprs.size() > 1)
+        {
+            code.add_ins<Opcode::BuildList, Size>(exprs.size());
+        }
+
+        code.add_ins<Opcode::Return>();
+    }
 }
 
 void IfElseStmt::codegen(Code &code)
@@ -710,7 +716,7 @@ void ForeachStmt::codegen(Code &code)
      * generate code for: @& //__it: expr.__iterator__();
     */
     code.add_ins<Opcode::LoadMember, String>("__iterator__");
-    code.add_ins<Opcode::FastCall>();
+    code.add_ins<Opcode::FastCall, Size>(0);
 
     auto it_name = "//__it_" + std::to_string(code.size());
     code.add_ins<Opcode::StoreRef>(it_name);

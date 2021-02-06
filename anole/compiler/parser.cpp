@@ -1178,8 +1178,21 @@ Ptr<ClassExpr> Parser::gen_class_expr()
                 }
                 else
                 {
+                    auto &params = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->parameters;
                     auto block = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->block.get();
-                    block->statements.push_back(std::make_unique<ReturnStmt>(ExprList()));
+
+                    if (params.empty())
+                    {
+                        throw CompileError("method need at least 1 parameter");
+                    }
+
+                    ExprList retvals;
+                    retvals.push_back(std::make_unique<IdentifierExpr>(
+                        params.front().first->name
+                    ));
+                    block->statements.push_back(
+                        std::make_unique<ReturnStmt>(std::move(retvals))
+                    );
                 }
             }
         }
@@ -1196,8 +1209,21 @@ Ptr<ClassExpr> Parser::gen_class_expr()
                     }
                     else
                     {
+                        auto &params = reinterpret_cast<LambdaExpr *>(vardecl.expr.get())->parameters;
                         auto block = reinterpret_cast<LambdaExpr *>(vardecl.expr.get())->block.get();
-                        block->statements.push_back(std::make_unique<ReturnStmt>(ExprList()));
+
+                        if (params.empty())
+                        {
+                            throw CompileError("method need at least 1 parameter");
+                        }
+
+                        ExprList retvals;
+                        retvals.push_back(std::make_unique<IdentifierExpr>(
+                            params.front().first->name
+                        ));
+                        block->statements.push_back(
+                            std::make_unique<ReturnStmt>(std::move(retvals))
+                        );
                     }
                 }
             }
