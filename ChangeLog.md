@@ -4,7 +4,7 @@
 
 ### Added
 
-- Improve declaration with new syntax `@[a, b], c: [1, 2], 3;`
+- Improve declaration with new syntax `@[a, b], c: [1, 2], 3;`, see [FEATURE#50](https://github.com/anole-lang/anole/issues/50)
 
 ### Changed
 
