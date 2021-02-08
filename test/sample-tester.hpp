@@ -424,4 +424,29 @@ foreach [1, 2] as i, foreach [2, 3] as j, { print(i); print(j); }();
 R"(12132223)");
 }
 
+TEST(Sample, MultiDeclaration)
+{
+    ASSERT_EQ(execute(
+// input
+R"(
+@prints(...args) {
+    foreach args as arg {
+        print(arg);
+        print(" ");
+    }
+    print("\n");
+}
+
+@a, b: 1, 2;
+prints(a, b);
+@a, b: [3, 4];
+prints(a, b);
+@[a, b]: [5, 6];
+prints(a, b);
+)"),
+
+// output
+R"(1 2 3 4 5 6 )");
+}
+
 #endif

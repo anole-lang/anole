@@ -549,8 +549,12 @@ void ExprStmt::codegen(Code &code)
     code.add_ins<Opcode::Pop, Size>(1);
 }
 
-void VariableDeclarationStmt::codegen(Code &code)
+void NormalDeclarationStmt::codegen(Code &code)
 {
+    /**
+     * for `@var;`, the expr will be none expr
+     *  but this is promised in parsing
+    */
     if (expr)
     {
         expr->codegen(code);
@@ -571,11 +575,42 @@ void VariableDeclarationStmt::codegen(Code &code)
     }
 }
 
+void MultiVarsDeclarationStmt::SingleDeclVariable::codegen(Code &code)
+{
+    if (is_ref)
+    {
+        code.add_ins<Opcode::StoreRef, String>(name);
+    }
+    else
+    {
+        code.add_ins<Opcode::StoreLocal, String>(name);
+    }
+}
+
+void MultiVarsDeclarationStmt::MultiDeclVariables::codegen(Code &code)
+{
+    code.add_ins<Opcode::Unpack>(variables.size());
+
+    for (auto &variable : variables)
+    {
+        variable->codegen(code);
+    }
+}
+
 void MultiVarsDeclarationStmt::codegen(Code &code)
 {
     if (exprs.empty())
     {
-        for (Size i = 0; i < decls.size(); ++i)
+        // check the variables are nested or not
+        for (auto &variable : variables)
+        {
+            if (!dynamic_cast<MultiDeclVariables *>(variable.get()))
+            {
+                throw CompileError("expect expressions");
+            }
+        }
+
+        for (Size i = 0; i < variables.size(); ++i)
         {
             std::make_unique<NoneExpr>()->codegen(code);
         }
@@ -587,22 +622,15 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
             (*expr)->codegen(code);
         }
 
-        if (exprs.size() == 1)
+        if (exprs.size() == 1 && variables.size() > 1)
         {
-            code.add_ins<Opcode::Unpack>(decls.size());
+            code.add_ins<Opcode::Unpack>(variables.size());
         }
     }
 
-    for (auto &decl : decls)
+    for (auto &variable : variables)
     {
-        if (decl.is_ref)
-        {
-            code.add_ins<Opcode::StoreRef, String>(decl.name);
-        }
-        else
-        {
-            code.add_ins<Opcode::StoreLocal, String>(decl.name);
-        }
+        variable->codegen(code);
     }
 }
 
@@ -740,7 +768,7 @@ void ForeachStmt::codegen(Code &code)
     );
     if (!varname.empty())
     {
-        *block->statements.begin() = std::make_unique<VariableDeclarationStmt>(
+        *block->statements.begin() = std::make_unique<NormalDeclarationStmt>(
             varname, move(next), true
         );
     }

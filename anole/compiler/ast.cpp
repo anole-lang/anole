@@ -6,6 +6,7 @@ AST::~AST() = default;
 Stmt::~Stmt() = default;
 Expr::~Expr() = default;
 DeclarationStmt::~DeclarationStmt() = default;
+MultiVarsDeclarationStmt::DeclVariable::~DeclVariable() = default;
 
 bool AST::is_integer_expr() noexcept
 {
@@ -53,6 +54,12 @@ UnaryOperatorExpr::UnaryOperatorExpr(Token op, Ptr<Expr> &&expr) noexcept
 
 BinaryOperatorExpr::BinaryOperatorExpr(Ptr<Expr> &&lhs, Token op, Ptr<Expr> &&rhs) noexcept
   : op(op), lhs(std::move(lhs)), rhs(std::move(rhs))
+{
+    // ...
+}
+
+LambdaExpr::LambdaExpr(Ptr<BlockExpr> &&block) noexcept
+  : block(std::move(block))
 {
     // ...
 }
@@ -105,14 +112,32 @@ ExprStmt::ExprStmt(Ptr<Expr> &&expr) noexcept
     // ...
 }
 
-VariableDeclarationStmt::VariableDeclarationStmt(String name, Ptr<Expr> &&expr, bool is_ref) noexcept
-  : name(std::move(name)), expr(std::move(expr)), is_ref(is_ref)
+NormalDeclarationStmt::NormalDeclarationStmt(String name, Ptr<Expr> &&expr, bool is_ref) noexcept
+  : is_ref(is_ref), name(std::move(name)), expr(std::move(expr))
 {
     // ...
 }
 
-MultiVarsDeclarationStmt::MultiVarsDeclarationStmt(std::list<VariableDeclarationStmt> &&decls, ExprList &&exprs) noexcept
-  : decls(std::move(decls)), exprs(std::move(exprs))
+MultiVarsDeclarationStmt::SingleDeclVariable::SingleDeclVariable(String name, bool is_ref) noexcept
+  : name(std::move(name)), is_ref(is_ref)
+{
+    // ...
+}
+
+MultiVarsDeclarationStmt::MultiDeclVariables::MultiDeclVariables(DeclVariableList &&variables) noexcept
+  : variables(std::move(variables))
+{
+    // ...
+}
+
+MultiVarsDeclarationStmt::MultiVarsDeclarationStmt(DeclVariableList &&variables) noexcept
+  : variables(std::move(variables))
+{
+    // ...
+}
+
+MultiVarsDeclarationStmt::MultiVarsDeclarationStmt(DeclVariableList &&variables, ExprList &&exprs) noexcept
+  : variables(std::move(variables)), exprs(std::move(exprs))
 {
     // ...
 }
@@ -125,6 +150,11 @@ PrefixopDeclarationStmt::PrefixopDeclarationStmt(String op) noexcept
 
 InfixopDeclarationStmt::InfixopDeclarationStmt(String op, Size precedence) noexcept
   : precedence(precedence), op(std::move(op))
+{
+    // ...
+}
+
+ReturnStmt::ReturnStmt() noexcept
 {
     // ...
 }

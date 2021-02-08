@@ -13,21 +13,13 @@ namespace anole
 {
 class Code;
 
-using StmtList
-    = std::list<Ptr<struct Stmt>>
-;
 using ExprList
     = std::list<Ptr<struct Expr>>
 ;
-using DeclList
-    = std::list<Ptr<struct DeclarationStmt>>
-;
+
 using ArgumentList
     = std::list<std::pair<Ptr<struct Expr>, bool>>
 ; // boolean stands for whether it is unpacked
-using ParameterList
-    = std::list<std::pair<Ptr<struct VariableDeclarationStmt>, bool>>
-; // boolean stands for whether it is packed
 
 /**
  * as an attribute
@@ -64,6 +56,10 @@ struct Expr : AST
 
 struct BlockExpr : Expr
 {
+    using StmtList
+        = std::list<Ptr<Stmt>>
+    ;
+
     StmtList statements;
 
     void codegen(Code &) override;
@@ -159,9 +155,14 @@ struct BinaryOperatorExpr : Expr, with_location
 
 struct LambdaExpr : Expr
 {
+    using ParameterList
+        = std::list<std::pair<Ptr<struct NormalDeclarationStmt>, bool>>
+    ; // boolean stands for whether it is packed
+
     ParameterList parameters;
     Ptr<BlockExpr> block;
 
+    LambdaExpr(Ptr<BlockExpr> &&) noexcept;
     LambdaExpr(ParameterList &&, Ptr<BlockExpr> &&) noexcept;
     void codegen(Code &) override;
 };
@@ -177,7 +178,7 @@ struct DotExpr : Expr, with_location
 
 struct EnumExpr : Expr
 {
-    std::list<struct VariableDeclarationStmt> decls;
+    std::list<struct NormalDeclarationStmt> decls;
 
     void codegen(Code &) override;
 };
@@ -216,6 +217,10 @@ struct DictExpr : Expr
 
 struct ClassExpr : Expr
 {
+    using DeclList
+        = std::list<Ptr<struct DeclarationStmt>>
+    ;
+
     String name;
     ArgumentList bases;
     DeclList members;
@@ -253,11 +258,18 @@ struct UseStmt : Stmt
         String mod;
         Type type;
     };
-    using NestedModule = std::vector<Module>;
 
-    // second String for the alias
-    using Alias = std::pair<NestedModule, String>;
-    using Aliases = std::list<Alias>;
+    using NestedModule
+        = std::vector<Module>
+    ;
+
+    using Alias
+        = std::pair<NestedModule, String>
+    ; // second String for the alias
+
+    using Aliases
+        = std::list<Alias>
+    ;
 
     // empty alias means `use *`
     Aliases aliases;
@@ -279,34 +291,65 @@ struct ExprStmt : Stmt
 
 struct DeclarationStmt : Stmt
 {
+
     virtual ~DeclarationStmt() = 0;
     virtual void codegen(Code &) = 0;
 };
 
-struct VariableDeclarationStmt : DeclarationStmt
+struct NormalDeclarationStmt : DeclarationStmt
 {
+    bool is_ref;
     String name;
     Ptr<Expr> expr;
-    bool is_ref;
 
-    VariableDeclarationStmt(String, Ptr<Expr> &&, bool = false) noexcept;
-    void codegen(Code &) override;
-};
-
-struct MultiVarsDeclarationStmt : DeclarationStmt
-{
-    // just reuse VariableDeclarationStmt
-    std::list<VariableDeclarationStmt> decls;
-    ExprList exprs;
-
-    MultiVarsDeclarationStmt(std::list<VariableDeclarationStmt> &&, ExprList &&) noexcept;
+    NormalDeclarationStmt(String, Ptr<Expr> &&, bool = false) noexcept;
     void codegen(Code &) override;
 };
 
 /**
- * TODO:
- *  NestedMultiVarsDeclarationStmt
+ * correct:
+ *  @a, b: 1, 2;     // positional
+ *  @a, b: [1, 2];   // unpack
+ *  @[a, b]: [1, 2]; // unpack
+ *
+ * wrong:
+ *  @[a, b]: 1, 2;
 */
+struct MultiVarsDeclarationStmt : DeclarationStmt
+{
+    struct DeclVariable
+    {
+        virtual ~DeclVariable() = 0;
+        virtual void codegen(Code &) = 0;
+    };
+    using DeclVariableList
+        = std::list<Ptr<DeclVariable>>
+    ;
+
+    struct SingleDeclVariable : DeclVariable
+    {
+        bool is_ref;
+        String name;
+
+        SingleDeclVariable(String, bool = false) noexcept;
+        void codegen(Code &) override;
+    };
+
+    struct MultiDeclVariables : DeclVariable
+    {
+        DeclVariableList variables;
+
+        MultiDeclVariables(DeclVariableList &&) noexcept;
+        void codegen(Code &) override;
+    };
+
+    DeclVariableList variables;
+    ExprList exprs;
+
+    MultiVarsDeclarationStmt(DeclVariableList &&variables) noexcept;
+    MultiVarsDeclarationStmt(DeclVariableList &&variables, ExprList &&exprs) noexcept;
+    void codegen(Code &) override;
+};
 
 struct PrefixopDeclarationStmt : Stmt
 {
@@ -339,6 +382,7 @@ struct ReturnStmt : Stmt
 {
     ExprList exprs;
 
+    ReturnStmt() noexcept;
     ReturnStmt(ExprList &&) noexcept;
     void codegen(Code &) override;
 };
