@@ -434,7 +434,7 @@ R"(
         print(arg);
         print(" ");
     }
-    print("\n");
+    // print("\n");
 }
 
 @a, b: 1, 2;
