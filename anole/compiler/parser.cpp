@@ -113,11 +113,6 @@ Ptr<AST> Parser::gen_statement()
     return stmt;
 }
 
-Ptr<AST> Parser::gen_statements()
-{
-    return gen_stmts();
-}
-
 CompileError Parser::ParseError(const String &info)
 {
     return CompileError(tokenizer_.get_err_info(info));
@@ -157,6 +152,18 @@ void Parser::try_resume(Size times)
     }
 }
 
+ExprList Parser::gen_exprs()
+{
+    ExprList exprs;
+    exprs.push_back(gen_delay_expr());
+    while (current_token_.type == TokenType::Comma)
+    {
+        get_next_token();
+        exprs.push_back(gen_delay_expr());
+    }
+    return exprs;
+}
+
 ArgumentList Parser::gen_arguments()
 {
     ArgumentList args;
@@ -184,99 +191,6 @@ ArgumentList Parser::gen_arguments()
     return args;
 }
 
-ParameterList Parser::gen_parameters()
-{
-    bool need_default = false;
-    bool packed = false;
-
-    ParameterList parameters;
-    while (current_token_.type != TokenType::RParen)
-    {
-        if (current_token_.type == TokenType::Dooot)
-        {
-            packed = true;
-            get_next_token();
-
-            bool is_ref = false;
-            if (current_token_.type == TokenType::BAnd)
-            {
-                is_ref = true;
-                get_next_token();
-            }
-
-            auto decl = std::make_unique<VariableDeclarationStmt>(
-                gen_ident_rawstr(), nullptr, is_ref
-            );
-            parameters.push_back(std::make_pair(std::move(decl), true));
-        }
-        else
-        {
-            bool is_ref = false;
-            if (current_token_.type == TokenType::BAnd)
-            {
-                is_ref = true;
-                get_next_token();
-            }
-
-            auto ident = gen_ident_rawstr();
-            Ptr<VariableDeclarationStmt> decl = nullptr;
-            if (current_token_.type == TokenType::Colon)
-            {
-                need_default = true;
-                get_next_token();
-                decl = std::make_unique<VariableDeclarationStmt>(
-                    std::move(ident), gen_expr(), is_ref
-                );
-            }
-            else if (need_default)
-            {
-                throw ParseError("parameter without default argument cannot follow parameter with default argument");
-            }
-            else
-            {
-                decl = std::make_unique<VariableDeclarationStmt>(
-                    std::move(ident), nullptr, is_ref
-                );
-            }
-
-            parameters.push_back(std::make_pair(std::move(decl), false));
-        }
-
-        if (current_token_.type == TokenType::Comma)
-        {
-            if (packed)
-            {
-                throw ParseError("packed parameter should be the last parameter");
-            }
-            get_next_token();
-        }
-        else
-        {
-            check<TokenType::RParen>("expected ')' here");
-        }
-    }
-    return parameters;
-}
-
-// usually use when interacting
-Ptr<BlockExpr> Parser::gen_stmts()
-{
-    auto stmts = std::make_unique<BlockExpr>();
-    while (current_token_.type != TokenType::End)
-    {
-        while (current_token_.type == TokenType::Semicolon)
-        {
-            get_next_token();
-        }
-
-        auto stmt = gen_stmt();
-        if (stmt)
-        {
-            stmts->statements.emplace_back(std::move(stmt));
-        }
-    }
-    return stmts;
-}
 
 // gen normal block as {...}
 Ptr<BlockExpr> Parser::gen_block()
@@ -408,6 +322,18 @@ Ptr<Stmt> Parser::gen_stmt()
 // generate declaration or assignment (@var:)
 Ptr<DeclarationStmt> Parser::gen_declaration()
 {
+    if (current_token_.type == TokenType::LBracket)
+    {
+        auto variables = gen_variables();
+        if (current_token_.type != TokenType::Colon)
+        {
+            return std::make_unique<MultiVarsDeclarationStmt>(std::move(variables));
+        }
+
+        get_next_token();
+        return std::make_unique<MultiVarsDeclarationStmt>(std::move(variables), gen_exprs());
+    }
+
     bool is_ref = false;
     if (current_token_.type == TokenType::BAnd)
     {
@@ -420,42 +346,26 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
     {
     case TokenType::Comma:
     {
-        std::list<VariableDeclarationStmt> decls;
-        decls.emplace_back(std::move(name), nullptr, is_ref);
-
-        while (current_token_.type == TokenType::Comma)
-        {
-            get_next_token();
-            bool is_ref = false;
-            if (current_token_.type == TokenType::BAnd)
-            {
-                is_ref = true;
-                get_next_token();
-            }
-            decls.emplace_back(gen_ident_rawstr(), nullptr, is_ref);
-        }
+        get_next_token();
+        auto vars = gen_variables();
+        vars.push_front(
+            std::make_unique<MultiVarsDeclarationStmt::SingleDeclVariable>(std::move(name), is_ref)
+        );
 
         // @var1, ..., varn
         if (current_token_.type != TokenType::Colon)
         {
-            return std::make_unique<MultiVarsDeclarationStmt>(std::move(decls), ExprList{});
+            return std::make_unique<MultiVarsDeclarationStmt>(std::move(vars));
         }
 
         // @var1, ..., varn: expr
         get_next_token();
-        ExprList exprs;
-        exprs.push_back(gen_delay_expr());
-        while (current_token_.type == TokenType::Comma)
-        {
-            get_next_token();
-            exprs.push_back(gen_delay_expr());
-        }
-        return std::make_unique<MultiVarsDeclarationStmt>(std::move(decls), std::move(exprs));
+        return std::make_unique<MultiVarsDeclarationStmt>(std::move(vars), gen_exprs());
     }
 
     case TokenType::Colon:
         get_next_token();
-        return std::make_unique<VariableDeclarationStmt>(
+        return std::make_unique<NormalDeclarationStmt>(
             std::move(name), gen_delay_expr(), is_ref
         );
 
@@ -477,21 +387,13 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         {
             get_next_token();
             block = std::make_unique<BlockExpr>();
-            ExprList exprs;
-            exprs.push_back(gen_delay_expr());
-            while (current_token_.type == TokenType::Comma)
-            {
-                get_next_token();
-                exprs.push_back(gen_delay_expr());
-            }
-
-            block->statements.push_back(std::make_unique<ReturnStmt>(std::move(exprs)));
+            block->statements.push_back(std::make_unique<ReturnStmt>(gen_exprs()));
         }
         else
         {
             block = gen_block();
         }
-        return std::make_unique<VariableDeclarationStmt>(std::move(name),
+        return std::make_unique<NormalDeclarationStmt>(std::move(name),
             std::make_unique<LambdaExpr>(std::move(parameters), std::move(block)), true
         );
     }
@@ -503,7 +405,50 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         }
         break;
     }
-    return std::make_unique<VariableDeclarationStmt>(std::move(name), std::make_unique<NoneExpr>());
+    return std::make_unique<NormalDeclarationStmt>(
+        std::move(name), std::make_unique<NoneExpr>(), false
+    );
+}
+
+Ptr<MultiVarsDeclarationStmt::DeclVariable> Parser::gen_variable()
+{
+    if (current_token_.type == TokenType::BAnd || current_token_.type == TokenType::Identifier)
+    {
+        bool is_ref = false;
+        if (current_token_.type == TokenType::BAnd)
+        {
+            is_ref = true;
+            get_next_token();
+        }
+
+        auto name = gen_ident_rawstr();
+        return std::make_unique<MultiVarsDeclarationStmt::SingleDeclVariable>(std::move(name), is_ref);
+    }
+    else if (current_token_.type == TokenType::LBracket)
+    {
+        get_next_token();
+        auto var = std::make_unique<MultiVarsDeclarationStmt::MultiDeclVariables>(gen_variables());
+        eat<TokenType::RBracket>("expect ']' here");
+        return var;
+    }
+    else
+    {
+        throw CompileError("expect an identifier");
+    }
+}
+
+MultiVarsDeclarationStmt::DeclVariableList Parser::gen_variables()
+{
+    MultiVarsDeclarationStmt::DeclVariableList variables;
+
+    variables.push_back(gen_variable());
+    while (current_token_.type == TokenType::Comma)
+    {
+        get_next_token();
+        variables.push_back(gen_variable());
+    }
+
+    return variables;
 }
 
 Ptr<DeclarationStmt> Parser::gen_class_declaration()
@@ -514,7 +459,7 @@ Ptr<DeclarationStmt> Parser::gen_class_declaration()
         throw ParseError("expected class name");
     }
 
-    return std::make_unique<VariableDeclarationStmt>(
+    return std::make_unique<NormalDeclarationStmt>(
         class_expr->name, std::move(class_expr), true
     );
 }
@@ -733,18 +678,10 @@ Ptr<Stmt> Parser::gen_return_stmt()
     if (current_token_.type == TokenType::Semicolon)
     {
         get_next_token();
-        return std::make_unique<ReturnStmt>(ExprList());
+        return std::make_unique<ReturnStmt>();
     }
 
-    ExprList exprs;
-    exprs.push_back(gen_delay_expr());
-    while (current_token_.type == TokenType::Comma)
-    {
-        get_next_token();
-        exprs.push_back(gen_delay_expr());
-    }
-
-    return std::make_unique<ReturnStmt>(std::move(exprs));
+    return std::make_unique<ReturnStmt>(gen_exprs());
 }
 
 Ptr<Expr> Parser::gen_delay_expr()
@@ -938,7 +875,7 @@ Ptr<Expr> Parser::gen_term()
         return gen_class_expr();
 
     case TokenType::LBrace:
-        return std::make_unique<LambdaExpr>(ParameterList{}, gen_block());
+        return std::make_unique<LambdaExpr>(gen_block());
 
     default:
         throw ParseError("expected an expr here");
@@ -1144,7 +1081,7 @@ Ptr<ClassExpr> Parser::gen_class_expr()
         name = gen_ident_rawstr();
     }
 
-    DeclList members;
+    ClassExpr::DeclList members;
     eat<TokenType::LBrace>("expected '{'");
     while (current_token_.type != TokenType::RBrace)
     {
@@ -1167,9 +1104,9 @@ Ptr<ClassExpr> Parser::gen_class_expr()
          *
          * this will be promised by allowing only definition with function body
         */
-        if (dynamic_cast<VariableDeclarationStmt *>(decl.get()))
+        if (dynamic_cast<NormalDeclarationStmt *>(decl.get()))
         {
-            auto vardecl = reinterpret_cast<VariableDeclarationStmt *>(decl.get());
+            auto vardecl = reinterpret_cast<NormalDeclarationStmt *>(decl.get());
             if (vardecl->name == "__init__")
             {
                 if (!dynamic_cast<LambdaExpr *>(vardecl->expr.get()))
@@ -1198,35 +1135,22 @@ Ptr<ClassExpr> Parser::gen_class_expr()
         }
         else
         {
+            throw CompileError("not support multi-declaration in class");
+
+            /**
+             * TODO:
+             *  solve the problem of __init__'s return
+             *
             auto muldecl = reinterpret_cast<MultiVarsDeclarationStmt *>(decl.get());
-            for (auto &vardecl : muldecl->decls)
+
+            for (auto &variable : muldecl->variables)
             {
-                if (vardecl.name == "__init__")
+                if (variable == "__init__")
                 {
-                    if (!dynamic_cast<LambdaExpr *>(vardecl.expr.get()))
-                    {
-                        throw ParseError("__init__ must be with function body");
-                    }
-                    else
-                    {
-                        auto &params = reinterpret_cast<LambdaExpr *>(vardecl.expr.get())->parameters;
-                        auto block = reinterpret_cast<LambdaExpr *>(vardecl.expr.get())->block.get();
-
-                        if (params.empty())
-                        {
-                            throw CompileError("method need at least 1 parameter");
-                        }
-
-                        ExprList retvals;
-                        retvals.push_back(std::make_unique<IdentifierExpr>(
-                            params.front().first->name
-                        ));
-                        block->statements.push_back(
-                            std::make_unique<ReturnStmt>(std::move(retvals))
-                        );
-                    }
+                    throw CompileError("__init__ must be with function body individually ");
                 }
             }
+            */
         }
 
         members.emplace_back(std::move(decl));
@@ -1260,15 +1184,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
     {
         get_next_token();
         block = std::make_unique<BlockExpr>();
-        ExprList exprs;
-        exprs.push_back(gen_delay_expr());
-        while (current_token_.type == TokenType::Comma)
-        {
-            get_next_token();
-            exprs.push_back(gen_delay_expr());
-        }
-
-        block->statements.push_back(std::make_unique<ReturnStmt>(std::move(exprs)));
+        block->statements.push_back(std::make_unique<ReturnStmt>(gen_exprs()));
     }
     else
     {
@@ -1276,6 +1192,80 @@ Ptr<Expr> Parser::gen_lambda_expr()
     }
 
     return gen_term_tail(std::make_unique<LambdaExpr>(std::move(parameters), std::move(block)));
+}
+
+LambdaExpr::ParameterList Parser::gen_parameters()
+{
+    bool need_default = false;
+    bool packed = false;
+
+    LambdaExpr::ParameterList parameters;
+    while (current_token_.type != TokenType::RParen)
+    {
+        if (current_token_.type == TokenType::Dooot)
+        {
+            packed = true;
+            get_next_token();
+
+            bool is_ref = false;
+            if (current_token_.type == TokenType::BAnd)
+            {
+                is_ref = true;
+                get_next_token();
+            }
+
+            auto decl = std::make_unique<NormalDeclarationStmt>(
+                gen_ident_rawstr(), nullptr, is_ref
+            );
+            parameters.push_back(std::make_pair(std::move(decl), true));
+        }
+        else
+        {
+            bool is_ref = false;
+            if (current_token_.type == TokenType::BAnd)
+            {
+                is_ref = true;
+                get_next_token();
+            }
+
+            auto ident = gen_ident_rawstr();
+            Ptr<NormalDeclarationStmt> decl = nullptr;
+            if (current_token_.type == TokenType::Colon)
+            {
+                need_default = true;
+                get_next_token();
+                decl = std::make_unique<NormalDeclarationStmt>(
+                    std::move(ident), gen_expr(), is_ref
+                );
+            }
+            else if (need_default)
+            {
+                throw ParseError("parameter without default argument cannot follow parameter with default argument");
+            }
+            else
+            {
+                decl = std::make_unique<NormalDeclarationStmt>(
+                    std::move(ident), nullptr, is_ref
+                );
+            }
+
+            parameters.push_back(std::make_pair(std::move(decl), false));
+        }
+
+        if (current_token_.type == TokenType::Comma)
+        {
+            if (packed)
+            {
+                throw ParseError("packed parameter should be the last parameter");
+            }
+            get_next_token();
+        }
+        else
+        {
+            check<TokenType::RParen>("expected ')' here");
+        }
+    }
+    return parameters;
 }
 
 /**

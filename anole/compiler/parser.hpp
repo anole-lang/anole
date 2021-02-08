@@ -27,7 +27,6 @@ class Parser
     void set_resume_action(std::function<void()>);
 
     Ptr<AST> gen_statement();
-    Ptr<AST> gen_statements();
 
   private:
     // special name to be like CompileError
@@ -53,14 +52,15 @@ class Parser
     Token &next_token();
     void try_resume(Size times = 0);
 
+    ExprList gen_exprs();
     ArgumentList gen_arguments();
-    ParameterList gen_parameters();
 
-    Ptr<BlockExpr> gen_stmts();
     Ptr<BlockExpr> gen_block();
 
     Ptr<Stmt> gen_stmt();
     Ptr<DeclarationStmt> gen_declaration();
+        Ptr<MultiVarsDeclarationStmt::DeclVariable> gen_variable();
+        MultiVarsDeclarationStmt::DeclVariableList gen_variables();
     Ptr<DeclarationStmt> gen_class_declaration();
     Ptr<Stmt> gen_use_stmt();
         UseStmt::Module gen_module();
@@ -79,8 +79,8 @@ class Parser
     Ptr<Expr> gen_expr(int layer = -1);
     Ptr<Expr> gen_term();
     Ptr<Expr> gen_term_tail(Ptr<Expr> expr);
-    String gen_ident_rawstr();
     Ptr<IdentifierExpr> gen_ident_expr();
+        String gen_ident_rawstr();
     Ptr<Expr> gen_numeric_expr();
     Ptr<Expr> gen_none_expr();
     Ptr<Expr> gen_boolean_expr();
@@ -91,6 +91,7 @@ class Parser
     Ptr<Expr> gen_dict_expr();
     Ptr<ClassExpr> gen_class_expr();
     Ptr<Expr> gen_lambda_expr();
+        LambdaExpr::ParameterList gen_parameters();
     Ptr<Expr> gen_match_expr();
     Ptr<Expr> gen_list_expr();
 
