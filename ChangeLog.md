@@ -9,6 +9,7 @@
 ### Changed
 
 - `return val1, val2;` equals `return [val1, val2]` now
+- Use `=> expr` instead of `} else expr` for the else-expr of match-expr, see [FEATURE#33](https://github.com/anole-lang/anole/issues/33)
 
 ### Removed
 
