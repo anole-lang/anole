@@ -373,7 +373,8 @@ while (state != State.End) {
             state: State.End;
             return "running"
         }(),
-    } else "end");
+        => "end"
+    });
 })"),
 
 // output

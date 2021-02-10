@@ -76,6 +76,12 @@ DotExpr::DotExpr(Ptr<Expr> &&left, String name) noexcept
     // ...
 }
 
+MatchExpr::MatchExpr() noexcept
+  : expr(nullptr), else_expr(nullptr)
+{
+    // ...
+}
+
 IndexExpr::IndexExpr(Ptr<Expr> &&expr, Ptr<Expr> &&index) noexcept
   : expr(std::move(expr)), index(std::move(index))
 {
@@ -119,7 +125,7 @@ NormalDeclarationStmt::NormalDeclarationStmt(String name, Ptr<Expr> &&expr, bool
 }
 
 MultiVarsDeclarationStmt::SingleDeclVariable::SingleDeclVariable(String name, bool is_ref) noexcept
-  : name(std::move(name)), is_ref(is_ref)
+  : is_ref(is_ref), name(std::move(name))
 {
     // ...
 }

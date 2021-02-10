@@ -1272,8 +1272,9 @@ LambdaExpr::ParameterList Parser::gen_parameters()
  * generate match expr as the following:
  *  match value {
  *      1, 2, 3, 4 => "smaller than five",
- *      5 => "five"
- *  } else "bigger than five"
+ *      5 => "five",
+ *      => "bigger than five"
+ *  }
 */
 Ptr<Expr> Parser::gen_match_expr()
 {
@@ -1286,6 +1287,29 @@ Ptr<Expr> Parser::gen_match_expr()
 
     while (current_token_.type != TokenType::RBrace)
     {
+        if (current_token_.type == TokenType::Ret)
+        {
+            if (match_expr->else_expr)
+            {
+                throw CompileError("redefinition of else-expr of match-expr");
+            }
+
+            get_next_token();
+            match_expr->else_expr = gen_expr();
+
+            if (current_token_.type == TokenType::Comma)
+            {
+                get_next_token();
+            }
+            else
+            {
+                check<TokenType::RBrace>("expected '}'");
+            }
+
+            try_resume();
+            continue;
+        }
+
         match_expr->keylists.push_back({});
         auto location = current_token_.location;
         match_expr->keylists.back().push_back(gen_expr());
@@ -1315,17 +1339,6 @@ Ptr<Expr> Parser::gen_match_expr()
     }
 
     get_next_token(); // eat '}'
-
-    // check 'else' after 'match {}'
-    if (current_token_.type == TokenType::Else)
-    {
-        get_next_token();
-        match_expr->else_expr = gen_expr();
-    }
-    else
-    {
-        match_expr->else_expr = nullptr;
-    }
 
     return match_expr;
 }
