@@ -190,6 +190,7 @@ struct MatchExpr : Expr, with_locations
     std::vector<Ptr<Expr>> values;
     Ptr<Expr> else_expr;
 
+    MatchExpr() noexcept;
     void codegen(Code &) override;
 };
 
