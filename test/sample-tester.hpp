@@ -84,15 +84,11 @@ TEST(Sample, SimpleIfElseStmt)
 // input
 R"(
 a: 1;
-@foo(x)
-{
+@foo(x) {
     a : 1;
-    if x
-    {
+    if x {
         return a: 2;
-    }
-    else
-    {
+    } else {
         return a: 3;
     };
 };
@@ -240,7 +236,9 @@ R"(
             conts.push(cont);
             try(@(x): x)();
         });
-        if !(e is none), cfun(e);
+        if !(e is none) {
+            cfun(e);
+        }
     }
 
     @try(fun): @(f): f(fun);
@@ -258,7 +256,9 @@ prefixop try;
 infixop catch;
 
 @div(a, b) {
-    if b = 0, throw "err: div 0";
+    if b = 0 {
+        throw "err: div 0";
+    }
     return a / b;
 };
 
@@ -289,18 +289,14 @@ TEST(Sample, CustomOp)
 R"(
 @*=*(lhs, rhs): lhs + rhs;
 
-@*-*(lhs, rhs), return lhs + rhs;
-
 @*^*(lhs, rhs) {
     return lhs + rhs;
 }
 
 infixop 50  *=*;
-infixop 100 *-*;
 infixop 200 *^*;
 
 println(2 * 3 *=* 4 * 5);
-println(2 * 3 *-* 4 * 5);
 println(2 * 3 *^* 4 * 5);
 
 @refof(&var): delay var;
@@ -313,7 +309,6 @@ println(a);)"),
 
 // output
 R"(26
-26
 70
 10
 )");
@@ -418,7 +413,12 @@ TEST(Sample, NestedForeach)
     ASSERT_EQ(execute(
 // input
 R"(
-foreach [1, 2] as i, foreach [2, 3] as j, { print(i); print(j); }();
+foreach [1, 2] as i {
+    foreach [2, 3] as j {
+        print(i);
+        print(j);
+    }
+}
 )"),
 
 // output
