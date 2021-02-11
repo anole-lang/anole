@@ -5,15 +5,18 @@
 ### Added
 
 - Improve declaration with new syntax `@[a, b], c: [1, 2], 3;`, see [FEATURE#50](https://github.com/anole-lang/anole/issues/50)
+- Empty parameters can be omitted. For example, `@: 42;` is a lambda expression
 
 ### Changed
 
 - `return val1, val2;` equals `return [val1, val2]` now
 - Use `=> expr` instead of `} else expr` for the else-expr of match-expr, see [FEATURE#33](https://github.com/anole-lang/anole/issues/33)
+- Returning multi values in lambda-expression must be explicit by writing `[ret1, ..., retn]`, see [FEATURE#54](https://github.com/anole-lang/anole/issues/54)
 
 ### Removed
 
 - Discard feature direct-return-multi-value, see [DISCARD#49](https://github.com/anole-lang/anole/issues/49)
+- Disable using single statement as block by `, stmt`
 
 ## 0.0.22 - 2021/01/24
 

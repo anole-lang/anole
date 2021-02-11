@@ -191,49 +191,28 @@ ArgumentList Parser::gen_arguments()
     return args;
 }
 
-
 // gen normal block as {...}
 Ptr<BlockExpr> Parser::gen_block()
 {
-    Ptr<BlockExpr> block;
-
-    if (current_token_.type == TokenType::LBrace)
+    eat<TokenType::LBrace>("expect '{'");
+    try_resume();
+    auto block = std::make_unique<BlockExpr>();
+    // '}' means the end of a block
+    while (current_token_.type != TokenType::RBrace)
     {
-        get_next_token(); // eat '{'
-        try_resume();
-        block = std::make_unique<BlockExpr>();
-        // '}' means the end of a block
-        while (current_token_.type != TokenType::RBrace)
+        auto stmt = gen_stmt();
+        if (stmt)
         {
-            auto stmt = gen_stmt();
-            if (stmt)
-            {
-                block->statements.push_back(std::move(stmt));
-            }
-
-            if (current_token_.type == TokenType::Semicolon)
-            {
-                get_next_token();
-            }
-            try_resume();
+            block->statements.push_back(std::move(stmt));
         }
-        get_next_token(); // eat '}'
-    }
-    else if (current_token_.type == TokenType::Comma)
-    {
-        get_next_token();
-        try_resume();
-        block = std::make_unique<BlockExpr>();
-        block->statements.push_back(gen_stmt());
+
         if (current_token_.type == TokenType::Semicolon)
         {
             get_next_token();
         }
+        try_resume();
     }
-    else
-    {
-        throw ParseError("expected '{' or ',' here");
-    }
+    get_next_token(); // eat '}'
 
     return block;
 }
@@ -249,6 +228,10 @@ Ptr<Stmt> Parser::gen_stmt()
     // @ is special
     case TokenType::At:
         if (next_token().type == TokenType::LParen)
+        {
+            return std::make_unique<ExprStmt>(gen_lambda_expr());
+        }
+        else if (current_token_.type == TokenType::Colon)
         {
             return std::make_unique<ExprStmt>(gen_lambda_expr());
         }
@@ -1171,11 +1154,16 @@ Ptr<ClassExpr> Parser::gen_class_expr()
 */
 Ptr<Expr> Parser::gen_lambda_expr()
 {
-    // eat '('
-    get_next_token();
-    auto parameters = gen_parameters();
-    // eat ')'
-    get_next_token();
+    LambdaExpr::ParameterList parameters;
+
+    if (current_token_.type == TokenType::LParen)
+    {
+        // eat '('
+        get_next_token();
+        parameters = gen_parameters();
+        // eat ')'
+        get_next_token();
+    }
 
     try_resume();
     Ptr<BlockExpr> block = nullptr;
@@ -1183,8 +1171,11 @@ Ptr<Expr> Parser::gen_lambda_expr()
     if (current_token_.type == TokenType::Colon)
     {
         get_next_token();
+
         block = std::make_unique<BlockExpr>();
-        block->statements.push_back(std::make_unique<ReturnStmt>(gen_exprs()));
+        ExprList exprs;
+        exprs.push_back(gen_delay_expr());
+        block->statements.push_back(std::make_unique<ReturnStmt>(std::move(exprs)));
     }
     else
     {
