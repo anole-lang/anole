@@ -12,7 +12,9 @@ infixop +=;
             info.state: true;
             res: rhs(info);
         }
-        if info.state = true, return res;
+        if info.state = true {
+            return res;
+        }
     };
 
 @　(&lhs, &rhs):
@@ -23,7 +25,9 @@ infixop +=;
             info.index: anchor;
         } else {
             @rr: rhs(info);
-            if info.state, return @(f): rr(lr(f));
+            if info.state {
+                return @(f): rr(lr(f));
+            }
         }
     };
 
@@ -44,10 +48,15 @@ infixop +=;
             if (info.index < info.str.size() and info.str[info.index] = str[i]) {
                 i += 1;
                 info.index += 1;
-            } else, break;
+            } else {
+                break;
+            }
         }
-        if i != str.size(), info.state: false;
-        else, return @(f): f(str);
+        if i != str.size() {
+            info.state: false;
+        } else {
+            return @(f): f(str);
+        }
     };
 
 @by(cond):
@@ -58,7 +67,9 @@ infixop +=;
             info.index += 1;
             return @(f): f(res);
         }
-        else, info.state: false;
+        else {
+            info.state: false;
+        }
     };
 
 @epsilon(init):
