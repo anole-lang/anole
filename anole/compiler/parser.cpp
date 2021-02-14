@@ -227,19 +227,17 @@ Ptr<Stmt> Parser::gen_stmt()
 
     // @ is special
     case TokenType::At:
-        if (next_token().type == TokenType::LParen)
+    {
+        auto type = next_token().type;
+        if (type == TokenType::LParen || type == TokenType::Colon || type == TokenType::LBrace)
         {
-            return std::make_unique<ExprStmt>(gen_lambda_expr());
+            return std::make_unique<ExprStmt>(gen_expr());
         }
-        else if (current_token_.type == TokenType::Colon)
-        {
-            return std::make_unique<ExprStmt>(gen_lambda_expr());
-        }
-        else if (current_token_.type != TokenType::End)
+        else
         {
             return gen_declaration();
         }
-        break;
+    }
 
     case TokenType::Class:
         return gen_class_declaration();
@@ -1146,7 +1144,6 @@ Ptr<ClassExpr> Parser::gen_class_expr()
 /**
  * generate lambda expr like:
  *   @(): expr
- *   @(), stmt
  *   @() {}
  *
  * '()' cannot be ignored because anole enable '@var: expr and @var()...',
@@ -1182,7 +1179,9 @@ Ptr<Expr> Parser::gen_lambda_expr()
         block = gen_block();
     }
 
-    return gen_term_tail(std::make_unique<LambdaExpr>(std::move(parameters), std::move(block)));
+    return std::make_unique<LambdaExpr>(
+        std::move(parameters), std::move(block)
+    );
 }
 
 LambdaExpr::ParameterList Parser::gen_parameters()
