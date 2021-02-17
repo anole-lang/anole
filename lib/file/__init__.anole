@@ -8,8 +8,8 @@ use __open from "./libfileobject.so";
     @trunc:  1 << 4;
     @ate:    1 << 5;
 
-    return {};
-}();
+    return @{};
+};
 
 @open(path, mode: mode.in | mode.out) {
     return __open(path, mode);

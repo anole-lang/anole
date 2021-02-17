@@ -188,7 +188,7 @@ TEST(Sample, Continuation)
     ASSERT_EQ(execute(
 // input
 R"code(
-Xb: {
+Xb: @{
     println("Hi! My name is Xu Bo.");
     cont: call_with_current_continuation(Lyx);
     println("Do you love me?");
@@ -243,8 +243,8 @@ R"(
 
     @try(fun): @(f): f(fun);
 
-    return {};
-}();
+    return @{};
+};
 
 @throw: Except.throw;
 prefixop throw;
@@ -270,7 +270,7 @@ infixop catch;
     }
 };
 
-try {
+try @{
     div_forever(100);
 }
 catch @(e) {
@@ -363,11 +363,11 @@ while (state != State.End) {
         State.Start => {
             state: State.Running;
             return "start";
-        }(),
+        },
         State.Running => {
             state: State.End;
             return "running"
-        }(),
+        },
         => "end"
     });
 })"),
