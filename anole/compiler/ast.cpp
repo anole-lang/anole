@@ -40,6 +40,12 @@ IdentifierExpr::IdentifierExpr(String name) noexcept
     // ...
 }
 
+ParenOperatorExpr::ParenOperatorExpr(Ptr<Expr> &&expr) noexcept
+  : expr(std::move(expr))
+{
+    // ...
+}
+
 ParenOperatorExpr::ParenOperatorExpr(Ptr<Expr> &&expr, ArgumentList &&args) noexcept
   : expr(std::move(expr)), args(std::move(args))
 {

@@ -131,6 +131,7 @@ struct ParenOperatorExpr : Expr, with_location
     Ptr<Expr> expr;
     ArgumentList args;
 
+    ParenOperatorExpr(Ptr<Expr> &&) noexcept;
     ParenOperatorExpr(Ptr<Expr> &&, ArgumentList &&) noexcept;
     void codegen(Code &) override;
 };

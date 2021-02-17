@@ -755,16 +755,14 @@ void ForeachStmt::codegen(Code &code)
     auto cond = std::make_unique<ParenOperatorExpr>(
         std::make_unique<DotExpr>(
             std::make_unique<IdentifierExpr>(it_name), "__has_next__"
-        ),
-        ArgumentList()
+        )
     );
 
     block->statements.push_front(nullptr);
     auto next = std::make_unique<ParenOperatorExpr>(
         std::make_unique<DotExpr>(
             std::make_unique<IdentifierExpr>(it_name), "__next__"
-        ),
-        ArgumentList()
+        )
     );
     if (!varname.empty())
     {

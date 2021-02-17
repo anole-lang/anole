@@ -856,7 +856,9 @@ Ptr<Expr> Parser::gen_term()
         return gen_class_expr();
 
     case TokenType::LBrace:
-        return std::make_unique<LambdaExpr>(gen_block());
+        return std::make_unique<ParenOperatorExpr>(
+            std::make_unique<LambdaExpr>(gen_block())
+        );
 
     default:
         throw ParseError("expected an expr here");
