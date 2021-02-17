@@ -15,7 +15,8 @@ infixop +=;
         if info.state = true {
             return res;
         }
-    };
+    }
+;
 
 @　(&lhs, &rhs):
     @(info) {
@@ -29,7 +30,8 @@ infixop +=;
                 return @(f): rr(lr(f));
             }
         }
-    };
+    }
+;
 
 @->(&exec, callback):
     @(info) {
@@ -37,44 +39,48 @@ infixop +=;
         if info.state {
             return @(f): f(res(callback));
         }
-    };
+    }
+;
 
 @token: {
 
-@literial(str):
-    @(info) {
-        @i: 0;
-        while i < str.size() {
-            if (info.index < info.str.size() and info.str[info.index] = str[i]) {
-                i += 1;
-                info.index += 1;
+    @literial(str):
+        @(info) {
+            @i: 0;
+            while i < str.size() {
+                if (info.index < info.str.size() and info.str[info.index] = str[i]) {
+                    i += 1;
+                    info.index += 1;
+                } else {
+                    break;
+                }
+            }
+            if i != str.size() {
+                info.state: false;
             } else {
-                break;
+                return @(f): f(str);
             }
         }
-        if i != str.size() {
-            info.state: false;
-        } else {
-            return @(f): f(str);
+    ;
+
+    @by(cond):
+        @(info) {
+            if info.index < info.str.size() and cond(info.str[info.index]) {
+                info.state: true;
+                @res: info.str[info.index];
+                info.index += 1;
+                return @(f): f(res);
+            }
+            else {
+                info.state: false;
+            }
         }
-    };
+    ;
 
-@by(cond):
-    @(info) {
-        if info.index < info.str.size() and cond(info.str[info.index]) {
-            info.state: true;
-            @res: info.str[info.index];
-            info.index += 1;
-            return @(f): f(res);
-        }
-        else {
-            info.state: false;
-        }
-    };
+    @epsilon(init):
+        @(info): @(f): f(init())
+    ;
 
-@epsilon(init):
-    @(info): @(f): f(init());
+    return @{};
 
-return {};
-
-}();
+};

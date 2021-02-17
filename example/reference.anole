@@ -7,7 +7,7 @@ prefixop refof;
 //     and call expression will return the reference to the result expression
 
 @a: 1;
-@b, &c, &d: refof a, a, { return a; }();
+@b, &c, &d: refof a, a, { return a; };
 
 a: 2;
 
