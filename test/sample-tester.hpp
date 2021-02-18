@@ -22,9 +22,9 @@ inline String execute(const String &input)
     auto code = std::make_shared<Code>("<test>", std::filesystem::current_path());
     theCurrContext = std::make_shared<Context>(code);
     Parser parser{ss, "<test>"};
-    while (auto ast = parser.gen_statement())
+    while (auto stmt = parser.gen_statement())
     {
-        ast->codegen(*code);
+        stmt->codegen(*code);
         Context::execute();
     }
   #ifdef _DEBUG

@@ -54,7 +54,7 @@ struct Expr : AST
     virtual void codegen(Code &) = 0;
 };
 
-struct BlockExpr : Expr
+struct Block : AST
 {
     using StmtList
         = std::list<Ptr<Stmt>>
@@ -161,10 +161,10 @@ struct LambdaExpr : Expr
     ; // boolean stands for whether it is packed
 
     ParameterList parameters;
-    Ptr<BlockExpr> block;
+    Ptr<Block> block;
 
-    LambdaExpr(Ptr<BlockExpr> &&) noexcept;
-    LambdaExpr(ParameterList &&, Ptr<BlockExpr> &&) noexcept;
+    LambdaExpr(Ptr<Block> &&) noexcept;
+    LambdaExpr(ParameterList &&, Ptr<Block> &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -392,28 +392,28 @@ struct ReturnStmt : Stmt
 struct IfElseStmt : Stmt, with_location
 {
     Ptr<Expr> cond;
-    Ptr<BlockExpr> true_block;
+    Ptr<Block> true_block;
     Ptr<AST> false_branch;
 
-    IfElseStmt(Ptr<Expr> &&, Ptr<BlockExpr> &&, Ptr<AST> &&) noexcept;
+    IfElseStmt(Ptr<Expr> &&, Ptr<Block> &&, Ptr<AST> &&) noexcept;
     void codegen(Code &) override;
 };
 
 struct WhileStmt : Stmt, with_location
 {
     Ptr<Expr> cond;
-    Ptr<BlockExpr> block;
+    Ptr<Block> block;
 
-    WhileStmt(Ptr<Expr> &&, Ptr<BlockExpr> &&) noexcept;
+    WhileStmt(Ptr<Expr> &&, Ptr<Block> &&) noexcept;
     void codegen(Code &) override;
 };
 
 struct DoWhileStmt : Stmt, with_location
 {
     Ptr<Expr> cond;
-    Ptr<BlockExpr> block;
+    Ptr<Block> block;
 
-    DoWhileStmt(Ptr<Expr> &&, Ptr<BlockExpr> &&) noexcept;
+    DoWhileStmt(Ptr<Expr> &&, Ptr<Block> &&) noexcept;
     void codegen(Code &) override;
 };
 
@@ -421,9 +421,9 @@ struct ForeachStmt : Stmt
 {
     Ptr<Expr> expr;
     String varname;
-    Ptr<BlockExpr> block;
+    Ptr<Block> block;
 
-    ForeachStmt(Ptr<Expr> &&, String, Ptr<BlockExpr> &&) noexcept;
+    ForeachStmt(Ptr<Expr> &&, String, Ptr<Block> &&) noexcept;
     void codegen(Code &) override;
 };
 }

@@ -93,7 +93,12 @@ void replrun::run()
 
         theCurrContext->pc() = code->size();
 
-        auto stmt = parser.gen_statement();
+        Ptr<AST> stmt = parser.gen_statement();
+        if (stmt == nullptr)
+        {
+            continue;
+        }
+
         if (stmt->is_expr_stmt())
         {
             ArgumentList args;

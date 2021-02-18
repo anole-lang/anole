@@ -103,13 +103,20 @@ void Parser::set_resume_action(std::function<void()> action)
     resume_action_ = std::move(action);
 }
 
-Ptr<AST> Parser::gen_statement()
+Ptr<Stmt> Parser::gen_statement()
 {
-    auto stmt = gen_stmt();
-    if (current_token_.type == TokenType::Semicolon)
+    while (current_token_.type == TokenType::Semicolon)
     {
         get_next_token();
     }
+
+    auto stmt = gen_stmt();
+
+    while (current_token_.type == TokenType::Semicolon)
+    {
+        get_next_token();
+    }
+
     return stmt;
 }
 
@@ -192,24 +199,16 @@ ArgumentList Parser::gen_arguments()
 }
 
 // gen normal block as {...}
-Ptr<BlockExpr> Parser::gen_block()
+Ptr<Block> Parser::gen_block()
 {
     eat<TokenType::LBrace>("expect '{'");
     try_resume();
-    auto block = std::make_unique<BlockExpr>();
+
+    auto block = std::make_unique<Block>();
     // '}' means the end of a block
     while (current_token_.type != TokenType::RBrace)
     {
-        auto stmt = gen_stmt();
-        if (stmt)
-        {
-            block->statements.push_back(std::move(stmt));
-        }
-
-        if (current_token_.type == TokenType::Semicolon)
-        {
-            get_next_token();
-        }
+        block->statements.push_back(gen_statement());
         try_resume();
     }
     get_next_token(); // eat '}'
@@ -217,7 +216,7 @@ Ptr<BlockExpr> Parser::gen_block()
     return block;
 }
 
-// generate normal statement
+// generate plain statement
 Ptr<Stmt> Parser::gen_stmt()
 {
     switch (current_token_.type)
@@ -235,24 +234,24 @@ Ptr<Stmt> Parser::gen_stmt()
         }
         else
         {
-            return gen_declaration();
+            return gen_decl_stmt();
         }
     }
 
     case TokenType::Class:
-        return gen_class_declaration();
+        return gen_class_decl_stmt();
 
     case TokenType::Use:
         return gen_use_stmt();
 
     case TokenType::Prefixop:
-        return gen_prefixop_decl();
+        return gen_prefixop_decl_stmt();
 
     case TokenType::Infixop:
-        return gen_infixop_decl();
+        return gen_infixop_decl_stmt();
 
     case TokenType::If:
-        return gen_if_else();
+        return gen_if_else_stmt();
 
     case TokenType::While:
         return gen_while_stmt();
@@ -301,7 +300,7 @@ Ptr<Stmt> Parser::gen_stmt()
 }
 
 // generate declaration or assignment (@var:)
-Ptr<DeclarationStmt> Parser::gen_declaration()
+auto Parser::gen_decl_stmt() -> Ptr<DeclarationStmt>
 {
     if (current_token_.type == TokenType::LBracket)
     {
@@ -362,18 +361,19 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
         get_next_token();
 
         try_resume();
-        Ptr<BlockExpr> block = nullptr;
 
+        Ptr<Block> block = nullptr;
         if (current_token_.type == TokenType::Colon)
         {
             get_next_token();
-            block = std::make_unique<BlockExpr>();
+            block = std::make_unique<Block>();
             block->statements.push_back(std::make_unique<ReturnStmt>(gen_exprs()));
         }
         else
         {
             block = gen_block();
         }
+
         return std::make_unique<NormalDeclarationStmt>(std::move(name),
             std::make_unique<LambdaExpr>(std::move(parameters), std::move(block)), true
         );
@@ -391,7 +391,7 @@ Ptr<DeclarationStmt> Parser::gen_declaration()
     );
 }
 
-Ptr<MultiVarsDeclarationStmt::DeclVariable> Parser::gen_variable()
+auto Parser::gen_variable() -> Ptr<MultiVarsDeclarationStmt::DeclVariable>
 {
     if (current_token_.type == TokenType::BAnd || current_token_.type == TokenType::Identifier)
     {
@@ -418,7 +418,7 @@ Ptr<MultiVarsDeclarationStmt::DeclVariable> Parser::gen_variable()
     }
 }
 
-MultiVarsDeclarationStmt::DeclVariableList Parser::gen_variables()
+auto Parser::gen_variables() -> MultiVarsDeclarationStmt::DeclVariableList
 {
     MultiVarsDeclarationStmt::DeclVariableList variables;
 
@@ -432,7 +432,7 @@ MultiVarsDeclarationStmt::DeclVariableList Parser::gen_variables()
     return variables;
 }
 
-Ptr<DeclarationStmt> Parser::gen_class_declaration()
+Ptr<Stmt> Parser::gen_class_decl_stmt()
 {
     auto class_expr = gen_class_expr();
     if (class_expr->name.empty())
@@ -486,7 +486,7 @@ Ptr<Stmt> Parser::gen_use_stmt()
 /**
  * single module may be denoted by name of path
 */
-UseStmt::Module Parser::gen_module()
+auto Parser::gen_module() -> UseStmt::Module
 {
     UseStmt::Module mod;
     if (current_token_.type == TokenType::Identifier)
@@ -506,7 +506,7 @@ UseStmt::Module Parser::gen_module()
     return mod;
 }
 
-UseStmt::NestedModule Parser::gen_nested_module()
+auto Parser::gen_nested_module() -> UseStmt::NestedModule
 {
     UseStmt::NestedModule result;
 
@@ -525,7 +525,7 @@ UseStmt::NestedModule Parser::gen_nested_module()
     return result;
 }
 
-UseStmt::Alias Parser::gen_alias()
+auto Parser::gen_alias() -> UseStmt::Alias
 {
     UseStmt::Alias alias;
     alias.first = gen_nested_module();
@@ -550,14 +550,14 @@ UseStmt::Alias Parser::gen_alias()
     return alias;
 }
 
-Ptr<Stmt> Parser::gen_prefixop_decl()
+Ptr<Stmt> Parser::gen_prefixop_decl_stmt()
 {
     get_next_token();
     check<TokenType::Identifier>("expected an identifier here");
     return std::make_unique<PrefixopDeclarationStmt>(gen_ident_rawstr());
 }
 
-Ptr<Stmt> Parser::gen_infixop_decl()
+Ptr<Stmt> Parser::gen_infixop_decl_stmt()
 {
     get_next_token();
     Size precedence = 50;
@@ -570,37 +570,32 @@ Ptr<Stmt> Parser::gen_infixop_decl()
     return std::make_unique<InfixopDeclarationStmt>(gen_ident_rawstr(), precedence);
 }
 
-Ptr<Stmt> Parser::gen_if_else()
+Ptr<Stmt> Parser::gen_if_else_stmt()
 {
-    auto location = next_token().location;
+    eat<TokenType::If, TokenType::Elif>("expect elif");
+
+    auto location = current_token_.location;
 
     auto cond = gen_expr();
     auto true_block = gen_block();
     try_resume(1);
-    auto false_branch = gen_if_else_tail();
-    auto stmt = std::make_unique<IfElseStmt>(std::move(cond),
-        std::move(true_block), std::move(false_branch)
-    );
 
-    stmt->location = location;
-    return stmt;
-}
-
-Ptr<AST> Parser::gen_if_else_tail()
-{
+    Ptr<AST> false_branch = nullptr;
     if (current_token_.type == TokenType::Elif)
     {
-        return gen_if_else();
+        false_branch = gen_if_else_stmt();
     }
     else if (current_token_.type == TokenType::Else)
     {
         get_next_token();
-        return gen_block();
+        false_branch = gen_block();
     }
-    else
-    {
-        return nullptr;
-    }
+
+    auto stmt = std::make_unique<IfElseStmt>(std::move(cond),
+        std::move(true_block), std::move(false_branch)
+    );
+    stmt->location = location;
+    return stmt;
 }
 
 Ptr<Stmt> Parser::gen_while_stmt()
@@ -810,7 +805,7 @@ Ptr<Expr> Parser::gen_expr(int layer)
 Ptr<Expr> Parser::gen_term()
 {
     try_resume();
-    Ptr<Expr> node = nullptr;
+
     switch (current_token_.type)
     {
     case TokenType::Identifier:
@@ -831,10 +826,12 @@ Ptr<Expr> Parser::gen_term()
         return gen_string_expr();
 
     case TokenType::LParen:
+    {
         get_next_token();
-        node = gen_expr();
+        auto node = gen_expr();
         eat<TokenType::RParen>("expected ')' here");
         return node;
+    }
 
     case TokenType::At:
         get_next_token();
@@ -910,7 +907,7 @@ Ptr<Expr> Parser::gen_term_tail(Ptr<Expr> expr)
     return expr;
 }
 
-String Parser::gen_ident_rawstr()
+auto Parser::gen_ident_rawstr() -> String
 {
     check<TokenType::Identifier>("expect an identifier here");
     auto result = current_token_.value;
@@ -918,7 +915,7 @@ String Parser::gen_ident_rawstr()
     return result;
 }
 
-Ptr<IdentifierExpr> Parser::gen_ident_expr()
+Ptr<Expr> Parser::gen_ident_expr()
 {
     auto location = current_token_.location;
     auto expr = std::make_unique<IdentifierExpr>(gen_ident_rawstr());
@@ -1048,101 +1045,6 @@ Ptr<Expr> Parser::gen_dict_expr()
     return dict_expr;
 }
 
-Ptr<ClassExpr> Parser::gen_class_expr()
-{
-    get_next_token(); // eat 'class'
-
-    ArgumentList bases;
-    if (current_token_.type == TokenType::LParen)
-    {
-        bases = gen_arguments();
-    }
-
-    String name;
-    if (current_token_.type == TokenType::Identifier)
-    {
-        name = gen_ident_rawstr();
-    }
-
-    ClassExpr::DeclList members;
-    eat<TokenType::LBrace>("expected '{'");
-    while (current_token_.type != TokenType::RBrace)
-    {
-        while (current_token_.type == TokenType::Semicolon)
-        {
-            get_next_token();
-        }
-
-        try_resume();
-        if (current_token_.type == TokenType::RBrace)
-        {
-            break;
-        }
-
-        auto decl = gen_declaration();
-
-        /**
-         * that the member's name is __init__
-         *  means it is the special constructor without return-values
-         *
-         * this will be promised by allowing only definition with function body
-        */
-        if (dynamic_cast<NormalDeclarationStmt *>(decl.get()))
-        {
-            auto vardecl = reinterpret_cast<NormalDeclarationStmt *>(decl.get());
-            if (vardecl->name == "__init__")
-            {
-                if (!dynamic_cast<LambdaExpr *>(vardecl->expr.get()))
-                {
-                    throw ParseError("__init__ must be with function body");
-                }
-                else
-                {
-                    auto &params = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->parameters;
-                    auto block = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->block.get();
-
-                    if (params.empty())
-                    {
-                        throw CompileError("method need at least 1 parameter");
-                    }
-
-                    ExprList retvals;
-                    retvals.push_back(std::make_unique<IdentifierExpr>(
-                        params.front().first->name
-                    ));
-                    block->statements.push_back(
-                        std::make_unique<ReturnStmt>(std::move(retvals))
-                    );
-                }
-            }
-        }
-        else
-        {
-            throw CompileError("not support multi-declaration in class");
-
-            /**
-             * TODO:
-             *  solve the problem of __init__'s return
-             *
-            auto muldecl = reinterpret_cast<MultiVarsDeclarationStmt *>(decl.get());
-
-            for (auto &variable : muldecl->variables)
-            {
-                if (variable == "__init__")
-                {
-                    throw CompileError("__init__ must be with function body individually ");
-                }
-            }
-            */
-        }
-
-        members.emplace_back(std::move(decl));
-    }
-    get_next_token();
-
-    return std::make_unique<ClassExpr>(std::move(name), std::move(bases), std::move(members));
-}
-
 /**
  * generate lambda expr like:
  *   @(): expr
@@ -1165,13 +1067,13 @@ Ptr<Expr> Parser::gen_lambda_expr()
     }
 
     try_resume();
-    Ptr<BlockExpr> block = nullptr;
+    Ptr<Block> block = nullptr;
 
     if (current_token_.type == TokenType::Colon)
     {
         get_next_token();
 
-        block = std::make_unique<BlockExpr>();
+        block = std::make_unique<Block>();
         ExprList exprs;
         exprs.push_back(gen_delay_expr());
         block->statements.push_back(std::make_unique<ReturnStmt>(std::move(exprs)));
@@ -1186,7 +1088,7 @@ Ptr<Expr> Parser::gen_lambda_expr()
     );
 }
 
-LambdaExpr::ParameterList Parser::gen_parameters()
+auto Parser::gen_parameters() -> LambdaExpr::ParameterList
 {
     bool need_default = false;
     bool packed = false;
@@ -1350,5 +1252,100 @@ Ptr<Expr> Parser::gen_list_expr()
     }
     get_next_token(); // eat(']')
     return list_expr;
+}
+
+Ptr<ClassExpr> Parser::gen_class_expr()
+{
+    get_next_token(); // eat 'class'
+
+    ArgumentList bases;
+    if (current_token_.type == TokenType::LParen)
+    {
+        bases = gen_arguments();
+    }
+
+    String name;
+    if (current_token_.type == TokenType::Identifier)
+    {
+        name = gen_ident_rawstr();
+    }
+
+    ClassExpr::DeclList members;
+    eat<TokenType::LBrace>("expected '{'");
+    while (current_token_.type != TokenType::RBrace)
+    {
+        while (current_token_.type == TokenType::Semicolon)
+        {
+            get_next_token();
+        }
+
+        try_resume();
+        if (current_token_.type == TokenType::RBrace)
+        {
+            break;
+        }
+
+        auto decl = gen_decl_stmt();
+
+        /**
+         * that the member's name is __init__
+         *  means it is the special constructor without return-values
+         *
+         * this will be promised by allowing only definition with function body
+        */
+        if (dynamic_cast<NormalDeclarationStmt *>(decl.get()))
+        {
+            auto vardecl = reinterpret_cast<NormalDeclarationStmt *>(decl.get());
+            if (vardecl->name == "__init__")
+            {
+                if (!dynamic_cast<LambdaExpr *>(vardecl->expr.get()))
+                {
+                    throw ParseError("__init__ must be with function body");
+                }
+                else
+                {
+                    auto &params = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->parameters;
+                    auto block = reinterpret_cast<LambdaExpr *>(vardecl->expr.get())->block.get();
+
+                    if (params.empty())
+                    {
+                        throw CompileError("method need at least 1 parameter");
+                    }
+
+                    ExprList retvals;
+                    retvals.push_back(std::make_unique<IdentifierExpr>(
+                        params.front().first->name
+                    ));
+                    block->statements.push_back(
+                        std::make_unique<ReturnStmt>(std::move(retvals))
+                    );
+                }
+            }
+        }
+        else
+        {
+            throw CompileError("not support multi-declaration in class");
+
+            /**
+             * TODO:
+             *  solve the problem of __init__'s return
+             *
+            auto muldecl = reinterpret_cast<MultiVarsDeclarationStmt *>(decl.get());
+
+            for (auto &variable : muldecl->variables)
+            {
+                if (variable == "__init__")
+                {
+                    throw CompileError("__init__ must be with function body individually ");
+                }
+            }
+            */
+        }
+
+        members.emplace_back(std::move(decl));
+    }
+    get_next_token();
+
+    return std::make_unique<ClassExpr>(std::move(name), std::move(bases), std::move(members));
 }
 }

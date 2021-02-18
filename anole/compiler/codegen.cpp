@@ -7,7 +7,7 @@
 
 namespace anole
 {
-void BlockExpr::codegen(Code &code)
+void Block::codegen(Code &code)
 {
     for (auto &statement : statements)
     {

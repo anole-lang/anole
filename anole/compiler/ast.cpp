@@ -64,13 +64,13 @@ BinaryOperatorExpr::BinaryOperatorExpr(Ptr<Expr> &&lhs, Token op, Ptr<Expr> &&rh
     // ...
 }
 
-LambdaExpr::LambdaExpr(Ptr<BlockExpr> &&block) noexcept
+LambdaExpr::LambdaExpr(Ptr<Block> &&block) noexcept
   : block(std::move(block))
 {
     // ...
 }
 
-LambdaExpr::LambdaExpr(ParameterList &&parameters, Ptr<BlockExpr> &&block) noexcept
+LambdaExpr::LambdaExpr(ParameterList &&parameters, Ptr<Block> &&block) noexcept
   : parameters(std::move(parameters)), block(std::move(block))
 {
     // ...
@@ -177,25 +177,25 @@ ReturnStmt::ReturnStmt(ExprList &&exprs) noexcept
     // ...
 }
 
-IfElseStmt::IfElseStmt(Ptr<Expr> &&cond, Ptr<BlockExpr> &&true_block, Ptr<AST> &&false_branch) noexcept
+IfElseStmt::IfElseStmt(Ptr<Expr> &&cond, Ptr<Block> &&true_block, Ptr<AST> &&false_branch) noexcept
   : cond(std::move(cond)), true_block(std::move(true_block)), false_branch(std::move(false_branch))
 {
     // ...
 }
 
-WhileStmt::WhileStmt(Ptr<Expr> &&cond, Ptr<BlockExpr> &&block) noexcept
+WhileStmt::WhileStmt(Ptr<Expr> &&cond, Ptr<Block> &&block) noexcept
   : cond(std::move(cond)), block(std::move(block))
 {
     // ...
 }
 
-DoWhileStmt::DoWhileStmt(Ptr<Expr> &&cond, Ptr<BlockExpr> &&block) noexcept
+DoWhileStmt::DoWhileStmt(Ptr<Expr> &&cond, Ptr<Block> &&block) noexcept
   : cond(std::move(cond)), block(std::move(block))
 {
     // ...
 }
 
-ForeachStmt::ForeachStmt(Ptr<Expr> &&expr, String varname, Ptr<BlockExpr> &&block) noexcept
+ForeachStmt::ForeachStmt(Ptr<Expr> &&expr, String varname, Ptr<Block> &&block) noexcept
   : expr(std::move(expr)), varname(std::move(varname)), block(std::move(block))
 {
     // ...

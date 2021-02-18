@@ -6,6 +6,10 @@
 
 - Regard `{ ... }` as `@{ ... }()` now
 
+### Fixed
+
+- Fix bug when inputting `;;;` in the REPL
+
 ## 0.0.23 - 2021/02/13
 
 ### Added
