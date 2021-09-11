@@ -19,7 +19,6 @@ class Parser
     static void add_infixop(const String &str, Size precedence);
 
   public:
-    Parser() noexcept;
     Parser(std::istream &input, String name_of_input) noexcept;
 
     void resume();

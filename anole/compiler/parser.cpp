@@ -3,6 +3,7 @@
 #include "../error.hpp"
 
 #include <set>
+#include <utility>
 #include <algorithm>
 
 namespace anole
@@ -14,11 +15,7 @@ std::set<TokenType> uops
     TokenType::Not, TokenType::Sub, TokenType::BNeg
 };
 
-std::vector<Size> bop_precedences
-{
-    100, 110, 120, 130, 140, 150, 160, 170, 180, 190
-};
-std::map<Size, std::set<TokenType>> bop_mapping
+std::vector<std::pair<Size, std::set<TokenType>>> bop_precedences
 {
     { 100, { TokenType::Or } },
     { 110, { TokenType::And } },
@@ -32,14 +29,9 @@ std::map<Size, std::set<TokenType>> bop_mapping
     { 190, { TokenType::Is,  TokenType::Mul, TokenType::Div, TokenType::Mod } }
 };
 
-std::set<TokenType> &bops_at_precedence(Size precedence)
-{
-    return bop_mapping[precedence];
-}
-
 std::set<TokenType> &bops_at_layer(Size layer)
 {
-    return bop_mapping[bop_precedences[layer]];
+    return bop_precedences[layer].second;
 }
 }
 
@@ -63,20 +55,14 @@ void Parser::add_infixop(const String &str, Size precedence)
     }
 
     auto lower = lower_bound(operators::bop_precedences.begin(),
-        operators::bop_precedences.end(), precedence
+        operators::bop_precedences.end(), std::make_pair(precedence, std::set<TokenType>()),
+        [] (const std::pair<Size, std::set<TokenType>> &lhs, const std::pair<Size, std::set<TokenType>> &rhs)
+        {
+            return lhs.first < rhs.first;
+        }
     );
-    if (lower == operators::bop_precedences.end() || *lower != precedence)
-    {
-        operators::bop_precedences.insert(lower, precedence);
-    }
 
-    operators::bops_at_precedence(precedence).insert(type);
-}
-
-Parser::Parser() noexcept
-  : Parser(std::cin, "<stdin>")
-{
-    // ...
+    operators::bop_precedences.insert(lower, std::make_pair(precedence, std::set<TokenType>{ type }));
 }
 
 Parser::Parser(std::istream &input, String name_of_input) noexcept
