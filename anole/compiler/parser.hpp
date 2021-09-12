@@ -38,7 +38,7 @@ class Parser
 
         if (current_token_.type != type)
         {
-            if constexpr (sizeof...(types))
+            if constexpr (sizeof...(types) > 0)
             {
                 check<types...>(err_info);
             }
