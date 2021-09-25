@@ -20,6 +20,6 @@ jobs:
       - name: test
         run: cd build && ctest
       - name: make install
-        run: mkdir build && cd build && cmake .. && sudo make install
+        run: cd build && sudo make install
       - name: run example
         run: cd example && bash test.sh
