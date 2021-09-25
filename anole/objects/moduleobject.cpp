@@ -19,7 +19,7 @@ namespace fs = std::filesystem;
 
 namespace anole
 {
-namespace
+namespace // local
 {
 /**
  * TODO:

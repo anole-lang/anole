@@ -7,7 +7,7 @@
 
 namespace anole
 {
-namespace
+namespace // local
 {
 std::map<String, std::function<void(ListObject *)>>
 localBuiltinMethodsForList

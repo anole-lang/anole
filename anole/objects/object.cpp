@@ -8,7 +8,7 @@
 
 namespace anole
 {
-namespace
+namespace // local
 {
 std::vector<String> localMappingTypeStr
 {

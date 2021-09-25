@@ -18,7 +18,7 @@
 
 namespace anole
 {
-namespace
+namespace // local
 {
 sigjmp_buf localEnv;
 
