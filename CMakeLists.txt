@@ -94,7 +94,7 @@ ELSE ()
 
 ENDIF ()
 
-# -- install lib ----------------
+# --- install lib ---
 
 # install header `anole.hpp`
 install (FILES "anole/anole.hpp"
@@ -163,3 +163,25 @@ install (TARGETS "read_dir"
 install (FILES "lib/coroutine/__init__.anole"
     DESTINATION "lib/anole/coroutine"
 )
+
+# --- anole test ---
+enable_testing()
+
+add_executable(
+    anole_test
+    test/test.cpp
+    anole/error.cpp
+    ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER}
+)
+target_link_libraries(
+    anole_test
+    dl
+    stdc++fs
+    readline
+
+    pthread
+    gtest
+)
+
+include(GoogleTest)
+gtest_discover_tests(anole_test)

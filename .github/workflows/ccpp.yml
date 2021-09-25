@@ -14,9 +14,11 @@ jobs:
       - name: apt-get install readline
         run: sudo apt-get install libreadline6-dev
       - name: apt-get install libgtest-dev
-        run: sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake CMakeLists.txt && sudo make install
-      - name: make test
-        run: make test
+        run: sudo apt-get install libgtest-dev
+      - name: cmake
+        run: cmake -S . -B build && cmake --build build -j4
+      - name: test
+        run: cd build && ctest
       - name: make install
         run: mkdir build && cd build && cmake .. && sudo make install
       - name: run example
