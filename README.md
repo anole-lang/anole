@@ -18,9 +18,7 @@ sudo apt-get install libreadline6-dev
 ```bash
 ~> git clone https://github.com/anole-lang/anole.git
 ~> cd anole
-~/anole> mkdir build
-~/anole> cd build
-~/build> cmake ..
+~/anole> mkdir build && cd build && cmake ..
 ~/build> sudo make install
 ```
 

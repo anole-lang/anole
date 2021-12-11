@@ -5,6 +5,16 @@
 #include <string>
 #include <cstdint>
 
+#if defined(__linux__)
+    #define __POSIX__
+    #define __LINUX__
+#elif defined(__APPLE__)
+    #define __POSIX__
+    #define __MACOS__
+#else
+    #error "only support linux and macos now"
+#endif
+
 namespace anole
 {
 template<typename T>

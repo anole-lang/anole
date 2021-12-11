@@ -1,16 +1,12 @@
 #include "repl.hpp"
 #include "anole.hpp"
 
-#ifdef __linux__
-    #include <readline/readline.h>
-    #include <readline/history.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
-    #include <setjmp.h>
-    #include <unistd.h>
-    #include <signal.h>
-#else
-    #error "only support linux"
-#endif
+#include <setjmp.h>
+#include <unistd.h>
+#include <signal.h>
 
 #include <cstdio>
 #include <sstream>

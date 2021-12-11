@@ -3,11 +3,7 @@
 #include "../runtime/runtime.hpp"
 #include "../compiler/compiler.hpp"
 
-#ifdef __linux__
-    #include <dlfcn.h>
-#else
-    #error only support linux
-#endif
+#include <dlfcn.h>
 
 #include <fstream>
 
@@ -190,7 +186,11 @@ Address AnoleModuleObject::load_member(const String &name)
 CppModuleObject::CppModuleObject(const fs::path &path)
   : ModuleObject(ObjectType::CppModule)
 {
+#ifdef __LINUX__
     handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND);
+#elif defined(__MACOS__)
+    handle_ = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+#endif
     good_ = handle_;
     names_ = good_
         ? reinterpret_cast<decltype(names_)>(dlsym(handle_, "_FUNCTIONS"))
