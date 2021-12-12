@@ -100,7 +100,7 @@ void ParenOperatorExpr::codegen(Code &code)
         }
         expr->codegen(code);
         code.locate(location);
-        code.add_ins<Opcode::FastCall>(args.size());
+        code.add_ins<Opcode::FastCall, Size>(args.size());
     }
 }
 
@@ -589,7 +589,7 @@ void MultiVarsDeclarationStmt::SingleDeclVariable::codegen(Code &code)
 
 void MultiVarsDeclarationStmt::MultiDeclVariables::codegen(Code &code)
 {
-    code.add_ins<Opcode::Unpack>(variables.size());
+    code.add_ins<Opcode::Unpack, Size>(variables.size());
 
     for (auto &variable : variables)
     {
@@ -624,7 +624,7 @@ void MultiVarsDeclarationStmt::codegen(Code &code)
 
         if (exprs.size() == 1 && variables.size() > 1)
         {
-            code.add_ins<Opcode::Unpack>(variables.size());
+            code.add_ins<Opcode::Unpack, Size>(variables.size());
         }
     }
 
