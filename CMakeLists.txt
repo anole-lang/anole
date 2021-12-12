@@ -27,7 +27,7 @@ file (GLOB SRC_RUNTIME "anole/runtime/*.cpp")
 file (GLOB SRC_COMPILER "anole/compiler/*.cpp")
 
 IF (CMAKE_BUILD_TYPE STREQUAL Debug)
-    set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -g -Wall")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall")
     ADD_DEFINITIONS (-D_DEBUG)
 
     add_executable (anole ${SRC_MAIN} ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER})
@@ -41,7 +41,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL Debug)
     install (TARGETS anole DESTINATION bin)
 
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
-    set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -pg -O3 -Wall")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg -O3 -Wall")
 
     add_executable (anole ${SRC_MAIN} ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER})
 
@@ -54,7 +54,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Gprof)
     install (TARGETS anole DESTINATION bin)
 
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
-    set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O3 -Wall")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
 
     add_library (objects SHARED
         ${SRC_OBJECTS}
@@ -94,7 +94,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL Dynamic)
     install (TARGETS anole DESTINATION bin)
 
 ELSE ()
-    set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O3 -Wall")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
 
     add_executable (anole ${SRC_MAIN} ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER})
 
@@ -118,71 +118,71 @@ install (FILES "anole/anole.hpp"
 )
 
 #install libs of anole
-IF (${IS_MACOS})
-# TODO: for macos
+if (IS_MACOS)
+    add_link_options(-undefined dynamic_lookup)
 
-    # #install lib file
-    # add_library (fileobject MODULE
-    #     lib/file/fileobject.cpp
-    # )
+    #install lib file
+    add_library (fileobject MODULE
+        lib/file/fileobject.cpp
+    )
 
-    # install (FILES "lib/file/__init__.anole"
-    #     DESTINATION "lib/anole/file"
-    # )
+    install (FILES "lib/file/__init__.anole"
+        DESTINATION "lib/anole/file"
+    )
 
-    # install (TARGETS fileobject
-    #     DESTINATION "lib/anole/file"
-    # )
+    install (TARGETS fileobject
+        DESTINATION "lib/anole/file"
+    )
 
-    # #install lib env
-    # add_library (env MODULE
-    #     lib/env/env.cpp
-    # )
+    #install lib env
+    add_library (env MODULE
+        lib/env/env.cpp
+    )
 
-    # install (FILES "lib/env/__init__.anole"
-    #     DESTINATION "lib/anole/env"
-    # )
+    install (FILES "lib/env/__init__.anole"
+        DESTINATION "lib/anole/env"
+    )
 
-    # install (TARGETS env
-    #     DESTINATION "lib/anole/env"
-    # )
+    install (TARGETS env
+        DESTINATION "lib/anole/env"
+    )
 
-    # #install lib os
-    # install (FILES "lib/os/__init__.anole"
-    #     DESTINATION "lib/anole/os"
-    # )
+    #install lib os
+    install (FILES "lib/os/__init__.anole"
+        DESTINATION "lib/anole/os"
+    )
 
-    # #install lib path of lib os
-    # add_library ("path" MODULE
-    #     "lib/os/path/path.cpp"
-    # )
+    #install lib path of lib os
+    add_library ("path" MODULE
+        "lib/os/path/path.cpp"
+    )
 
-    # install (FILES "lib/os/path/__init__.anole"
-    #     DESTINATION "lib/anole/os/path"
-    # )
+    install (FILES "lib/os/path/__init__.anole"
+        DESTINATION "lib/anole/os/path"
+    )
 
-    # install (TARGETS "path"
-    #     DESTINATION "lib/anole/os/path"
-    # )
+    install (TARGETS "path"
+        DESTINATION "lib/anole/os/path"
+    )
 
-    # #install lib read_dir of lib os
-    # add_library ("read_dir" MODULE
-    #     "lib/os/read_dir/read_dir.cpp"
-    # )
+    #install lib read_dir of lib os
+    add_library ("read_dir" MODULE
+        "lib/os/read_dir/read_dir.cpp"
+    )
 
-    # install (FILES "lib/os/read_dir/__init__.anole"
-    #     DESTINATION "lib/anole/os/read_dir"
-    # )
+    install (FILES "lib/os/read_dir/__init__.anole"
+        DESTINATION "lib/anole/os/read_dir"
+    )
 
-    # install (TARGETS "read_dir"
-    #     DESTINATION "lib/anole/os/read_dir"
-    # )
+    install (TARGETS "read_dir"
+        DESTINATION "lib/anole/os/read_dir"
+    )
 
-    # #install lib coroutine
-    # install (FILES "lib/coroutine/__init__.anole"
-    #     DESTINATION "lib/anole/coroutine"
-    # )
-ELSE ()
+    #install lib coroutine
+    install (FILES "lib/coroutine/__init__.anole"
+        DESTINATION "lib/anole/coroutine"
+    )
+else ()
     #install lib file
     add_library (fileobject SHARED
         lib/file/fileobject.cpp
@@ -244,7 +244,7 @@ ELSE ()
     install (FILES "lib/coroutine/__init__.anole"
         DESTINATION "lib/anole/coroutine"
     )
-ENDIF ()
+endif ()
 
 # --- anole test ---
 enable_testing()
@@ -257,9 +257,9 @@ add_executable(
 )
 
 if (IS_MACOS)
-    target_link_libraries (anole_test dl readline pthread gtest)
+    target_link_libraries (anole_test dl pthread gtest)
 else ()
-    target_link_libraries (anole_test dl stdc++fs readline pthread gtest)
+    target_link_libraries (anole_test dl stdc++fs pthread gtest)
 endif ()
 
 include(GoogleTest)
