@@ -1,13 +1,15 @@
 # ChangeLog for Anole
 
-## Unreleased
+## 0.0.24 - 2021/12/12
 
 ### Changed
 
 - Regard `{ ... }` as `@{ ... }()` now
+- Edit CMakeLists.txt to support MacOS simply
 
 ### Fixed
 
+- Fix code bug when `std::size_t` is not same to `std::uint64_t`
 - Fix bug when inputting `;;;` in the REPL
 
 ## 0.0.23 - 2021/02/13

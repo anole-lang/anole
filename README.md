@@ -16,10 +16,9 @@ sudo apt-get install libreadline6-dev
 ### Install
 
 ```bash
-~> git clone https://github.com/anole-lang/anole.git
-~> cd anole
-~/anole> mkdir build && cd build && cmake ..
-~/build> sudo make install
+git clone https://github.com/anole-lang/anole.git && cd anole
+cmake -S . -B build && cmake --build build -j4
+cd build && sudo make install
 ```
 
 If you want to remove anole, you can execute `cat install_manifest.txt | sudo xargs rm` in `build/`
