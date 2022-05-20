@@ -23,6 +23,10 @@ cd build && sudo make install
 
 If you want to remove anole, you can execute `cat install_manifest.txt | sudo xargs rm` in `build/`
 
+### Test
+
+Run `cmake -D CMAKE_BUILD_TYPE=Test -S . -B build && cmake --build build -j4`
+
 ### Usage
 
 ```bash

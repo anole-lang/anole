@@ -247,20 +247,22 @@ else ()
 endif ()
 
 # --- anole test ---
-enable_testing()
+IF (CMAKE_BUILD_TYPE STREQUAL Test)
+    enable_testing()
 
-add_executable(
-    anole_test
-    test/test.cpp
-    anole/error.cpp
-    ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER}
-)
+    add_executable(
+        anole_test
+        test/test.cpp
+        anole/error.cpp
+        ${SRC_OBJECTS} ${SRC_RUNTIME} ${SRC_COMPILER}
+    )
 
-if (IS_MACOS)
-    target_link_libraries (anole_test dl pthread gtest)
-else ()
-    target_link_libraries (anole_test dl stdc++fs pthread gtest)
-endif ()
+    if (IS_MACOS)
+        target_link_libraries (anole_test dl pthread gtest)
+    else ()
+        target_link_libraries (anole_test dl stdc++fs pthread gtest)
+    endif ()
 
-include(GoogleTest)
-gtest_discover_tests(anole_test)
+    include(GoogleTest)
+    gtest_discover_tests(anole_test)
+endif()
