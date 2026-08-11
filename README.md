@@ -7,8 +7,8 @@ classes, modules and first-class continuations.
 
 ## Toolchain
 
-The repository pins the latest stable Rust release used by this rewrite in
-`rust-toolchain.toml`. Rustup selects it automatically.
+The repository tracks the Rust `stable` channel in `rust-toolchain.toml`.
+Rustup selects the current stable toolchain automatically.
 
 ## Build and install
 
