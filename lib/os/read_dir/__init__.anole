@@ -1,3 +1,0 @@
-use * from "./libread_dir.so";
-
-@read_dir(path): __read_dir(path);

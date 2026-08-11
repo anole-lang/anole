@@ -1,52 +1,57 @@
 # Anole Programming Language
 
-[![New Issue](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/anole-lang/anole/issues/new)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/anole-lang/anole/compare)
-[![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/anole)
-[![License](https://img.shields.io/github/license/anole-lang/anole.svg)](https://github.com/anole-lang/anole)
+Anole is a small dynamically typed language. The interpreter is implemented in
+safe, idiomatic Rust and preserves the observable behavior of the former C++
+0.0.24 implementation, including dynamic operators, lazy values, references,
+classes, modules and first-class continuations.
 
-## Quick Usage
+## Toolchain
 
-### Requirements
+The repository pins the latest stable Rust release used by this rewrite in
+`rust-toolchain.toml`. Rustup selects it automatically.
 
-```bash
-sudo apt-get install libreadline6-dev
-```
-
-### Install
+## Build and install
 
 ```bash
-git clone https://github.com/anole-lang/anole.git && cd anole
-cmake -S . -B build && cmake --build build -j4
-cd build && sudo make install
+cargo build --release
+cargo install --path .
 ```
 
-If you want to remove anole, you can execute `cat install_manifest.txt | sudo xargs rm` in `build/`
+The standard `env`, `file`, `os`, `debug`, and `coroutine` modules are embedded
+in the binary. An installed interpreter therefore has no C++ shared-library or
+external runtime dependency.
 
-### Test
+## Usage
 
-Run `cmake -D CMAKE_BUILD_TYPE=Test -S . -B build && cmake --build build -j4`
-
-### Usage
+Run a source file:
 
 ```bash
-~> anole
+anole example/class.anole
 ```
 
-You can see some examples in `example/` or the `test/sample-tester.hpp`, this is the yin-yang puzzle for fun
+Pass arguments to a program:
 
-```
-(@(yang): @(yin): yin(yang))
-    ((@(cc) { print("*"); return cc; })
-        (call_with_current_continuation(@(cont): cont)))
-    ((@(cc) { print("@"); return cc; })
-        (call_with_current_continuation(@(cont): cont)));
+```bash
+anole example/env_args.anole first second
 ```
 
-### Extension in Visual Studio Code
+Start the REPL with `anole`, or pipe a program through standard input. Print the
+compatible version literal with `anole --version`.
 
-Search `Anole-Lang`, only provides highlight now
+## Development
 
-## ChangeLog
+The rewrite follows a test-first compatibility suite derived from the original
+tokenizer tests, runtime samples, command-line behavior and repository examples.
 
-See [ChangeLog.md](ChangeLog.md)
+```bash
+cargo fmt --all -- --check
+cargo test --all-targets
+cargo clippy --all-targets -- -D warnings
+```
+
+The implementation is split into a lexer, Rust enum-based AST, Pratt parser and
+a trampolined continuation-passing runtime. The trampoline makes loops, deep
+functional composition and resumable continuations independent of the native
+call-stack depth.
+
+See [ChangeLog.md](ChangeLog.md) for the historical language changes.
