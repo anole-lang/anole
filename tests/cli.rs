@@ -6,7 +6,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::os::unix::fs::PermissionsExt;
 
 #[test]
-fn reports_the_legacy_version_literal() {
+fn reports_the_version_literal() {
     for option in ["--version", "-version"] {
         let output = Command::new(env!("CARGO_BIN_EXE_anole"))
             .arg(option)
@@ -15,7 +15,7 @@ fn reports_the_legacy_version_literal() {
         assert!(output.status.success());
         assert_eq!(
             String::from_utf8(output.stdout).unwrap(),
-            "Anole 0.0.24 2021/12/12\n",
+            "Anole 0.0.25 2026/08/12\n",
             "option: {option}",
         );
     }
@@ -72,7 +72,7 @@ fn directory_entry_points_keep_all_arguments_in_the_cli_prefix() {
         .arg("--version")
         .output()
         .unwrap();
-    assert_eq!(version.stdout, b"Anole 0.0.24 2021/12/12\n");
+    assert_eq!(version.stdout, b"Anole 0.0.25 2026/08/12\n");
     assert!(version.stderr.is_empty());
     fs::remove_dir_all(directory).unwrap();
 }
@@ -1039,7 +1039,7 @@ fn executes_piped_standard_input() {
             "    _                _\n",
             "   / \\   _ __   ___ | | ___\n",
             "  / _ \\ | '_ \\ / _ \\| |/ _ \\\n",
-            " / ___ \\| | | | (_) | |  __/   0.0.24 2021/12/12\n",
+            " / ___ \\| | | | (_) | |  __/   0.0.25 2026/08/12\n",
             "/_/   \\_\\_| |_|\\___/|_|\\___|\n\n",
             ">> println(21 * 2);\n",
             "42\n",

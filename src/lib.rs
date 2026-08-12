@@ -1,6 +1,6 @@
 //! Anole language implementation.
 
-pub const VERSION_LITERAL: &str = "0.0.24 2021/12/12";
+pub const VERSION_LITERAL: &str = "0.0.25 2026/08/12";
 
 pub mod ast;
 mod ir;
