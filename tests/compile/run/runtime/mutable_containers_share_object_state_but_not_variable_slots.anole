@@ -1,0 +1,16 @@
+
+@a: [1];
+@b: a;
+b.push(2);
+println(a);
+println(a is b);
+b: [];
+println(a);
+println(b);
+@d: dict { "one" => 1 };
+@e: d;
+e.insert("two", 2);
+println(d);
+e: dict {};
+println(d);
+println(e);

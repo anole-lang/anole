@@ -1,0 +1,1 @@
+@join(left, right): left + right;if true { infixop 50 join; println(1 join 2); }

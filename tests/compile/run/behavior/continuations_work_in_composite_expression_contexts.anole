@@ -1,0 +1,9 @@
+@mapping: dict {
+    "answer" => call_with_current_continuation(@(continuation): continuation(42))
+};
+println(mapping.answer);
+println(match 1 {
+    1 => call_with_current_continuation(@(continuation): continuation(43))
+});
+@pick(value: call_with_current_continuation(@(continuation): continuation(44))): value;
+println(pick());

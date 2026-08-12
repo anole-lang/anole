@@ -1,0 +1,7 @@
+
+@items: [1];
+@mapping: dict {};
+println(type(items.push));
+println(str(items.push));
+println(type("text".size));
+println(type(mapping.insert));

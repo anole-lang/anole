@@ -17,6 +17,11 @@ path = "src/lib.rs"
 name = "anole"
 path = "src/main.rs"
 
+[[test]]
+name = "compile_tests"
+path = "tests/compile_tests.rs"
+harness = false
+
 [profile.release]
 lto = true
 strip = true

@@ -1,0 +1,4 @@
+State: enum { Start, Running: 4, End };
+class Base { value: 1; __init__(self, x) { self.value: x; } }
+@[a, b]: [1, 2];
+result: match State.Start { State.Start => { return a; }, => b };

@@ -1,0 +1,12 @@
+
+@saved: none;
+@phase: 0;
+@value: call_with_current_continuation(@(continuation) {
+    saved: continuation;
+    return 1;
+});
+println(type(value));
+if phase = 0 {
+    phase: 1;
+    call_with_current_continuation(saved);
+}

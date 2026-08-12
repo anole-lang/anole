@@ -1,0 +1,13 @@
+
+@integer_a: 1;
+@integer_b: 1;
+@float_a: 2.5;
+@float_b: 2.5;
+@string_a: "value";
+@string_b: "value";
+println(integer_a is integer_b);
+println(float_a is float_b);
+println(string_a is string_b);
+println(id(integer_a) = id(integer_b));
+println(id(float_a) = id(float_b));
+println(id(string_a) = id(string_b));

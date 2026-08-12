@@ -1,0 +1,7 @@
+
+println(1 > "a");
+println(1 >= "a");
+println(none > "a");
+println(none >= "a");
+println([1] > "a");
+println([1] >= "a");

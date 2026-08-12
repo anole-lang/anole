@@ -1,0 +1,21 @@
+
+@items: [1];
+println(items.size(90, 91));
+items.push(2, 3);
+println(items);
+println(items.front(90));
+println(items.back(90));
+
+@iterator: items.__iterator__(90);
+println(iterator.__has_next__(90));
+println(iterator.__next__(90));
+
+@mapping: dict {};
+mapping.insert("answer", 42, 90);
+println(mapping.at("answer", 90));
+mapping.erase("answer", 90);
+println(mapping.empty(90));
+
+println("123tail".to_int(90));
+println("abc".size(90));
+println((42).to_str(90));

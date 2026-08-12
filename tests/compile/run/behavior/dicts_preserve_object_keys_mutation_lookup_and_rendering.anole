@@ -1,0 +1,20 @@
+
+@function(): none;
+@functions: dict { function => 7 };
+println(functions[function]);
+println(functions);
+
+@key: [1];
+@mutable: dict { key => 8 };
+key.push(2);
+println(mutable[key]);
+
+@left: dict { "x" => 1 };
+@right: dict { "x" => 2 };
+@outer: dict { left => 10, right => 20 };
+println(outer.size());
+println(outer[left]);
+println(outer[right]);
+
+println(dict {});
+println(dict { none => 1, 2.5 => 2, "a" => 3 });

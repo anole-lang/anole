@@ -1,0 +1,1 @@
+call_with_current_continuation(@(continuation: none): continuation);

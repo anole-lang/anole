@@ -23,7 +23,8 @@ To remove Anole, run `cargo uninstall anole`.
 
 ### Test
 
-Run `cargo test --all-targets`.
+Run `cargo test --all-targets`. Language behavior tests live in
+[`tests/compile`](tests/compile); see its README for adding and updating cases.
 
 ### Usage
 
@@ -31,8 +32,7 @@ Run `cargo test --all-targets`.
 $ anole
 ```
 
-You can find examples in `example/` and runtime samples in
-`tests/support/native_samples.rs`. This is the yin-yang puzzle for fun:
+You can find examples in `example/`. This is the yin-yang puzzle for fun:
 
 ```anole
 (@(yang): @(yin): yin(yang))

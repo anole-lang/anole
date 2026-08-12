@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: no member named value
+line: 5
+column: 14

@@ -1,0 +1,5 @@
+
+class Answer {
+    __init__(self) { return 42; }
+}
+println(Answer());

@@ -1,0 +1,3 @@
+
+@pick(value, fallback: value): fallback;
+println(pick(42));

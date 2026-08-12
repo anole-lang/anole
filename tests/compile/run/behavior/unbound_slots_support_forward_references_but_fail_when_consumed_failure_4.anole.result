@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: var named missing doesn't reference to any object
+line: 1
+column: 2

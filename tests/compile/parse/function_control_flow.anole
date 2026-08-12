@@ -1,0 +1,5 @@
+@sum(a, b: 2) { return a + b; }
+@result: 0;
+foreach [1, 2] as item {
+    if item > 1 { result: sum(item); }
+}

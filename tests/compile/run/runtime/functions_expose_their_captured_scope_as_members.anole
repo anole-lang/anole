@@ -1,0 +1,8 @@
+
+@Factory: {
+    @answer: 42;
+    @get(): answer;
+    return @{};
+};
+println(Factory.answer);
+println(Factory.get());

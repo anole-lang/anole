@@ -1,0 +1,7 @@
+
+@*=*(lhs, rhs): lhs + rhs;
+@*^*(lhs, rhs) { return lhs + rhs; }
+infixop 50 *=*;
+infixop 200 *^*;
+println(2 * 3 *=* 4 * 5);
+println(2 * 3 *^* 4 * 5);

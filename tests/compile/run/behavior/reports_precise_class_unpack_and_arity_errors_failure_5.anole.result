@@ -1,0 +1,3 @@
+mode: run
+status: failure
+message: missing the parameter named 'right'

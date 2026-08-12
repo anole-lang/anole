@@ -1,0 +1,6 @@
+@inner(value) {
+    return value.missing;
+}
+@middle(value): inner(value);
+@outer(): middle(1);
+outer();

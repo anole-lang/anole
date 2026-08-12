@@ -1,0 +1,5 @@
+@*=*(left, right): left + right;
+infixop 50 *=*;
+@refof(&value): delay value;
+prefixop refof;
+result: refof 2 * 3 *=* 4 * 5;

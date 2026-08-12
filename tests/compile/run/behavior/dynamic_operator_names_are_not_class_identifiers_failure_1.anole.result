@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: expected '{'
+line: 3
+column: 6

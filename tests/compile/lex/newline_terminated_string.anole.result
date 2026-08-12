@@ -1,0 +1,5 @@
+mode: lex
+status: failure
+message: expected "
+line: 2
+column: 2

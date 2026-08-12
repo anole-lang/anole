@@ -1,0 +1,4 @@
+
+@identity(&value): @(): value;
+@recursive: identity(recursive);
+println(type(recursive()));

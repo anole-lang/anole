@@ -1,0 +1,5 @@
+mode: parse
+status: failure
+message: reference should be binded with other variable
+line: 1
+column: 11

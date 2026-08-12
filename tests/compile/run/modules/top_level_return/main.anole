@@ -1,0 +1,6 @@
+use dep;
+@observed: 99;
+println(type(observed));
+println(type(dep));
+use dep;
+println(type(dep));

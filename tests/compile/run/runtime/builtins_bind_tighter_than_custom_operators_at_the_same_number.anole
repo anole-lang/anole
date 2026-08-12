@@ -1,0 +1,4 @@
+
+@join(left, right): left * 10 + right;
+infixop 190 join;
+println(1 join 2 * 3);

@@ -1,0 +1,6 @@
+
+class Kind { __init__(self): none; }
+@value: Kind();
+println(type(value));
+println(value is none);
+println(dict { none => 1, value => 2 }.size());

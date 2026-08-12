@@ -1,0 +1,24 @@
+
+println(1 > 1);
+println(1 >= 1);
+println(2 > 1);
+println(2 >= 1);
+@integer_left: 1;
+@integer_right: 1;
+println(integer_left > integer_right);
+println(integer_left >= integer_right);
+@float_left: 1.0;
+@float_right: 1.0;
+println(float_left > float_right);
+println(float_left >= float_right);
+println("b" > "b");
+println("b" >= "b");
+println("b" > "a");
+println("b" >= "a");
+println("a" < 1);
+println("a" <= 1);
+println("123suffix".to_int());
+println("  -42tail".to_int());
+println("é".size());
+println("é"[0].size());
+println("é"[1].size());

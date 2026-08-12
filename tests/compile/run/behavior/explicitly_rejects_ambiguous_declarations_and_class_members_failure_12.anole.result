@@ -1,0 +1,5 @@
+mode: parse
+status: failure
+message: unexpected from because there is at least one module denoted by its path
+line: 1
+column: 34

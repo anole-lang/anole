@@ -1,0 +1,1 @@
+use left, right; println(left.value is right.value);

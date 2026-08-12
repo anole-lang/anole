@@ -1,0 +1,8 @@
+
+@mapping: dict { "value" => 1 };
+@&through_at: mapping.at("value");
+through_at: 2;
+println(mapping.value);
+@&through_index: mapping["value"];
+through_index: 3;
+println(mapping.value);

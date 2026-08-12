@@ -1,0 +1,1 @@
+@join(left, right): left + right;infixop 50 join;join; println("infix");@negate(value): 0 - value;prefixop negate;negate; println("prefix");

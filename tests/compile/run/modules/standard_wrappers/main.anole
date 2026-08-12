@@ -1,0 +1,8 @@
+use env, file, os;
+println(type(env.__args)); println(type(env.args));
+println(type(file.__open)); println(type(file.open));
+println(type(file.mode)); println(file.mode.in | file.mode.out);
+println(type(os.path.__current_path));
+println(type(os.path.current_path));
+println(type(os.read_dir.__read_dir));
+println(type(os.read_dir.read_dir));

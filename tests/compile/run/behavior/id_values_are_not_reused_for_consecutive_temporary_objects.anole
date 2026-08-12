@@ -1,0 +1,11 @@
+
+println(id([1]) = id([2]));
+println(id(dict { "left" => 1 }) = id(dict { "right" => 2 }));
+println(id(@(): none) = id(@(): none));
+@seen: dict {};
+@index: 0;
+while index < 256 {
+    seen.insert(id([index]), true);
+    index: index + 1;
+}
+println(seen.size());

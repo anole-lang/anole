@@ -1,0 +1,7 @@
+
+foreach [1, 2] as i {
+    foreach [2, 3] as j {
+        print(i);
+        print(j);
+    }
+}

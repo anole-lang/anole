@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: integer overflow
+line: 1
+column: 48

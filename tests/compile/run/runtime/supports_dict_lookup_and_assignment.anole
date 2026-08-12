@@ -1,0 +1,5 @@
+
+d: dict { "one" => 1 };
+println(d["one"]);
+d["two"]: 2;
+println(d["two"]);

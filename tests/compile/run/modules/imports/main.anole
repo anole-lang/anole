@@ -1,0 +1,4 @@
+use numbers as nums;
+use one, sum from numbers;
+println(nums.two);
+println(sum(one, nums.two));

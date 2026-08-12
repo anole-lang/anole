@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: no member named index
+line: 8
+column: 21

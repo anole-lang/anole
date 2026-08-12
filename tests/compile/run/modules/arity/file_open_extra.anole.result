@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: function takes 2 arguments but 3 were given
+line: 13
+column: 24

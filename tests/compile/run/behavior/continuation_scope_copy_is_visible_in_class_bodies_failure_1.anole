@@ -1,0 +1,5 @@
+
+class Answer {
+    value: call_with_current_continuation(@(continuation): continuation(43));
+}
+println(Answer.value);

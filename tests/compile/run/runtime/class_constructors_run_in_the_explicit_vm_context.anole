@@ -1,0 +1,7 @@
+
+@Box: class {
+    __init__(self) {
+        self.value: call_with_current_continuation(@(cont): 7);
+    };
+};
+println(Box().value);

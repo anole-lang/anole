@@ -1,0 +1,11 @@
+
+@state: 0;
+@boxes: [[0], [0]];
+boxes[(state: state * 10 + 1) % 2][0]: state: state * 10 + 2;
+println(state);
+@*~*(left, right): left + right;
+infixop 180 *~*;
+state: 0;
+@value: (state: state * 10 + 1) *~* (state: state * 10 + 2);
+println(state);
+println(value);

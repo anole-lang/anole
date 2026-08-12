@@ -1,0 +1,14 @@
+
+@state: 0;
+@values: [
+    state: state * 10 + 1,
+    state: state * 10 + 2,
+    state: state * 10 + 3
+];
+println(state);
+state: 0;
+@mapping: dict {
+    (state: state * 10 + 1) => (state: state * 10 + 2),
+    (state: state * 10 + 3) => (state: state * 10 + 4)
+};
+println(state);

@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: no mod method
+line: 1
+column: 4

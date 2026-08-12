@@ -1,0 +1,4 @@
+
+l: [1, 2, 3];
+foreach l as i { i: 10; }
+println(l);

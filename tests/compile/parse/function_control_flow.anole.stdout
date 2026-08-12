@@ -1,0 +1,170 @@
+[
+    Declaration(
+        Declaration {
+            bindings: [
+                Name {
+                    name: "sum",
+                    by_reference: true,
+                },
+            ],
+            values: [
+                Lambda {
+                    parameters: [
+                        Parameter {
+                            name: "a",
+                            by_reference: false,
+                            variadic: false,
+                            default: None,
+                        },
+                        Parameter {
+                            name: "b",
+                            by_reference: false,
+                            variadic: false,
+                            default: Some(
+                                Literal(
+                                    Integer(
+                                        2,
+                                    ),
+                                ),
+                            ),
+                        },
+                    ],
+                    body: [
+                        Return(
+                            [
+                                Binary {
+                                    left: Identifier(
+                                        "a",
+                                        Location {
+                                            line: 1,
+                                            column: 23,
+                                        },
+                                    ),
+                                    operator: "+",
+                                    right: Identifier(
+                                        "b",
+                                        Location {
+                                            line: 1,
+                                            column: 27,
+                                        },
+                                    ),
+                                    location: Location {
+                                        line: 1,
+                                        column: 25,
+                                    },
+                                },
+                            ],
+                        ),
+                    ],
+                },
+            ],
+        },
+    ),
+    Declaration(
+        Declaration {
+            bindings: [
+                Name {
+                    name: "result",
+                    by_reference: false,
+                },
+            ],
+            values: [
+                Literal(
+                    Integer(
+                        0,
+                    ),
+                ),
+            ],
+        },
+    ),
+    Foreach {
+        iterable: List(
+            [
+                Literal(
+                    Integer(
+                        1,
+                    ),
+                ),
+                Literal(
+                    Integer(
+                        2,
+                    ),
+                ),
+            ],
+        ),
+        binding: Some(
+            "item",
+        ),
+        body: [
+            If {
+                condition: Binary {
+                    left: Identifier(
+                        "item",
+                        Location {
+                            line: 4,
+                            column: 7,
+                        },
+                    ),
+                    operator: ">",
+                    right: Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                    location: Location {
+                        line: 4,
+                        column: 12,
+                    },
+                },
+                then_block: [
+                    Expression(
+                        Binary {
+                            left: Identifier(
+                                "result",
+                                Location {
+                                    line: 4,
+                                    column: 18,
+                                },
+                            ),
+                            operator: ":",
+                            right: Call {
+                                callee: Identifier(
+                                    "sum",
+                                    Location {
+                                        line: 4,
+                                        column: 26,
+                                    },
+                                ),
+                                arguments: [
+                                    Argument {
+                                        value: Identifier(
+                                            "item",
+                                            Location {
+                                                line: 4,
+                                                column: 30,
+                                            },
+                                        ),
+                                        unpack: false,
+                                    },
+                                ],
+                                location: Location {
+                                    line: 4,
+                                    column: 29,
+                                },
+                            },
+                            location: Location {
+                                line: 4,
+                                column: 24,
+                            },
+                        },
+                    ),
+                ],
+                else_branch: None,
+                location: Location {
+                    line: 4,
+                    column: 7,
+                },
+            },
+        ],
+    },
+]

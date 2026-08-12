@@ -1,0 +1,3 @@
+mode: run
+status: failure
+message: each base of one class must be one class

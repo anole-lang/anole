@@ -1,0 +1,12 @@
+
+a: 1;
+@foo(x) {
+    a : 1;
+    if x {
+        return a: 2;
+    } else {
+        return a: 3;
+    };
+};
+print(foo(1));
+print(foo(0));

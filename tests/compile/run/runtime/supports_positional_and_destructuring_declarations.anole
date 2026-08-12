@@ -1,0 +1,10 @@
+
+@prints(...args) {
+    foreach args as arg { print(arg); print(" "); }
+}
+@a, b: 1, 2;
+prints(a, b);
+@a, b: [3, 4];
+prints(a, b);
+@[a, b]: [5, 6];
+prints(a, b);

@@ -1,0 +1,10 @@
+
+@a: 1;
+@b: a;
+@c: 1;
+println(id(a) = id(b));
+println(id(a) = id(c));
+println(id(true) = id(true));
+println(str(none));
+println([none]);
+println(none);

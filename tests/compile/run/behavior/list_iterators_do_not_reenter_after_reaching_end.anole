@@ -1,0 +1,7 @@
+
+@items: [1, 2];
+@iterator: items.__iterator__();
+iterator.__next__();
+iterator.__next__();
+items.push(3);
+println(iterator.__has_next__());

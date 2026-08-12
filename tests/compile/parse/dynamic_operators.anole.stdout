@@ -1,0 +1,153 @@
+[
+    Declaration(
+        Declaration {
+            bindings: [
+                Name {
+                    name: "*=*",
+                    by_reference: true,
+                },
+            ],
+            values: [
+                Lambda {
+                    parameters: [
+                        Parameter {
+                            name: "left",
+                            by_reference: false,
+                            variadic: false,
+                            default: None,
+                        },
+                        Parameter {
+                            name: "right",
+                            by_reference: false,
+                            variadic: false,
+                            default: None,
+                        },
+                    ],
+                    body: [
+                        Return(
+                            [
+                                Binary {
+                                    left: Identifier(
+                                        "left",
+                                        Location {
+                                            line: 1,
+                                            column: 19,
+                                        },
+                                    ),
+                                    operator: "+",
+                                    right: Identifier(
+                                        "right",
+                                        Location {
+                                            line: 1,
+                                            column: 26,
+                                        },
+                                    ),
+                                    location: Location {
+                                        line: 1,
+                                        column: 24,
+                                    },
+                                },
+                            ],
+                        ),
+                    ],
+                },
+            ],
+        },
+    ),
+    InfixOperator {
+        operator: "*=*",
+        precedence: 50,
+    },
+    Declaration(
+        Declaration {
+            bindings: [
+                Name {
+                    name: "refof",
+                    by_reference: true,
+                },
+            ],
+            values: [
+                Lambda {
+                    parameters: [
+                        Parameter {
+                            name: "value",
+                            by_reference: true,
+                            variadic: false,
+                            default: None,
+                        },
+                    ],
+                    body: [
+                        Return(
+                            [
+                                Delay(
+                                    Identifier(
+                                        "value",
+                                        Location {
+                                            line: 3,
+                                            column: 22,
+                                        },
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ],
+                },
+            ],
+        },
+    ),
+    PrefixOperator(
+        "refof",
+    ),
+    Expression(
+        Binary {
+            left: Identifier(
+                "result",
+                Location {
+                    line: 5,
+                    column: 0,
+                },
+            ),
+            operator: ":",
+            right: Binary {
+                left: Binary {
+                    left: Unary {
+                        operator: "refof",
+                        operand: Literal(
+                            Integer(
+                                2,
+                            ),
+                        ),
+                        location: Location {
+                            line: 5,
+                            column: 8,
+                        },
+                    },
+                    operator: "*",
+                    right: Literal(
+                        Integer(
+                            3,
+                        ),
+                    ),
+                    location: Location {
+                        line: 5,
+                        column: 16,
+                    },
+                },
+                operator: "*=*",
+                right: Literal(
+                    Integer(
+                        20,
+                    ),
+                ),
+                location: Location {
+                    line: 5,
+                    column: 20,
+                },
+            },
+            location: Location {
+                line: 5,
+                column: 6,
+            },
+        },
+    ),
+]

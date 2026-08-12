@@ -1,0 +1,3 @@
+
+@adddd: @(a): @(b): @(c): @(d): a + b + c + d;
+print(adddd(1)(2)(3)(4));

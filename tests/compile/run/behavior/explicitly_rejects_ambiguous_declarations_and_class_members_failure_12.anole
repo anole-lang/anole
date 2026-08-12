@@ -1,0 +1,1 @@
+use "module.anole" as module from parent;

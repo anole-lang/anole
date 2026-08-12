@@ -1,0 +1,5 @@
+[1mTraceback:
+[0m  running at traceback.anole:6:6
+  running at traceback.anole:5:17
+  running at traceback.anole:4:22
+[1m  running at traceback.anole:2:17: [0m[31merror: [0mno member named missing

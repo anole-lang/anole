@@ -1,0 +1,2 @@
+@first(left, right): left * 10 + right; infixop 50 first;
+@second(left, right): left * 100 + right; infixop 50 second;

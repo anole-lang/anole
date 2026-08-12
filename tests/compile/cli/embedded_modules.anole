@@ -1,0 +1,7 @@
+use env;
+use coroutine;
+println(env.args().size());
+@once() { println(42); coroutine.co_yield(); }
+@id: coroutine.co_create(once);
+coroutine.co_resume(id);
+coroutine.co_destroy(id);

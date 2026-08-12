@@ -1,0 +1,14 @@
+
+@mapping: dict {
+    "x" => 1,
+    "x" => 2,
+    [1] => 3,
+    [1] => 4,
+    1.0000001 => 5,
+    1.0000002 => 6
+};
+println(mapping.size());
+println(mapping["x"]);
+println(mapping[[1]]);
+println(mapping[1.0000002]);
+println(mapping);

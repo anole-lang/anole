@@ -1,0 +1,5 @@
+mode: parse
+status: failure
+message: __init__ must be with function body
+line: 1
+column: 21

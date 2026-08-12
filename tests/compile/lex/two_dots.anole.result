@@ -1,0 +1,5 @@
+mode: lex
+status: failure
+message: unexpected ".."
+line: 1
+column: 0

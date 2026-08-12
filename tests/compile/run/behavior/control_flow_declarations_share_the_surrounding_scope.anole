@@ -1,0 +1,19 @@
+
+@value: 1;
+if true { @value: 2; }
+println(value);
+@count: 0;
+while count < 1 {
+    @inside: 42;
+    count: count + 1;
+}
+
+println(inside);
+foreach [41, 42] as item {}
+println(item);
+@functions: [];
+foreach [1, 2] as captured {
+    functions.push(@(): captured);
+}
+println(functions[0]());
+println(functions[1]());

@@ -1,0 +1,17 @@
+
+class Base {
+    value: 1;
+    __init__(self): none;
+}
+class (Base) Derived {}
+Base.value: 9;
+println(Derived.value);
+println(Derived.bctors.size());
+
+class Left { selected: 10; }
+class Right { selected: 20; }
+class (Left, Right) Combined {}
+Left.selected: 11;
+Right.selected: 21;
+println(Combined.selected);
+println(Combined.bctors.size());

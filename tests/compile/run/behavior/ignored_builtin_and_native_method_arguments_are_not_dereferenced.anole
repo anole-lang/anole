@@ -1,0 +1,17 @@
+
+println(42, missing);
+println(str(7, missing));
+println(type(7, missing));
+println(id(none, missing) = id(none));
+println(type(time(missing)));
+println(eval("6 * 7", missing));
+println(call_with_current_continuation(@(continuation): 9, missing));
+
+@items: [1];
+println(items.size(missing));
+items.push(2, missing);
+println(items);
+println(items.front(missing));
+@mapping: dict {};
+mapping.insert("answer", 42, missing);
+println(mapping.at("answer", missing));

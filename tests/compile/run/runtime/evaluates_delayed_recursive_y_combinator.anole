@@ -1,0 +1,6 @@
+
+@Y(f):
+  (@(x): f(delay x(delay x)))
+  (@(x): f(delay x(delay x)));
+@fact(f): @(n): n ? (n * f(n-1)) , 1;
+print(Y(fact)(5));

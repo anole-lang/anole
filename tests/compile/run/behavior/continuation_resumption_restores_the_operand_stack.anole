@@ -1,0 +1,11 @@
+@saved: none;
+@round: 0;
+@value: 10 + call_with_current_continuation(@(continuation) {
+    saved: continuation;
+    return 1;
+}) * 2;
+println(value);
+if round < 2 {
+    round: round + 1;
+    saved(round + 1);
+}

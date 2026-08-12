@@ -1,0 +1,1 @@
+use file; file.__open(1);

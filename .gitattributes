@@ -1,0 +1,2 @@
+*.anole.stdout whitespace=-trailing-space
+*.anole.stderr whitespace=-trailing-space

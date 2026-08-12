@@ -1,0 +1,1 @@
+class Empty {} Empty.new_member: 1;

@@ -1,0 +1,8 @@
+
+@literal(): 7;
+@from_first_call: literal();
+@from_second_call: literal();
+@from_first_eval: eval("7");
+@from_second_eval: eval("7");
+println(from_first_call is from_second_call);
+println(from_first_eval is from_second_eval);

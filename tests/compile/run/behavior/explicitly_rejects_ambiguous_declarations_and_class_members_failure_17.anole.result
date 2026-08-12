@@ -1,0 +1,5 @@
+mode: parse
+status: failure
+message: expected ')'
+line: 1
+column: 70

@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: continuation need a argument
+line: 1
+column: 60

@@ -1,0 +1,7 @@
+
+@refof(&var): delay var;
+prefixop refof;
+@a: 1;
+@test(var): var: 10;
+test(refof a);
+println(a);

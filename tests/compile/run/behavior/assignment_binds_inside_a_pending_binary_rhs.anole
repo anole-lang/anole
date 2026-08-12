@@ -1,0 +1,6 @@
+
+@left: 1;
+@right: 2;
+println(left + right: 3);
+println(left);
+println(right);

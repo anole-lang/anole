@@ -1,0 +1,7 @@
+use * from operators;
+@saved: none; @round: 0;
+@value: call_with_current_continuation(@(continuation) {
+    saved: continuation; return 10;
+});
+println(value);
+if round = 0 { round: 1; saved(20); }

@@ -1,0 +1,3 @@
+@join(left, right): left + right;
+infixop 50 join;
+class join {}

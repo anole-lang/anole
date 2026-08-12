@@ -1,0 +1,14 @@
+
+println(1.5);
+d: dict { "one" => 1 };
+println(d);
+println(d.empty());
+d.insert("two", 2);
+println(d.size());
+println(d.at("two"));
+d.three: 3;
+println(d["three"]);
+d.erase("one");
+println(d.size());
+d.clear();
+println(d.empty());

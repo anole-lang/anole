@@ -1,0 +1,6 @@
+
+@low: [1];
+@high: [3];
+@mapping: dict { low => "low", high => "high" };
+low[0]: 4;
+println(mapping);

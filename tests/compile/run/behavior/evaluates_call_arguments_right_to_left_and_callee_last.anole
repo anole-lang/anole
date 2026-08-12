@@ -1,0 +1,11 @@
+
+@callee(left, right): none;
+@state: 0;
+callee(state: state * 10 + 1, state: state * 10 + 2);
+println(state);
+state: 0;
+((state: state * 10 + 3) ? callee, callee)(
+    state: state * 10 + 1,
+    state: state * 10 + 2
+);
+println(state);

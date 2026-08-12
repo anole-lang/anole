@@ -1,0 +1,14 @@
+
+@State: enum { Start, Running: 4, End };
+println(type(State));
+println(State.Start);
+println(State.Running);
+println(State.End);
+
+@iterator: [10, 20].__iterator__();
+println(type(iterator));
+println(iterator.__has_next__());
+println(iterator.__next__());
+println(iterator.__has_next__());
+println(iterator.__next__());
+println(iterator.__has_next__());

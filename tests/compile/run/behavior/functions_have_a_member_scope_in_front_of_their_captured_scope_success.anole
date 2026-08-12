@@ -1,0 +1,4 @@
+
+@function(): hidden;
+function.hidden: 42;
+println(function());

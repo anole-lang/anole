@@ -1,0 +1,5 @@
+mode: parse
+status: failure
+message: method need at least 1 parameter
+line: 1
+column: 26

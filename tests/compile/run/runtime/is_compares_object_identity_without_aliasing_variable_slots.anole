@@ -1,0 +1,11 @@
+
+@a: 1;
+@b: 1;
+@c: a;
+println(a is b);
+println(a is c);
+c: 2;
+println(a);
+println(c);
+println(none is none);
+println(true is true);

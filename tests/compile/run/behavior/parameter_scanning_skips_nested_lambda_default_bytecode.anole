@@ -1,0 +1,6 @@
+
+@defaults(callback: (@(value) { @lazy: delay value + 1; return lazy; }),
+          transform: (@(value): value * 2)):
+    [callback(4), transform(4)];
+println(defaults());
+println(defaults((@(value): value * 2), (@(value): value + 5)));

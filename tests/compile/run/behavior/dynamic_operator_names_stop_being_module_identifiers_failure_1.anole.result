@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: expect a module here
+line: 3
+column: 4

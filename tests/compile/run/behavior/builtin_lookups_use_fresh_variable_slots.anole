@@ -1,0 +1,9 @@
+
+@&saved_print: print;
+print: 1;
+saved_print("first");
+@&alias: println;
+alias: 2;
+println("second");
+println(type(print));
+println(print is print);

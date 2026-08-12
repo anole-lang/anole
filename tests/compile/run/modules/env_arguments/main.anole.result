@@ -1,0 +1,4 @@
+mode: run
+arg: alpha
+arg: beta
+status: success

@@ -1,0 +1,3 @@
+mode: lex
+no-final-newline: true
+status: success

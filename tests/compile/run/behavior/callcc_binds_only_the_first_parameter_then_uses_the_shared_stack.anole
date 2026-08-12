@@ -1,0 +1,1 @@
+println(call_with_current_continuation(@(continuation, extra): extra, 42));

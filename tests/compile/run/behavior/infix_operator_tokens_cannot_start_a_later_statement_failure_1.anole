@@ -1,0 +1,1 @@
+@join(left, right): left + right;infixop 50 join;println(0); join 1;

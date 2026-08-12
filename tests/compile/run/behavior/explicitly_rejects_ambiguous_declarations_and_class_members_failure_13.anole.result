@@ -1,0 +1,5 @@
+mode: parse
+status: failure
+message: expected an identifier here
+line: 1
+column: 29

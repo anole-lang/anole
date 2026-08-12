@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: no member named new_member
+line: 1
+column: 20

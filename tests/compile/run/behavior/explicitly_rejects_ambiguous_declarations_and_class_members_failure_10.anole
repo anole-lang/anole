@@ -1,0 +1,1 @@
+println(match 1 { 1, => 10 });

@@ -1,0 +1,1 @@
+@collect(...items): items; @one: 1; collect(one...);

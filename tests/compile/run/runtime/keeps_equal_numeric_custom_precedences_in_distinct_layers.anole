@@ -1,0 +1,7 @@
+
+@first(left, right): left * 10 + right;
+@second(left, right): left * 100 + right;
+infixop 50 first;
+infixop 50 second;
+println(1 second 2 first 3);
+println(1 first 2 second 3);

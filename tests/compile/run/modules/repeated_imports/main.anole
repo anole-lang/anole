@@ -1,0 +1,5 @@
+use plain; @&first: plain;
+use plain; @&second: plain;
+println(first is second);
+first: 1;
+println(type(second)); println(second.answer);

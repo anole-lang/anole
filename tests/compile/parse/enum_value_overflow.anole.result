@@ -1,0 +1,5 @@
+mode: parse
+status: failure
+message: enum value overflow
+line: 1
+column: 44

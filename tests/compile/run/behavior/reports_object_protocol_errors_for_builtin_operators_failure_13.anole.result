@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: failed call with the given non-function
+line: 1
+column: 1

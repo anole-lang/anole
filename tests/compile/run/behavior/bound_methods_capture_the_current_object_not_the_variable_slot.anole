@@ -1,0 +1,24 @@
+
+@number: 1;
+@to_string: number.to_str;
+number: 2;
+println(to_string());
+
+@items: [1];
+@old_items: items;
+@push: items.push;
+items: [2];
+push(3);
+println(old_items);
+println(items);
+
+class Box {
+    value: 0;
+    get(self): self.value;
+    __init__(self, value) { self.value: value; }
+}
+@box: Box(4);
+@get: box.get;
+box: Box(5);
+println(get());
+println(box.get());

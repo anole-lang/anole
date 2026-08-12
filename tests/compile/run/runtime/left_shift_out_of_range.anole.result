@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: invalid shift count
+line: 1
+column: 28

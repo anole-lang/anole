@@ -1,0 +1,10 @@
+
+@capture(&slot, ...slot): slot;
+@value: 1;
+println(capture(value, 2, 3));
+println(value);
+
+@capture_refs(&slot, ...&slot): slot;
+@other: 4;
+println(capture_refs(other, value));
+println(other);

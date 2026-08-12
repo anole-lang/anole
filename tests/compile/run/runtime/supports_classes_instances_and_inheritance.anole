@@ -1,0 +1,15 @@
+
+class Base {
+    age: 10;
+    __init__(self, x) { self.name: x; }
+}
+class (Base) Student {
+    __init__(self, x) { bctors[0](self, x); }
+}
+stu: Student("Anole");
+println(Student.age);
+println(stu.age);
+println(stu.name);
+stu.age: 20;
+println(Student.age);
+println(stu.age);

@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: only default ctor but given non-zero arguments
+line: 1
+column: 20

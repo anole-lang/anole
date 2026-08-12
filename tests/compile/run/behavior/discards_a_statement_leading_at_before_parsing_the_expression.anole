@@ -1,0 +1,5 @@
+
+@{ println("block"); };
+@(println("paren"));
+@value: @(): 42;
+println(value());

@@ -1,0 +1,19 @@
+
+@items: [1, 2];
+foreach items as item {
+    @value: call_with_current_continuation(@(cont): item);
+    print(value);
+    if item = 2 { items.push(3); }
+}
+print("\n");
+@Range: class {
+    __init__(self) { self.i: 0; };
+    __iterator__(self) { return self; };
+    __has_next__(self) { return self.i < 3; };
+    __next__(self) {
+        @value: self.i;
+        self.i: self.i + 1;
+        return value;
+    };
+};
+foreach Range() as value { print(value); }

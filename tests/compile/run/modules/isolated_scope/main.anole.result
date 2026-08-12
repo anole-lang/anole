@@ -1,0 +1,3 @@
+mode: run
+status: failure
+message: var named secret doesn't reference to any object

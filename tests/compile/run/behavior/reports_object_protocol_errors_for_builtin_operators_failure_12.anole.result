@@ -1,0 +1,5 @@
+mode: run
+status: failure
+message: not support index
+line: 1
+column: 1

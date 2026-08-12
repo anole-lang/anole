@@ -1,0 +1,6 @@
+
+foo: @(m, n: n) { return m + n; };
+n: 1;
+println(foo(1));
+n: 2;
+println(foo(1));

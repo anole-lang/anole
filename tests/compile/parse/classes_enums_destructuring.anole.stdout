@@ -1,0 +1,264 @@
+[
+    Expression(
+        Binary {
+            left: Identifier(
+                "State",
+                Location {
+                    line: 1,
+                    column: 0,
+                },
+            ),
+            operator: ":",
+            right: Enum(
+                [
+                    (
+                        "Start",
+                        0,
+                    ),
+                    (
+                        "Running",
+                        4,
+                    ),
+                    (
+                        "End",
+                        5,
+                    ),
+                ],
+            ),
+            location: Location {
+                line: 1,
+                column: 5,
+            },
+        },
+    ),
+    Declaration(
+        Declaration {
+            bindings: [
+                Name {
+                    name: "Base",
+                    by_reference: true,
+                },
+            ],
+            values: [
+                Class {
+                    name: Some(
+                        "Base",
+                    ),
+                    bases: [],
+                    members: [
+                        Declaration {
+                            bindings: [
+                                Name {
+                                    name: "value",
+                                    by_reference: false,
+                                },
+                            ],
+                            values: [
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ],
+                        },
+                        Declaration {
+                            bindings: [
+                                Name {
+                                    name: "__init__",
+                                    by_reference: true,
+                                },
+                            ],
+                            values: [
+                                Lambda {
+                                    parameters: [
+                                        Parameter {
+                                            name: "self",
+                                            by_reference: false,
+                                            variadic: false,
+                                            default: None,
+                                        },
+                                        Parameter {
+                                            name: "x",
+                                            by_reference: false,
+                                            variadic: false,
+                                            default: None,
+                                        },
+                                    ],
+                                    body: [
+                                        Expression(
+                                            Binary {
+                                                left: Member {
+                                                    object: Identifier(
+                                                        "self",
+                                                        Location {
+                                                            line: 2,
+                                                            column: 43,
+                                                        },
+                                                    ),
+                                                    name: "value",
+                                                    location: Location {
+                                                        line: 2,
+                                                        column: 47,
+                                                    },
+                                                },
+                                                operator: ":",
+                                                right: Identifier(
+                                                    "x",
+                                                    Location {
+                                                        line: 2,
+                                                        column: 55,
+                                                    },
+                                                ),
+                                                location: Location {
+                                                    line: 2,
+                                                    column: 53,
+                                                },
+                                            },
+                                        ),
+                                        Return(
+                                            [
+                                                Identifier(
+                                                    "self",
+                                                    Location {
+                                                        line: 0,
+                                                        column: 0,
+                                                    },
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
+    ),
+    Declaration(
+        Declaration {
+            bindings: [
+                Destructure(
+                    [
+                        Name {
+                            name: "a",
+                            by_reference: false,
+                        },
+                        Name {
+                            name: "b",
+                            by_reference: false,
+                        },
+                    ],
+                ),
+            ],
+            values: [
+                List(
+                    [
+                        Literal(
+                            Integer(
+                                1,
+                            ),
+                        ),
+                        Literal(
+                            Integer(
+                                2,
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        },
+    ),
+    Expression(
+        Binary {
+            left: Identifier(
+                "result",
+                Location {
+                    line: 4,
+                    column: 0,
+                },
+            ),
+            operator: ":",
+            right: Match {
+                value: Member {
+                    object: Identifier(
+                        "State",
+                        Location {
+                            line: 4,
+                            column: 14,
+                        },
+                    ),
+                    name: "Start",
+                    location: Location {
+                        line: 4,
+                        column: 19,
+                    },
+                },
+                arms: [
+                    (
+                        [
+                            Member {
+                                object: Identifier(
+                                    "State",
+                                    Location {
+                                        line: 4,
+                                        column: 28,
+                                    },
+                                ),
+                                name: "Start",
+                                location: Location {
+                                    line: 4,
+                                    column: 33,
+                                },
+                            },
+                        ],
+                        Call {
+                            callee: Lambda {
+                                parameters: [],
+                                body: [
+                                    Return(
+                                        [
+                                            Identifier(
+                                                "a",
+                                                Location {
+                                                    line: 4,
+                                                    column: 52,
+                                                },
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            },
+                            arguments: [],
+                            location: Location {
+                                line: 0,
+                                column: 0,
+                            },
+                        },
+                    ),
+                ],
+                key_locations: [
+                    [
+                        Location {
+                            line: 4,
+                            column: 28,
+                        },
+                    ],
+                ],
+                fallback: Some(
+                    Identifier(
+                        "b",
+                        Location {
+                            line: 4,
+                            column: 61,
+                        },
+                    ),
+                ),
+            },
+            location: Location {
+                line: 4,
+                column: 6,
+            },
+        },
+    ),
+]

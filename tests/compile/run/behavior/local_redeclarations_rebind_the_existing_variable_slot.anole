@@ -1,0 +1,10 @@
+
+@value: 1;
+@&alias: value;
+@value: 2;
+println(alias);
+println(value);
+
+@value;
+println(alias is none);
+println(value is none);
