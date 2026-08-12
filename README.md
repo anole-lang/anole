@@ -1,58 +1,47 @@
 # Anole Programming Language
 
-Anole is a small dynamically typed language implemented in safe, idiomatic
-Rust. It supports dynamic operators, lazy values, references, classes, modules,
-and first-class continuations.
+[![New Issue](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/anole-lang/anole/issues/new)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/anole-lang/anole/compare)
+[![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/anole)
+[![License](https://img.shields.io/github/license/anole-lang/anole.svg)](https://github.com/anole-lang/anole)
 
-## Toolchain
+## Quick Usage
 
-The repository tracks the Rust `stable` channel in `rust-toolchain.toml`.
-Rustup selects the current stable toolchain automatically.
+### Requirements
 
-## Build and install
+Install [Rust](https://www.rust-lang.org/tools/install). Anole tracks the latest
+stable Rust toolchain.
+
+### Install
 
 ```bash
-cargo build --release
+git clone https://github.com/anole-lang/anole.git && cd anole
 cargo install --path .
 ```
 
-The standard `env`, `file`, `os`, `debug`, and `coroutine` modules are embedded
-in the binary, so an installed interpreter has no external runtime dependency.
+To remove Anole, run `cargo uninstall anole`.
 
-## Usage
+### Test
 
-Run a source file:
+Run `cargo test --all-targets`.
 
-```bash
-anole example/class.anole
+### Usage
+
+```console
+$ anole
 ```
 
-Pass arguments to a program:
+You can find examples in `example/` and runtime samples in
+`tests/support/native_samples.rs`. This is the yin-yang puzzle for fun:
 
-```bash
-anole example/env_args.anole first second
+```anole
+(@(yang): @(yin): yin(yang))
+    ((@(cc) { print("*"); return cc; })
+        (call_with_current_continuation(@(cont): cont)))
+    ((@(cc) { print("@"); return cc; })
+        (call_with_current_continuation(@(cont): cont)));
 ```
 
-Start the REPL with `anole`, or pipe a program through standard input. Print the
-compatible version literal with `anole --version`.
+### Extension in Visual Studio Code
 
-Successful file execution writes `<source>.ir`, including for imported Anole
-modules. The cache uses native-endian 64-bit fields, magic value `20210213`, a
-constant pool and opcode stream, followed by the source-position map. No IR file
-is written when parsing or execution fails.
-
-## Development
-
-The interpreter is covered by behavior tests for tokenization, parsing, IR,
-runtime semantics, command-line behavior, standard modules, and examples.
-
-```bash
-cargo fmt --all -- --check
-cargo test --all-targets
-cargo clippy --all-targets -- -D warnings
-```
-
-The implementation is split into a lexer, Rust enum-based AST, Pratt parser,
-bytecode generator and an explicit VM. `call_with_current_continuation` captures
-a copy of the VM context, including its operand stack, scope, program counter,
-and parent-context chain; execution does not depend on native call-stack depth.
+Search for `Anole-Lang`. It currently provides syntax highlighting.
