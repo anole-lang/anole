@@ -6,7 +6,7 @@ pub enum Literal {
     Bool(bool),
     Integer(i64),
     Float(f64),
-    String(String),
+    String(Vec<u8>),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -70,6 +70,7 @@ pub enum Expr {
     Match {
         value: Box<Expr>,
         arms: Vec<(Vec<Expr>, Expr)>,
+        key_locations: Vec<Vec<Location>>,
         fallback: Option<Box<Expr>>,
     },
     Class {
@@ -94,7 +95,7 @@ pub struct Declaration {
 #[derive(Clone, Debug, PartialEq)]
 pub enum ModulePart {
     Name(String),
-    Path(String),
+    Path(Vec<u8>),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -115,21 +116,24 @@ pub enum Stmt {
     PrefixOperator(String),
     InfixOperator {
         operator: String,
-        precedence: u16,
+        precedence: u64,
     },
     If {
         condition: Expr,
         then_block: Block,
         else_branch: Option<Box<Stmt>>,
+        location: Location,
     },
     Block(Block),
     While {
         condition: Expr,
         body: Block,
+        location: Location,
     },
     DoWhile {
         body: Block,
         condition: Expr,
+        location: Location,
     },
     Foreach {
         iterable: Expr,

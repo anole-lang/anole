@@ -1,0 +1,4 @@
+@twice(value): value * 2;
+prefixop twice;
+@combine(left, right): left + right;
+infixop 18446744073709551615 combine;

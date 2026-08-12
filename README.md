@@ -1,9 +1,8 @@
 # Anole Programming Language
 
-Anole is a small dynamically typed language. The interpreter is implemented in
-safe, idiomatic Rust and preserves the observable behavior of the former C++
-0.0.24 implementation, including dynamic operators, lazy values, references,
-classes, modules and first-class continuations.
+Anole is a small dynamically typed language implemented in safe, idiomatic
+Rust. It supports dynamic operators, lazy values, references, classes, modules,
+and first-class continuations.
 
 ## Toolchain
 
@@ -18,8 +17,7 @@ cargo install --path .
 ```
 
 The standard `env`, `file`, `os`, `debug`, and `coroutine` modules are embedded
-in the binary. An installed interpreter therefore has no C++ shared-library or
-external runtime dependency.
+in the binary, so an installed interpreter has no external runtime dependency.
 
 ## Usage
 
@@ -38,10 +36,15 @@ anole example/env_args.anole first second
 Start the REPL with `anole`, or pipe a program through standard input. Print the
 compatible version literal with `anole --version`.
 
+Successful file execution writes `<source>.ir`, including for imported Anole
+modules. The cache uses native-endian 64-bit fields, magic value `20210213`, a
+constant pool and opcode stream, followed by the source-position map. No IR file
+is written when parsing or execution fails.
+
 ## Development
 
-The rewrite follows a test-first compatibility suite derived from the original
-tokenizer tests, runtime samples, command-line behavior and repository examples.
+The interpreter is covered by behavior tests for tokenization, parsing, IR,
+runtime semantics, command-line behavior, standard modules, and examples.
 
 ```bash
 cargo fmt --all -- --check
@@ -49,9 +52,7 @@ cargo test --all-targets
 cargo clippy --all-targets -- -D warnings
 ```
 
-The implementation is split into a lexer, Rust enum-based AST, Pratt parser and
-a trampolined continuation-passing runtime. The trampoline makes loops, deep
-functional composition and resumable continuations independent of the native
-call-stack depth.
-
-See [ChangeLog.md](ChangeLog.md) for the historical language changes.
+The implementation is split into a lexer, Rust enum-based AST, Pratt parser,
+bytecode generator and an explicit VM. `call_with_current_continuation` captures
+a copy of the VM context, including its operand stack, scope, program counter,
+and parent-context chain; execution does not depend on native call-stack depth.

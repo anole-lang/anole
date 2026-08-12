@@ -1,0 +1,46 @@
+;;;
+@identity(value): value;
+@zero: @: 0;
+@block_lambda: @{ return 1; };
+@empty_lambda: @{};
+@called: identity(1,);
+@packed(...items): items;
+@expanded: packed([2, 3]...);
+@returned() { return 4, 5; }
+@pair: returned();
+
+@state: 0;
+if false {
+    state: 1;
+} elif false {
+    state: 2;
+} else {
+    state: 3;
+}
+do {
+    state: state - 1;
+} while state > 1;
+foreach [6, 7] {
+    state: state + 1;
+}
+
+@list: [1 2, 3,];
+@mapping: dict { "one" => 1, "two" => 2, };
+@numbers: enum { Zero, Three: 3, Four, };
+@selected: match state {
+    0, 1 => "small",
+    2 => "two",
+    => "other",
+};
+
+@negate(value): -value;
+prefixop negate;
+@merge(left, right): left * 10 + right;
+infixop 175 merge;
+@custom: negate 1 merge 2;
+
+class Parent { value: 8; }
+@Anonymous: class(Parent,) { other: 9; };
+@member: Anonymous.value;
+@indexed: list[0];
+@assigned: indexed: 10;

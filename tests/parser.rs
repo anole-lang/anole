@@ -63,3 +63,35 @@ result: match State.Start { State.Start => { return a; }, => b };
     };
     assert!(matches!(declaration.bindings[0], Binding::Destructure(_)));
 }
+
+#[test]
+fn enum_value_overflow_is_an_explicit_parse_error() {
+    let error = Parser::new("@State: enum { Maximum: 9223372036854775807 };", "<test>")
+        .unwrap()
+        .parse()
+        .unwrap_err();
+    assert_eq!(error.message, "enum value overflow");
+}
+
+#[test]
+fn float_literal_overflow_matches_stod_failure() {
+    let source = format!("{}.0;", "9".repeat(400));
+    let error = Parser::new(&source, "<test>").unwrap().parse().unwrap_err();
+    assert_eq!(error.message, "stod");
+}
+
+#[test]
+fn anonymous_lambda_shorthand_accepts_only_one_return_expression() {
+    let error = anole::Parser::new("@f: @(): 1, 2;", "lambda.anole")
+        .unwrap()
+        .parse()
+        .unwrap_err();
+    assert_eq!(error.message, "wrong token here");
+    assert_eq!(
+        error.location,
+        anole::Location {
+            line: 1,
+            column: 10
+        }
+    );
+}

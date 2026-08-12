@@ -1,0 +1,19 @@
+@saved: none;
+@reader: none;
+@round: 0;
+@run() {
+    @value: call_with_current_continuation(@(continuation) {
+        saved: continuation;
+        return 10;
+    });
+    @local: round;
+    if round = 0 {
+        reader: @(): local;
+    }
+    println(reader());
+}
+run();
+if round = 0 {
+    round: 1;
+    saved(20);
+}

@@ -12,6 +12,8 @@ impl Location {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum TokenKind {
+    #[doc(hidden)]
+    Invalid,
     At,
     Use,
     From,
@@ -81,14 +83,44 @@ pub struct Token {
     pub kind: TokenKind,
     pub lexeme: String,
     pub location: Location,
+    pub(crate) end_column: usize,
+    pub(crate) bytes: Vec<u8>,
 }
 
 impl Token {
-    fn new(kind: TokenKind, lexeme: impl Into<String>, location: Location) -> Self {
+    fn new(
+        kind: TokenKind,
+        lexeme: impl Into<String>,
+        location: Location,
+        end_column: usize,
+    ) -> Self {
+        let lexeme = lexeme.into();
         Self {
             kind,
-            lexeme: lexeme.into(),
+            bytes: lexeme.as_bytes().to_vec(),
+            lexeme,
             location,
+            end_column,
+        }
+    }
+
+    fn new_bytes(kind: TokenKind, bytes: Vec<u8>, location: Location, end_column: usize) -> Self {
+        Self {
+            kind,
+            lexeme: String::from_utf8_lossy(&bytes).into_owned(),
+            bytes,
+            location,
+            end_column,
+        }
+    }
+
+    pub(crate) fn invalid(error: LexError) -> Self {
+        Self {
+            kind: TokenKind::Invalid,
+            bytes: error.message.as_bytes().to_vec(),
+            lexeme: error.message,
+            location: error.location,
+            end_column: error.location.column,
         }
     }
 }
@@ -116,7 +148,7 @@ impl fmt::Display for LexError {
 impl std::error::Error for LexError {}
 
 pub struct Lexer<'source> {
-    source: &'source str,
+    source: &'source [u8],
     name: String,
     offset: usize,
     location: Location,
@@ -125,6 +157,11 @@ pub struct Lexer<'source> {
 impl<'source> Lexer<'source> {
     #[must_use]
     pub fn new(source: &'source str, name: impl Into<String>) -> Self {
+        Self::new_bytes(source.as_bytes(), name)
+    }
+
+    #[must_use]
+    pub fn new_bytes(source: &'source [u8], name: impl Into<String>) -> Self {
         Self {
             source,
             name: name.into(),
@@ -147,9 +184,12 @@ impl<'source> Lexer<'source> {
 
     pub fn next_token(&mut self) -> Result<Token, LexError> {
         self.skip_trivia();
-        let location = self.location;
+        let mut location = self.location;
         let Some(current) = self.peek() else {
-            return Ok(Token::new(TokenKind::End, "", location));
+            if location.column > 0 {
+                location.column -= 1;
+            }
+            return Ok(Token::new(TokenKind::End, "", location, location.column));
         };
 
         if current.is_ascii_digit() {
@@ -160,20 +200,20 @@ impl<'source> Lexer<'source> {
         }
 
         match current {
-            '@' => Ok(self.single(TokenKind::At, location)),
-            '&' => Ok(self.single(TokenKind::BitAnd, location)),
-            ':' => Ok(self.single(TokenKind::Colon, location)),
-            ';' => Ok(self.single(TokenKind::Semicolon, location)),
-            ',' => Ok(self.single(TokenKind::Comma, location)),
-            '(' => Ok(self.single(TokenKind::LeftParen, location)),
-            ')' => Ok(self.single(TokenKind::RightParen, location)),
-            '[' => Ok(self.single(TokenKind::LeftBracket, location)),
-            ']' => Ok(self.single(TokenKind::RightBracket, location)),
-            '{' => Ok(self.single(TokenKind::LeftBrace, location)),
-            '}' => Ok(self.single(TokenKind::RightBrace, location)),
-            '?' => Ok(self.single(TokenKind::Question, location)),
-            '.' => self.dot(location),
-            '"' => self.string(location),
+            b'@' => Ok(self.single(TokenKind::At, location)),
+            b'&' => Ok(self.single(TokenKind::BitAnd, location)),
+            b':' => Ok(self.single(TokenKind::Colon, location)),
+            b';' => Ok(self.single(TokenKind::Semicolon, location)),
+            b',' => Ok(self.single(TokenKind::Comma, location)),
+            b'(' => Ok(self.single(TokenKind::LeftParen, location)),
+            b')' => Ok(self.single(TokenKind::RightParen, location)),
+            b'[' => Ok(self.single(TokenKind::LeftBracket, location)),
+            b']' => Ok(self.single(TokenKind::RightBracket, location)),
+            b'{' => Ok(self.single(TokenKind::LeftBrace, location)),
+            b'}' => Ok(self.single(TokenKind::RightBrace, location)),
+            b'?' => Ok(self.single(TokenKind::Question, location)),
+            b'.' => self.dot(location),
+            b'"' => self.string(location),
             _ if is_abnormal_identifier_char(current) => Ok(self.abnormal_identifier(location)),
             _ => Err(self.error(location, format!("unexpected character {current:?}"))),
         }
@@ -187,9 +227,18 @@ impl<'source> Lexer<'source> {
             {
                 self.advance();
             }
-            if self.remaining().starts_with("//") {
-                while self.peek().is_some_and(|character| character != '\n') {
+            if self.remaining().starts_with(b"//") {
+                while self
+                    .raw_peek()
+                    .is_some_and(|character| !matches!(character, b'\n' | u8::MAX))
+                {
                     self.advance();
+                }
+                if self.raw_peek() == Some(u8::MAX) {
+                    // `istream::get()` was stored in a signed `char`; 0xff
+                    // therefore compared equal to EOF. The line-comment
+                    // state performed one more read before resuming.
+                    self.offset += 1;
                 }
                 continue;
             }
@@ -205,7 +254,7 @@ impl<'source> Lexer<'source> {
         {
             self.advance();
         }
-        let kind = if self.peek() == Some('.') {
+        let kind = if self.peek() == Some(b'.') {
             self.advance();
             while self
                 .peek()
@@ -217,7 +266,13 @@ impl<'source> Lexer<'source> {
         } else {
             TokenKind::Integer
         };
-        Token::new(kind, &self.source[start..self.offset], location)
+        Token::new(
+            kind,
+            std::str::from_utf8(&self.source[start..self.offset])
+                .expect("numeric tokens are ASCII"),
+            location,
+            self.location.column,
+        )
     }
 
     fn normal_identifier(&mut self, location: Location) -> Token {
@@ -225,8 +280,14 @@ impl<'source> Lexer<'source> {
         while self.peek().is_some_and(is_normal_identifier_char) {
             self.advance();
         }
-        let value = &self.source[start..self.offset];
-        Token::new(keyword_or_identifier(value), value, location)
+        let value = std::str::from_utf8(&self.source[start..self.offset])
+            .expect("normal identifiers are ASCII");
+        Token::new(
+            keyword_or_identifier(value),
+            value,
+            location,
+            self.location.column,
+        )
     }
 
     fn abnormal_identifier(&mut self, location: Location) -> Token {
@@ -234,50 +295,90 @@ impl<'source> Lexer<'source> {
         while self.peek().is_some_and(is_abnormal_identifier_char) {
             self.advance();
         }
-        let value = &self.source[start..self.offset];
-        Token::new(keyword_or_identifier(value), value, location)
+        if self.peek().is_none() {
+            // EOF in this state discards the pending abnormal token.
+            return Token::new(TokenKind::End, "", location, self.location.column);
+        }
+        let bytes = self.source[start..self.offset].to_vec();
+        let value = symbol_from_bytes(&bytes);
+        Token {
+            kind: keyword_or_identifier(&value),
+            lexeme: value,
+            location,
+            end_column: self.location.column,
+            bytes,
+        }
     }
 
     fn dot(&mut self, location: Location) -> Result<Token, LexError> {
         self.advance();
-        if self.peek() != Some('.') {
-            return Ok(Token::new(TokenKind::Dot, ".", location));
+        if self.peek() != Some(b'.') {
+            return Ok(Token::new(
+                TokenKind::Dot,
+                ".",
+                location,
+                self.location.column,
+            ));
         }
         self.advance();
-        if self.peek() != Some('.') {
+        if self.peek() != Some(b'.') {
             return Err(self.error(location, "unexpected \"..\""));
         }
         self.advance();
-        Ok(Token::new(TokenKind::Ellipsis, "...", location))
+        Ok(Token::new(
+            TokenKind::Ellipsis,
+            "...",
+            location,
+            self.location.column,
+        ))
     }
 
     fn string(&mut self, location: Location) -> Result<Token, LexError> {
         self.advance();
-        let mut value = String::new();
+        let mut value = Vec::new();
         loop {
             let Some(character) = self.advance() else {
-                return Err(self.error(location, "expected \\\""));
+                // EOF terminates the token; only a newline diagnoses a missing
+                // closing quote.
+                return Ok(Token::new(
+                    TokenKind::End,
+                    "",
+                    location,
+                    self.location.column,
+                ));
             };
             match character {
-                '"' => return Ok(Token::new(TokenKind::String, value, location)),
-                '\n' => return Err(self.error(location, "expected \\\"")),
-                '\\' => {
+                b'"' => {
+                    return Ok(Token::new_bytes(
+                        TokenKind::String,
+                        value,
+                        location,
+                        self.location.column,
+                    ));
+                }
+                b'\n' => return Err(self.error(location, "expected \"")),
+                b'\\' => {
                     let Some(escaped) = self.advance() else {
-                        return Err(self.error(location, "expected \\\""));
+                        return Ok(Token::new(
+                            TokenKind::End,
+                            "",
+                            location,
+                            self.location.column,
+                        ));
                     };
                     match escaped {
-                        '\n' => return Err(self.error(location, "expected \\\"")),
-                        'n' => value.push('\n'),
-                        '\\' => value.push('\\'),
-                        '"' => value.push('"'),
-                        'a' => value.push('\x07'),
-                        'b' => value.push('\x08'),
-                        '0' => value.push('\0'),
-                        't' => value.push('\t'),
-                        'r' => value.push('\r'),
-                        'f' => value.push('\x0c'),
+                        b'\n' => return Err(self.error(location, "expected \"")),
+                        b'n' => value.push(b'\n'),
+                        b'\\' => value.push(b'\\'),
+                        b'"' => value.push(b'"'),
+                        b'a' => value.push(0x07),
+                        b'b' => value.push(0x08),
+                        b'0' => value.push(0),
+                        b't' => value.push(b'\t'),
+                        b'r' => value.push(b'\r'),
+                        b'f' => value.push(0x0c),
                         unknown => {
-                            value.push('\\');
+                            value.push(b'\\');
                             value.push(unknown);
                         }
                     }
@@ -291,24 +392,35 @@ impl<'source> Lexer<'source> {
         let character = self
             .advance()
             .expect("single token starts with a character");
-        Token::new(kind, character, location)
+        Token::new(
+            kind,
+            char::from(character).to_string(),
+            location,
+            self.location.column,
+        )
     }
 
-    fn peek(&self) -> Option<char> {
-        self.remaining().chars().next()
+    fn peek(&self) -> Option<u8> {
+        self.raw_peek().filter(|character| *character != u8::MAX)
     }
 
-    fn remaining(&self) -> &'source str {
+    fn raw_peek(&self) -> Option<u8> {
+        self.source.get(self.offset).copied()
+    }
+
+    fn remaining(&self) -> &'source [u8] {
         &self.source[self.offset..]
     }
 
-    fn advance(&mut self) -> Option<char> {
+    fn advance(&mut self) -> Option<u8> {
         let character = self.peek()?;
-        self.offset += character.len_utf8();
-        if character == '\n' {
+        self.offset += 1;
+        if character == b'\n' {
             self.location.line += 1;
             self.location.column = 0;
         } else {
+            // Columns count bytes because positions are serialized in `.ir`
+            // source mappings.
             self.location.column += 1;
         }
         Some(character)
@@ -317,10 +429,11 @@ impl<'source> Lexer<'source> {
     fn error(&self, location: Location, message: impl Into<String>) -> LexError {
         let line = self
             .source
-            .lines()
+            .split(|byte| *byte == b'\n')
             .nth(location.line.saturating_sub(1))
-            .unwrap_or_default()
-            .to_owned();
+            .map_or_else(String::new, |line| {
+                String::from_utf8_lossy(line).into_owned()
+            });
         LexError {
             name: self.name.clone(),
             location,
@@ -330,20 +443,62 @@ impl<'source> Lexer<'source> {
     }
 }
 
-fn is_normal_identifier_start(character: char) -> bool {
-    character.is_ascii_alphabetic() || character == '_'
+// Symbol names can contain arbitrary bytes. Keep ASCII unchanged and map every
+// non-ASCII byte to a private-use scalar. Encoding valid UTF-8 byte-by-byte as
+// well keeps the mapping injective even for private-use source text.
+pub(crate) fn symbol_from_bytes(bytes: &[u8]) -> String {
+    bytes
+        .iter()
+        .map(|byte| {
+            if byte.is_ascii() {
+                char::from(*byte)
+            } else {
+                char::from_u32(0xe000 + u32::from(*byte)).expect("private-use symbol byte")
+            }
+        })
+        .collect()
 }
 
-fn is_normal_identifier_char(character: char) -> bool {
-    character.is_ascii_alphanumeric() || character == '_'
+pub(crate) fn symbol_to_bytes(symbol: &str) -> Vec<u8> {
+    let mut bytes = Vec::with_capacity(symbol.len());
+    for character in symbol.chars() {
+        let value = u32::from(character);
+        if (0xe080..=0xe0ff).contains(&value) {
+            bytes.push((value - 0xe000) as u8);
+        } else {
+            let mut encoded = [0; 4];
+            bytes.extend_from_slice(character.encode_utf8(&mut encoded).as_bytes());
+        }
+    }
+    bytes
 }
 
-fn is_abnormal_identifier_char(character: char) -> bool {
+fn is_normal_identifier_start(character: u8) -> bool {
+    character.is_ascii_alphabetic() || character == b'_'
+}
+
+fn is_normal_identifier_char(character: u8) -> bool {
+    character.is_ascii_alphanumeric() || character == b'_'
+}
+
+fn is_abnormal_identifier_char(character: u8) -> bool {
     !character.is_ascii_whitespace()
         && !is_normal_identifier_char(character)
         && !matches!(
             character,
-            '@' | '.' | ',' | ':' | ';' | '"' | '?' | '&' | '(' | ')' | '[' | ']' | '{' | '}'
+            b'@' | b'.'
+                | b','
+                | b':'
+                | b';'
+                | b'"'
+                | b'?'
+                | b'&'
+                | b'('
+                | b')'
+                | b'['
+                | b']'
+                | b'{'
+                | b'}'
         )
 }
 

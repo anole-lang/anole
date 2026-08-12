@@ -20,6 +20,30 @@ print(a + b);
 }
 
 #[test]
+fn invalid_integer_arithmetic_reports_explicit_runtime_errors() {
+    for (source, expected) in [
+        ("@zero: 0; @one: 1; one / zero;", "integer division by zero"),
+        ("@zero: 0; @one: 1; one % zero;", "integer division by zero"),
+        (
+            "@maximum: 9223372036854775807; @one: 1; maximum + one;",
+            "integer overflow",
+        ),
+        ("9223372036854775807 + 1;", "integer overflow"),
+        (
+            "@distance: 64; @one: 1; one << distance;",
+            "invalid shift count",
+        ),
+        (
+            "@distance: 0 - 1; @one: 1; one >> distance;",
+            "invalid shift count",
+        ),
+    ] {
+        let error = Interpreter::new().run(source, "<test>").unwrap_err();
+        assert_eq!(error.message, expected, "source: {source}");
+    }
+}
+
+#[test]
 fn runs_curried_functions() {
     assert_eq!(
         execute(
@@ -90,6 +114,37 @@ println(2 * 3 *^* 4 * 5);
 "#,
         ),
         "26\n70\n"
+    );
+}
+
+#[test]
+fn keeps_equal_numeric_custom_precedences_in_distinct_layers() {
+    assert_eq!(
+        execute(
+            r#"
+@first(left, right): left * 10 + right;
+@second(left, right): left * 100 + right;
+infixop 50 first;
+infixop 50 second;
+println(1 second 2 first 3);
+println(1 first 2 second 3);
+"#,
+        ),
+        "123\n1203\n"
+    );
+}
+
+#[test]
+fn builtins_bind_tighter_than_custom_operators_at_the_same_number() {
+    assert_eq!(
+        execute(
+            r#"
+@join(left, right): left * 10 + right;
+infixop 190 join;
+println(1 join 2 * 3);
+"#,
+        ),
+        "16\n"
     );
 }
 
@@ -403,7 +458,7 @@ println(none is none);
 println(true is true);
 "#,
         ),
-        "false\ntrue\n1\n2\ntrue\ntrue\n"
+        "true\ntrue\n1\n2\ntrue\ntrue\n"
     );
 }
 
@@ -429,7 +484,7 @@ println(d);
 println(e);
 "#,
         ),
-        "[1, 2]\ntrue\n[1, 2]\n[]\n{ one => 1, two => 2 }\n{ one => 1, two => 2 }\n{  }\n"
+        "[1, 2]\ntrue\n[1, 2]\n[]\n{ one => 1, two => 2 }\n{ one => 1, two => 2 }\n{ }\n"
     );
 }
 
@@ -449,7 +504,7 @@ println([none]);
 println(none);
 "#,
         ),
-        "true\nfalse\ntrue\n<no definition of to_str>\n[<no definition of to_str>]\n\n"
+        "true\ntrue\ntrue\n<no definition of to_str>\n[<no definition of to_str>]\n"
     );
 }
 
@@ -472,12 +527,12 @@ foreach items as item {
     print(value);
     if item = 2 { items.push(3); }
 }
-println();
+print("\n");
 @Range: class {
-    @__init__(self) { self.i: 0; };
-    @__iterator__(self) { return self; };
-    @__has_next__(self) { return self.i < 3; };
-    @__next__(self) {
+    __init__(self) { self.i: 0; };
+    __iterator__(self) { return self; };
+    __has_next__(self) { return self.i < 3; };
+    __next__(self) {
         @value: self.i;
         self.i: self.i + 1;
         return value;
@@ -486,17 +541,17 @@ println();
 foreach Range() as value { print(value); }
 "#,
         ),
-        "123\n012"
+        "12\n012"
     );
 }
 
 #[test]
-fn class_constructors_run_in_the_continuation_trampoline() {
+fn class_constructors_run_in_the_explicit_vm_context() {
     assert_eq!(
         execute(
             r#"
 @Box: class {
-    @__init__(self) {
+    __init__(self) {
         self.value: call_with_current_continuation(@(cont): 7);
     };
 };

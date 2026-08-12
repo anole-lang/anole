@@ -111,12 +111,66 @@ fn skips_line_comments_but_keeps_division_tokens() {
 }
 
 #[test]
-fn reports_the_start_of_an_unterminated_string() {
-    let error = Lexer::new("\n  \"unterminated", "sample.anole")
+fn reports_the_start_of_a_newline_terminated_string() {
+    let error = Lexer::new("\n  \"unterminated\n", "sample.anole")
         .next_token()
         .unwrap_err();
     assert_eq!(error.location, Location { line: 2, column: 2 });
     assert!(error.to_string().contains("sample.anole:2:2: error"));
+}
+
+#[test]
+fn treats_eof_inside_a_string_as_the_end_token() {
+    let token = Lexer::new("\n  \"unterminated", "sample.anole")
+        .next_token()
+        .unwrap();
+    assert_eq!(token.kind, TokenKind::End);
+    assert_eq!(token.location, Location { line: 2, column: 2 });
+}
+
+#[test]
+fn end_token_points_at_the_last_character_instead_of_after_it() {
+    let mut lexer = Lexer::new("word", "sample.anole");
+    assert_eq!(lexer.next_token().unwrap().kind, TokenKind::Identifier);
+    let end = lexer.next_token().unwrap();
+    assert_eq!(end.kind, TokenKind::End);
+    assert_eq!(end.location, Location { line: 1, column: 3 });
+}
+
+#[test]
+fn drops_an_abnormal_identifier_at_eof() {
+    for source in ["+", "/", "!=", "++"] {
+        let token = Lexer::new(source, "sample.anole").next_token().unwrap();
+        assert_eq!(token.kind, TokenKind::End, "source: {source}");
+    }
+}
+
+#[test]
+fn treats_source_byte_ff_as_the_signed_char_eof_sentinel() {
+    let tokens = Lexer::new_bytes(b"left;\xff right;", "bytes.anole")
+        .tokenize()
+        .unwrap();
+    assert_eq!(
+        tokens.iter().map(|token| &token.kind).collect::<Vec<_>>(),
+        vec![
+            &TokenKind::Identifier,
+            &TokenKind::Semicolon,
+            &TokenKind::End
+        ]
+    );
+
+    let tokens = Lexer::new_bytes(b"// ignored\xffright;", "bytes.anole")
+        .tokenize()
+        .unwrap();
+    assert_eq!(
+        tokens.iter().map(|token| &token.kind).collect::<Vec<_>>(),
+        vec![
+            &TokenKind::Identifier,
+            &TokenKind::Semicolon,
+            &TokenKind::End
+        ]
+    );
+    assert_eq!(tokens[0].lexeme, "right");
 }
 
 #[test]
