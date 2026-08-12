@@ -1,0 +1,13 @@
+@colors: enum { Red, Green: 3, Blue };
+@[x, y]: [1, 2];
+@p, q: [3, 4];
+@[[u, v]]: [[5, 6]];
+class Base {
+    value: 1;
+    method(&this): this.value;
+    __init__(&this, initial) { this.value: initial; }
+}
+class (Base) Derived {
+    other: 2;
+}
+@anonymous: class { field: 3; };

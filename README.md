@@ -1,52 +1,58 @@
 # Anole Programming Language
 
-[![New Issue](https://img.shields.io/badge/request-new%20features-blue.svg)](https://github.com/anole-lang/anole/issues/new)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/anole-lang/anole/compare)
-[![Gitter](https://badges.gitter.im/JoinChat.svg)](https://gitter.im/anole)
-[![License](https://img.shields.io/github/license/anole-lang/anole.svg)](https://github.com/anole-lang/anole)
+Anole is a small dynamically typed language implemented in safe, idiomatic
+Rust. It supports dynamic operators, lazy values, references, classes, modules,
+and first-class continuations.
 
-## Quick Usage
+## Toolchain
 
-### Requirements
+The repository tracks the Rust `stable` channel in `rust-toolchain.toml`.
+Rustup selects the current stable toolchain automatically.
 
-```bash
-sudo apt-get install libreadline6-dev
-```
-
-### Install
+## Build and install
 
 ```bash
-git clone https://github.com/anole-lang/anole.git && cd anole
-cmake -S . -B build && cmake --build build -j4
-cd build && sudo make install
+cargo build --release
+cargo install --path .
 ```
 
-If you want to remove anole, you can execute `cat install_manifest.txt | sudo xargs rm` in `build/`
+The standard `env`, `file`, `os`, `debug`, and `coroutine` modules are embedded
+in the binary, so an installed interpreter has no external runtime dependency.
 
-### Test
+## Usage
 
-Run `cmake -D CMAKE_BUILD_TYPE=Test -S . -B build && cmake --build build -j4`
-
-### Usage
+Run a source file:
 
 ```bash
-~> anole
+anole example/class.anole
 ```
 
-You can see some examples in `example/` or the `test/sample-tester.hpp`, this is the yin-yang puzzle for fun
+Pass arguments to a program:
 
-```
-(@(yang): @(yin): yin(yang))
-    ((@(cc) { print("*"); return cc; })
-        (call_with_current_continuation(@(cont): cont)))
-    ((@(cc) { print("@"); return cc; })
-        (call_with_current_continuation(@(cont): cont)));
+```bash
+anole example/env_args.anole first second
 ```
 
-### Extension in Visual Studio Code
+Start the REPL with `anole`, or pipe a program through standard input. Print the
+compatible version literal with `anole --version`.
 
-Search `Anole-Lang`, only provides highlight now
+Successful file execution writes `<source>.ir`, including for imported Anole
+modules. The cache uses native-endian 64-bit fields, magic value `20210213`, a
+constant pool and opcode stream, followed by the source-position map. No IR file
+is written when parsing or execution fails.
 
-## ChangeLog
+## Development
 
-See [ChangeLog.md](ChangeLog.md)
+The interpreter is covered by behavior tests for tokenization, parsing, IR,
+runtime semantics, command-line behavior, standard modules, and examples.
+
+```bash
+cargo fmt --all -- --check
+cargo test --all-targets
+cargo clippy --all-targets -- -D warnings
+```
+
+The implementation is split into a lexer, Rust enum-based AST, Pratt parser,
+bytecode generator and an explicit VM. `call_with_current_continuation` captures
+a copy of the VM context, including its operand stack, scope, program counter,
+and parent-context chain; execution does not depend on native call-stack depth.

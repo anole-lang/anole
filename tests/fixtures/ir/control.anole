@@ -1,0 +1,7 @@
+@n: 0;
+if true { n: n + 1; } else { n: n - 1; }
+while n < 2 { n: n + 1; continue; }
+do { n: n - 1; if n = 0 { break; } } while true;
+foreach [1, 2] as item { n: n + item; }
+@choose(value) { return match value { 1, 2 => "small", 3 => "three", => "other" }; }
+@picked: choose(2);

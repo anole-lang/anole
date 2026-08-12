@@ -1,0 +1,8 @@
+use dep;
+use dep as renamed;
+use value as imported from dep;
+use * from dep;
+use "dep.anole" as direct;
+use * from operators;
+@result: dep.value + renamed.value + imported + direct.value;
+@operated: twice 3 combine 4;

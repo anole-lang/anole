@@ -1,0 +1,5 @@
+@items: [1, 2, 3];
+@iterator: items.__iterator__();
+println(iterator.__next__());
+items.pop_front();
+println(iterator.__next__());

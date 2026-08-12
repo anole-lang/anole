@@ -1,0 +1,22 @@
+[package]
+name = "anole"
+version = "0.0.24"
+edition = "2024"
+description = "The Anole programming language"
+license = "MIT"
+repository = "https://github.com/anole-lang/anole"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lib]
+name = "anole"
+path = "src/lib.rs"
+
+[[bin]]
+name = "anole"
+path = "src/main.rs"
+
+[profile.release]
+lto = true
+strip = true

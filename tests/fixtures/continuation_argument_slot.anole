@@ -1,0 +1,13 @@
+@saved: none;
+@round: 0;
+@source: 1;
+@&result: call_with_current_continuation(@(continuation) {
+    saved: continuation;
+    return none;
+});
+if round = 0 {
+    round: 1;
+    saved(source);
+}
+result: 9;
+println(source);
